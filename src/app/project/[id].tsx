@@ -3,7 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Pencil, Plus, Trash2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Task } from "@/lib/types";
-import { priorityMeta } from "@/lib/types";
+import { priorityStripeClass } from "@/lib/priority";
 import { confirmAsync } from "@/lib/confirm";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
@@ -170,7 +170,7 @@ export default function ProjectDetail() {
       />
       <ScrollView contentContainerClassName="gap-5 p-5">
         <View className="flex-row flex-wrap items-center gap-2">
-          <Text>{priorityMeta(project.priority).emoji}</Text>
+          <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[project.priority]}`} />
           <Text className="text-text-muted">{t(`priority.${project.priority}`)}</Text>
           <View className="rounded-full border border-border bg-surface px-2.5 py-0.5">
             <Text className="text-xs text-text-muted">

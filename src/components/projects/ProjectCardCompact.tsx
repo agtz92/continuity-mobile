@@ -2,7 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import { Clock, Rocket, Sparkles } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Category, Project, Task } from "@/lib/types";
-import { priorityMeta } from "@/lib/types";
+import { priorityStripeClass } from "@/lib/priority";
 import { daysSince, isDueToday, isOverdue } from "@/lib/date";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
 
@@ -12,7 +12,7 @@ const ORANGE = "249,115,22"; // orange-500
 /**
  * Compact, tappable project card. Mirrors the web card used in Today's grids;
  * here it's also the list item on the Projects screen. Variants differ in tint
- * (launched gets an accent-2 wash), header lead (priority emoji vs Rocket),
+ * (launched gets an accent-2 wash), header lead (priority dot vs Rocket),
  * footer ("Xd ago" only for active), and a launched-only "X open" badge.
  */
 export function ProjectCardCompact({
@@ -75,7 +75,7 @@ export function ProjectCardCompact({
         {variant === "launched" ? (
           <Rocket size={14} color={c.accent2} />
         ) : (
-          <Text>{priorityMeta(p.priority).emoji}</Text>
+          <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[p.priority]}`} />
         )}
         <Text numberOfLines={1} className="flex-1 font-semibold text-text">
           {p.name}

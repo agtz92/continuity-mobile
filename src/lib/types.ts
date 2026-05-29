@@ -248,18 +248,10 @@ export interface AnalyticsData {
 }
 
 /**
- * Priority emojis (locale-independent). Localized labels live in messages
+ * Priority values in severity order. Localized labels live in messages
  * under `priority.{value}` and should be resolved via `useTranslations`.
  */
-export const PRIORITIES: { value: Priority; emoji: string }[] = [
-  { value: "critical", emoji: "🔥" },
-  { value: "high", emoji: "⚡" },
-  { value: "medium", emoji: "🌱" },
-  { value: "low", emoji: "🧊" },
-];
-
-export const priorityMeta = (p: Priority) =>
-  PRIORITIES.find((x) => x.value === p) ?? PRIORITIES[2];
+export const PRIORITIES: Priority[] = ["critical", "high", "medium", "low"];
 
 export const priorityRank = (p: Priority): number => {
   const order: Record<Priority, number> = {

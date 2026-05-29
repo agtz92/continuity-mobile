@@ -108,9 +108,8 @@ export default function ProjectForm() {
     label: t(`status.${s}`),
   }));
   const priorityOptions: ChipOption<Priority>[] = PRIORITIES.map((p) => ({
-    value: p.value,
-    label: t(`priority.${p.value}`),
-    prefix: <Text className="text-base leading-none">{p.emoji}</Text>,
+    value: p,
+    label: t(`priority.${p}`),
   }));
 
   return (
