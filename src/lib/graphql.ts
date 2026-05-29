@@ -1535,3 +1535,22 @@ export const DISCONNECT_GOOGLE_TASKS = gql`
     disconnectGoogleTasks
   }
 `;
+
+// --- Push notifications (Fase 8) ----------------------------------------------
+// These documents target backend mutations that DO NOT EXIST YET in
+// agtz92/continuity_backend. They are kept here so the client is ready to wire,
+// but execution is gated behind PUSH_BACKEND_READY in src/lib/notifications.ts.
+// When implementing the backend, match these signatures (scalar Boolean return):
+//   registerPushToken(token: String!, deviceId: String!): Boolean
+//   unregisterPushToken(deviceId: String!): Boolean
+export const REGISTER_PUSH_TOKEN = gql`
+  mutation RegisterPushToken($token: String!, $deviceId: String!) {
+    registerPushToken(token: $token, deviceId: $deviceId)
+  }
+`;
+
+export const UNREGISTER_PUSH_TOKEN = gql`
+  mutation UnregisterPushToken($deviceId: String!) {
+    unregisterPushToken(deviceId: $deviceId)
+  }
+`;

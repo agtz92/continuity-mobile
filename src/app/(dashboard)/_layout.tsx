@@ -11,12 +11,16 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 import { PALETTE_SWATCHES } from "@/palette/config";
 import { DashboardTour } from "@/components/onboarding/DashboardTour";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export default function DashboardLayout() {
   const { t } = useTranslation();
   const { effective, palette } = useTheme();
   const surfaces = THEME_SURFACES[effective];
   const [accent] = PALETTE_SWATCHES[palette][effective];
+
+  // Push registration + tap-to-navigate (Fase 8). Inert under Expo Go.
+  usePushNotifications();
 
   return (
     <>
