@@ -1,0 +1,1538 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "Inicia sesión para seguir terminando lo que empiezas.",
+      "email": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "signIn": "Iniciar sesión",
+      "google": "Continuar con Google",
+      "forgot": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes cuenta?",
+      "signUpLink": "Regístrate"
+    },
+    "signup": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza a terminar lo que empiezas.",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Al menos 8 caracteres",
+      "signUp": "Crear cuenta",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "signInLink": "Inicia sesión",
+      "checkEmail": "Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión."
+    },
+    "reset": {
+      "title": "Restablece tu contraseña",
+      "subtitle": "Te enviaremos un enlace para crear una nueva contraseña.",
+      "email": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "send": "Enviar enlace",
+      "sent": "Si ese correo tiene cuenta, el enlace va en camino.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "divider": "o",
+    "errors": {
+      "generic": "Algo salió mal. Inténtalo de nuevo.",
+      "googleUnavailable": "Iniciar con Google requiere un dev build. Por ahora usa correo y contraseña en Expo Go."
+    }
+  },
+  "assistant": {
+    "title": "Asistente",
+    "subtitle": "Beta de Claude — solo lectura",
+    "subtitleReadWrite": "Beta de Claude — lee y edita",
+    "buttonLabel": "Preguntar a Claude",
+    "openTooltip": "Preguntar a Claude sobre tus proyectos",
+    "newChat": "Nueva conversación",
+    "close": "Cerrar",
+    "send": "Enviar",
+    "stop": "Detener",
+    "deepMode": "Modo profundo",
+    "deepModeHint": "Usa el modelo Sonnet, más capaz, para esta respuesta. Cuesta más — aplica un límite diario.",
+    "inputPlaceholder": "Pregunta sobre tus proyectos, tareas o ideas…",
+    "welcome": {
+      "title": "¡Hola! Estoy aquí para ayudar.",
+      "body": "Puedo leer tus proyectos y tareas para resumir, sugerir prioridades y buscar cosas. Aún no puedo editar nada — eso llega pronto.",
+      "bodyReadWrite": "Puedo leer y organizar tu trabajo — crear y actualizar tareas, fijar prioridades, redactar rutinas y ordenar proyectos. Dime qué necesitas."
+    },
+    "message": {
+      "thinking": "Pensando…",
+      "working": "Claude está trabajando…"
+    },
+    "tools": {
+      "running": "Ejecutando",
+      "done": "Listo",
+      "input": "Entrada"
+    },
+    "quickActions": {
+      "priorities": "Prioridades de esta semana",
+      "sleeping": "Resumen de proyectos dormidos",
+      "lastWeek": "¿En qué trabajé la semana pasada?",
+      "staleIdeas": "Mostrar ideas estancadas"
+    },
+    "usage": {
+      "usedOf": "{used} / {cap} mensajes hoy",
+      "uncapped": "Sin límite",
+      "upgrade": "Mejorar plan",
+      "dailyMessages": "Mensajes hoy",
+      "monthlyTokens": "Tokens este mes"
+    },
+    "errors": {
+      "stopped": "Detenido",
+      "dailyLimit": "Alcanzaste el límite diario de mensajes.",
+      "rateLimit": "Límite de uso alcanzado.",
+      "tooLong": "El mensaje es demasiado largo.",
+      "sessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
+      "unknown": "Algo salió mal."
+    }
+  },
+  "common": {
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saved": "Guardado",
+    "retry": "Reintentar",
+    "back": "Atrás",
+    "backToDashboard": "Volver al dashboard",
+    "comingSoon": "Próximamente.",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "new": "Nuevo",
+    "clickToEdit": "Click para editar",
+    "showMore": "Ver {count} más",
+    "showLess": "Ver menos",
+    "done": "Listo",
+    "clear": "Borrar"
+  },
+  "paywall": {
+    "title": "Esta función requiere {plan}",
+    "body": "Administra tu cuenta en la web para desbloquearla.",
+    "manage": "Administrar mi cuenta"
+  },
+  "notifications": {
+    "dismiss": "Cerrar",
+    "quotaWillExceed": {
+      "projects": {
+        "title": "Vas a quedar sobre la cuota de proyectos",
+        "body": "Tienes {current} proyectos activos. Cuando bajes a Free el {date}, el plan permite solo {cap}. Archiva {over_by} antes de esa fecha para evitar bloqueos.",
+        "cta": "Ir a proyectos"
+      },
+      "tasks_total": {
+        "title": "Vas a quedar sobre la cuota de tareas",
+        "body": "Tienes {current} tareas abiertas. Cuando bajes a Free el {date}, el plan permite solo {cap}. Cierra o elimina {over_by} antes.",
+        "cta": "Ir a tareas"
+      },
+      "routines": {
+        "title": "Vas a quedar sobre la cuota de rutinas",
+        "body": "Tienes {current} rutinas activas. Cuando bajes a Free el {date}, el plan permite solo {cap}. Archiva {over_by} antes.",
+        "cta": "Ir a rutinas"
+      },
+      "ideas": {
+        "title": "Vas a quedar sobre la cuota de ideas",
+        "body": "Tienes {current} ideas. Cuando bajes a Free el {date}, el plan permite solo {cap}. Elimina o promueve {over_by} antes.",
+        "cta": "Ir a ideas"
+      },
+      "categories": {
+        "title": "Vas a quedar sobre la cuota de categorías",
+        "body": "Tienes {current} categorías. Cuando bajes a Free el {date}, el plan permite solo {cap}. Elimina {over_by} antes.",
+        "cta": "Gestionar categorías"
+      }
+    },
+    "quotaOver": {
+      "projects": {
+        "title": "Excediste tu cuota de proyectos",
+        "body": "Tienes {current} proyectos activos pero el plan {plan} permite solo {cap}. Archiva {over_by} para evitar bloqueos al crear nuevos.",
+        "cta": "Ir a proyectos"
+      },
+      "tasks_total": {
+        "title": "Excediste tu cuota de tareas",
+        "body": "Tienes {current} tareas abiertas pero el plan {plan} permite solo {cap}. Cierra o elimina {over_by} para volver dentro del límite.",
+        "cta": "Ir a tareas"
+      },
+      "routines": {
+        "title": "Excediste tu cuota de rutinas",
+        "body": "Tienes {current} rutinas activas pero el plan {plan} permite solo {cap}. Archiva {over_by} para volver dentro del límite.",
+        "cta": "Ir a rutinas"
+      },
+      "ideas": {
+        "title": "Excediste tu cuota de ideas",
+        "body": "Tienes {current} ideas pero el plan {plan} permite solo {cap}. Elimina o convierte {over_by} en proyectos.",
+        "cta": "Ir a ideas"
+      },
+      "categories": {
+        "title": "Excediste tu cuota de categorías",
+        "body": "Tienes {current} categorías pero el plan {plan} permite solo {cap}. Elimina {over_by} para volver dentro del límite.",
+        "cta": "Gestionar categorías"
+      }
+    }
+  },
+  "errors": {
+    "quota": {
+      "default": "Llegaste al límite de tu plan {plan} ({current}/{cap}). Sube de plan para seguir.",
+      "projects": "Llegaste al límite de proyectos activos en el plan {plan} ({current}/{cap}). Archiva alguno o sube de plan.",
+      "tasks_total": "Llegaste al límite de tareas abiertas en el plan {plan} ({current}/{cap}). Cierra algunas o sube de plan.",
+      "tasks_per_project": "Llegaste al límite de tareas para este proyecto en el plan {plan} ({current}/{cap}).",
+      "routines": "Llegaste al límite de rutinas activas en el plan {plan} ({current}/{cap}). Archiva alguna o sube de plan.",
+      "ideas": "Llegaste al límite de ideas en el plan {plan} ({current}/{cap}). Convierte alguna en proyecto o elimínala.",
+      "categories": "Llegaste al límite de categorías en el plan {plan} ({current}/{cap}).",
+      "notes_per_project": "Llegaste al límite de notas para este proyecto en el plan {plan} ({current}/{cap})."
+    },
+    "retentionAlreadyUsed": "Ya usaste una oferta de retención antes. Si quieres cancelar, te llevamos a la confirmación.",
+    "noActiveSubscription": "Esta cuenta no tiene una suscripción activa en Stripe.",
+    "billingNotConfigured": "El sistema de pagos aún no está configurado. Avísanos si esto persiste.",
+    "unauthenticated": "Tu sesión expiró. Inicia sesión de nuevo.",
+    "badInput": "La información que enviaste no es válida. Revisa e inténtalo otra vez."
+  },
+  "dashboard": {
+    "header": {
+      "active": "Activos",
+      "launched": "Lanzados",
+      "stalled": "Estancados",
+      "thisWeek": "Esta semana",
+      "streak": "Racha",
+      "streakRecord": "Racha · récord",
+      "best": "Mejor",
+      "streakTooltipActive": "Racha actual: {current, plural, one {# día} other {# días}} · Mejor: {best}",
+      "streakTooltipBest": "Mejor racha: {best, plural, one {# día} other {# días}}. Registra actividad hoy para empezar una nueva.",
+      "weekTooltip": "Activo {count} de 7 días esta semana"
+    }
+  },
+  "tabs": {
+    "today": "Hoy",
+    "projects": "Proyectos",
+    "tasks": "Tareas",
+    "routines": "Rutinas",
+    "ideas": "Ideas",
+    "log": "Bitácora",
+    "analytics": "Analíticas",
+    "more": "Más"
+  },
+  "status": {
+    "idea": "Idea",
+    "active": "Activo",
+    "stalled": "Estancado",
+    "paused": "Pausado",
+    "launched": "Lanzado",
+    "archived": "Archivado",
+    "all": "Todos",
+    "allStatuses": "Todos los estados"
+  },
+  "priority": {
+    "critical": "Crítica",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "label": "Prioridad: {label}"
+  },
+  "accountMenu": {
+    "ariaLabel": "Menú de cuenta",
+    "freePlan": "Plan gratis",
+    "close": "Cerrar",
+    "closeTooltip": "Cerrar (Esc)",
+    "openTooltip": "Cuenta y ajustes",
+    "groups": {
+      "settings": "Ajustes",
+      "workspace": "Espacio",
+      "support": "Soporte"
+    },
+    "items": {
+      "profile": "Perfil",
+      "notifications": "Notificaciones",
+      "appearance": "Apariencia e idioma",
+      "billing": "Facturación y plan",
+      "plugins": "Integraciones",
+      "gettingStarted": "Cómo empezar",
+      "categories": "Categorías",
+      "exportBackup": "Exportar / respaldar",
+      "viewLanding": "Página de inicio",
+      "blog": "Blog",
+      "resources": "Recursos",
+      "comingSoon": "Pronto",
+      "reportBug": "Reportar un bug",
+      "reddit": "Comunidad en Reddit",
+      "discord": "Soporte en Discord",
+      "signOut": "Cerrar sesión"
+    }
+  },
+  "onboarding": {
+    "progress": "Paso {current} de {total}",
+    "skip": "Saltar setup",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "continue": "Continuar",
+    "saving": "Guardando",
+    "step1": {
+      "heading": "Bienvenido, builder.",
+      "sub": "Esto toma 90 segundos. ¿Cómo te llamo?",
+      "label": "Nombre",
+      "placeholder": "Solo tu nombre",
+      "helperPrefilled": "Lo tomamos de tu cuenta de Google. Edítalo si quieres.",
+      "errorEmpty": "Escribe tu nombre.",
+      "errorTooLong": "Máximo 50 caracteres."
+    },
+    "step2": {
+      "heading": "¿Cómo se ve mejor?",
+      "sub": "Puedes cambiarlo después en Settings.",
+      "mode": "Modo",
+      "palette": "Paleta"
+    },
+    "step3": {
+      "heading": "Elige un avatar, {name}.",
+      "sub": "El que se sienta tú."
+    },
+    "step4Beta": {
+      "heading": "Gracias por estar aquí, {name}.",
+      "body": "Estás en el plan {plan}, sin cargo. Eres de los primeros builders probando esto.",
+      "body2": "Si algo se rompe o se siente raro, dímelo. Responde cualquier email que te mande. Los leo todos.",
+      "signoff": "Alfredo",
+      "primary": "Ir al dashboard"
+    },
+    "step4Plan": {
+      "heading": "Elige un plan, o no.",
+      "sub": "Free le funciona a la mayoría que está empezando. Puedes cambiarlo cuando quieras.",
+      "decideLater": "Decidir después",
+      "primary": "Continuar",
+      "currentBadge": "Actual",
+      "selectButton": "Elegir",
+      "selectedButton": "Elegido",
+      "cards": {
+        "free": "Empieza aquí. Sube de plan cuando lo necesites.",
+        "pro": "Más espacio. La IA puede escribir.",
+        "studio": "Sin límites, todo incluido."
+      }
+    },
+    "replay": {
+      "banner": "Estás editando tu setup. Lo que guardes aplica a tu cuenta.",
+      "planHeading": "Tu plan.",
+      "planInfo": "Estás en el plan {plan}.",
+      "planChangeCta": "Cambiar en Facturación",
+      "finishButton": "Listo",
+      "replayTourButton": "Ver el tour del dashboard otra vez"
+    },
+    "tour": {
+      "next": "Siguiente",
+      "skip": "Saltar tour",
+      "step1": {
+        "title": "Aquí viven tus proyectos.",
+        "body": "Cada uno está activo, paused with intention, o killed. Ninguno se queda en el limbo."
+      },
+      "step2": {
+        "title": "Las tasks pertenecen a un proyecto.",
+        "body": "Si no hay proyecto, no hay task. Esa es la regla."
+      },
+      "step3": {
+        "title": "Las routines son lo que haces sin pensar.",
+        "body": "Lo que pasa todos los días. Trackéalo aquí. Lo demás es ruido."
+      },
+      "step4": {
+        "title": "¿Atorado? Pregúntale a tu IA.",
+        "body": "Este botón abre el asistente. Lee tus proyectos y tasks, y te responde con tu contexto."
+      },
+      "finalCta": {
+        "title": "Ahora construye algo.",
+        "body": "Crea tu primer proyecto. Aunque no sepas qué es todavía.",
+        "more": "Hay más por aquí (ideas, log, analytics, chat) pero no queremos aburrirte. Aquí están los links cuando los necesites. Cualquier duda, pregúntale a tu IA.",
+        "resourcesLink": "Recursos",
+        "resourcesComingSoon": "Pronto",
+        "primary": "Crear primer proyecto",
+        "secondary": "Lo hago después"
+      }
+    }
+  },
+  "settings": {
+    "nav": {
+      "label": "Ajustes",
+      "profile": "Perfil",
+      "notifications": "Notificaciones",
+      "appearance": "Apariencia e idioma",
+      "billing": "Facturación y plan",
+      "plugins": "Integraciones"
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "Información de tu cuenta.",
+      "email": "Correo",
+      "memberSince": "Miembro desde",
+      "avatar": "Avatar",
+      "avatarDescription": "Elige cómo apareces en la app.",
+      "changeAvatar": "Cambiar avatar",
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "clearAvatar": "Quitar avatar",
+      "pickerTitle": "Elige tu avatar",
+      "moreSoon": "Pronto podrás editar más campos del perfil.",
+      "connectedAccounts": "Cuentas vinculadas",
+      "googleConnect": "Conectar cuenta de Google",
+      "googleConnectDescription": "Vincula tu cuenta de Google para iniciar sesión con un toque.",
+      "googleConnected": "Google conectado",
+      "googleConnecting": "Conectando…",
+      "googleLinkError": "No se pudo conectar Google. Inténtalo de nuevo."
+    },
+    "appearance": {
+      "title": "Apariencia e idioma",
+      "description": "Elige cómo se ve la app y el idioma en el que la lees.",
+      "language": "Idioma",
+      "languageHint": "Afecta la interfaz y los digests/notificaciones que recibas.",
+      "theme": "Tema",
+      "themeHint": "Elige tu apariencia preferida. \"Sistema\" sigue la configuración de tu dispositivo.",
+      "themeContinuuit": "Continuuit",
+      "themeLight": "Claro",
+      "themeDark": "Oscuro",
+      "themeSystem": "Sistema",
+      "palette": "Paleta de colores",
+      "paletteHint": "Cambia solo los colores de acento. El tema controla claro/oscuro; la paleta cambia los resaltes.",
+      "paletteDefault": "Predeterminada",
+      "paletteContinuuit": "Continuuit",
+      "palettePink": "Rosa",
+      "paletteBusiness": "Business",
+      "paletteNeon": "Neón",
+      "paletteGreen": "Verde",
+      "paletteTurquoise": "Turquesa",
+      "paletteCute": "Tierna",
+      "paletteMidnight": "Medianoche",
+      "paletteBoho": "Boho",
+      "paletteComplimentary": "Complementaria",
+      "paletteSunset": "Atardecer",
+      "paletteRetro": "Retro"
+    },
+    "billing": {
+      "title": "Facturación y plan",
+      "description": "Administra tu suscripción, método de pago y facturas.",
+      "currentPlan": "Plan actual",
+      "free": "Free",
+      "pro": "Pro",
+      "studio": "Studio",
+      "admin": "Admin (staff)",
+      "freeBlurb": "Sube a Pro o Studio cuando necesites más espacio o más asistente.",
+      "exemptBadge": "Cortesía del equipo",
+      "exemptBlurb": "Tu cuenta tiene el plan {plan} sin costo, cortesía del equipo. No verás cobros de Stripe mientras tengas esta exención.",
+      "renewsAt": "Renueva el {date}",
+      "renewsAtWithDays": "Próximo cobro el {date} — en {days, plural, =0 {hoy} =1 {1 día} other {# días}}",
+      "renewsToday": "Renueva hoy",
+      "cancelScheduled": "Cancelación programada",
+      "cancelScheduledBlurb": "Tu plan {plan} sigue activo hasta el {date} ({days, plural, =0 {hoy} =1 {1 día restante} other {# días restantes}}). Después pasarás automáticamente a Free. Tus proyectos y datos se conservan.",
+      "reactivate": "Reactivar suscripción",
+      "reactivateSuccess": "Listo. Tu suscripción sigue activa.",
+      "upgrade": "Mejorar plan",
+      "upgradeToPro": "Subir a Pro",
+      "upgradeToStudio": "Subir a Studio",
+      "upgradeSectionTitle": "Sube de plan",
+      "upgradeSectionTitlePro": "Lleva tu cuenta al siguiente nivel",
+      "popular": "Más popular",
+      "manageSubscription": "Administrar suscripción",
+      "manageOnWebHint": "Los cambios de plan, métodos de pago y facturas se administran en la web.",
+      "cancelSubscription": "Bajar a Free",
+      "downgradeToProButton": "Bajar a Pro",
+      "billingPeriod": {
+        "label": "Período de facturación",
+        "currentMonthly": "Estás en plan mensual",
+        "currentAnnual": "Estás en plan anual",
+        "switchToAnnual": "Cambiar a anual",
+        "switchToMonthly": "Cambiar a mensual",
+        "annualSavingsHint": "Pagar anual ahorra ~22%",
+        "confirmTitle": "Cambiar a {period}",
+        "confirmTitleAnnual": "Cambiar a facturación anual",
+        "confirmTitleMonthly": "Cambiar a facturación mensual",
+        "confirmBodyToAnnual": "Cambiaremos tu plan {plan} a facturación anual. Pasarás de {currentPrice} USD/mes a {newPrice} USD/mes facturado una vez al año. Stripe prorrateará la diferencia automáticamente.",
+        "confirmBodyToMonthly": "Cambiaremos tu plan {plan} a facturación mensual. Pasarás de {currentPrice} USD/mes (facturado anual) a {newPrice} USD/mes. El cambio aplica desde tu próximo ciclo.",
+        "confirm": "Confirmar cambio",
+        "back": "Atrás",
+        "successAnnual": "Listo. Ahora pagas anual.",
+        "successMonthly": "Listo. Ahora pagas mensual."
+      },
+      "downgradeConfirm": {
+        "title": "¿Bajar a Pro?",
+        "body": "Bajarás de Studio a Pro inmediatamente. Stripe prorrateará la diferencia en tu próxima factura — verás un crédito automático. Conservas todos tus proyectos, tareas y conversaciones.",
+        "noteAnnual": "Tu plan actual es anual. El downgrade te deja en Pro mensual; si prefieres Pro anual, cámbialo desde 'Administrar suscripción' después.",
+        "confirm": "Confirmar downgrade",
+        "back": "Atrás",
+        "success": "Listo. Tu plan ahora es Pro."
+      },
+      "retention": {
+        "title": "Bajar a Free",
+        "stepReasonTitle": "¿Qué te lleva a bajar de plan?",
+        "stepReasonSubtitle": "Tu respuesta nos ayuda a mejorar.",
+        "reasonTooExpensive": "Muy caro",
+        "reasonNotUsed": "No lo uso lo suficiente",
+        "reasonMissingFeatures": "Faltan funciones que necesito",
+        "reasonSwitching": "Encontré otra herramienta",
+        "reasonTrialOnly": "Solo era para probar",
+        "reasonOther": "Otro motivo",
+        "feedbackPlaceholder": "Cuéntanos un poco más (opcional)…",
+        "continue": "Continuar",
+        "cancel": "Cerrar",
+        "back": "Atrás",
+        "stepOfferTitleTooExpensive": "Entendemos. El precio importa.",
+        "stepOfferBodyTooExpensive": "Quédate con nosotros y aplicamos 30% de descuento los próximos 3 meses, automáticamente.",
+        "stepOfferTitleNotUsed": "¿Te ayudamos a usarlo más?",
+        "stepOfferBodyNotUsed": "Te aplicamos 25% off los próximos 3 meses y te enviamos tips semanales para sacarle más jugo.",
+        "stepOfferTitleMissingFeatures": "Queremos saber qué te falta.",
+        "stepOfferBodyMissingFeatures": "Lee tu feedback nuestro equipo. Mientras tanto, te dejamos 25% off los próximos 3 meses.",
+        "stepOfferTitleSwitching": "Antes de irte…",
+        "stepOfferBodySwitching": "Aplicamos 20% off los próximos 3 meses por si quieres reconsiderar.",
+        "stepOfferTitleTrialOnly": "Una probada más larga, por nuestra cuenta.",
+        "stepOfferBodyTrialOnly": "Tienes 30% off el siguiente mes para decidir con calma.",
+        "stepOfferTitleOther": "Antes de irte…",
+        "stepOfferBodyOther": "Te dejamos 20% off los próximos 3 meses como agradecimiento.",
+        "acceptOffer": "Aceptar oferta",
+        "declineOffer": "No, gracias",
+        "stepDowngradeTitle": "¿Probar con Pro en lugar de cancelar?",
+        "stepDowngradeBody": "Pro ({price}/mes) conserva el asistente con escritura, brainstorming, integraciones y Deep Mode. Solo se reducen los caps.",
+        "downgradeToPro": "Bajar a Pro",
+        "stepConfirmTitle": "Confirma el cambio a Free",
+        "stepConfirmBody": "Tu plan actual sigue activo hasta el {date}. Después pasarás al plan Free. Tus proyectos, tareas e ideas se conservan — solo cambian los límites del plan.",
+        "confirmCancel": "Confirmar cambio a Free",
+        "stepDoneTitleCancelled": "Listo. Bajaremos tu plan a Free el {date}.",
+        "stepDoneBodyCancelled": "Conservas acceso completo hasta esa fecha. Si cambias de opinión, puedes volver a suscribir desde aquí.",
+        "stepDoneTitleOffer": "¡Aplicamos tu descuento!",
+        "stepDoneBodyOffer": "Verás el ajuste en tu próxima factura. Gracias por quedarte.",
+        "stepDoneTitleDowngrade": "Cambiamos tu plan a Pro.",
+        "stepDoneBodyDowngrade": "Stripe prorrateó el cambio. Verás el ajuste en tu próxima factura.",
+        "close": "Cerrar",
+        "retentionAlreadyUsed": "Ya usaste tu oferta de retención anterior. Vamos directo a confirmar el cambio a Free."
+      },
+      "billingMonthly": "Mensual",
+      "billingAnnual": "Anual",
+      "billingAnnualHint": "Ahorra ~22% con pago anual",
+      "checkoutSuccess": "¡Listo! Tu plan se activará en cuanto Stripe confirme el pago.",
+      "checkoutCancelled": "Cancelaste el pago. Cuando quieras, vuelve a intentarlo.",
+      "checkoutError": "No se pudo abrir el checkout. Intenta de nuevo en unos segundos.",
+      "portalError": "No se pudo abrir el portal. Intenta de nuevo en unos segundos."
+    },
+    "plugins": {
+      "title": "Integraciones",
+      "description": "Conecta Continuity con las herramientas que ya usas.",
+      "comingSoonBody": "Aquí vivirán integraciones como GitHub, Linear, Notion y Slack.",
+      "statusConnected": "Conectado",
+      "statusNotConnected": "No conectado",
+      "googleTasks": {
+        "name": "Google Tasks",
+        "shortDescription": "Importa tus tareas desde Google Tasks.",
+        "title": "Google Tasks",
+        "description": "Trae tus tareas existentes de Google Tasks a Continuity. Solo leemos tus tareas — no enviamos nada de vuelta a Google.",
+        "notConnectedBody": "Conecta tu cuenta de Google para elegir qué listas importar.",
+        "connectButton": "Conectar Google Tasks",
+        "connectedAs": "Conectado como {email}",
+        "disconnectButton": "Desconectar",
+        "loadingLists": "Cargando tus listas de tareas…",
+        "noLists": "No se encontraron listas de tareas en esta cuenta de Google.",
+        "listColumn": "Lista de Google Tasks",
+        "projectColumn": "Proyecto en Continuity",
+        "projectNone": "— No asignar a un proyecto",
+        "projectExisting": "Proyectos existentes",
+        "projectNew": "Crear nuevo proyecto: {name}",
+        "newProjectPlaceholder": "Escribe un nombre para crear un proyecto",
+        "importButton": "Importar tareas",
+        "importing": "Importando…",
+        "importSuccess": "{imported} tareas importadas. {skipped} omitidas (ya importadas antes).",
+        "importSuccessWithProjects": "{imported} tareas importadas. Proyecto(s) creado(s): {projects}.",
+        "errorConnect": "No se pudo iniciar el inicio de sesión con Google: {error}",
+        "errorImport": "La importación falló: {error}"
+      }
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Recibe avisos en Telegram para que un proyecto no muera en silencio.",
+      "channels": "Canales",
+      "telegram": "Telegram",
+      "whatsappSoon": "WhatsApp llegará pronto.",
+      "useDeviceTimezone": "Usar zona horaria del dispositivo",
+      "weeklyDigest": "Resumen semanal",
+      "weeklyDigestToggle": "Enviarme el resumen semanal de mis analíticas",
+      "day": "Día",
+      "hour": "Hora (local)",
+      "timezone": "Zona horaria (IANA)",
+      "timezoneSearchPlaceholder": "Buscar zona horaria...",
+      "timezoneNoMatches": "Sin resultados",
+      "dailyDigest": "Pendientes diarios",
+      "dailyDigestToggle": "Enviarme los pendientes de hoy",
+      "dailyDigestHint": "Llega cada día a la hora que elijas con tus tareas vencidas y las que vencen hoy.",
+      "otherNotifications": "Otras notificaciones",
+      "sleepingAlertsToggle": "Alertas de proyectos durmientes (≥7, 14, 30 días)",
+      "dueRemindersToggle": "Aviso de pendientes a fin de día",
+      "dueReminderHour": "Hora del aviso (local)",
+      "dueRemindersHint": "A la hora elegida, si aún quedan tareas o rutinas abiertas hoy, te llega un recordatorio. Si todo está cerrado, no se envía nada.",
+      "manualToggle": "Recibir avisos manuales / del admin",
+      "channel": {
+        "connected": "Conectado",
+        "waiting": "Esperando a que presiones Start en Telegram…",
+        "notConnected": "No conectado",
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "disconnectConfirm": "¿Desconectar Telegram? Puedes reconectar después.",
+        "disconnected": "Desconectado"
+      }
+    }
+  },
+  "analytics": {
+    "title": "Analíticas",
+    "refreshing": "actualizando…",
+    "calculating": "Calculando analíticas…",
+    "loadError": "No se pudieron cargar las analíticas",
+    "chips": {
+      "activity": "Actividad",
+      "cadence": "Cadencia",
+      "status": "Estado",
+      "backlog": "Backlog",
+      "weekday": "Días",
+      "topProjects": "Top",
+      "sleeping": "Durmiendo",
+      "funnel": "Embudo",
+      "effort": "Esfuerzo"
+    },
+    "cadence": {
+      "title": "Cadencia",
+      "currentStreak": "Racha actual",
+      "bestStreak": "Mejor racha",
+      "activeDays": "Días activos",
+      "events": "Eventos"
+    },
+    "activityChart": {
+      "title": "Actividad por día",
+      "updates": "Updates",
+      "tasks": "Tareas"
+    },
+    "weekday": {
+      "title": "Por día de la semana",
+      "labels": {
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mié",
+        "thu": "Jue",
+        "fri": "Vie",
+        "sat": "Sáb",
+        "sun": "Dom"
+      }
+    },
+    "topProjects": {
+      "title": "Más activos",
+      "subtitle": "Top 5 por interacciones (updates + tareas completadas)",
+      "empty": "Sin actividad en este rango."
+    },
+    "statusBreakdown": {
+      "title": "Por estado y categoría",
+      "subtitle": "{count, plural, one {# proyecto} other {# proyectos}}",
+      "status": "Estado",
+      "category": "Categoría",
+      "noData": "Sin datos.",
+      "noCategories": "Sin categorías.",
+      "rowMeta": "{projects} proy · {interactions} interacciones"
+    },
+    "backlog": {
+      "title": "Backlog",
+      "subtitle": "{count, plural, one {# tarea abierta en total} other {# tareas abiertas en total}}",
+      "overdue": "Vencidas",
+      "dueSoon": "Próximas (7d)",
+      "quickWins": "Quick wins",
+      "quickWinsHint": "Proyectos con ≤2 tareas abiertas",
+      "almostThere": "Casi listos",
+      "almostThereHint": "≥80% completado"
+    },
+    "sleeping": {
+      "title": "Durmiendo",
+      "subtitle": "Proyectos sin actividad reciente (≥7 días)",
+      "empty": "Nada durmiendo. Buen ritmo."
+    },
+    "stale": {
+      "title": "Ideas estancadas",
+      "subtitle": "Sin promover en ≥30 días",
+      "empty": "Sin ideas estancadas."
+    },
+    "ideaFunnel": {
+      "title": "Funnel de ideas",
+      "subtitle": "Ideas creadas vs promovidas a proyecto",
+      "created": "Creadas",
+      "promoted": "Promovidas",
+      "rate": "Tasa"
+    },
+    "effort": {
+      "title": "Esfuerzo",
+      "subtitle": "Cobertura {coverage}% (solo cuentan tareas con horas registradas)",
+      "totalHoursSuffix": "horas en el rango",
+      "empty": "Sin tareas con horas registradas en este rango."
+    },
+    "range": {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "1y": "1a",
+      "all": "Todo"
+    }
+  },
+  "views": {
+    "today": {
+      "greeting": {
+        "morning": "Buenos días",
+        "afternoon": "Buenas tardes",
+        "evening": "Buenas noches"
+      },
+      "streakCard": {
+        "title": "Racha",
+        "days": "{count, plural, one {# día} other {# días}}",
+        "nextMilestone": "Próximo objetivo: {days}d",
+        "best": "Mejor: {days}d"
+      },
+      "counters": {
+        "active": "Activos",
+        "launched": "Lanzados",
+        "stalled": "Estancados",
+        "ideas": "Ideas",
+        "tasks": "Tareas"
+      },
+      "fab": {
+        "open": "Crear",
+        "newTask": "Nueva tarea",
+        "newProject": "Nuevo proyecto",
+        "newRoutine": "Nueva rutina",
+        "newIdea": "Nueva idea"
+      },
+      "backupAlert": {
+        "lastBackupAgo": "Último respaldo hace {days, plural, one {# día} other {# días}}",
+        "noBackup": "Aún no hay respaldo",
+        "explanation": "Exporta un respaldo JSON para no perder tu información.",
+        "openTools": "Abrir herramientas de respaldo"
+      },
+      "stalledAlert": {
+        "title": "{count, plural, one {# proyecto necesita} other {# proyectos necesitan}} atención",
+        "subtitleLead": "Sin actividad en 7+ días.",
+        "subtitleEmphasis": "No dejes que mueran en silencio."
+      },
+      "createMenu": {
+        "title": "Crear",
+        "project": "Proyecto",
+        "task": "Tarea",
+        "routine": "Rutina",
+        "idea": "Idea"
+      },
+      "focus": {
+        "title": "Enfoque de hoy",
+        "tasksTooltip": "{dueToday} para hoy · {overdue} vencidas",
+        "tasksLabel": "{count, plural, one {# tarea} other {# tareas}}",
+        "overdueExtra": "· {count} vencidas",
+        "totalHoursTooltip": "Horas estimadas totales para tareas de hoy + vencidas",
+        "totalHoursLabel": "{hours}h en total",
+        "markDone": "Marcar tarea como hecha",
+        "emptyTitle": "Nada apremiante hoy.",
+        "emptyHintFirst": "Agrega tu primer proyecto para empezar.",
+        "emptyHintNext": "Agrega tareas o próximos pasos a tus proyectos activos.",
+        "labels": {
+          "overdue": "Vencida",
+          "dueToday": "Para hoy",
+          "stalled": "Estancado",
+          "nextStep": "Próximo paso"
+        },
+        "daysLate": "{count}d de retraso",
+        "daysIdleLine": "{name} — {count, plural, one {# día sin actividad} other {# días sin actividad}}",
+        "viewAll": "Ver todas las tareas",
+        "moreCount": "+{count} más"
+      },
+      "doneToday": {
+        "title": "Hecho hoy",
+        "tasksLabel": "{count, plural, one {# tarea} other {# tareas}}",
+        "logsLabel": "{count, plural, one {# entrada} other {# entradas}}",
+        "showAll": "Mostrar todo",
+        "showOnlyTasks": "Solo tareas",
+        "showOnlyLogs": "Solo entradas",
+        "hoursWorkedTooltip": "Horas estimadas en tareas completadas hoy",
+        "hoursWorkedLabel": "{hours}h trabajadas",
+        "hoursByProject": "Horas por proyecto",
+        "task": "Tarea",
+        "log": "Nuevo log",
+        "note": "Nota nueva",
+        "routine": "Rutina",
+        "edit": "Editar",
+        "editTaskAria": "Editar tarea",
+        "undo": "Deshacer",
+        "undoAria": "Deshacer completado"
+      },
+      "closeable": {
+        "title": "Cerca de la meta",
+        "almostThereChip": "Casi listo · {pct}%",
+        "tasksLeft": "{count, plural, one {# tarea pendiente} other {# tareas pendientes}} · {done}/{total} hechas",
+        "quickWin": "Quick win",
+        "tasksAway": "Solo {count, plural, one {# tarea} other {# tareas}} para terminar."
+      },
+      "sleeping": {
+        "title": "Proyectos durmiendo",
+        "daysIdle": "{count}d sin actividad",
+        "resume": "Retomar"
+      },
+      "staleIdeas": {
+        "title": "{count, plural, one {# idea esperando} other {# ideas esperando}} hace 30+ días",
+        "subtitle": "Promueve una a proyecto, o suéltala para dar espacio a algo nuevo."
+      },
+      "active": {
+        "title": "Proyectos activos"
+      },
+      "launched": {
+        "title": "Lanzados · aún tienen tareas"
+      },
+      "routines": {
+        "title": "Rutinas para hoy",
+        "routinesTooltip": "{dueToday} para hoy · {overdue} vencidas",
+        "routinesLabel": "{count, plural, one {# rutina} other {# rutinas}}",
+        "overdueExtra": "· {count} vencidas",
+        "totalHoursTooltip": "Horas estimadas totales para rutinas de hoy + vencidas",
+        "totalHoursLabel": "{hours}h en total"
+      }
+    },
+    "tasks": {
+      "title": "Todas las tareas",
+      "search": "Buscar tareas o proyecto...",
+      "empty": "Aún no hay tareas.",
+      "addFirst": "Crear primera tarea",
+      "noMatch": "No hay tareas que coincidan con \"{query}\"",
+      "todayBucket": "Hoy y vencidas",
+      "todayEmpty": "Todo en orden — nada para hoy. ✨",
+      "overdueBucket": "Vencidas",
+      "todayOnlyBucket": "Hoy",
+      "totalEffort": "Tiempo estimado total",
+      "pickDay": "Asignar día",
+      "pickDayHint": "— prográmalas para que sucedan",
+      "upcoming": "Próximas",
+      "completed": "Completadas",
+      "filterCta": "Filtrar",
+      "newAria": "Nueva tarea",
+      "range": {
+        "today": "Hoy",
+        "week": "Semana",
+        "all": "Todas"
+      },
+      "filterSheet": {
+        "title": "Filtrar",
+        "clear": "Limpiar",
+        "apply": "Aplicar ({count})",
+        "applyEmpty": "Ninguna tarea coincide",
+        "byProject": "Por proyecto",
+        "noProject": "Sin proyecto",
+        "showCompleted": "Mostrar completadas",
+        "showBlocked": "Mostrar bloqueadas"
+      }
+    },
+    "routines": {
+      "title": "Rutinas",
+      "search": "Buscar rutinas...",
+      "empty": "Aún no hay rutinas. Crea una para registrar actividades recurrentes o sueltas.",
+      "addFirst": "Crear primera rutina",
+      "todayBucket": "Hoy y vencidas",
+      "todayEmpty": "Sin rutinas para hoy. ✨",
+      "completedToday": "Completadas hoy",
+      "upcoming": "Próximas (7 días)",
+      "later": "Más adelante",
+      "archived": "Archivadas",
+      "newAria": "Nueva rutina"
+    },
+    "projects": {
+      "title": "Todos los proyectos",
+      "search": "Buscar por nombre, descripción, categoría...",
+      "empty": "Aún no hay proyectos.",
+      "addFirst": "Agrega tu primer proyecto",
+      "noMatchSearch": "No hay proyectos que coincidan con \"{query}\"",
+      "noMatchFilters": "No hay proyectos que coincidan con estos filtros",
+      "clearFilters": "Limpiar filtros",
+      "filterStatusAria": "Filtrar por estado",
+      "filterCategoryAria": "Filtrar por categoría",
+      "filterPriorityAria": "Filtrar por prioridad",
+      "sortAria": "Ordenar proyectos",
+      "allCategories": "Todas las categorías",
+      "allPriorities": "Todas las prioridades",
+      "filterCta": "Filtrar",
+      "sortCta": "Ordenar",
+      "newAria": "Nuevo proyecto",
+      "filterSheet": {
+        "title": "Filtrar",
+        "clear": "Limpiar",
+        "apply": "Aplicar ({count})",
+        "applyEmpty": "Ningún proyecto coincide",
+        "dueDate": "Fecha de vencimiento",
+        "dueAny": "Cualquiera",
+        "dueOverdue": "Vencidas",
+        "dueSoon": "Próximos 7 días",
+        "dueNone": "Sin fecha"
+      },
+      "sortSheet": {
+        "title": "Ordenar por"
+      },
+      "filterLabel": {
+        "status": "Estado",
+        "category": "Categoría",
+        "priority": "Prioridad",
+        "sort": "Orden"
+      },
+      "sortBy": {
+        "label": "Orden",
+        "smart": "Inteligente",
+        "priority": "Por prioridad",
+        "recent": "Actividad reciente",
+        "name": "Nombre",
+        "status": "Por estado"
+      },
+      "openFullView": "Abrir proyecto",
+      "detail": {
+        "title": "Detalle del proyecto",
+        "closeTooltip": "Cerrar (Esc)"
+      },
+      "card": {
+        "overdueBadge": "{count} vencidas",
+        "todayBadge": "{count} hoy",
+        "idleBadge": "{count}d sin actividad",
+        "pendingHoursBadge": "{hours}h pendientes",
+        "pendingHoursTooltip": "Suma de horas estimadas de tareas pendientes",
+        "nextStep": "Próximo paso",
+        "nextStepEmpty": "¿Cuál es la siguiente acción concreta?",
+        "whyMatters": "Por qué importa",
+        "whyEmpty": "Captura tu motivación para tenerla cuando la necesites.",
+        "description": "Descripción",
+        "descriptionEmpty": "Describe qué es este proyecto, en un párrafo.",
+        "notes": "Notas",
+        "notesEmpty": "Pensamientos, decisiones, links, todo lo que no quieras olvidar.",
+        "tasks": "Tareas",
+        "addTask": "Agregar tarea",
+        "noTasks": "Aún no hay tareas",
+        "recentActivity": "Actividad reciente",
+        "logUpdate": "Registrar update",
+        "noUpdates": "Sin updates registrados",
+        "editTaskAria": "Editar tarea",
+        "deleteTaskAria": "Eliminar tarea"
+      }
+    },
+    "ideas": {
+      "title": "Parking lot de ideas",
+      "search": "Buscar ideas...",
+      "capture": "Capturar",
+      "captureAria": "Capturar nueva idea",
+      "addFirst": "Capturar primera idea",
+      "subtitle": "Aparca aquí ideas nuevas para no abandonar lo que ya estás haciendo. Promuévelas cuando estés listo.",
+      "empty": "Aún no has capturado ideas.",
+      "noMatch": "No hay ideas que coincidan con \"{query}\"",
+      "promote": "Promover a proyecto"
+    },
+    "log": {
+      "title": "Bitácora",
+      "search": "Buscar entradas o proyecto...",
+      "empty": "Sin actividad registrada todavía. Registra updates en tus proyectos para llevar momentum.",
+      "noMatch": "No hay entradas que coincidan con \"{query}\"",
+      "noneInFilter": "Sin entradas en este filtro.",
+      "deleteConfirm": "¿Eliminar esta entrada?",
+      "editEntryAria": "Editar entrada",
+      "deleteEntryAria": "Eliminar entrada",
+      "filters": {
+        "all": "Todos",
+        "achievements": "Logros",
+        "notes": "Notas",
+        "changes": "Cambios",
+        "deleted": "Eliminados"
+      },
+      "buckets": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "thisWeek": "Esta semana",
+        "thisMonth": "Este mes",
+        "older": "Anteriores"
+      },
+      "entries": {
+        "untitled": "(sin título)",
+        "taskCompleted": "Completaste la tarea {title}",
+        "taskCreated": "Creaste la tarea {title}",
+        "taskDeleted": "Eliminaste la tarea {title}",
+        "taskRescheduled": "Reagendaste {title} para {date}",
+        "taskDueCleared": "Quitaste la fecha de {title}",
+        "projectCreated": "Creaste el proyecto {title}",
+        "projectDeleted": "Eliminaste el proyecto {title}",
+        "projectStatusChanged": "Moviste {title}: {previous} → {next}",
+        "projectDueSet": "Pusiste la fecha de {title} a {date}",
+        "projectDueCleared": "Quitaste la fecha de {title}",
+        "ideaCreated": "Capturaste la idea {title}",
+        "ideaDeleted": "Descartaste la idea {title}",
+        "ideaPromoted": "Promoviste {title} a proyecto",
+        "routineCreated": "Creaste la rutina {title}",
+        "routineCompleted": "Completaste la rutina {title}",
+        "routineDeleted": "Eliminaste la rutina {title}"
+      }
+    }
+  },
+  "taskRow": {
+    "markDone": "Marcar como hecha",
+    "markNotDone": "Marcar como no hecha",
+    "deleteAria": "Eliminar tarea",
+    "dueToday": "Para hoy",
+    "addDate": "Agregar fecha",
+    "blocked": "Bloqueada"
+  },
+  "routineRow": {
+    "markDone": "Marcar como hecha",
+    "markNotDone": "Marcar como no hecha",
+    "today": "Para hoy",
+    "editAria": "Editar rutina",
+    "archiveAria": "Archivar rutina",
+    "unarchiveAria": "Reactivar rutina",
+    "deleteAria": "Eliminar rutina"
+  },
+  "recurrence": {
+    "once": "Una vez · {date}",
+    "weeklyEmpty": "Sin días seleccionados",
+    "everyN": {
+      "days": "Cada {n, plural, one {día} other {# días}}",
+      "weeks": "Cada {n, plural, one {semana} other {# semanas}}",
+      "months": "Cada {n, plural, one {mes} other {# meses}}"
+    },
+    "monthlyDay": "Día {day} de cada mes",
+    "weekday": {
+      "short": {
+        "0": "L",
+        "1": "M",
+        "2": "M",
+        "3": "J",
+        "4": "V",
+        "5": "S",
+        "6": "D"
+      }
+    }
+  },
+  "projectCard": {
+    "comebackBadge": "Comeback · {days}d",
+    "comebackTooltip": "Actividad retomada en las últimas 24h tras un periodo idle",
+    "openCount": "{count} abiertas",
+    "overdueBadge": "{count} vencidas",
+    "todayBadge": "{count} hoy",
+    "donePct": "{pct}% hecho",
+    "todayHoursTooltip": "Horas invertidas hoy",
+    "todayHoursLabel": "+{hours}h hoy",
+    "totalHoursTooltip": "Horas totales invertidas en tareas completadas",
+    "totalHoursLabel": "{hours}h en total",
+    "daysAgo": "hace {days}d"
+  },
+  "notes": {
+    "newNote": "Nueva nota",
+    "untitled": "Sin título",
+    "empty": "Aún no hay notas. Captura decisiones, links, ideas mientras trabajas.",
+    "titlePlaceholder": "Título (opcional)",
+    "bodyPlaceholder": "Decisiones, links, ideas, lo que no quieras olvidar…",
+    "editorHint": "⌘+Enter para guardar · Esc para cancelar",
+    "deleteConfirm": "¿Eliminar esta nota?",
+    "justNow": "ahora mismo",
+    "minutesAgo": "{count, plural, one {hace # min} other {hace # min}}",
+    "hoursAgo": "{count, plural, one {hace # hr} other {hace # hrs}}",
+    "daysAgo": "{count, plural, one {hace # día} other {hace # días}}"
+  },
+  "modals": {
+    "project": {
+      "newTitle": "Nuevo proyecto",
+      "editTitle": "Editar proyecto",
+      "name": "Nombre *",
+      "why": "¿Por qué importa?",
+      "whyPlaceholder": "Tu motivación — vuelve a salvarte cuando se estanque.",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Qué es este proyecto, en un párrafo.",
+      "nextStep": "Próximo paso",
+      "nextStepPlaceholder": "La acción concreta que sigue",
+      "status": "Estado",
+      "priority": "Prioridad",
+      "category": "Categoría",
+      "noCategory": "Sin categoría",
+      "newCategoryName": "Nombre de categoría",
+      "createCategory": "Crear"
+    },
+    "task": {
+      "newTitle": "Nueva tarea",
+      "editTitle": "Editar tarea",
+      "titleField": "Título *",
+      "project": "Proyecto",
+      "noProject": "Sin proyecto",
+      "dueDate": "Fecha de vencimiento",
+      "effort": "Esfuerzo (horas)",
+      "effortPlaceholder": "ej. 2.5",
+      "decreaseEffortAria": "Reducir esfuerzo",
+      "increaseEffortAria": "Aumentar esfuerzo",
+      "blockers": "Bloqueadores",
+      "selectBlockingTask": "Selecciona una tarea bloqueante…",
+      "addBlocker": "Agregar",
+      "externalBlockerPlaceholder": "Bloqueo externo (ej. esperando al cliente)",
+      "unknownTask": "Tarea desconocida",
+      "chips": {
+        "today": "Hoy",
+        "tomorrow": "Mañana",
+        "thisWeek": "Esta semana",
+        "clear": "Quitar"
+      }
+    },
+    "idea": {
+      "newTitle": "Capturar idea",
+      "editTitle": "Editar idea",
+      "intro": "Aparcala aquí para no distraerte de lo que estás haciendo.",
+      "title": "Idea *",
+      "why": "¿Por qué importa?",
+      "whyPlaceholder": "Motivación opcional — útil cuando la promuevas más tarde.",
+      "notes": "Notas",
+      "captureCta": "Capturar"
+    },
+    "routine": {
+      "newTitle": "Nueva rutina",
+      "editTitle": "Editar rutina",
+      "titleField": "Título *",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Opcional — un recordatorio breve.",
+      "recurrenceType": "Tipo de recurrencia",
+      "type": {
+        "once": "Una vez",
+        "weeklyDays": "Semanal (días)",
+        "everyN": "Cada N…",
+        "monthlyDay": "Día del mes"
+      },
+      "dateField": "Fecha",
+      "startDateField": "Inicio",
+      "endDateField": "Fin (opcional)",
+      "weekdaysField": "Días de la semana",
+      "intervalField": "Cada",
+      "unit": {
+        "days": "días",
+        "weeks": "semanas",
+        "months": "meses"
+      },
+      "monthlyDayHint": "Se repetirá el día {day} de cada mes (tomado de la fecha de inicio).",
+      "effort": "Esfuerzo estimado (horas)",
+      "effortPlaceholder": "Opcional · ej. 0.5",
+      "decreaseEffortAria": "Reducir esfuerzo",
+      "increaseEffortAria": "Aumentar esfuerzo",
+      "errorTitle": "Pon un título.",
+      "errorStartDate": "Elige una fecha.",
+      "errorWeekdays": "Selecciona al menos un día.",
+      "errorIntervalN": "El intervalo debe ser un número ≥ 1.",
+      "errorMonthlyDay": "El día del mes debe estar entre 1 y 31."
+    },
+    "update": {
+      "newTitle": "Registrar update",
+      "editTitle": "Editar entrada",
+      "field": "¿Qué pasó?",
+      "placeholder": "ej., Terminé el wireframe de la landing",
+      "logCta": "Registrar"
+    },
+    "category": {
+      "title": "Administrar categorías",
+      "empty": "Aún no hay categorías.",
+      "add": "Nueva categoría",
+      "create": "Crear",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "namePlaceholder": "Nombre",
+      "editAria": "Editar categoría",
+      "deleteAria": "Eliminar categoría",
+      "footnote": "Al eliminar una categoría sus proyectos quedan sin categoría (no se borran)."
+    },
+    "backup": {
+      "title": "Respaldo y restauración",
+      "intro": "Exporta un archivo JSON con todos tus proyectos, tareas, ideas y bitácora. Guárdalo en un lugar seguro (Google Drive, Dropbox, iCloud).",
+      "currentData": "Información actual",
+      "counts": "{projects} proyectos · {tasks} tareas · {ideas} ideas · {updates} updates",
+      "lastBackup": "Último respaldo: {when}",
+      "exportCta": "Exportar a archivo JSON",
+      "restoreHeader": "Restaurar desde respaldo",
+      "restoreIntro": "Selecciona un JSON exportado previamente. Elige cómo manejar la información actual:",
+      "importMerge": "Importar y mezclar con la información actual",
+      "importReplace": "Importar y reemplazar todo",
+      "replaceConfirm": "Esto BORRARÁ toda la información actual y la reemplazará con el respaldo. ¿Continuar?",
+      "toast": {
+        "exported": "Respaldo exportado",
+        "invalidFile": "Archivo inválido. Se esperaba un export de Continuity.",
+        "readError": "No se pudo leer el archivo de respaldo: {message}",
+        "imported": "Importados {projects} proyectos, {tasks} tareas, {ideas} ideas, {notes} notas, {projectNotes} notas de proyecto."
+      }
+    }
+  },
+  "avatars": {
+    "styles": {
+      "3d": "3D",
+      "anime": "Anime",
+      "8bit": "8-bit",
+      "vector": "Vector"
+    },
+    "names": {
+      "momo": "Momo",
+      "yuki": "Yuki",
+      "tako": "Tako",
+      "kuma": "Kuma",
+      "hoshi": "Hoshi",
+      "pip": "Pip",
+      "tetsu": "Tetsu"
+    }
+  },
+  "admin": {
+    "toast": {
+      "statusUpdated": "Estado actualizado",
+      "postDeleted": "Entrada eliminada",
+      "pageDeleted": "Página eliminada",
+      "resourceCreated": "Recurso creado",
+      "resourceDeleted": "Recurso eliminado",
+      "categoryCreated": "Categoría creada",
+      "categoryDeleted": "Categoría eliminada",
+      "cannotDeleteCategoryInUse": "Mueve o elimina primero los recursos en esta categoría",
+      "imageUploadError": "Error al subir imagen"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "continuu.it — Termina lo que empiezas",
+      "description": "El gestor de proyectos para quienes empiezan más de lo que terminan. Pensado para founders, freelancers y constructores de side projects que abandonan justo lo que más importa."
+    },
+    "nav": {
+      "features": "Cómo funciona",
+      "pricing": "Precios",
+      "blog": "Blog",
+      "beta": "Beta",
+      "signIn": "Iniciar sesión",
+      "dashboard": "Ir al dashboard",
+      "ctaShort": "Unirme a la beta"
+    },
+    "hero": {
+      "eyebrow": "En beta privada. Quedan 50 lugares.",
+      "headline": "Termina lo que empiezas.",
+      "subheadline": "El gestor de proyectos para quienes empiezan más de lo que terminan. Para founders, freelancers y constructores de side projects que siguen abandonando lo que más importa.",
+      "ctaPrimary": "Acceder a la beta — gratis",
+      "ctaSecondary": "Sin tarjeta. Gratis de por vida para los primeros 50.",
+      "scrollHint": "Mira cómo funciona"
+    },
+    "recognition": {
+      "headline": "Tienes un cementerio de proyectos a medias. No estás solo. No eres flojo.",
+      "p1": "Abre tu Notion. Cuenta los documentos a medio escribir.",
+      "p2": "Abre tu GitHub. Cuenta los repos privados.",
+      "p3": "Abre tus marcadores. Cuenta las herramientas que compraste y nunca abriste.",
+      "p4": "No te falta motivación. No te falta inteligencia. No te falta disciplina.",
+      "p5": "Has estado usando herramientas de productividad diseñadas para el problema equivocado.",
+      "callout": "Cinco meses en un ERP que nunca desplegué. Una agencia mientras mis propios sitios se quedaban viejos. Una app de fantasy football mientras mi equipo me esperaba. Tres semanas codeando alrededor de un bug de 30 minutos.",
+      "calloutAuthor": "Alfredo, fundador de continuu.it",
+      "readManifesto": "Lee el manifiesto completo del fundador"
+    },
+    "diagnosis": {
+      "headline": "Cada herramienta de productividad se diseñó para ayudarte a empezar. Ninguna se diseñó para ayudarte a terminar.",
+      "p1": "Todoist hace que agregar una tarea sea sin fricción. Notion hace que abrir un doc se sienta elegante. Things hace que planear un proyecto sea satisfactorio.",
+      "p2": "Todas premian el dopaminazo de empezar.",
+      "p3": "Por eso tienes 47 proyectos, 12 sistemas y 3 apps de productividad abiertas ahora mismo, y sigues sintiendo que vas atrasado en todo.",
+      "p4": "El problema no es capturar. Es cerrar.",
+      "compare": {
+        "othersTitle": "Otras herramientas",
+        "usTitle": "continuu.it",
+        "rows": [
+          { "others": "Capturar más", "us": "Terminar más" },
+          { "others": "Planear más", "us": "Cerrar bucles" },
+          { "others": "Agregar proyectos nuevos", "us": "Confrontar los viejos" },
+          { "others": "Optimizar para empezar", "us": "Optimizar para terminar" }
+        ]
+      }
+    },
+    "promise": {
+      "eyebrow": "Te presentamos continuu.it",
+      "headline": "El gestor de proyectos que cierra el bucle.",
+      "p1": "continuu.it es la primera herramienta diseñada en torno a un solo principio: cada proyecto que empiezas tiene que llegar a una decisión.",
+      "p2": "Terminado. Cancelado. Pausado a propósito.",
+      "p3": "Nunca abandonado. Nunca a la deriva. Nunca perdido en el cementerio del 'algún día le entro'.",
+      "p4": "Porque el costo del trabajo a medias no es tiempo. Es posición competitiva. Es confianza. Es la erosión lenta de tu relación con tus propias ideas.",
+      "p5": "Construimos continuu.it para devolverte eso.",
+      "cta": "Acceder a la beta"
+    },
+    "features": {
+      "intro": {
+        "eyebrow": "Así lo vas a usar",
+        "headline": "Seis rituales que convierten la deriva en trabajo enviado."
+      },
+      "forcedClosure": {
+        "label": "Cierre forzado",
+        "headline": "Ningún proyecto a la deriva. Nunca.",
+        "body": "Cada proyecto vive en uno de cuatro estados: Activo, Pausado, Cancelado o Terminado. Después de 14 días en silencio, continuu.it te pregunta cuál es. La deriva es lo que mata a quien construye. Nosotros no la dejamos pasar.",
+        "demo": {
+          "projectTitle": "Rediseño de landing page",
+          "daysSilent": "14 días sin tocarlo",
+          "prompt": "Llevas 14 días sin tocar esto. ¿Listo para enviarlo? ¿Necesitas ayuda? ¿O este proyecto ya terminó?",
+          "ship": "Enviarlo",
+          "help": "Necesito ayuda",
+          "kill": "Cancelar"
+        }
+      },
+      "aiChat": {
+        "label": "Chat con IA",
+        "headline": "Cuéntale a la IA qué estás construyendo. Lo divide en tareas que sí te mueven.",
+        "body": "No plantillas genéricas tipo 'Planear, Construir, Probar, Lanzar'. Pasos reales, específicos y accionables para tu proyecto, tu stack, tu alcance. Solo tienes que ser honesto con lo que quieres construir.",
+        "demo": {
+          "projectTitle": "Proyecto: Landing page de SaaS",
+          "userMessage": "Quiero hacer una landing page para mi SaaS en Next.js, pero siempre me trabo en por dónde empezar.",
+          "aiResponse": "Listo. Tres preguntas rápidas:",
+          "questions": [
+            "¿Ya tienes el copy escrito o empiezas desde el mensaje?",
+            "¿Usas un design system o partes de cero?",
+            "¿Cuál es tu fecha objetivo?"
+          ],
+          "footer": "Con esto te lo divido en 8–12 tareas ordenadas por qué desbloquea qué.",
+          "tag": "Asistente IA"
+        },
+        "closing": "La mayoría de los proyectos no mueren por falta de esfuerzo. Mueren por falta de estructura. Eso lo arreglamos el día uno."
+      },
+      "resumeContext": {
+        "label": "Retomar con contexto",
+        "headline": "Vuelve a tus proyectos sin perder dónde te quedaste.",
+        "body": "Pausaste un proyecto hace tres semanas. Estás listo para retomarlo. Pero ya no recuerdas dónde estabas, qué decidiste y qué te bloqueaba. Por eso no lo retomas. continuu.it resuelve eso.",
+        "demo": {
+          "title": "Bienvenido de vuelta a Rediseño de landing",
+          "lastWorked": "Última vez que trabajaste aquí: hace 23 días.",
+          "nextActionLabel": "Tu siguiente acción era:",
+          "nextAction": "Escribir el copy del hero para la sección de precios",
+          "blockersLabel": "Bloqueos abiertos:",
+          "blockers": [
+            "Estrategia de precios sin definir",
+            "Design tokens sin migrar a v2",
+            "Video demo pendiente de grabar"
+          ],
+          "decisionsLabel": "Decisiones que ya habías tomado:",
+          "decisions": ["Stripe en lugar de Lemon Squeezy", "Tres tiers, descuento anual"]
+        },
+        "closing": "El costo de regresar baja a cero. Proyectos que dabas por muertos empiezan a terminarse solos."
+      },
+      "notifications": {
+        "label": "Telegram + WhatsApp",
+        "headline": "Despierta a tu día. Recibe el recordatorio antes de perderlo.",
+        "body": "continuu.it te alcanza donde ya estás. Cada mañana, a la hora que elijas, te llega un resumen enfocado en Telegram. WhatsApp viene en camino. Mismo flujo, tu canal.",
+        "demo": {
+          "botName": "Bot de continuu.it",
+          "greeting": "Buenos días, Alfredo.",
+          "todayLabel": "Pendientes de hoy:",
+          "topPriorityLabel": "Prioridad alta",
+          "topPriority": "Terminar el hero de la landing page",
+          "topPriorityNote": "Activo 5 días, te comprometiste a enviarlo esta semana",
+          "secondaryLabel": "Secundario",
+          "secondary": ["Revisar tracking de conversión en GTM", "Responder feedback de beta testers"],
+          "footer": "Responde STATUS para el reporte completo.",
+          "userReply": "STATUS"
+        },
+        "closing": "Las notificaciones funcionan cuando viven donde ya está tu atención."
+      },
+      "friction": {
+        "label": "Fricción donde importa",
+        "headline": "Las ideas nuevas tienen fricción. Los compromisos viejos no.",
+        "body": "Cada vez que agregas un proyecto nuevo en continuu.it, ves todos los proyectos activos que ya tienes. No para abandonarlos. Solo para reconocerlos. Para tomar una decisión.",
+        "demo": {
+          "newProjectLabel": "Nuevo proyecto",
+          "newProjectPlaceholder": "Herramienta de automatización para indie hackers…",
+          "modalTitle": "Antes de empezar uno nuevo…",
+          "modalBody": "Ya tienes 4 proyectos activos. ¿Qué decisión estás tomando?",
+          "activeProjects": [
+            { "name": "Rediseño de landing page", "status": "5 días activo" },
+            { "name": "Bot de Telegram v2", "status": "12 días pausado" },
+            { "name": "Migración del newsletter", "status": "23 días activo" },
+            { "name": "App de fantasy football", "status": "47 días a la deriva" }
+          ],
+          "continueNew": "Empezar igual",
+          "pauseExisting": "Pausar uno primero",
+          "reconsider": "Reconsiderar"
+        },
+        "closing": "Muchas veces, la decisión es enviar uno de ellos primero."
+      },
+      "sundayReview": {
+        "label": "Revisión del domingo",
+        "headline": "La hora más importante de tu semana.",
+        "body": "Cada domingo a la hora que elijas, continuu.it te hace cinco preguntas. Diez minutos. Un ritual. El mecanismo que evita que el próximo viernes sea copia del anterior.",
+        "demo": {
+          "title": "Revisión del domingo",
+          "subtitle": "Cinco preguntas. Diez minutos.",
+          "questions": [
+            "¿Qué enviaste esta semana?",
+            "¿Qué evitaste?",
+            "¿Qué bloqueo se te repite?",
+            "¿Con qué te comprometes la próxima semana?",
+            "¿Qué vas a soltar?"
+          ],
+          "placeholder": "Escribe tu respuesta…",
+          "cta": "Siguiente pregunta"
+        },
+        "closing": "No inventamos la revisión semanal. Solo la hicimos imposible de saltarse."
+      }
+    },
+    "loopSociety": {
+      "eyebrow": "Las matemáticas del trabajo a medias",
+      "headline": "Cada builder carga un cementerio.",
+      "subheadline": "El patrón se repite. Los números no mienten.",
+      "body": "Este es el contorno del problema — la gravedad contra la que diseñamos continuu.it.",
+      "stats": {
+        "one": {
+          "value": "47",
+          "label": "Proyectos abiertos",
+          "body": "El número de proyectos a medias que el builder promedio carga en la cabeza. La mayoría nunca llega a una decisión."
+        },
+        "two": {
+          "value": "3 semanas",
+          "label": "Media vida",
+          "body": "El punto donde un side project pasa de \"sigo en eso\" a \"ya le entro después\" — y nunca regresa."
+        },
+        "three": {
+          "value": "4 herramientas",
+          "label": "Abiertas ahora mismo",
+          "body": "Apps de productividad peleando por tu atención. Ninguna está diseñada para cerrar un bucle. Todas premian empezar."
+        },
+        "four": {
+          "value": "0 apps",
+          "label": "Hasta ahora",
+          "body": "Construidas alrededor del cierre forzado. Todas las demás herramientas hacen más fácil empezar. Nosotros hacemos que terminar sea la única salida."
+        }
+      }
+    },
+    "howItWorks": {
+      "headline": "Cómo funciona continuu.it",
+      "steps": [
+        {
+          "title": "Trae lo que ya estás construyendo.",
+          "body": "Agrega tus proyectos a medias. El repo. El doc de Notion. El side hustle. Después platica con la IA para dividir cada uno en tareas que tengan sentido."
+        },
+        {
+          "title": "Deja que el sistema te alcance donde estás.",
+          "body": "Recibe tu briefing matutino en Telegram. Define horarios de recordatorio. Retoma proyectos pausados con contexto de IA. Cerramos el bucle del follow-up para que tú te quedes en el flujo de construir."
+        },
+        {
+          "title": "Aparécete los domingos. Toma decisiones.",
+          "body": "continuu.it empuja, resume, recuerda y ritualiza. Tú solo tienes que responder cinco preguntas cada domingo y elegir qué sigue."
+        }
+      ],
+      "cta": "Empieza tu beta — gratis de por vida"
+    },
+    "beta": {
+      "eyebrow": "En beta privada",
+      "headline": "50 lugares. Acceso Pro gratis de por vida.",
+      "body": "Dejamos entrar a los primeros 50 builders para probar continuu.it antes del lanzamiento público. A cambio de tu feedback honesto, recibes:",
+      "perks": [
+        "Acceso de por vida al tier Pro ($96/año de valor)",
+        "Línea directa con el fundador para pedir features",
+        "Influencia sobre lo que construimos a continuación",
+        "Insignia de miembro fundador en tu perfil",
+        "Acceso temprano a los avatares Premium de la Loop Society"
+      ],
+      "footer": "Los lugares se llenan por orden de llegada. Buscamos builders capaces de decirnos qué les gusta y qué no. Sin paja. Solo builders dispuestos a ayudarnos a construir.",
+      "cta": "Apartar mi lugar",
+      "counter": {
+        "claimed": "{taken} / {total} lugares apartados",
+        "almostFull": "Casi lleno",
+        "live": "En vivo"
+      }
+    },
+    "pricing": {
+      "headline": "Elige el plan que termina contigo.",
+      "subheadline": "Empieza gratis. Sube cuando lo necesites.",
+      "monthly": "/mes",
+      "yearly": "/año",
+      "popular": "Más popular",
+      "billingToggle": {
+        "monthly": "Mensual",
+        "annual": "Anual",
+        "annualHint": "Ahorra ~22% pagando anual"
+      },
+      "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "Gratis",
+          "priceCadence": "para siempre",
+          "perks": [
+            "3 proyectos activos",
+            "50 tareas abiertas",
+            "2 rutinas activas",
+            "Asistente IA — 15 mensajes/día (solo lectura)",
+            "Notificaciones por Email y Telegram",
+            "Today view, analíticas y bitácora completos",
+            "Historial de 30 días",
+            "Hasta 30 ideas"
+          ],
+          "cta": "Crear cuenta gratis"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$9",
+          "priceAnnual": "$7",
+          "priceCadence": "USD al mes",
+          "priceCadenceAnnual": "USD al mes, facturado anual",
+          "inheritsFrom": "Todo lo de Free, más:",
+          "perks": [
+            "25 proyectos activos, 200 tareas por proyecto",
+            "20 rutinas activas, 500 ideas",
+            "Asistente IA — 200 mensajes/día con escritura y brainstorming",
+            "Deep Mode (Sonnet) — 5 mensajes/día",
+            "WhatsApp — 100 mensajes/mes incluidos",
+            "Google Tasks + Calendar sync",
+            "Sleeping alerts y digest diario",
+            "Export CSV/JSON",
+            "Soporte por email en 48h"
+          ],
+          "cta": "Probar Pro 14 días gratis"
+        },
+        "studio": {
+          "name": "Studio",
+          "price": "$24",
+          "priceAnnual": "$19",
+          "priceCadence": "USD al mes",
+          "priceCadenceAnnual": "USD al mes, facturado anual",
+          "inheritsFrom": "Todo lo de Pro, más:",
+          "perks": [
+            "Proyectos, tareas y rutinas ilimitadas",
+            "Asistente IA — 600 mensajes/día",
+            "Deep Mode (Sonnet) — 25 mensajes/día",
+            "WhatsApp — 500 mensajes/mes + tu asistente vía WhatsApp (próximamente)",
+            "All-time analytics",
+            "Webhooks salientes y API key personal",
+            "Reglas personalizadas de notificación",
+            "Onboarding 1:1 y early access a features",
+            "Soporte prioritario en menos de 24h"
+          ],
+          "cta": "Probar Studio 14 días gratis"
+        }
+      },
+      "betaBanner": "Los usuarios beta se quedan con Studio gratis, de por vida. Sin truco. Solo feedback.",
+      "betaCta": "Solicitar acceso a la beta"
+    },
+    "finalCall": {
+      "headlineLine1": "El cementerio de proyectos a medias en tu cabeza no es tu fracaso.",
+      "headlineLine2": "Es un problema estructural de cómo se diseñó la productividad.",
+      "p1": "Te dieron herramientas para empezar. No te dieron herramientas para cerrar el bucle.",
+      "p2": "Claro que tienes un cementerio. El sistema que te entregaron construye cementerios.",
+      "p3": "¿Y si dejaras de aceptarlo?",
+      "p4": "¿Y si decidieras, hoy, hacer algo con las diecisiete cosas que empezaste y nunca terminaste?",
+      "p5": "Aunque sea una. Elige una. Ábrela. Decide si vive o muere. Toma la decisión.",
+      "p6": "Ese es todo el juego. El resto de tu vida es consecuencia de ese hábito.",
+      "cta": "Unirme a la beta",
+      "subCta": "Gratis de por vida. Sin tarjeta. 50 lugares.",
+      "tagline": "Termina lo que empiezas."
+    },
+    "footer": {
+      "tagline": "Termina lo que empiezas.",
+      "product": "Producto",
+      "productLinks": {
+        "features": "Cómo funciona",
+        "pricing": "Precios",
+        "manifesto": "Manifiesto del fundador"
+      },
+      "community": "Comunidad",
+      "communityLinks": {
+        "reddit": "r/Continuuit",
+        "twitter": "Twitter / X",
+        "newsletter": "Newsletter"
+      },
+      "company": "Compañía",
+      "companyLinks": {
+        "about": "Sobre nosotros",
+        "contact": "hello@continuu.it"
+      },
+      "copyright": "© {year} continuu.it"
+    },
+    "langSwitcher": {
+      "ariaLabel": "Cambiar idioma",
+      "en": "English",
+      "es": "Español"
+    },
+    "blog": {
+      "eyebrow": "Notas del fundador",
+      "title": "Blog",
+      "subtitle": "Cómo dejar de huir del trabajo que importa. Reflexiones honestas sobre construir, abandonar y terminar.",
+      "empty": "Aún no hay entradas publicadas.",
+      "readMore": "Leer la entrada",
+      "backToBlog": "Volver al blog"
+    }
+  }
+}

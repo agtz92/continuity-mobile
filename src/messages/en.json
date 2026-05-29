@@ -1,0 +1,1538 @@
+{
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to keep finishing what you start.",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "signIn": "Sign in",
+      "google": "Continue with Google",
+      "forgot": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up"
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Start finishing what you start.",
+      "name": "First name",
+      "namePlaceholder": "Your first name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "signUp": "Create account",
+      "haveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "checkEmail": "Account created. Check your email to confirm it, then sign in."
+    },
+    "reset": {
+      "title": "Reset your password",
+      "subtitle": "We'll email you a link to set a new password.",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "send": "Send reset link",
+      "sent": "If that email has an account, a reset link is on its way.",
+      "backToLogin": "Back to sign in"
+    },
+    "divider": "or",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "googleUnavailable": "Google sign-in needs a dev build. Use email and password in Expo Go for now."
+    }
+  },
+  "assistant": {
+    "title": "Assistant",
+    "subtitle": "Read-only Claude beta",
+    "subtitleReadWrite": "Claude beta — reads & updates",
+    "buttonLabel": "Ask Claude",
+    "openTooltip": "Ask Claude about your projects",
+    "newChat": "New conversation",
+    "close": "Close",
+    "send": "Send",
+    "stop": "Stop",
+    "deepMode": "Deep mode",
+    "deepModeHint": "Use the more capable Sonnet model for this reply. Costs more — daily limit applies.",
+    "inputPlaceholder": "Ask about your projects, tasks, or ideas…",
+    "welcome": {
+      "title": "Hi! I'm here to help.",
+      "body": "I can read your projects and tasks to summarize, suggest priorities, and find things. I can't edit anything yet — that's coming soon.",
+      "bodyReadWrite": "I can read and organize your work — create and update tasks, set priorities, draft routines, and tidy up projects. Just tell me what you need."
+    },
+    "message": {
+      "thinking": "Thinking…",
+      "working": "Claude is working…"
+    },
+    "tools": {
+      "running": "Running",
+      "done": "Done",
+      "input": "Input"
+    },
+    "quickActions": {
+      "priorities": "Priorities for this week",
+      "sleeping": "Summarize sleeping projects",
+      "lastWeek": "What did I work on last week?",
+      "staleIdeas": "Show stale ideas"
+    },
+    "usage": {
+      "usedOf": "{used} / {cap} messages today",
+      "uncapped": "Unlimited",
+      "upgrade": "Upgrade",
+      "dailyMessages": "Messages today",
+      "monthlyTokens": "Tokens this month"
+    },
+    "errors": {
+      "stopped": "Stopped",
+      "dailyLimit": "Daily message limit reached.",
+      "rateLimit": "Rate limit reached.",
+      "tooLong": "Message too long.",
+      "sessionExpired": "Session expired. Sign in again.",
+      "unknown": "Something went wrong."
+    }
+  },
+  "notifications": {
+    "dismiss": "Close",
+    "quotaWillExceed": {
+      "projects": {
+        "title": "You'll be over your projects quota",
+        "body": "You have {current} active projects. When you drop to Free on {date}, the plan allows only {cap}. Archive {over_by} before then to avoid being blocked.",
+        "cta": "Go to projects"
+      },
+      "tasks_total": {
+        "title": "You'll be over your tasks quota",
+        "body": "You have {current} open tasks. When you drop to Free on {date}, the plan allows only {cap}. Close or delete {over_by} before then.",
+        "cta": "Go to tasks"
+      },
+      "routines": {
+        "title": "You'll be over your routines quota",
+        "body": "You have {current} active routines. When you drop to Free on {date}, the plan allows only {cap}. Archive {over_by} before then.",
+        "cta": "Go to routines"
+      },
+      "ideas": {
+        "title": "You'll be over your ideas quota",
+        "body": "You have {current} ideas. When you drop to Free on {date}, the plan allows only {cap}. Delete or promote {over_by} before then.",
+        "cta": "Go to ideas"
+      },
+      "categories": {
+        "title": "You'll be over your categories quota",
+        "body": "You have {current} categories. When you drop to Free on {date}, the plan allows only {cap}. Delete {over_by} before then.",
+        "cta": "Manage categories"
+      }
+    },
+    "quotaOver": {
+      "projects": {
+        "title": "Project quota exceeded",
+        "body": "You have {current} active projects but the {plan} plan allows only {cap}. Archive {over_by} to avoid getting blocked when creating new ones.",
+        "cta": "Go to projects"
+      },
+      "tasks_total": {
+        "title": "Task quota exceeded",
+        "body": "You have {current} open tasks but the {plan} plan allows only {cap}. Close or delete {over_by} to get back under the limit.",
+        "cta": "Go to tasks"
+      },
+      "routines": {
+        "title": "Routine quota exceeded",
+        "body": "You have {current} active routines but the {plan} plan allows only {cap}. Archive {over_by} to get back under the limit.",
+        "cta": "Go to routines"
+      },
+      "ideas": {
+        "title": "Ideas quota exceeded",
+        "body": "You have {current} ideas but the {plan} plan allows only {cap}. Delete or promote {over_by} to projects.",
+        "cta": "Go to ideas"
+      },
+      "categories": {
+        "title": "Categories quota exceeded",
+        "body": "You have {current} categories but the {plan} plan allows only {cap}. Delete {over_by} to get back under the limit.",
+        "cta": "Manage categories"
+      }
+    }
+  },
+  "errors": {
+    "quota": {
+      "default": "You hit your {plan} plan limit ({current}/{cap}). Upgrade to keep going.",
+      "projects": "You hit your active projects limit on the {plan} plan ({current}/{cap}). Archive one or upgrade.",
+      "tasks_total": "You hit your open tasks limit on the {plan} plan ({current}/{cap}). Complete some or upgrade.",
+      "tasks_per_project": "You hit the per-project task limit on the {plan} plan ({current}/{cap}).",
+      "routines": "You hit your active routines limit on the {plan} plan ({current}/{cap}). Archive one or upgrade.",
+      "ideas": "You hit your ideas limit on the {plan} plan ({current}/{cap}). Promote one to a project or delete it.",
+      "categories": "You hit your categories limit on the {plan} plan ({current}/{cap}).",
+      "notes_per_project": "You hit the per-project notes limit on the {plan} plan ({current}/{cap})."
+    },
+    "retentionAlreadyUsed": "You've already used a retention offer. We'll take you straight to confirm cancellation.",
+    "noActiveSubscription": "This account has no active Stripe subscription.",
+    "billingNotConfigured": "Billing isn't configured yet. Let us know if this keeps happening.",
+    "unauthenticated": "Your session expired. Please sign in again.",
+    "badInput": "The information you submitted is invalid. Check and try again."
+  },
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saved": "Saved",
+    "retry": "Retry",
+    "back": "Back",
+    "backToDashboard": "Back to dashboard",
+    "comingSoon": "Coming soon.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "new": "New",
+    "clickToEdit": "Click to edit",
+    "showMore": "Show {count} more",
+    "showLess": "Show less",
+    "done": "Done",
+    "clear": "Clear"
+  },
+  "paywall": {
+    "title": "This feature requires {plan}",
+    "body": "Manage your account on the web to unlock it.",
+    "manage": "Manage my account"
+  },
+  "dashboard": {
+    "header": {
+      "active": "Active",
+      "launched": "Launched",
+      "stalled": "Stalled",
+      "thisWeek": "This week",
+      "streak": "Streak",
+      "streakRecord": "Streak · record",
+      "best": "Best",
+      "streakTooltipActive": "Current streak: {current, plural, one {# day} other {# days}} · Best: {best}",
+      "streakTooltipBest": "Best streak: {best, plural, one {# day} other {# days}}. Log activity today to start a new run.",
+      "weekTooltip": "Active on {count} of 7 days this week"
+    }
+  },
+  "tabs": {
+    "today": "Today",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "routines": "Routines",
+    "ideas": "Ideas",
+    "log": "Log",
+    "analytics": "Analytics",
+    "more": "More"
+  },
+  "status": {
+    "idea": "Idea",
+    "active": "Active",
+    "stalled": "Stalled",
+    "paused": "Paused",
+    "launched": "Launched",
+    "archived": "Archived",
+    "all": "All",
+    "allStatuses": "All statuses"
+  },
+  "priority": {
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "label": "Priority: {label}"
+  },
+  "accountMenu": {
+    "ariaLabel": "Account menu",
+    "freePlan": "Free plan",
+    "close": "Close",
+    "closeTooltip": "Close (Esc)",
+    "openTooltip": "Account & settings",
+    "groups": {
+      "settings": "Settings",
+      "workspace": "Workspace",
+      "support": "Support"
+    },
+    "items": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "appearance": "Appearance & language",
+      "billing": "Billing & plan",
+      "plugins": "Plugins",
+      "gettingStarted": "Getting started",
+      "categories": "Categories",
+      "exportBackup": "Export / backup",
+      "viewLanding": "Home page",
+      "blog": "Blog",
+      "resources": "Resources",
+      "comingSoon": "Soon",
+      "reportBug": "Report a bug",
+      "reddit": "Reddit community",
+      "discord": "Discord support",
+      "signOut": "Sign out"
+    }
+  },
+  "onboarding": {
+    "progress": "Step {current} of {total}",
+    "skip": "Skip setup",
+    "next": "Next",
+    "back": "Back",
+    "continue": "Continue",
+    "saving": "Saving",
+    "step1": {
+      "heading": "Welcome, builder.",
+      "sub": "This takes 90 seconds. What should I call you?",
+      "label": "First name",
+      "placeholder": "Just your first name",
+      "helperPrefilled": "From your Google account. Edit it if you want.",
+      "errorEmpty": "Type your first name.",
+      "errorTooLong": "50 characters max."
+    },
+    "step2": {
+      "heading": "How should this look?",
+      "sub": "You can change this anytime in Settings.",
+      "mode": "Mode",
+      "palette": "Palette"
+    },
+    "step3": {
+      "heading": "Pick an avatar, {name}.",
+      "sub": "Whichever feels like you."
+    },
+    "step4Beta": {
+      "heading": "Thanks for being here, {name}.",
+      "body": "You're on the {plan} plan, no charge. You're part of the first builders testing this.",
+      "body2": "If something breaks or feels off, tell me. Reply to any email I send. I read all of them.",
+      "signoff": "Alfredo",
+      "primary": "Go to dashboard"
+    },
+    "step4Plan": {
+      "heading": "Pick a plan, or don't.",
+      "sub": "Free works fine for most builders starting out. You can change this whenever.",
+      "decideLater": "Decide later",
+      "primary": "Continue",
+      "currentBadge": "Current",
+      "selectButton": "Select",
+      "selectedButton": "Selected",
+      "cards": {
+        "free": "Start here. Upgrade whenever.",
+        "pro": "More room. AI can write.",
+        "studio": "No limits, all features."
+      }
+    },
+    "replay": {
+      "banner": "Editing your setup. Saving applies to your account.",
+      "planHeading": "Your plan.",
+      "planInfo": "You're on the {plan} plan.",
+      "planChangeCta": "Manage in Billing",
+      "finishButton": "Done",
+      "replayTourButton": "Watch the dashboard tour again"
+    },
+    "tour": {
+      "next": "Next",
+      "skip": "Skip tour",
+      "step1": {
+        "title": "Projects live here.",
+        "body": "Each one is active, paused with intention, or killed. None of them sit in limbo."
+      },
+      "step2": {
+        "title": "Tasks belong to a project.",
+        "body": "If there's no project, there's no task. That's the rule."
+      },
+      "step3": {
+        "title": "Routines are what you do without thinking.",
+        "body": "The stuff that happens every day. Track it here. The rest is noise."
+      },
+      "step4": {
+        "title": "Stuck? Ask your AI.",
+        "body": "This button opens the assistant. It reads your projects and tasks, and answers in your context."
+      },
+      "finalCta": {
+        "title": "Now build something.",
+        "body": "Create your first project. Even if you're not sure what it is yet.",
+        "more": "There's more (ideas, log, analytics, chat) but we don't want to bore you. Here are the links when you need them. Anything else, ask your AI.",
+        "resourcesLink": "Resources",
+        "resourcesComingSoon": "Soon",
+        "primary": "Create first project",
+        "secondary": "I'll do it later"
+      }
+    }
+  },
+  "settings": {
+    "nav": {
+      "label": "Settings",
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "appearance": "Appearance & language",
+      "billing": "Billing & plan",
+      "plugins": "Plugins"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "Your account information.",
+      "email": "Email",
+      "memberSince": "Member since",
+      "avatar": "Avatar",
+      "avatarDescription": "Choose how you appear in the app.",
+      "changeAvatar": "Change avatar",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "clearAvatar": "Remove avatar",
+      "pickerTitle": "Choose your avatar",
+      "moreSoon": "Editable profile fields are coming soon.",
+      "connectedAccounts": "Connected accounts",
+      "googleConnect": "Connect Google account",
+      "googleConnectDescription": "Link your Google account to sign in with one tap.",
+      "googleConnected": "Google connected",
+      "googleConnecting": "Connecting…",
+      "googleLinkError": "Couldn't connect Google. Please try again."
+    },
+    "appearance": {
+      "title": "Appearance & language",
+      "description": "Pick how the app looks and the language you read it in.",
+      "language": "Language",
+      "languageHint": "Affects the app interface and any digests/notifications you receive.",
+      "theme": "Theme",
+      "themeHint": "Choose your preferred appearance. \"System\" follows your device setting.",
+      "themeContinuuit": "Continuuit",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System",
+      "palette": "Color palette",
+      "paletteHint": "Changes the accent colors only. Theme controls light/dark; palette swaps the highlights.",
+      "paletteDefault": "Default",
+      "paletteContinuuit": "Continuuit",
+      "palettePink": "Pink",
+      "paletteBusiness": "Business",
+      "paletteNeon": "Neon",
+      "paletteGreen": "Green",
+      "paletteTurquoise": "Turquoise",
+      "paletteCute": "Cute",
+      "paletteMidnight": "Midnight",
+      "paletteBoho": "Boho",
+      "paletteComplimentary": "Complimentary",
+      "paletteSunset": "Sunset",
+      "paletteRetro": "Retro"
+    },
+    "billing": {
+      "title": "Billing & plan",
+      "description": "Manage your subscription, payment method, and invoices.",
+      "currentPlan": "Current plan",
+      "free": "Free",
+      "pro": "Pro",
+      "studio": "Studio",
+      "admin": "Admin (staff)",
+      "freeBlurb": "Upgrade to Pro or Studio when you need more room or more AI.",
+      "exemptBadge": "Team comp",
+      "exemptBlurb": "Your account has the {plan} plan free of charge, courtesy of the team. You won't see Stripe charges while this exemption is active.",
+      "renewsAt": "Renews on {date}",
+      "renewsAtWithDays": "Next charge on {date} — in {days, plural, =0 {today} =1 {1 day} other {# days}}",
+      "renewsToday": "Renews today",
+      "cancelScheduled": "Cancellation scheduled",
+      "cancelScheduledBlurb": "Your {plan} plan stays active until {date} ({days, plural, =0 {today} =1 {1 day remaining} other {# days remaining}}). After that you'll automatically move to Free. Your projects and data are kept.",
+      "reactivate": "Reactivate subscription",
+      "reactivateSuccess": "Done. Your subscription stays active.",
+      "upgrade": "Upgrade plan",
+      "upgradeToPro": "Upgrade to Pro",
+      "upgradeToStudio": "Upgrade to Studio",
+      "upgradeSectionTitle": "Pick a plan",
+      "upgradeSectionTitlePro": "Take your account to the next level",
+      "popular": "Most popular",
+      "manageSubscription": "Manage subscription",
+      "manageOnWebHint": "Plan changes, payment methods, and invoices are managed on the web.",
+      "cancelSubscription": "Downgrade to Free",
+      "downgradeToProButton": "Downgrade to Pro",
+      "billingPeriod": {
+        "label": "Billing period",
+        "currentMonthly": "You're on monthly billing",
+        "currentAnnual": "You're on annual billing",
+        "switchToAnnual": "Switch to annual",
+        "switchToMonthly": "Switch to monthly",
+        "annualSavingsHint": "Annual billing saves ~22%",
+        "confirmTitle": "Switch to {period}",
+        "confirmTitleAnnual": "Switch to annual billing",
+        "confirmTitleMonthly": "Switch to monthly billing",
+        "confirmBodyToAnnual": "We'll switch your {plan} plan to annual billing. You'll go from {currentPrice} USD/month to {newPrice} USD/month billed once a year. Stripe will prorate the difference automatically.",
+        "confirmBodyToMonthly": "We'll switch your {plan} plan to monthly billing. You'll go from {currentPrice} USD/month (billed annually) to {newPrice} USD/month. The change applies from your next cycle.",
+        "confirm": "Confirm switch",
+        "back": "Back",
+        "successAnnual": "Done. You're now on annual billing.",
+        "successMonthly": "Done. You're now on monthly billing."
+      },
+      "downgradeConfirm": {
+        "title": "Downgrade to Pro?",
+        "body": "You'll switch from Studio to Pro immediately. Stripe will prorate the difference on your next invoice — you'll see an automatic credit. All your projects, tasks, and conversations stay.",
+        "noteAnnual": "Your current plan is annual. The downgrade leaves you on Pro monthly; if you prefer Pro annual, change it from 'Manage subscription' afterwards.",
+        "confirm": "Confirm downgrade",
+        "back": "Back",
+        "success": "Done. Your plan is now Pro."
+      },
+      "retention": {
+        "title": "Downgrade to Free",
+        "stepReasonTitle": "What's leading you to downgrade?",
+        "stepReasonSubtitle": "Your answer helps us improve.",
+        "reasonTooExpensive": "Too expensive",
+        "reasonNotUsed": "I don't use it enough",
+        "reasonMissingFeatures": "Missing features I need",
+        "reasonSwitching": "Found another tool",
+        "reasonTrialOnly": "Just trying it out",
+        "reasonOther": "Another reason",
+        "feedbackPlaceholder": "Tell us a bit more (optional)…",
+        "continue": "Continue",
+        "cancel": "Close",
+        "back": "Back",
+        "stepOfferTitleTooExpensive": "We hear you. Price matters.",
+        "stepOfferBodyTooExpensive": "Stay with us and we'll apply 30% off for the next 3 months, automatically.",
+        "stepOfferTitleNotUsed": "Want us to help you use it more?",
+        "stepOfferBodyNotUsed": "We'll apply 25% off for the next 3 months and send weekly tips to get more out of it.",
+        "stepOfferTitleMissingFeatures": "We want to know what's missing.",
+        "stepOfferBodyMissingFeatures": "Our team reads your feedback. Meanwhile, here's 25% off for the next 3 months.",
+        "stepOfferTitleSwitching": "Before you go…",
+        "stepOfferBodySwitching": "We'll apply 20% off for the next 3 months in case you want to reconsider.",
+        "stepOfferTitleTrialOnly": "A longer trial, on us.",
+        "stepOfferBodyTrialOnly": "30% off your next month so you can decide without pressure.",
+        "stepOfferTitleOther": "Before you go…",
+        "stepOfferBodyOther": "20% off for the next 3 months as a thank you.",
+        "acceptOffer": "Accept offer",
+        "declineOffer": "No, thanks",
+        "stepDowngradeTitle": "Try Pro instead of cancelling?",
+        "stepDowngradeBody": "Pro ({price}/mo) keeps the assistant with write mode, brainstorming, integrations and Deep Mode. Only the caps go down.",
+        "downgradeToPro": "Downgrade to Pro",
+        "stepConfirmTitle": "Confirm the change to Free",
+        "stepConfirmBody": "Your current plan stays active until {date}. After that, you'll be on the Free plan. Your projects, tasks, and ideas are kept — only the plan limits change.",
+        "confirmCancel": "Confirm change to Free",
+        "stepDoneTitleCancelled": "Done. We'll move you to Free on {date}.",
+        "stepDoneBodyCancelled": "You keep full access until then. Change your mind anytime — you can resubscribe from here.",
+        "stepDoneTitleOffer": "Discount applied!",
+        "stepDoneBodyOffer": "You'll see the adjustment on your next invoice. Thanks for sticking around.",
+        "stepDoneTitleDowngrade": "Plan switched to Pro.",
+        "stepDoneBodyDowngrade": "Stripe prorated the change. You'll see the adjustment on your next invoice.",
+        "close": "Close",
+        "retentionAlreadyUsed": "You've already used your retention offer. Let's go straight to confirm the downgrade to Free."
+      },
+      "billingMonthly": "Monthly",
+      "billingAnnual": "Annual",
+      "billingAnnualHint": "Save ~22% paying annually",
+      "checkoutSuccess": "All set! Your plan will activate as soon as Stripe confirms the payment.",
+      "checkoutCancelled": "You cancelled the payment. Try again whenever you're ready.",
+      "checkoutError": "Couldn't open checkout. Please try again in a moment.",
+      "portalError": "Couldn't open the billing portal. Please try again in a moment."
+    },
+    "plugins": {
+      "title": "Plugins",
+      "description": "Connect Continuity with the tools you already use.",
+      "comingSoonBody": "Integrations like GitHub, Linear, Notion, and Slack will live here.",
+      "statusConnected": "Connected",
+      "statusNotConnected": "Not connected",
+      "googleTasks": {
+        "name": "Google Tasks",
+        "shortDescription": "Import your tasks from Google Tasks.",
+        "title": "Google Tasks",
+        "description": "Bring your existing Google Tasks into Continuity. We'll only read your tasks — nothing is sent back to Google.",
+        "notConnectedBody": "Connect your Google account to choose which task lists to import.",
+        "connectButton": "Connect Google Tasks",
+        "connectedAs": "Connected as {email}",
+        "disconnectButton": "Disconnect",
+        "loadingLists": "Loading your task lists…",
+        "noLists": "No task lists were found in this Google account.",
+        "listColumn": "Google Task List",
+        "projectColumn": "Continuity Project",
+        "projectNone": "— Don't assign to a project",
+        "projectExisting": "Existing projects",
+        "projectNew": "Create new project: {name}",
+        "newProjectPlaceholder": "Type a name to create a new project",
+        "importButton": "Import tasks",
+        "importing": "Importing…",
+        "importSuccess": "Imported {imported} tasks. {skipped} skipped (already imported).",
+        "importSuccessWithProjects": "Imported {imported} tasks. Created project(s): {projects}.",
+        "errorConnect": "Could not start Google sign-in: {error}",
+        "errorImport": "Import failed: {error}"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Get nudges on Telegram so a project doesn't quietly die.",
+      "channels": "Channels",
+      "telegram": "Telegram",
+      "whatsappSoon": "WhatsApp coming soon.",
+      "useDeviceTimezone": "Use device timezone",
+      "weeklyDigest": "Weekly digest",
+      "weeklyDigestToggle": "Send a weekly summary of my analytics",
+      "day": "Day",
+      "hour": "Hour (local)",
+      "timezone": "Timezone (IANA)",
+      "timezoneSearchPlaceholder": "Search timezone...",
+      "timezoneNoMatches": "No matches",
+      "dailyDigest": "Daily pending",
+      "dailyDigestToggle": "Send me today's pending tasks",
+      "dailyDigestHint": "Delivered every day at the hour you pick, with overdue tasks and tasks due today.",
+      "otherNotifications": "Other notifications",
+      "sleepingAlertsToggle": "Sleeping project alerts (≥7, 14, 30 days idle)",
+      "dueRemindersToggle": "End-of-day pending warning",
+      "dueReminderHour": "Warning hour (local)",
+      "dueRemindersHint": "At the chosen hour, if there are still open tasks or routines for today, we'll ping you. If everything's closed, nothing is sent.",
+      "manualToggle": "Receive admin / manual announcements",
+      "channel": {
+        "connected": "Connected",
+        "waiting": "Waiting for you to press Start in Telegram…",
+        "notConnected": "Not connected",
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "disconnectConfirm": "Disconnect Telegram? You can reconnect later.",
+        "disconnected": "Disconnected"
+      }
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "chips": {
+      "activity": "Activity",
+      "cadence": "Cadence",
+      "status": "Status",
+      "backlog": "Backlog",
+      "weekday": "Days",
+      "topProjects": "Top",
+      "sleeping": "Sleeping",
+      "funnel": "Funnel",
+      "effort": "Effort"
+    },
+    "refreshing": "refreshing…",
+    "calculating": "Calculating analytics…",
+    "loadError": "Couldn't load analytics",
+    "cadence": {
+      "title": "Cadence",
+      "currentStreak": "Current streak",
+      "bestStreak": "Best streak",
+      "activeDays": "Active days",
+      "events": "Events"
+    },
+    "activityChart": {
+      "title": "Daily activity",
+      "updates": "Updates",
+      "tasks": "Tasks"
+    },
+    "weekday": {
+      "title": "By weekday",
+      "labels": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "topProjects": {
+      "title": "Most active",
+      "subtitle": "Top 5 by interactions (updates + completed tasks)",
+      "empty": "No activity in this range."
+    },
+    "statusBreakdown": {
+      "title": "By status and category",
+      "subtitle": "{count, plural, one {# project} other {# projects}}",
+      "status": "Status",
+      "category": "Category",
+      "noData": "No data.",
+      "noCategories": "No categories.",
+      "rowMeta": "{projects} proj · {interactions} interactions"
+    },
+    "backlog": {
+      "title": "Backlog",
+      "subtitle": "{count, plural, one {# open task total} other {# open tasks total}}",
+      "overdue": "Overdue",
+      "dueSoon": "Due soon (7d)",
+      "quickWins": "Quick wins",
+      "quickWinsHint": "Projects with ≤2 open tasks",
+      "almostThere": "Almost there",
+      "almostThereHint": "≥80% complete"
+    },
+    "sleeping": {
+      "title": "Sleeping",
+      "subtitle": "Projects with no recent activity (≥7 days)",
+      "empty": "Nothing sleeping. Good pace."
+    },
+    "stale": {
+      "title": "Stale ideas",
+      "subtitle": "Not promoted in ≥30 days",
+      "empty": "No stale ideas."
+    },
+    "ideaFunnel": {
+      "title": "Idea funnel",
+      "subtitle": "Ideas created vs promoted to projects",
+      "created": "Created",
+      "promoted": "Promoted",
+      "rate": "Rate"
+    },
+    "effort": {
+      "title": "Effort",
+      "subtitle": "{coverage}% coverage (only tasks with logged hours are counted)",
+      "totalHoursSuffix": "hours in range",
+      "empty": "No tasks with logged hours in this range."
+    },
+    "range": {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "1y": "1y",
+      "all": "All"
+    }
+  },
+  "views": {
+    "today": {
+      "greeting": {
+        "morning": "Good morning",
+        "afternoon": "Good afternoon",
+        "evening": "Good evening"
+      },
+      "streakCard": {
+        "title": "Streak",
+        "days": "{count, plural, one {# day} other {# days}}",
+        "nextMilestone": "Next goal: {days}d",
+        "best": "Best: {days}d"
+      },
+      "counters": {
+        "active": "Active",
+        "launched": "Launched",
+        "stalled": "Stalled",
+        "ideas": "Ideas",
+        "tasks": "Tasks"
+      },
+      "fab": {
+        "open": "Create",
+        "newTask": "New task",
+        "newProject": "New project",
+        "newRoutine": "New routine",
+        "newIdea": "New idea"
+      },
+      "backupAlert": {
+        "lastBackupAgo": "Last backup {days, plural, one {# day} other {# days}} ago",
+        "noBackup": "No backup yet",
+        "explanation": "Export a JSON backup so you don't lose your data.",
+        "openTools": "Open backup tools"
+      },
+      "stalledAlert": {
+        "title": "{count, plural, one {# project needs} other {# projects need}} attention",
+        "subtitleLead": "No activity in 7+ days.",
+        "subtitleEmphasis": "Don't let them quietly die."
+      },
+      "createMenu": {
+        "title": "Create",
+        "project": "Project",
+        "task": "Task",
+        "routine": "Routine",
+        "idea": "Idea"
+      },
+      "focus": {
+        "title": "Today's Focus",
+        "tasksTooltip": "{dueToday} due today · {overdue} overdue",
+        "tasksLabel": "{count, plural, one {# task} other {# tasks}}",
+        "overdueExtra": "· {count} overdue",
+        "totalHoursTooltip": "Total estimated hours for tasks due today + overdue",
+        "totalHoursLabel": "{hours}h total",
+        "markDone": "Mark task as done",
+        "emptyTitle": "Nothing pressing today.",
+        "emptyHintFirst": "Add your first project to get started.",
+        "emptyHintNext": "Add tasks or next steps to your active projects.",
+        "labels": {
+          "overdue": "Overdue",
+          "dueToday": "Due today",
+          "stalled": "Stalled",
+          "nextStep": "Next step"
+        },
+        "daysLate": "{count}d late",
+        "daysIdleLine": "{name} — {count, plural, one {# day idle} other {# days idle}}",
+        "viewAll": "View all tasks",
+        "moreCount": "+{count} more"
+      },
+      "doneToday": {
+        "title": "Done today",
+        "tasksLabel": "{count, plural, one {# task} other {# tasks}}",
+        "logsLabel": "{count, plural, one {# entry} other {# entries}}",
+        "showAll": "Show all",
+        "showOnlyTasks": "Show only tasks",
+        "showOnlyLogs": "Show only entries",
+        "hoursWorkedTooltip": "Total estimated hours worked on completed tasks today",
+        "hoursWorkedLabel": "{hours}h worked",
+        "hoursByProject": "Hours by project",
+        "task": "Task",
+        "log": "New log",
+        "note": "New note",
+        "routine": "Routine",
+        "edit": "Edit",
+        "editTaskAria": "Edit task",
+        "undo": "Undo",
+        "undoAria": "Undo completion"
+      },
+      "closeable": {
+        "title": "Close to the finish line",
+        "almostThereChip": "Almost there · {pct}%",
+        "tasksLeft": "{count, plural, one {# task left} other {# tasks left}} · {done}/{total} done",
+        "quickWin": "Quick win",
+        "tasksAway": "Only {count, plural, one {# task} other {# tasks}} away from finishing."
+      },
+      "sleeping": {
+        "title": "Sleeping projects",
+        "daysIdle": "{count}d idle",
+        "resume": "Resume"
+      },
+      "staleIdeas": {
+        "title": "{count, plural, one {# idea waiting} other {# ideas waiting}} for 30+ days",
+        "subtitle": "Promote one into a project, or let it go to make room for new thinking."
+      },
+      "active": {
+        "title": "Active Projects"
+      },
+      "launched": {
+        "title": "Launched · still has tasks"
+      },
+      "routines": {
+        "title": "Routines for today",
+        "routinesTooltip": "{dueToday} due today · {overdue} overdue",
+        "routinesLabel": "{count, plural, one {# routine} other {# routines}}",
+        "overdueExtra": "· {count} overdue",
+        "totalHoursTooltip": "Total estimated hours for routines due today + overdue",
+        "totalHoursLabel": "{hours}h total"
+      }
+    },
+    "tasks": {
+      "title": "All Tasks",
+      "search": "Search tasks or project...",
+      "empty": "No tasks yet.",
+      "addFirst": "Create first task",
+      "noMatch": "No tasks match \"{query}\"",
+      "todayBucket": "Today & overdue",
+      "todayEmpty": "All clear — nothing due today. ✨",
+      "overdueBucket": "Overdue",
+      "todayOnlyBucket": "Today",
+      "totalEffort": "Total estimated time",
+      "pickDay": "Pick a day",
+      "pickDayHint": "— schedule them so they happen",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "filterCta": "Filter",
+      "newAria": "New task",
+      "range": {
+        "today": "Today",
+        "week": "Week",
+        "all": "All"
+      },
+      "filterSheet": {
+        "title": "Filter",
+        "clear": "Clear",
+        "apply": "Apply ({count})",
+        "applyEmpty": "No tasks match",
+        "byProject": "By project",
+        "noProject": "No project",
+        "showCompleted": "Show completed",
+        "showBlocked": "Show blocked"
+      }
+    },
+    "routines": {
+      "title": "Routines",
+      "search": "Search routines...",
+      "empty": "No routines yet. Create one to track recurring or standalone activities.",
+      "addFirst": "Create first routine",
+      "todayBucket": "Today & overdue",
+      "todayEmpty": "No routines for today. ✨",
+      "completedToday": "Completed today",
+      "upcoming": "Upcoming (7 days)",
+      "later": "Later",
+      "archived": "Archived",
+      "newAria": "New routine"
+    },
+    "projects": {
+      "title": "All Projects",
+      "search": "Search by name, description, category...",
+      "empty": "No projects yet.",
+      "addFirst": "Add your first project",
+      "noMatchSearch": "No projects match \"{query}\"",
+      "noMatchFilters": "No projects match these filters",
+      "clearFilters": "Clear filters",
+      "filterStatusAria": "Filter by status",
+      "filterCategoryAria": "Filter by category",
+      "filterPriorityAria": "Filter by priority",
+      "sortAria": "Sort projects",
+      "allCategories": "All categories",
+      "allPriorities": "All priorities",
+      "filterCta": "Filter",
+      "sortCta": "Sort",
+      "newAria": "New project",
+      "filterSheet": {
+        "title": "Filter",
+        "clear": "Clear",
+        "apply": "Apply ({count})",
+        "applyEmpty": "No projects match",
+        "dueDate": "Due date",
+        "dueAny": "Any",
+        "dueOverdue": "Overdue",
+        "dueSoon": "Next 7 days",
+        "dueNone": "No date"
+      },
+      "sortSheet": {
+        "title": "Sort by"
+      },
+      "filterLabel": {
+        "status": "Status",
+        "category": "Category",
+        "priority": "Priority",
+        "sort": "Sort"
+      },
+      "sortBy": {
+        "label": "Sort",
+        "smart": "Smart",
+        "priority": "By priority",
+        "recent": "Recent activity",
+        "name": "Name",
+        "status": "By status"
+      },
+      "openFullView": "Open project",
+      "detail": {
+        "title": "Project detail",
+        "closeTooltip": "Close (Esc)"
+      },
+      "card": {
+        "overdueBadge": "{count} overdue",
+        "todayBadge": "{count} today",
+        "idleBadge": "{count}d idle",
+        "pendingHoursBadge": "{hours}h pending",
+        "pendingHoursTooltip": "Sum of effort hours of pending tasks",
+        "nextStep": "Next step",
+        "nextStepEmpty": "What's the very next concrete action?",
+        "whyMatters": "Why this matters",
+        "whyEmpty": "Capture your motivation so it's there when you need it.",
+        "description": "Description",
+        "descriptionEmpty": "Describe what this project is, in one paragraph.",
+        "notes": "Notes",
+        "notesEmpty": "Running thoughts, decisions, links, anything you don't want to forget.",
+        "tasks": "Tasks",
+        "addTask": "Add task",
+        "noTasks": "No tasks yet",
+        "recentActivity": "Recent activity",
+        "logUpdate": "Log update",
+        "noUpdates": "No updates logged",
+        "editTaskAria": "Edit task",
+        "deleteTaskAria": "Delete task"
+      }
+    },
+    "ideas": {
+      "title": "Ideas Parking Lot",
+      "search": "Search ideas...",
+      "capture": "Capture",
+      "captureAria": "Capture new idea",
+      "addFirst": "Capture first idea",
+      "subtitle": "Park new ideas here so you don't abandon current projects. Promote them when you're ready.",
+      "empty": "No ideas captured yet.",
+      "noMatch": "No ideas match \"{query}\"",
+      "promote": "Promote to project"
+    },
+    "log": {
+      "title": "Activity Log",
+      "search": "Search log entries or project...",
+      "empty": "No activity logged yet. Log updates from your projects to track momentum.",
+      "noMatch": "No log entries match \"{query}\"",
+      "noneInFilter": "No items in this filter.",
+      "deleteConfirm": "Delete this log entry?",
+      "editEntryAria": "Edit log entry",
+      "deleteEntryAria": "Delete log entry",
+      "filters": {
+        "all": "All",
+        "achievements": "Achievements",
+        "notes": "Notes",
+        "changes": "Changes",
+        "deleted": "Deleted"
+      },
+      "buckets": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This week",
+        "thisMonth": "This month",
+        "older": "Older"
+      },
+      "entries": {
+        "untitled": "(untitled)",
+        "taskCompleted": "Completed task {title}",
+        "taskCreated": "Created task {title}",
+        "taskDeleted": "Deleted task {title}",
+        "taskRescheduled": "Rescheduled {title} to {date}",
+        "taskDueCleared": "Cleared due date on {title}",
+        "projectCreated": "Created project {title}",
+        "projectDeleted": "Deleted project {title}",
+        "projectStatusChanged": "Moved {title}: {previous} → {next}",
+        "projectDueSet": "Set due date of {title} to {date}",
+        "projectDueCleared": "Cleared due date on {title}",
+        "ideaCreated": "Captured idea {title}",
+        "ideaDeleted": "Discarded idea {title}",
+        "ideaPromoted": "Promoted {title} → project",
+        "routineCreated": "Created routine {title}",
+        "routineCompleted": "Completed routine {title}",
+        "routineDeleted": "Deleted routine {title}"
+      }
+    }
+  },
+  "taskRow": {
+    "markDone": "Mark as done",
+    "markNotDone": "Mark as not done",
+    "deleteAria": "Delete task",
+    "dueToday": "Due today",
+    "addDate": "Add date",
+    "blocked": "Blocked"
+  },
+  "routineRow": {
+    "markDone": "Mark as done",
+    "markNotDone": "Mark as not done",
+    "today": "Today",
+    "editAria": "Edit routine",
+    "archiveAria": "Archive routine",
+    "unarchiveAria": "Restore routine",
+    "deleteAria": "Delete routine"
+  },
+  "recurrence": {
+    "once": "Once · {date}",
+    "weeklyEmpty": "No days selected",
+    "everyN": {
+      "days": "Every {n, plural, one {day} other {# days}}",
+      "weeks": "Every {n, plural, one {week} other {# weeks}}",
+      "months": "Every {n, plural, one {month} other {# months}}"
+    },
+    "monthlyDay": "Day {day} of each month",
+    "weekday": {
+      "short": {
+        "0": "M",
+        "1": "T",
+        "2": "W",
+        "3": "T",
+        "4": "F",
+        "5": "S",
+        "6": "S"
+      }
+    }
+  },
+  "projectCard": {
+    "comebackBadge": "Comeback · {days}d",
+    "comebackTooltip": "Activity resumed within the last 24h after being idle",
+    "openCount": "{count} open",
+    "overdueBadge": "{count} overdue",
+    "todayBadge": "{count} today",
+    "donePct": "{pct}% done",
+    "todayHoursTooltip": "Hours invested today",
+    "todayHoursLabel": "+{hours}h today",
+    "totalHoursTooltip": "Total hours invested across completed tasks",
+    "totalHoursLabel": "{hours}h total",
+    "daysAgo": "{days}d ago"
+  },
+  "notes": {
+    "newNote": "New note",
+    "untitled": "Untitled note",
+    "empty": "No notes yet. Capture decisions, links, ideas as you work.",
+    "titlePlaceholder": "Title (optional)",
+    "bodyPlaceholder": "Decisions, links, ideas, anything you don't want to forget…",
+    "editorHint": "⌘+Enter to save · Esc to cancel",
+    "deleteConfirm": "Delete this note?",
+    "justNow": "just now",
+    "minutesAgo": "{count, plural, one {# min ago} other {# min ago}}",
+    "hoursAgo": "{count, plural, one {# hr ago} other {# hrs ago}}",
+    "daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+  },
+  "modals": {
+    "project": {
+      "newTitle": "New Project",
+      "editTitle": "Edit Project",
+      "name": "Name *",
+      "why": "Why does this matter?",
+      "whyPlaceholder": "Your motivation — comes back when stalled.",
+      "description": "Description",
+      "descriptionPlaceholder": "What is this project, in one paragraph.",
+      "nextStep": "Next step",
+      "nextStepPlaceholder": "The very next concrete action",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "noCategory": "No category",
+      "newCategoryName": "Category name",
+      "createCategory": "Create"
+    },
+    "task": {
+      "newTitle": "New Task",
+      "editTitle": "Edit Task",
+      "titleField": "Title *",
+      "project": "Project",
+      "noProject": "No project",
+      "dueDate": "Due date",
+      "effort": "Effort (hours)",
+      "effortPlaceholder": "e.g. 2.5",
+      "decreaseEffortAria": "Decrease effort",
+      "increaseEffortAria": "Increase effort",
+      "blockers": "Blockers",
+      "selectBlockingTask": "Select a blocking task…",
+      "addBlocker": "Add",
+      "externalBlockerPlaceholder": "External blocker (e.g. waiting on client)",
+      "unknownTask": "Unknown task",
+      "chips": {
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "thisWeek": "This week",
+        "clear": "Clear"
+      }
+    },
+    "idea": {
+      "newTitle": "Capture Idea",
+      "editTitle": "Edit Idea",
+      "intro": "Park it here so it doesn't pull you off your current work.",
+      "title": "Idea *",
+      "why": "Why does this matter?",
+      "whyPlaceholder": "Optional motivation — useful when you promote it later.",
+      "notes": "Notes",
+      "captureCta": "Capture"
+    },
+    "routine": {
+      "newTitle": "New routine",
+      "editTitle": "Edit routine",
+      "titleField": "Title *",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional — a short reminder.",
+      "recurrenceType": "Recurrence",
+      "type": {
+        "once": "Once",
+        "weeklyDays": "Weekly (days)",
+        "everyN": "Every N…",
+        "monthlyDay": "Day of month"
+      },
+      "dateField": "Date",
+      "startDateField": "Start",
+      "endDateField": "End (optional)",
+      "weekdaysField": "Weekdays",
+      "intervalField": "Every",
+      "unit": {
+        "days": "days",
+        "weeks": "weeks",
+        "months": "months"
+      },
+      "monthlyDayHint": "Will repeat on day {day} of every month (taken from the start date).",
+      "effort": "Estimated effort (hours)",
+      "effortPlaceholder": "Optional · e.g. 0.5",
+      "decreaseEffortAria": "Decrease effort",
+      "increaseEffortAria": "Increase effort",
+      "errorTitle": "Add a title.",
+      "errorStartDate": "Pick a date.",
+      "errorWeekdays": "Select at least one weekday.",
+      "errorIntervalN": "Interval must be a number ≥ 1.",
+      "errorMonthlyDay": "Day of month must be between 1 and 31."
+    },
+    "update": {
+      "newTitle": "Log update",
+      "editTitle": "Edit log entry",
+      "field": "What happened?",
+      "placeholder": "e.g., Finished the landing page wireframe",
+      "logCta": "Log it"
+    },
+    "category": {
+      "title": "Manage categories",
+      "empty": "No categories yet.",
+      "add": "New category",
+      "create": "Create",
+      "save": "Save",
+      "cancel": "Cancel",
+      "namePlaceholder": "Name",
+      "editAria": "Edit category",
+      "deleteAria": "Delete category",
+      "footnote": "Deleting a category leaves its projects intact (just uncategorized)."
+    },
+    "backup": {
+      "title": "Backup & Restore",
+      "intro": "Export a JSON file with all your projects, tasks, ideas, and activity log. Save it somewhere safe (Google Drive, Dropbox, iCloud).",
+      "currentData": "Current data",
+      "counts": "{projects} projects · {tasks} tasks · {ideas} ideas · {updates} updates",
+      "lastBackup": "Last backup: {when}",
+      "exportCta": "Export to JSON file",
+      "restoreHeader": "Restore from backup",
+      "restoreIntro": "Select a previously exported JSON file. Choose how to handle existing data:",
+      "importMerge": "Import & merge with current data",
+      "importReplace": "Import & replace all data",
+      "replaceConfirm": "This will DELETE all current data and replace it with the backup. Continue?",
+      "toast": {
+        "exported": "Backup exported",
+        "invalidFile": "Invalid file. Expected a Continuity export.",
+        "readError": "Could not read backup file: {message}",
+        "imported": "Imported {projects} projects, {tasks} tasks, {ideas} ideas, {notes} notes, {projectNotes} project notes."
+      }
+    }
+  },
+  "avatars": {
+    "styles": {
+      "3d": "3D",
+      "anime": "Anime",
+      "8bit": "8-bit",
+      "vector": "Vector"
+    },
+    "names": {
+      "momo": "Momo",
+      "yuki": "Yuki",
+      "tako": "Tako",
+      "kuma": "Kuma",
+      "hoshi": "Hoshi",
+      "pip": "Pip",
+      "tetsu": "Tetsu"
+    }
+  },
+  "admin": {
+    "toast": {
+      "statusUpdated": "Status updated",
+      "postDeleted": "Post deleted",
+      "pageDeleted": "Page deleted",
+      "resourceCreated": "Resource created",
+      "resourceDeleted": "Resource deleted",
+      "categoryCreated": "Category created",
+      "categoryDeleted": "Category deleted",
+      "cannotDeleteCategoryInUse": "Move or remove the resources in this category first",
+      "imageUploadError": "Failed to upload image"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "continuu.it — Finish what you start",
+      "description": "The project manager for people who start more than they finish. Built for founders, freelancers, and side-project builders who keep abandoning what matters most."
+    },
+    "nav": {
+      "features": "How it works",
+      "pricing": "Pricing",
+      "blog": "Blog",
+      "beta": "Beta",
+      "signIn": "Login",
+      "dashboard": "Go to dashboard",
+      "ctaShort": "Join beta"
+    },
+    "hero": {
+      "eyebrow": "Currently in private beta. 50 spots available.",
+      "headline": "Finish what you start.",
+      "subheadline": "The project manager for people who start more than they finish. Built for founders, freelancers, and side-project builders who keep abandoning what matters most.",
+      "ctaPrimary": "Get beta access — free",
+      "ctaSecondary": "No credit card. Lifetime free for the first 50 testers.",
+      "scrollHint": "See how it works"
+    },
+    "recognition": {
+      "headline": "You have a graveyard of unfinished projects. You're not alone. You're not lazy.",
+      "p1": "Open your Notion. Count the half-written docs.",
+      "p2": "Open your GitHub. Count the private repos.",
+      "p3": "Open your bookmarks. Count the tools you bought once and never opened.",
+      "p4": "You are not unmotivated. You are not unintelligent. You are not lacking discipline.",
+      "p5": "You have been using productivity tools designed for the wrong problem.",
+      "callout": "Five months on an ERP I never deployed. A web agency while my own websites went stale. A fantasy football tool while my team waited on me. Three weeks coding around a 30-minute bug.",
+      "calloutAuthor": "Alfredo, founder of continuu.it",
+      "readManifesto": "Read the full founder manifesto"
+    },
+    "diagnosis": {
+      "headline": "Every productivity tool was built to help you start. None were built to help you finish.",
+      "p1": "Todoist makes it frictionless to add a task. Notion makes it elegant to start a new doc. Things makes it satisfying to plan a project.",
+      "p2": "These tools all reward the dopamine hit of beginning.",
+      "p3": "That's why you have 47 projects, 12 systems, and 3 productivity apps open right now, and still feel behind on everything.",
+      "p4": "The problem isn't capture. It's closure.",
+      "compare": {
+        "othersTitle": "Other tools",
+        "usTitle": "continuu.it",
+        "rows": [
+          { "others": "Capture more", "us": "Finish more" },
+          { "others": "Plan more", "us": "Close loops" },
+          { "others": "Add new projects", "us": "Confront old ones" },
+          { "others": "Optimize for start", "us": "Optimize for done" }
+        ]
+      }
+    },
+    "promise": {
+      "eyebrow": "Introducing continuu.it",
+      "headline": "The project manager that closes the loop.",
+      "p1": "continuu.it is the first tool designed around a single principle: every project you start must reach a decision.",
+      "p2": "Finished. Killed. Paused with intention.",
+      "p3": "Never abandoned. Never drifting. Never lost in the graveyard of 'I'll get to it later.'",
+      "p4": "Because the cost of unfinished work isn't time. It's competitive position. It's trust. It's the slow erosion of your relationship with your own ideas.",
+      "p5": "We built continuu.it to give you that back.",
+      "cta": "Get beta access"
+    },
+    "features": {
+      "intro": {
+        "eyebrow": "How you'll use it",
+        "headline": "Six rituals that turn drift into shipped work."
+      },
+      "forcedClosure": {
+        "label": "Forced closure",
+        "headline": "No project drifts. Ever.",
+        "body": "Every project lives in one of four states: Active, Paused, Killed, or Completed. After 14 days of silence, continuu.it asks you which one you mean. The drift is what kills builders. We don't let it happen.",
+        "demo": {
+          "projectTitle": "Landing page redesign",
+          "daysSilent": "14 days untouched",
+          "prompt": "You haven't touched this in 14 days. Are you ready to ship? Need help? Or is this project done?",
+          "ship": "Ship it",
+          "help": "I need help",
+          "kill": "Kill it"
+        }
+      },
+      "aiChat": {
+        "label": "AI chat",
+        "headline": "Tell the AI what you're building. It breaks it into tasks that actually move you forward.",
+        "body": "Not generic 'Plan, Build, Test, Launch' templates. Real, specific, actionable next steps tailored to your project, your stack, your scope. You just have to be honest about what you want to build.",
+        "demo": {
+          "projectTitle": "Project: SaaS landing page",
+          "userMessage": "I want to build a landing page for my SaaS in Next.js, but I always get stuck on what to do first.",
+          "aiResponse": "Got it. Three quick questions:",
+          "questions": [
+            "Do you already have copy written, or do you need to start with messaging?",
+            "Are you using a design system or starting from scratch?",
+            "What's your timeline?"
+          ],
+          "footer": "Once I know these, I'll break this into 8–12 tasks ordered by what unblocks what.",
+          "tag": "AI assistant"
+        },
+        "closing": "Most projects don't die from lack of effort. They die from lack of structure. We fix that on day one."
+      },
+      "resumeContext": {
+        "label": "AI resume context",
+        "headline": "Come back to projects without losing where you were.",
+        "body": "You paused a project three weeks ago. You're ready to pick it back up. But you've forgotten where you were, what you decided, and what was blocking you. continuu.it solves that.",
+        "demo": {
+          "title": "Welcome back to Landing Page Redesign",
+          "lastWorked": "You last worked on this 23 days ago.",
+          "nextActionLabel": "Your next action was:",
+          "nextAction": "Write hero copy for new pricing section",
+          "blockersLabel": "Open blockers:",
+          "blockers": [
+            "Pricing strategy not finalized",
+            "Design tokens not migrated to v2",
+            "Demo video pending recording"
+          ],
+          "decisionsLabel": "Decisions you'd already made:",
+          "decisions": ["Stripe over Lemon Squeezy", "Three pricing tiers, annual discount"]
+        },
+        "closing": "The cost of returning drops to zero. Projects you wrote off start finishing themselves."
+      },
+      "notifications": {
+        "label": "Telegram + WhatsApp",
+        "headline": "Wake up to your day. Get reminded before you lose it.",
+        "body": "continuu.it meets you where you already are. Every morning, at the time you choose, it sends you a focused summary on Telegram. WhatsApp coming soon. Same workflow, your chosen channel.",
+        "demo": {
+          "botName": "continuu.it bot",
+          "greeting": "Good morning, Alfredo.",
+          "todayLabel": "Today's pending work:",
+          "topPriorityLabel": "Top priority",
+          "topPriority": "Finish the landing page hero",
+          "topPriorityNote": "Active for 5 days, you committed to shipping it this week",
+          "secondaryLabel": "Secondary",
+          "secondary": ["Review GTM conversion tracking", "Reply to beta tester feedback"],
+          "footer": "Reply STATUS for full report.",
+          "userReply": "STATUS"
+        },
+        "closing": "Notifications work best when they live where your attention already is."
+      },
+      "friction": {
+        "label": "Friction where it matters",
+        "headline": "New ideas have friction. Existing commitments don't.",
+        "body": "Every time you add a new project in continuu.it, you see every active project you already have. Not to abandon them. Just to acknowledge them. To make a decision.",
+        "demo": {
+          "newProjectLabel": "New project",
+          "newProjectPlaceholder": "Workflow automation tool for indie hackers…",
+          "modalTitle": "Before you start a new one…",
+          "modalBody": "You already have 4 active projects. Which decision are you making?",
+          "activeProjects": [
+            { "name": "Landing page redesign", "status": "5 days active" },
+            { "name": "Telegram bot v2", "status": "12 days paused" },
+            { "name": "Newsletter migration", "status": "23 days active" },
+            { "name": "Fantasy football tool", "status": "47 days drifting" }
+          ],
+          "continueNew": "Start anyway",
+          "pauseExisting": "Pause one first",
+          "reconsider": "Reconsider"
+        },
+        "closing": "Often, the decision is to ship one of them first."
+      },
+      "sundayReview": {
+        "label": "Sunday review",
+        "headline": "The most important hour of your week.",
+        "body": "Every Sunday at a time you choose, continuu.it asks five questions. Ten minutes. One ritual. The mechanism that prevents next Friday from being a repeat of last Friday.",
+        "demo": {
+          "title": "Sunday review",
+          "subtitle": "Five questions. Ten minutes.",
+          "questions": [
+            "What did you ship this week?",
+            "What did you avoid?",
+            "What blocker do you keep hitting?",
+            "What will you commit to next week?",
+            "What will you let go of?"
+          ],
+          "placeholder": "Type your answer…",
+          "cta": "Next question"
+        },
+        "closing": "We didn't invent the weekly review. We just made it impossible to skip."
+      }
+    },
+    "loopSociety": {
+      "eyebrow": "The math of unfinished work",
+      "headline": "Every builder is carrying a graveyard.",
+      "subheadline": "The pattern repeats. The numbers don't lie.",
+      "body": "This is the shape of the problem — the gravity continuu.it was built against.",
+      "stats": {
+        "one": {
+          "value": "47",
+          "label": "Open projects",
+          "body": "The number of half-finished projects the average builder carries in their head. Most never reach a decision."
+        },
+        "two": {
+          "value": "3 weeks",
+          "label": "Half-life",
+          "body": "The point at which a side project drifts from \"I'm working on it\" to \"I'll get back to it\" — and never does."
+        },
+        "three": {
+          "value": "4 tools",
+          "label": "Open right now",
+          "body": "Productivity apps competing for your attention. None of them are designed to close a loop. All of them reward starting."
+        },
+        "four": {
+          "value": "0 apps",
+          "label": "Until now",
+          "body": "Built around forced closure. Every other tool makes starting easier. We make finishing the only way out."
+        }
+      }
+    },
+    "howItWorks": {
+      "headline": "How continuu.it works",
+      "steps": [
+        {
+          "title": "Bring in what you're already building.",
+          "body": "Add your half-finished projects. The repo. The Notion doc. The side hustle. Then chat with the AI to break each one into tasks that make sense."
+        },
+        {
+          "title": "Let the system meet you where you are.",
+          "body": "Get your morning briefing on Telegram. Set reminder times. Pick up paused projects with AI context. We close the loop on follow-up so you can stay in the flow of building."
+        },
+        {
+          "title": "Show up on Sundays. Make decisions.",
+          "body": "continuu.it nudges, summarizes, reminds, and ritualizes. You just have to answer five questions every Sunday and pick what's next."
+        }
+      ],
+      "cta": "Start your beta — free for life"
+    },
+    "beta": {
+      "eyebrow": "Currently in private beta",
+      "headline": "50 spots. Lifetime free Pro access.",
+      "body": "We're letting in the first 50 builders to test continuu.it before public launch. In exchange for your honest feedback, you get:",
+      "perks": [
+        "Lifetime free access to Pro tier ($96/year value)",
+        "Direct line to the founder for feature requests",
+        "Influence on what we build next",
+        "Founding member badge in your profile",
+        "Early access to The Loop Society Premium avatars"
+      ],
+      "footer": "Spots are filled on a first-come basis. We're looking for builders willing to articulate what they like and what they don't. No fluff. Just builders willing to help us build.",
+      "cta": "Reserve your spot",
+      "counter": {
+        "claimed": "{taken} / {total} spots claimed",
+        "almostFull": "Almost full",
+        "live": "Live"
+      }
+    },
+    "pricing": {
+      "headline": "Pick the plan that finishes with you.",
+      "subheadline": "Start free. Upgrade when you need to.",
+      "monthly": "/month",
+      "yearly": "/year",
+      "popular": "Most popular",
+      "billingToggle": {
+        "monthly": "Monthly",
+        "annual": "Annual",
+        "annualHint": "Save ~22% paying annually"
+      },
+      "tiers": {
+        "free": {
+          "name": "Free",
+          "price": "Free",
+          "priceCadence": "forever",
+          "perks": [
+            "3 active projects",
+            "50 open tasks",
+            "2 active routines",
+            "AI Assistant — 15 messages/day (read-only)",
+            "Email and Telegram notifications",
+            "Full Today view, analytics, and activity log",
+            "30-day history",
+            "Up to 30 ideas"
+          ],
+          "cta": "Sign up for free"
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "$9",
+          "priceAnnual": "$7",
+          "priceCadence": "USD per month",
+          "priceCadenceAnnual": "USD per month, billed annually",
+          "inheritsFrom": "Everything in Free, plus:",
+          "perks": [
+            "25 active projects, 200 tasks per project",
+            "20 active routines, 500 ideas",
+            "AI Assistant — 200 messages/day with write + brainstorming",
+            "Deep Mode (Sonnet) — 5 messages/day",
+            "WhatsApp — 100 messages/month included",
+            "Google Tasks + Calendar sync",
+            "Sleeping alerts and daily digest",
+            "CSV/JSON export",
+            "Email support within 48h"
+          ],
+          "cta": "Try Pro free for 14 days"
+        },
+        "studio": {
+          "name": "Studio",
+          "price": "$24",
+          "priceAnnual": "$19",
+          "priceCadence": "USD per month",
+          "priceCadenceAnnual": "USD per month, billed annually",
+          "inheritsFrom": "Everything in Pro, plus:",
+          "perks": [
+            "Unlimited projects, tasks, and routines",
+            "AI Assistant — 600 messages/day",
+            "Deep Mode (Sonnet) — 25 messages/day",
+            "WhatsApp — 500 messages/month + your assistant on WhatsApp (coming soon)",
+            "All-time analytics",
+            "Outbound webhooks and personal API key",
+            "Custom notification rules",
+            "1:1 onboarding and early access to new features",
+            "Priority support within 24h"
+          ],
+          "cta": "Try Studio free for 14 days"
+        }
+      },
+      "betaBanner": "Beta users keep Studio free, for life. No catch. Just feedback.",
+      "betaCta": "Apply for beta access"
+    },
+    "finalCall": {
+      "headlineLine1": "The graveyard of unfinished projects in your head is not your failure.",
+      "headlineLine2": "It's a structural problem with how productivity has been designed.",
+      "p1": "You have been given tools for starting. You have not been given tools for closing the loop.",
+      "p2": "Of course you have a graveyard. The system you were handed builds graveyards.",
+      "p3": "What if you stopped accepting that?",
+      "p4": "What if you decided, today, to do something about the seventeen things you started and never finished?",
+      "p5": "Even one of them. Pick one. Open it. Decide if it lives or dies. Make the call.",
+      "p6": "That's the whole game. The rest of your life is downstream of that single habit.",
+      "cta": "Join the beta",
+      "subCta": "Free for life. No credit card. 50 spots.",
+      "tagline": "Finish what you start."
+    },
+    "footer": {
+      "tagline": "Finish what you start.",
+      "product": "Product",
+      "productLinks": {
+        "features": "How it works",
+        "pricing": "Pricing",
+        "manifesto": "Founder manifesto"
+      },
+      "community": "Community",
+      "communityLinks": {
+        "reddit": "r/Continuuit",
+        "twitter": "Twitter / X",
+        "newsletter": "Newsletter"
+      },
+      "company": "Company",
+      "companyLinks": {
+        "about": "About",
+        "contact": "hello@continuu.it"
+      },
+      "copyright": "© {year} continuu.it"
+    },
+    "langSwitcher": {
+      "ariaLabel": "Change language",
+      "en": "English",
+      "es": "Español"
+    },
+    "blog": {
+      "eyebrow": "Founder notes",
+      "title": "Blog",
+      "subtitle": "How to stop running from the work that matters. Honest reflections on building, abandoning, and finishing.",
+      "empty": "No posts published yet.",
+      "readMore": "Read the post",
+      "backToBlog": "Back to blog"
+    }
+  }
+}

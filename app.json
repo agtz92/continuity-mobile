@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "continuity-mobile",
+    "name": "Continuity",
     "slug": "continuity-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "continuitymobile",
+    "scheme": "continuity",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.continuity.app",
+      "supportsTablet": true
     },
     "android": {
+      "package": "com.continuity.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -34,7 +36,9 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
