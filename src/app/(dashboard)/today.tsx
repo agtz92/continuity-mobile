@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useMemo, useState } from "react";
+import { Fragment, type ReactNode, useCallback, useMemo, useState } from "react";
 import {
   Pressable,
   RefreshControl,
@@ -11,7 +11,7 @@ import DraggableFlatList, {
   type RenderItemParams,
 } from "react-native-draggable-flatlist";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Bell,
@@ -204,6 +204,20 @@ export default function Today() {
     } finally {
       setRefreshing(false);
     }
+  };
+
+  // Refetch whenever the Today screen comes into focus — so navigating back
+  // from a form (task-form, project-form, etc.) shows the newly created
+  // item without requiring a manual pull-to-refresh.
+  useFocusEffect(
+    useCallback(() => {
+      refetch().catch(() => undefined);
+    }, [refetch])
+  );
+
+  const exitEditAndRefresh = () => {
+    layout.setEditMode(false);
+    refetch().catch(() => undefined);
   };
 
   const jumpToProject = (id: string) =>
@@ -1230,7 +1244,7 @@ export default function Today() {
       <GestureHandlerRootView className="flex-1 bg-bg">
         <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
           <TodayCustomizeBar
-            onExit={() => layout.setEditMode(false)}
+            onExit={exitEditAndRefresh}
             onReset={layout.reset}
             labels={{
               title: t("views.today.customize.title"),

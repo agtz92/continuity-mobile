@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useApolloClient } from "@apollo/client/react";
 import i18n from "@/lib/i18n";
+import { DASHBOARD_QUERY } from "@/lib/graphql";
 import {
   cancelConversation,
   getUsage,
@@ -46,6 +48,8 @@ const INITIAL: AssistantState = {
 export function useAssistant() {
   const [state, setState] = useState<AssistantState>(INITIAL);
   const abortRef = useRef<AbortController | null>(null);
+  const usedToolRef = useRef(false);
+  const apollo = useApolloClient();
 
   const refreshUsage = useCallback(async () => {
     try {
@@ -67,6 +71,7 @@ export function useAssistant() {
       if (!trimmed) return;
 
       const userId = `local-${Date.now()}`;
+      usedToolRef.current = false;
       setState((s) => ({
         ...s,
         streaming: true,
@@ -117,6 +122,7 @@ export function useAssistant() {
                 append({ type: "text", text: event.payload.text });
               }
             } else if (event.kind === "tool_use_start") {
+              usedToolRef.current = true;
               append({
                 type: "tool_use",
                 id: event.payload.id,
@@ -177,9 +183,19 @@ export function useAssistant() {
         abortRef.current = null;
         setState((s) => ({ ...s, streaming: false }));
         refreshUsage();
+        // The assistant runs tools server-side that can create/update/delete
+        // projects, tasks, ideas, routines, etc. — none of which go through
+        // Apollo on the client. Refetch the dashboard so anything the AI
+        // touched shows up the moment the user navigates back.
+        if (usedToolRef.current) {
+          usedToolRef.current = false;
+          apollo
+            .refetchQueries({ include: [DASHBOARD_QUERY] })
+            .catch(() => undefined);
+        }
       }
     },
-    [state.streaming, state.conversationId, refreshUsage],
+    [state.streaming, state.conversationId, refreshUsage, apollo],
   );
 
   const stop = useCallback(async () => {
