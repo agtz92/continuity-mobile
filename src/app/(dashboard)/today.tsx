@@ -160,11 +160,11 @@ export default function Today() {
   const [refreshing, setRefreshing] = useState(false);
   const [showTodayFocus, setShowTodayFocus] = useState(true);
   const [showRoutinesToday, setShowRoutinesToday] = useState(true);
-  const [showDoneToday, setShowDoneToday] = useState(true);
-  const [showCloseable, setShowCloseable] = useState(true);
-  const [showSleeping, setShowSleeping] = useState(true);
-  const [showActive, setShowActive] = useState(true);
-  const [showLaunched, setShowLaunched] = useState(true);
+  const [showDoneToday, setShowDoneToday] = useState(false);
+  const [showCloseable, setShowCloseable] = useState(false);
+  const [showSleeping, setShowSleeping] = useState(false);
+  const [showActive, setShowActive] = useState(false);
+  const [showLaunched, setShowLaunched] = useState(false);
   const [doneTodayFilter, setDoneTodayFilter] = useState<"all" | "task" | "log">(
     "all"
   );
