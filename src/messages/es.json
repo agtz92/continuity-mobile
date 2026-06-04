@@ -692,6 +692,32 @@
         "newRoutine": "Nueva rutina",
         "newIdea": "Nueva idea"
       },
+      "customize": {
+        "entry": "Personalizar Today",
+        "title": "Personalizar Today",
+        "close": "Cerrar",
+        "done": "Listo",
+        "reset": "Restablecer",
+        "show": "Mostrar sección",
+        "hide": "Oculta",
+        "alwaysVisible": "Siempre visible",
+        "dragToReorder": "Mantén presionado y arrastra para reordenar",
+        "mobileOnly": "Móvil",
+        "hiddenFooter": "{{count}} ocultas · Personalizar"
+      },
+      "sections": {
+        "streak": "Racha",
+        "counters": "Contadores",
+        "stalledAlert": "Alerta de detenidos",
+        "todayFocus": "Enfoque de hoy",
+        "routinesToday": "Rutinas para hoy",
+        "doneToday": "Hecho hoy",
+        "closeable": "Proyectos por cerrar",
+        "sleeping": "Proyectos durmiendo",
+        "staleIdeas": "Ideas estancadas",
+        "activeProjects": "Proyectos activos",
+        "launchedWithTasks": "Lanzados con tareas abiertas"
+      },
       "backupAlert": {
         "lastBackupAgo": "Último respaldo hace {days, plural, one {# día} other {# días}}",
         "noBackup": "Aún no hay respaldo",

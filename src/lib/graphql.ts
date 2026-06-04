@@ -1457,6 +1457,35 @@ export const MARK_TOUR = gql`
   }
 `;
 
+const TODAY_LAYOUT_FIELDS = `
+  order
+  hidden
+`;
+
+export const TODAY_LAYOUT_QUERY = gql`
+  query TodayLayout {
+    todayLayout {
+      ${TODAY_LAYOUT_FIELDS}
+    }
+  }
+`;
+
+export const UPDATE_TODAY_LAYOUT = gql`
+  mutation UpdateTodayLayout($order: [String!], $hidden: [String!]) {
+    updateTodayLayout(order: $order, hidden: $hidden) {
+      ${TODAY_LAYOUT_FIELDS}
+    }
+  }
+`;
+
+export const RESET_TODAY_LAYOUT = gql`
+  mutation ResetTodayLayout {
+    resetTodayLayout {
+      ${TODAY_LAYOUT_FIELDS}
+    }
+  }
+`;
+
 export const ACTIVITY_QUERY = gql`
   query ActivityFeed(
     $limit: Int

@@ -692,6 +692,32 @@
         "newRoutine": "New routine",
         "newIdea": "New idea"
       },
+      "customize": {
+        "entry": "Customize Today",
+        "title": "Customize Today",
+        "close": "Close",
+        "done": "Done",
+        "reset": "Reset",
+        "show": "Show section",
+        "hide": "Hidden",
+        "alwaysVisible": "Always visible",
+        "dragToReorder": "Long-press and drag to reorder",
+        "mobileOnly": "Mobile",
+        "hiddenFooter": "{{count}} hidden · Customize"
+      },
+      "sections": {
+        "streak": "Streak",
+        "counters": "Counters",
+        "stalledAlert": "Stalled alert",
+        "todayFocus": "Today's Focus",
+        "routinesToday": "Routines for today",
+        "doneToday": "Done today",
+        "closeable": "Closeable projects",
+        "sleeping": "Sleeping projects",
+        "staleIdeas": "Stale ideas",
+        "activeProjects": "Active projects",
+        "launchedWithTasks": "Launched with open tasks"
+      },
       "backupAlert": {
         "lastBackupAgo": "Last backup {days, plural, one {# day} other {# days}} ago",
         "noBackup": "No backup yet",
