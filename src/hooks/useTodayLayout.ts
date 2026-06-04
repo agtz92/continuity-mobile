@@ -49,26 +49,47 @@ export function useTodayLayout() {
   const [hidden, setHidden] = useState<Set<TodaySectionId>>(serverState.hidden);
   const [editMode, setEditMode] = useState(false);
 
-  // Sync server -> local whenever server response refreshes, except while
-  // the user is mid-drag (edit mode) — avoids clobbering uncommitted state.
+  // Initialize local state from server ONCE, when the first response lands.
+  // After that, the mutation's cache update keeps the query in sync — resyncing
+  // on every server-data change would clobber pending optimistic edits when
+  // the user exits edit mode before the debounce fires.
+  const initializedRef = useRef(false);
   useEffect(() => {
-    if (editMode) return;
+    if (initializedRef.current) return;
     if (!data) return;
     setOrder(serverState.order);
     setHidden(serverState.hidden);
-  }, [data, editMode, serverState.order, serverState.hidden]);
+    initializedRef.current = true;
+  }, [data, serverState.order, serverState.hidden]);
 
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flush = useCallback(
     (nextOrder: TodaySectionId[], nextHidden: Set<TodaySectionId>) => {
       if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
+      const hiddenArr = Array.from(nextHidden);
       pendingTimerRef.current = setTimeout(() => {
         updateMutation({
-          variables: {
-            order: nextOrder,
-            hidden: Array.from(nextHidden),
+          variables: { order: nextOrder, hidden: hiddenArr },
+          optimisticResponse: {
+            updateTodayLayout: {
+              __typename: "TodayLayout",
+              order: nextOrder,
+              hidden: hiddenArr,
+            },
           },
-        }).catch(() => {
+          update: (cache, { data: mutData }) => {
+            const payload = (
+              mutData as { updateTodayLayout?: LayoutPayload } | null
+            )?.updateTodayLayout;
+            if (!payload) return;
+            cache.writeQuery({
+              query: TODAY_LAYOUT_QUERY,
+              data: { todayLayout: payload },
+            });
+          },
+        }).catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error("[useTodayLayout] update failed:", err);
           setOrder(serverState.order);
           setHidden(serverState.hidden);
         });
@@ -108,17 +129,27 @@ export function useTodayLayout() {
   const reset = useCallback(async () => {
     if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
     try {
-      const result = await resetMutation();
-      const data = result.data as
-        | { resetTodayLayout: LayoutPayload }
-        | undefined
-        | null;
-      const payload = data?.resetTodayLayout;
-      const next = reconcile(payload);
+      const result = await resetMutation({
+        update: (cache, { data: mutData }) => {
+          const payload = (
+            mutData as { resetTodayLayout?: LayoutPayload } | null
+          )?.resetTodayLayout;
+          if (!payload) return;
+          cache.writeQuery({
+            query: TODAY_LAYOUT_QUERY,
+            data: { todayLayout: payload },
+          });
+        },
+      });
+      const payload = (
+        result.data as { resetTodayLayout?: LayoutPayload } | null
+      )?.resetTodayLayout;
+      const next = reconcile(payload ?? undefined);
       setOrder(next.order);
       setHidden(next.hidden);
-    } catch {
-      // ignore — user can retry
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[useTodayLayout] reset failed:", err);
     }
   }, [resetMutation]);
 

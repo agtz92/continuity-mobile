@@ -1318,14 +1318,16 @@ export default function Today() {
         />
       </ScrollView>
 
-      <FAB
-        icon={<Plus size={26} color={c.bg} />}
-        label={t("views.today.createMenu.title")}
-        onPress={() => setCreateOpen(true)}
-      />
+      {!layout.editMode && (
+        <FAB
+          icon={<Plus size={26} color={c.bg} />}
+          label={t("views.today.createMenu.title")}
+          onPress={() => setCreateOpen(true)}
+        />
+      )}
 
       <BottomSheet
-        visible={createOpen}
+        visible={createOpen && !layout.editMode}
         onClose={() => setCreateOpen(false)}
         title={t("views.today.createMenu.title")}
       >
