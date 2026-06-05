@@ -703,7 +703,7 @@
         "alwaysVisible": "Always visible",
         "dragToReorder": "Long-press and drag to reorder",
         "mobileOnly": "Mobile",
-        "hiddenFooter": "{{count}} hidden · Customize"
+        "hiddenFooter": "{count, plural, one {# hidden · Customize} other {# hidden · Customize}}"
       },
       "sections": {
         "streak": "Streak",
