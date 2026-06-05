@@ -11,9 +11,12 @@ import { toast } from "./toast";
  * helper so a failure NEVER blocks the toast — the toast fires synchronously
  * regardless.
  */
+// Quick confirmation — shorter than the default toast TTL so it doesn't linger.
+const COMPLETED_TOAST_MS = 2500;
+
 export function confirmCompleted(message: string): void {
   void triggerSuccessHaptic();
-  toast.success(message);
+  toast.success(message, COMPLETED_TOAST_MS);
 }
 
 async function triggerSuccessHaptic(): Promise<void> {
