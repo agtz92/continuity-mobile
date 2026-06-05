@@ -164,8 +164,16 @@ export default function ProjectDetail() {
               hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={t("common.edit")}
+              // Fixed centered box so the icon sits dead-center (incl. inside
+              // iOS 26's circular glass bar-button background).
+              style={{
+                width: 32,
+                height: 32,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <Pencil size={18} color={s.text} />
+              <Pencil size={20} color={s.text} />
             </Pressable>
           ),
         }}
