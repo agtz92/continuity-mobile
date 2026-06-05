@@ -8,14 +8,14 @@
     "scheme": "continuity",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.continuity.app",
+      "bundleIdentifier": "it.continuu.app",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.continuity.app",
+      "package": "it.continuu.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -53,6 +53,19 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a3fea702-3da0-47f5-a527-650c12fe8588"
+      }
+    },
+    "owner": "agtzg92",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a3fea702-3da0-47f5-a527-650c12fe8588"
     }
   }
 }
