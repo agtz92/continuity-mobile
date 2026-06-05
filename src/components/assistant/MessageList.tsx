@@ -37,6 +37,7 @@ export function MessageList({
       className="flex-1"
       contentContainerClassName="gap-4 px-4 py-4"
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
       onContentSizeChange={() =>
         scrollRef.current?.scrollToEnd({ animated: true })
       }

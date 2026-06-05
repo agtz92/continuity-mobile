@@ -66,11 +66,10 @@ export default function AssistantScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
-      {/* Header. Modal-presented stack screens start below the status bar on
-          iOS, so top inset isn't needed (and would read 0 in the modal anyway);
-          pt-6 keeps the title clear of the sheet's top edge like ModalScaffold. */}
-      <View className="flex-row items-center gap-2 border-b border-border px-4 pb-3 pt-6">
+    <SafeAreaView className="flex-1 bg-bg" edges={["top", "bottom"]}>
+      {/* Header. Full-screen modal goes under the status bar, so the top safe
+          inset (via SafeAreaView edges) keeps the title clear of the notch. */}
+      <View className="flex-row items-center gap-2 border-b border-border px-4 pb-3 pt-3">
         <View
           className="h-8 w-8 items-center justify-center rounded-full"
           style={{ backgroundColor: c.accent }}

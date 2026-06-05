@@ -15,12 +15,14 @@ export const FormInput = forwardRef<TextInput, TextInputProps>(
         ref={ref}
         multiline={multiline}
         placeholderTextColor={c.textMuted}
+        // No `text-base`: its lineHeight (24) clips descenders (g/p/y) in an iOS
+        // TextInput. fontSize via style with no lineHeight + padding for height.
         className={
-          "rounded-lg border border-border bg-surface px-3 py-2.5 text-base " +
+          "rounded-lg border border-border bg-surface px-3 py-3 " +
           (multiline ? "min-h-20" : "")
         }
         style={[
-          { color: c.text },
+          { color: c.text, fontSize: 16 },
           multiline ? { textAlignVertical: "top" } : null,
           style,
         ]}

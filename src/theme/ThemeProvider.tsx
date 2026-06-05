@@ -3,12 +3,17 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { View, useColorScheme } from "react-native";
 import { vars } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery } from "@apollo/client/react";
+import { useAuth } from "@/lib/auth";
+import { NOTIFICATION_SETTINGS_QUERY } from "@/lib/graphql";
+import { isLocale, persistLocale } from "@/lib/locale";
 import { DEFAULT_THEME, isTheme, type Theme } from "./config";
 import { THEME_SURFACES, type EffectiveMode } from "./tokens";
 import {
@@ -75,6 +80,39 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (isPalette(p)) setPaletteState(p);
     })();
   }, []);
+
+  // Hydrate appearance from the backend once per signed-in user so changes made
+  // on web (or another device) show up here on launch. Local changes after this
+  // still win until the next launch (the ref guards against re-applying).
+  const { session } = useAuth();
+  const { data: settings } = useQuery<{
+    notificationSettings: {
+      theme?: string | null;
+      palette?: string | null;
+      locale?: string | null;
+    } | null;
+  }>(NOTIFICATION_SETTINGS_QUERY, {
+    skip: !session,
+    fetchPolicy: "cache-and-network",
+  });
+  const hydratedFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    const uid = session?.user?.id ?? null;
+    if (!uid || hydratedFor.current === uid) return;
+    const s = settings?.notificationSettings;
+    if (!s) return;
+    hydratedFor.current = uid;
+    if (isTheme(s.theme)) {
+      setThemeState(s.theme);
+      void AsyncStorage.setItem(THEME_KEY, s.theme);
+    }
+    if (isPalette(s.palette)) {
+      setPaletteState(s.palette);
+      void AsyncStorage.setItem(PALETTE_KEY, s.palette);
+    }
+    if (isLocale(s.locale)) void persistLocale(s.locale);
+  }, [settings, session]);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);

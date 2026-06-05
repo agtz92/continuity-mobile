@@ -104,6 +104,8 @@ export default function ProjectDetail() {
     headerTintColor: s.text,
     headerTitleStyle: { color: s.text },
     headerShadowVisible: false,
+    // Chevron only — hide the leaked "(dashboard)" back label.
+    headerBackButtonDisplayMode: "minimal",
   } as const;
 
   if (initialLoading && !project) {

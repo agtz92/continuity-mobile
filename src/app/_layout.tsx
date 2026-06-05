@@ -78,7 +78,7 @@ function RootNavigator() {
         <Stack.Screen name="(modals)" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="assistant"
-          options={{ presentation: "modal" }}
+          options={{ presentation: "fullScreenModal" }}
         />
       </Stack>
       <Toaster />
