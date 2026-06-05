@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -7,7 +8,7 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
-import { View, useColorScheme } from "react-native";
+import { AppState, View, useColorScheme } from "react-native";
 import { vars } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@apollo/client/react";
@@ -81,11 +82,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  // Hydrate appearance from the backend once per signed-in user so changes made
-  // on web (or another device) show up here on launch. Local changes after this
-  // still win until the next launch (the ref guards against re-applying).
+  // Appearance is owned per-user on the backend. Hydrate from it so changes made
+  // on web (or another device) reflect here — on launch AND whenever the app
+  // returns to the foreground (so switching from desktop to phone Just Works,
+  // no full restart). A mobile change also writes to the backend, so re-applying
+  // is consistent; we only apply on first load + explicit foreground refetch
+  // (fresh network data), never on the reactive cache, so a local edit mid-
+  // session isn't clobbered.
   const { session } = useAuth();
-  const { data: settings } = useQuery<{
+  const { data: settings, refetch } = useQuery<{
     notificationSettings: {
       theme?: string | null;
       palette?: string | null;
@@ -95,24 +100,51 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     skip: !session,
     fetchPolicy: "cache-and-network",
   });
-  const hydratedFor = useRef<string | null>(null);
 
+  const applyServerSettings = useCallback(
+    (s: {
+      theme?: string | null;
+      palette?: string | null;
+      locale?: string | null;
+    }) => {
+      if (isTheme(s.theme)) {
+        setThemeState(s.theme);
+        void AsyncStorage.setItem(THEME_KEY, s.theme);
+      }
+      if (isPalette(s.palette)) {
+        setPaletteState(s.palette);
+        void AsyncStorage.setItem(PALETTE_KEY, s.palette);
+      }
+      if (isLocale(s.locale)) void persistLocale(s.locale);
+    },
+    [],
+  );
+
+  // Initial hydration, once per signed-in user.
+  const hydratedFor = useRef<string | null>(null);
   useEffect(() => {
     const uid = session?.user?.id ?? null;
     if (!uid || hydratedFor.current === uid) return;
     const s = settings?.notificationSettings;
     if (!s) return;
     hydratedFor.current = uid;
-    if (isTheme(s.theme)) {
-      setThemeState(s.theme);
-      void AsyncStorage.setItem(THEME_KEY, s.theme);
-    }
-    if (isPalette(s.palette)) {
-      setPaletteState(s.palette);
-      void AsyncStorage.setItem(PALETTE_KEY, s.palette);
-    }
-    if (isLocale(s.locale)) void persistLocale(s.locale);
-  }, [settings, session]);
+    applyServerSettings(s);
+  }, [settings, session, applyServerSettings]);
+
+  // Re-sync on foreground (changed theme on web, then picked up the phone).
+  useEffect(() => {
+    if (!session) return;
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state !== "active") return;
+      refetch()
+        .then((res) => {
+          const s = res.data?.notificationSettings;
+          if (s) applyServerSettings(s);
+        })
+        .catch(() => {});
+    });
+    return () => sub.remove();
+  }, [session, refetch, applyServerSettings]);
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
