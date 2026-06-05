@@ -40,8 +40,17 @@ export async function signInWithGoogle(): Promise<void> {
     throw new Error("OAuth flow did not complete");
   }
 
-  const code = new URL(result.url).searchParams.get("code");
-  if (!code) throw new Error("No auth code in redirect");
+  const url = new URL(result.url);
+  const code = url.searchParams.get("code");
+  if (!code) {
+    // Surface Supabase's actual error if it redirected back with one, instead
+    // of a generic message — saves a debug build cycle.
+    const reason =
+      url.searchParams.get("error_description") ??
+      url.searchParams.get("error") ??
+      "No auth code in redirect";
+    throw new Error(reason);
+  }
 
   const { error: exchangeError } =
     await supabase.auth.exchangeCodeForSession(code);
