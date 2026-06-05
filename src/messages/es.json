@@ -989,7 +989,8 @@
     "deleteAria": "Eliminar tarea",
     "dueToday": "Para hoy",
     "addDate": "Agregar fecha",
-    "blocked": "Bloqueada"
+    "blocked": "Bloqueada",
+    "completedToast": "✓ Tarea completada"
   },
   "routineRow": {
     "markDone": "Marcar como hecha",
@@ -998,7 +999,8 @@
     "editAria": "Editar rutina",
     "archiveAria": "Archivar rutina",
     "unarchiveAria": "Reactivar rutina",
-    "deleteAria": "Eliminar rutina"
+    "deleteAria": "Eliminar rutina",
+    "completedToast": "✓ Rutina completada"
   },
   "recurrence": {
     "once": "Una vez · {date}",

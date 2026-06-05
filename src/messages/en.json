@@ -989,7 +989,8 @@
     "deleteAria": "Delete task",
     "dueToday": "Due today",
     "addDate": "Add date",
-    "blocked": "Blocked"
+    "blocked": "Blocked",
+    "completedToast": "✓ Task completed"
   },
   "routineRow": {
     "markDone": "Mark as done",
@@ -998,7 +999,8 @@
     "editAria": "Edit routine",
     "archiveAria": "Archive routine",
     "unarchiveAria": "Restore routine",
-    "deleteAria": "Delete routine"
+    "deleteAria": "Delete routine",
+    "completedToast": "✓ Routine completed"
   },
   "recurrence": {
     "once": "Once · {date}",
