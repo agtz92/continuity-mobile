@@ -118,7 +118,10 @@ export function RoutineRow({
         >
           <View className="flex-row flex-wrap items-center gap-2">
             <Text
-              className={isDone ? "text-text-muted line-through" : "text-text"}
+              className={
+                "text-base " +
+                (isDone ? "text-text-muted line-through" : "text-text")
+              }
             >
               {routine.title}
             </Text>

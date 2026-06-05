@@ -89,7 +89,12 @@ export function TaskRow({
           disabled={!onEdit}
         >
           <View className="flex-row flex-wrap items-center gap-2">
-            <Text className={done ? "text-text-muted line-through" : "text-text"}>
+            <Text
+              className={
+                "text-base " +
+                (done ? "text-text-muted line-through" : "text-text")
+              }
+            >
               {task.title}
             </Text>
             {task.effortHours != null && (
