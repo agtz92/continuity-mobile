@@ -56,6 +56,7 @@ import { RoutineRow } from "@/components/routines/RoutineRow";
 import { TodaySectionEditRow } from "@/components/today/TodaySectionEditRow";
 import { TodayCustomizeBar } from "@/components/today/TodayCustomizeBar";
 import { HiddenSectionsFooter } from "@/components/today/HiddenSectionsFooter";
+import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const RED = "239,68,68";
@@ -1279,6 +1280,9 @@ export default function Today() {
           />
         }
       >
+        {/* Admin announcements + derived alerts (mirrors web NotificationStack) */}
+        <NotificationStack />
+
         {/* Header: date + greeting + assistant trigger + customize */}
         <View className="flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
