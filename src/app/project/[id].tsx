@@ -121,7 +121,7 @@ export default function ProjectDetail() {
     return (
       <View className="flex-1 items-center justify-center bg-bg px-6">
         <Stack.Screen options={headerOptions} />
-        <Text className="text-center text-text-muted">
+        <Text className="text-base text-center text-text-muted">
           {t("views.projects.empty")}
         </Text>
       </View>
@@ -181,7 +181,7 @@ export default function ProjectDetail() {
       <ScrollView contentContainerClassName="gap-5 p-5">
         <View className="flex-row flex-wrap items-center gap-2">
           <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[project.priority]}`} />
-          <Text className="text-text-muted">{t(`priority.${project.priority}`)}</Text>
+          <Text className="text-base text-text-muted">{t(`priority.${project.priority}`)}</Text>
           <View className="rounded-full border border-border bg-surface px-2.5 py-0.5">
             <Text className="text-xs text-text-muted">
               {t(`status.${project.status}`)}

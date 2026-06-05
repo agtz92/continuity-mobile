@@ -51,11 +51,11 @@ export default function ResetPassword() {
             <Text className="text-3xl font-bold text-text">
               {t("auth.reset.title")}
             </Text>
-            <Text className="text-text-muted">{t("auth.reset.subtitle")}</Text>
+            <Text className="text-base text-text-muted">{t("auth.reset.subtitle")}</Text>
           </View>
 
           {sent ? (
-            <Text className="text-text">{t("auth.reset.sent")}</Text>
+            <Text className="text-base text-text">{t("auth.reset.sent")}</Text>
           ) : (
             <View className="gap-3">
               <View className="gap-1">
@@ -82,7 +82,7 @@ export default function ResetPassword() {
                 className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
               >
                 {busy && <ActivityIndicator size="small" />}
-                <Text className="font-semibold text-bg">
+                <Text className="text-base font-semibold text-bg">
                   {t("auth.reset.send")}
                 </Text>
               </Pressable>
@@ -90,7 +90,7 @@ export default function ResetPassword() {
           )}
 
           <Pressable onPress={() => router.replace("/login")} className="self-center">
-            <Text className="font-semibold text-accent">
+            <Text className="text-base font-semibold text-accent">
               {t("auth.reset.backToLogin")}
             </Text>
           </Pressable>

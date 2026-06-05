@@ -76,7 +76,7 @@ export function ModalScaffold({
           >
             <Text
               className={
-                "font-semibold " + (enabled ? "text-bg" : "text-text-muted")
+                "text-base font-semibold " + (enabled ? "text-bg" : "text-text-muted")
               }
             >
               {saveLabel ?? t("common.save")}
@@ -87,7 +87,7 @@ export function ModalScaffold({
             accessibilityRole="button"
             className="rounded-lg border border-border bg-surface px-5 py-3"
           >
-            <Text className="text-text">{t("common.cancel")}</Text>
+            <Text className="text-base text-text">{t("common.cancel")}</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>

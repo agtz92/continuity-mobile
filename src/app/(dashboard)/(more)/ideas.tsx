@@ -78,17 +78,17 @@ export default function Ideas() {
 
       {initialLoading && ideas.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-text-muted">…</Text>
+          <Text className="text-base text-text-muted">…</Text>
         </View>
       ) : ideas.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {t("views.ideas.empty")}
           </Text>
         </View>
       ) : filtered.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {t("views.ideas.noMatch", { query: search.trim() })}
           </Text>
         </View>

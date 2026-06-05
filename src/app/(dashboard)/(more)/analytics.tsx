@@ -788,7 +788,7 @@ export default function Analytics() {
 
       {initialLoading || (!analytics && !error) ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-text-muted">{t("analytics.calculating")}</Text>
+          <Text className="text-base text-text-muted">{t("analytics.calculating")}</Text>
         </View>
       ) : (
         <ScrollView

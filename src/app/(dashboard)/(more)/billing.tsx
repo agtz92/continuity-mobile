@@ -76,7 +76,7 @@ export default function Billing() {
           {t("settings.billing.currentPlan")}
         </Text>
         <View className="flex-row items-center gap-2">
-          <Text className="font-semibold text-text">{planLabel}</Text>
+          <Text className="text-base font-semibold text-text">{planLabel}</Text>
           <PlanBadge plan={plan} />
           {isExempt && (
             <View
@@ -167,7 +167,7 @@ export default function Billing() {
           className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
         >
           <ExternalLink size={16} color={c.text} />
-          <Text className="font-semibold text-text">
+          <Text className="text-base font-semibold text-text">
             {hasSubscription
               ? t("settings.billing.manageSubscription")
               : t("settings.billing.upgrade")}

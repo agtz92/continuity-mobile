@@ -528,7 +528,7 @@ export default function Today() {
     >
       {todayFocus.items.length === 0 ? (
         <View className="items-center rounded-xl border border-border bg-surface p-8">
-          <Text className="mb-3 text-text-muted">
+          <Text className="text-base mb-3 text-text-muted">
             {t("views.today.focus.emptyTitle")}
           </Text>
           <Text className="text-center text-sm text-text-muted">
@@ -607,7 +607,7 @@ export default function Today() {
                       )}
                     </View>
                     <View className="flex-row flex-wrap items-center gap-2">
-                      <Text className="text-text">
+                      <Text className="text-base text-text">
                         {item.task
                           ? item.task.title
                           : item.type === "stalled" && item.project
@@ -964,7 +964,7 @@ export default function Today() {
                 <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
                   {t("views.today.closeable.almostThereChip", { pct })}
                 </Text>
-                <Text className="mb-2 font-semibold text-text">
+                <Text className="text-base mb-2 font-semibold text-text">
                   {sp.project.name}
                 </Text>
                 <View className="mb-2 h-1.5 overflow-hidden rounded-full bg-border">
@@ -992,7 +992,7 @@ export default function Today() {
               <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
                 {t("views.today.closeable.quickWin")}
               </Text>
-              <Text className="mb-2 font-semibold text-text">
+              <Text className="text-base mb-2 font-semibold text-text">
                 {sp.project.name}
               </Text>
               <Text className="text-xs text-text-muted">
@@ -1039,7 +1039,7 @@ export default function Today() {
               <View className="min-w-0 flex-1">
                 <View className="flex-row flex-wrap items-center gap-2">
                   <Pressable onPress={() => jumpToProject(project.id)}>
-                    <Text className="font-semibold text-text">
+                    <Text className="text-base font-semibold text-text">
                       {project.name}
                     </Text>
                   </Pressable>

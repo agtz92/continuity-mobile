@@ -117,7 +117,7 @@ export default function Profile() {
         >
           <Text
             className={
-              "font-semibold " + (canSave ? "text-bg" : "text-text-muted")
+              "text-base font-semibold " + (canSave ? "text-bg" : "text-text-muted")
             }
           >
             {t("common.save")}
@@ -131,14 +131,14 @@ export default function Profile() {
           <Text className="text-xs uppercase tracking-wider text-text-muted">
             {t("settings.profile.email")}
           </Text>
-          <Text className="text-text">{email}</Text>
+          <Text className="text-base text-text">{email}</Text>
         </View>
         {createdAt !== "" && (
           <View className="gap-1">
             <Text className="text-xs uppercase tracking-wider text-text-muted">
               {t("settings.profile.memberSince")}
             </Text>
-            <Text className="text-text">{createdAt}</Text>
+            <Text className="text-base text-text">{createdAt}</Text>
           </View>
         )}
       </View>

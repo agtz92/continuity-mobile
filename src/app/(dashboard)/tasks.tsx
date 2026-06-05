@@ -283,17 +283,17 @@ export default function Tasks() {
 
       {initialLoading && tasks.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-text-muted">…</Text>
+          <Text className="text-base text-text-muted">…</Text>
         </View>
       ) : tasks.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {t("views.tasks.empty")}
           </Text>
         </View>
       ) : filteredTasks.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {searching
               ? t("views.tasks.noMatch", { query: search.trim() })
               : t("views.tasks.empty")}

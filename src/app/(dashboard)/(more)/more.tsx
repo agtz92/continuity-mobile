@@ -87,7 +87,7 @@ export default function More() {
             }
           >
             <Icon color={s.text} size={20} />
-            <Text className="flex-1 text-text">{it.label}</Text>
+            <Text className="text-base flex-1 text-text">{it.label}</Text>
             <ChevronRight color={s.textMuted} size={18} />
           </Pressable>
         );
@@ -112,7 +112,7 @@ export default function More() {
           className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4"
         >
           <LogOut color={s.text} size={18} />
-          <Text className="font-semibold text-text">
+          <Text className="text-base font-semibold text-text">
             {t("accountMenu.items.signOut")}
           </Text>
         </Pressable>

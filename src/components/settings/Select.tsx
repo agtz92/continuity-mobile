@@ -37,7 +37,7 @@ export function Select({
         className="flex-row items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5"
         style={disabled ? { opacity: 0.4 } : undefined}
       >
-        <Text className="text-text">{selected?.label ?? "—"}</Text>
+        <Text className="text-base text-text">{selected?.label ?? "—"}</Text>
         <ChevronDown size={16} color={c.textMuted} />
       </Pressable>
 
@@ -63,7 +63,7 @@ export function Select({
                   active ? { backgroundColor: alpha(c.accent, 0.1) } : undefined
                 }
               >
-                <Text className={active ? "font-semibold text-text" : "text-text"}>
+                <Text className={"text-base " + (active ? "font-semibold text-text" : "text-text")}>
                   {o.label}
                 </Text>
                 {active && <Check size={18} color={c.accent} />}

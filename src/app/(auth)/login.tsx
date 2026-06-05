@@ -66,7 +66,7 @@ export default function Login() {
             <Text className="text-3xl font-bold text-text">
               {t("auth.login.title")}
             </Text>
-            <Text className="text-text-muted">{t("auth.login.subtitle")}</Text>
+            <Text className="text-base text-text-muted">{t("auth.login.subtitle")}</Text>
           </View>
 
           <View className="gap-3">
@@ -117,7 +117,7 @@ export default function Login() {
               className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
             >
               {busy && <ActivityIndicator size="small" />}
-              <Text className="font-semibold text-bg">
+              <Text className="text-base font-semibold text-bg">
                 {t("auth.login.signIn")}
               </Text>
             </Pressable>
@@ -125,7 +125,7 @@ export default function Login() {
 
           <View className="flex-row items-center gap-3">
             <View className="h-px flex-1 bg-border" />
-            <Text className="text-text-muted">{t("auth.divider")}</Text>
+            <Text className="text-base text-text-muted">{t("auth.divider")}</Text>
             <View className="h-px flex-1 bg-border" />
           </View>
 
@@ -135,15 +135,15 @@ export default function Login() {
             className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-3"
           >
             {googleBusy && <ActivityIndicator size="small" />}
-            <Text className="font-semibold text-text">
+            <Text className="text-base font-semibold text-text">
               {t("auth.login.google")}
             </Text>
           </Pressable>
 
           <View className="flex-row justify-center gap-1">
-            <Text className="text-text-muted">{t("auth.login.noAccount")}</Text>
+            <Text className="text-base text-text-muted">{t("auth.login.noAccount")}</Text>
             <Pressable onPress={() => router.push("/signup")}>
-              <Text className="font-semibold text-accent">
+              <Text className="text-base font-semibold text-accent">
                 {t("auth.login.signUpLink")}
               </Text>
             </Pressable>

@@ -248,7 +248,7 @@ export default function GoogleTasks() {
               >
                 <Text
                   className={
-                    "font-semibold " +
+                    "text-base font-semibold " +
                     (canImport && !importing ? "text-bg" : "text-text-muted")
                   }
                 >

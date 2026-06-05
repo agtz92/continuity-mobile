@@ -62,7 +62,7 @@ export function TodaySectionEditRow({
       <View>{icon}</View>
 
       <View className="min-w-0 flex-1 flex-row flex-wrap items-center gap-2">
-        <Text className="font-medium text-text" numberOfLines={1}>
+        <Text className="text-base font-medium text-text" numberOfLines={1}>
           {label}
         </Text>
         {badge && (

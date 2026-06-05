@@ -28,13 +28,13 @@ export function Paywall({
       <Text className="text-center text-lg font-semibold text-text">
         {t("paywall.title", { plan: requiredPlan })}
       </Text>
-      <Text className="text-center text-text-muted">{t("paywall.body")}</Text>
+      <Text className="text-base text-center text-text-muted">{t("paywall.body")}</Text>
       <Pressable
         onPress={onManage}
         accessibilityRole="button"
         className="mt-1 rounded-xl bg-accent px-5 py-3 active:opacity-90"
       >
-        <Text className="font-semibold text-bg">{t("paywall.manage")}</Text>
+        <Text className="text-base font-semibold text-bg">{t("paywall.manage")}</Text>
       </Pressable>
     </View>
   );

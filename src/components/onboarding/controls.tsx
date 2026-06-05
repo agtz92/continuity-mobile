@@ -24,7 +24,7 @@ export function PrimaryButton({
       style={off ? { opacity: 0.5 } : undefined}
     >
       {busy && <ActivityIndicator size="small" color={c.bg} />}
-      <Text className="font-semibold text-bg">{label}</Text>
+      <Text className="text-base font-semibold text-bg">{label}</Text>
     </Pressable>
   );
 }
@@ -74,7 +74,7 @@ export function Pill({
       }
     >
       {leading}
-      <Text className={active ? "font-semibold text-bg" : "text-text"}>
+      <Text className={"text-base " + (active ? "font-semibold text-bg" : "text-text")}>
         {label}
       </Text>
     </Pressable>

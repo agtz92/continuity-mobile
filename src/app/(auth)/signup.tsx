@@ -57,17 +57,17 @@ export default function Signup() {
             <Text className="text-3xl font-bold text-text">
               {t("auth.signup.title")}
             </Text>
-            <Text className="text-text-muted">{t("auth.signup.subtitle")}</Text>
+            <Text className="text-base text-text-muted">{t("auth.signup.subtitle")}</Text>
           </View>
 
           {done ? (
             <View className="gap-4">
-              <Text className="text-text">{t("auth.signup.checkEmail")}</Text>
+              <Text className="text-base text-text">{t("auth.signup.checkEmail")}</Text>
               <Pressable
                 onPress={() => router.replace("/login")}
                 className="flex-row items-center justify-center rounded-xl bg-accent px-4 py-3"
               >
-                <Text className="font-semibold text-bg">
+                <Text className="text-base font-semibold text-bg">
                   {t("auth.signup.signInLink")}
                 </Text>
               </Pressable>
@@ -127,18 +127,18 @@ export default function Signup() {
                   className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
                 >
                   {busy && <ActivityIndicator size="small" />}
-                  <Text className="font-semibold text-bg">
+                  <Text className="text-base font-semibold text-bg">
                     {t("auth.signup.signUp")}
                   </Text>
                 </Pressable>
               </View>
 
               <View className="flex-row justify-center gap-1">
-                <Text className="text-text-muted">
+                <Text className="text-base text-text-muted">
                   {t("auth.signup.haveAccount")}
                 </Text>
                 <Pressable onPress={() => router.replace("/login")}>
-                  <Text className="font-semibold text-accent">
+                  <Text className="text-base font-semibold text-accent">
                     {t("auth.signup.signInLink")}
                   </Text>
                 </Pressable>

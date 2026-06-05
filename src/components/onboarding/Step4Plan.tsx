@@ -20,7 +20,7 @@ function ManageBillingLink() {
       className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
     >
       <ExternalLink size={16} color={c.text} />
-      <Text className="font-semibold text-text">
+      <Text className="text-base font-semibold text-text">
         {t("onboarding.replay.planChangeCta")}
       </Text>
     </Pressable>

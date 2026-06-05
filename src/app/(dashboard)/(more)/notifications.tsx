@@ -158,7 +158,7 @@ export default function Notifications() {
       <Section title={t("settings.notifications.channels")}>
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-3">
-            <Text className="font-medium text-text">
+            <Text className="text-base font-medium text-text">
               {t("settings.notifications.telegram")}
             </Text>
             <Text className="mt-0.5 text-xs text-text-muted">
@@ -245,7 +245,7 @@ export default function Notifications() {
         <View className="mt-3">
           <Field label={t("settings.notifications.timezone")}>
             <View className="flex-row items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5">
-              <Text className="flex-1 text-text" numberOfLines={1}>
+              <Text className="text-base flex-1 text-text" numberOfLines={1}>
                 {settings.timezone || "—"}
               </Text>
               {deviceTz && deviceTz !== settings.timezone && (

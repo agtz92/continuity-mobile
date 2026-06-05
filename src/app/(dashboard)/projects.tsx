@@ -216,17 +216,17 @@ export default function Projects() {
 
       {initialLoading && projects.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-text-muted">…</Text>
+          <Text className="text-base text-text-muted">…</Text>
         </View>
       ) : projects.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {t("views.projects.empty")}
           </Text>
         </View>
       ) : visible.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-3 px-5">
-          <Text className="text-center text-text-muted">
+          <Text className="text-base text-center text-text-muted">
             {search.trim()
               ? t("views.projects.noMatchSearch", { query: search.trim() })
               : t("views.projects.noMatchFilters")}
@@ -288,7 +288,7 @@ export default function Projects() {
                 }}
                 className="flex-row items-center justify-between rounded-lg px-3 py-3"
               >
-                <Text className={active ? "text-accent" : "text-text"}>
+                <Text className={"text-base " + (active ? "text-accent" : "text-text")}>
                   {t(`views.projects.sortBy.${m}`)}
                 </Text>
                 {active && <Check size={18} color={c.accent} />}

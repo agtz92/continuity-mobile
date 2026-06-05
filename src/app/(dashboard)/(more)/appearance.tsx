@@ -34,7 +34,7 @@ function Pill({
         (active ? "border-accent bg-accent" : "border-border bg-surface")
       }
     >
-      <Text className={active ? "font-semibold text-bg" : "text-text"}>
+      <Text className={"text-base " + (active ? "font-semibold text-bg" : "text-text")}>
         {label}
       </Text>
     </Pressable>
@@ -77,7 +77,7 @@ export default function Appearance() {
       contentContainerClassName="gap-6 p-5"
     >
       <View className="gap-2">
-        <Text className="font-semibold text-text">
+        <Text className="text-base font-semibold text-text">
           {t("settings.appearance.language")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -96,7 +96,7 @@ export default function Appearance() {
       </View>
 
       <View className="gap-2">
-        <Text className="font-semibold text-text">
+        <Text className="text-base font-semibold text-text">
           {t("settings.appearance.theme")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -115,7 +115,7 @@ export default function Appearance() {
       </View>
 
       <View className="gap-2">
-        <Text className="font-semibold text-text">
+        <Text className="text-base font-semibold text-text">
           {t("settings.appearance.palette")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -143,7 +143,7 @@ export default function Appearance() {
         className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
       >
         <Compass size={16} color={c.text} />
-        <Text className="font-semibold text-text">
+        <Text className="text-base font-semibold text-text">
           {t("onboarding.replay.replayTourButton")}
         </Text>
       </Pressable>

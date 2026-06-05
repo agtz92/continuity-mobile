@@ -77,7 +77,7 @@ export function ProjectCardCompact({
         ) : (
           <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[p.priority]}`} />
         )}
-        <Text numberOfLines={1} className="flex-1 font-semibold text-text">
+        <Text numberOfLines={1} className="text-base flex-1 font-semibold text-text">
           {p.name}
         </Text>
         {comebackGapDays != null && comebackGapDays > 0 && (

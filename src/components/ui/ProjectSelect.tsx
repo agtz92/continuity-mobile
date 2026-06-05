@@ -36,7 +36,7 @@ export function ProjectSelect({
         accessibilityRole="button"
         className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
       >
-        <Text className={selected ? "text-text" : "text-text-muted"}>
+        <Text className={"text-base " + (selected ? "text-text" : "text-text-muted")}>
           {selected ? selected.name : t("modals.task.noProject")}
         </Text>
         <ChevronDown size={18} color={c.textMuted} />
@@ -52,7 +52,7 @@ export function ProjectSelect({
             onPress={() => select(null)}
             className="flex-row items-center justify-between rounded-lg px-3 py-3"
           >
-            <Text className={!value ? "text-accent" : "text-text"}>
+            <Text className={"text-base " + (!value ? "text-accent" : "text-text")}>
               {t("modals.task.noProject")}
             </Text>
             {!value && <Check size={18} color={c.accent} />}
@@ -65,7 +65,7 @@ export function ProjectSelect({
                 onPress={() => select(p.id)}
                 className="flex-row items-center justify-between rounded-lg px-3 py-3"
               >
-                <Text className={active ? "text-accent" : "text-text"}>
+                <Text className={"text-base " + (active ? "text-accent" : "text-text")}>
                   {p.name}
                 </Text>
                 {active && <Check size={18} color={c.accent} />}

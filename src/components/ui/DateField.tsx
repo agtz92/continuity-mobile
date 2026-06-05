@@ -75,7 +75,7 @@ export function DateField({
         accessibilityRole="button"
         className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
       >
-        <Text className={value ? "text-text" : "text-text-muted"}>{label}</Text>
+        <Text className={"text-base " + (value ? "text-text" : "text-text-muted")}>{label}</Text>
         <View className="flex-row items-center gap-2">
           {clearable && !!value && (
             <Pressable
@@ -116,7 +116,7 @@ export function DateField({
                   }}
                   className="flex-1 items-center rounded-lg border border-border bg-surface py-3"
                 >
-                  <Text className="font-medium text-text-muted">
+                  <Text className="text-base font-medium text-text-muted">
                     {t("common.clear")}
                   </Text>
                 </Pressable>
@@ -128,7 +128,7 @@ export function DateField({
                 }}
                 className="flex-1 items-center rounded-lg bg-accent py-3"
               >
-                <Text className="font-medium text-bg">{t("common.done")}</Text>
+                <Text className="text-base font-medium text-bg">{t("common.done")}</Text>
               </Pressable>
             </View>
           }
