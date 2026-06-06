@@ -19,10 +19,10 @@ async function triggerHaptic(): Promise<void> {
     // under `.default`, which silently left the API undefined before).
     const mod = (await import("expo-haptics")) as Record<string, unknown>;
     const Haptics = (mod.default ?? mod) as typeof import("expo-haptics");
-    // Light impact — a soft but still-perceptible tap. Tuning the strength
-    // (Light/Medium/Heavy) is pure JS, so it hot-reloads with no rebuild once
-    // the native module is linked in the build.
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Success notification haptic — the gentle "two soft taps" iOS pattern.
+    // The haptic type is pure JS, so it hot-reloads with no rebuild once the
+    // native module is linked in the build.
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   } catch (err) {
     console.warn("[haptics] not fired:", err);
   }
