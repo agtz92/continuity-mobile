@@ -1583,3 +1583,11 @@ export const UNREGISTER_PUSH_TOKEN = gql`
     unregisterPushToken(deviceId: $deviceId)
   }
 `;
+
+// Permanently deletes the user's account + all data (Apple requirement). After
+// success the client must sign out. Does NOT cancel Stripe — warn the user.
+export const DELETE_ACCOUNT = gql`
+  mutation DeleteAccount {
+    deleteAccount
+  }
+`;

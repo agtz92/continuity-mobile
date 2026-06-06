@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client/react";
+import { AlertTriangle } from "lucide-react-native";
 import { useAuth } from "@/lib/auth";
-import { PROFILE_QUERY, UPDATE_PROFILE } from "@/lib/graphql";
+import { DELETE_ACCOUNT, PROFILE_QUERY, UPDATE_PROFILE } from "@/lib/graphql";
 import { useUserAvatar } from "@/hooks/useUserAvatar";
 import { AvatarPickerSheet } from "@/components/settings/AvatarPickerSheet";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
+import { confirmAsync } from "@/lib/confirm";
+import { supabase } from "@/lib/supabase";
 import { toast } from "@/lib/toast";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 type ProfileData = { profile: { avatar: string | null; firstName: string | null } };
+
+const BILLING_URL = "https://continuu.it/settings/billing";
 
 export default function Profile() {
   const { t, i18n } = useTranslation();
@@ -24,6 +29,8 @@ export default function Profile() {
   const [updateProfile, { loading: saving }] = useMutation(UPDATE_PROFILE, {
     refetchQueries: [{ query: PROFILE_QUERY }],
   });
+  const [deleteAccountMutation, { loading: deleting }] =
+    useMutation(DELETE_ACCOUNT);
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [name, setName] = useState<string | null>(null);
@@ -52,6 +59,32 @@ export default function Profile() {
       toast.success(t("common.saved"));
     } catch {
       /* error link surfaces a toast */
+    }
+  };
+
+  // Double-confirm, then permanently delete the account (Apple requirement).
+  const handleDeleteAccount = async () => {
+    if (deleting) return;
+    const first = await confirmAsync(
+      t("settings.deleteAccount.confirm1Title"),
+      t("settings.deleteAccount.confirm1Body"),
+      t("settings.deleteAccount.confirm1Cta"),
+      t("common.cancel"),
+    );
+    if (!first) return;
+    const second = await confirmAsync(
+      t("settings.deleteAccount.confirm2Title"),
+      t("settings.deleteAccount.confirm2Body"),
+      t("settings.deleteAccount.confirm2Cta"),
+      t("common.cancel"),
+    );
+    if (!second) return;
+    try {
+      await deleteAccountMutation();
+      // Account + data are gone; sign out so the auth gate sends us to /login.
+      await supabase.auth.signOut();
+    } catch {
+      toast.error(t("settings.deleteAccount.error"));
     }
   };
 
@@ -141,6 +174,54 @@ export default function Profile() {
             <Text className="text-base text-text">{createdAt}</Text>
           </View>
         )}
+      </View>
+
+      {/* Danger zone — account deletion (Apple requirement) */}
+      <View
+        className="gap-3 rounded-2xl border p-5"
+        style={{
+          borderColor: "rgba(239,68,68,0.4)",
+          backgroundColor: "rgba(239,68,68,0.06)",
+        }}
+      >
+        <View className="flex-row items-center gap-2">
+          <AlertTriangle size={16} color="rgb(248,113,113)" />
+          <Text
+            className="text-base font-semibold"
+            style={{ color: "rgb(248,113,113)" }}
+          >
+            {t("settings.deleteAccount.title")}
+          </Text>
+        </View>
+        <Text className="text-sm text-text-muted">
+          {t("settings.deleteAccount.body")}
+        </Text>
+        <Text className="text-sm text-text-muted">
+          {t("settings.deleteAccount.subscriptionWarning")}
+        </Text>
+        <Pressable
+          onPress={() => void Linking.openURL(BILLING_URL)}
+          accessibilityRole="button"
+          hitSlop={6}
+          className="self-start"
+        >
+          <Text className="text-sm font-medium text-accent underline">
+            {t("settings.deleteAccount.manageSubscription")}
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => void handleDeleteAccount()}
+          disabled={deleting}
+          accessibilityRole="button"
+          className="items-center rounded-lg py-3"
+          style={{ backgroundColor: "rgb(220,38,38)", opacity: deleting ? 0.6 : 1 }}
+        >
+          <Text className="text-base font-semibold text-white">
+            {deleting
+              ? t("settings.deleteAccount.deleting")
+              : t("settings.deleteAccount.button")}
+          </Text>
+        </Pressable>
       </View>
 
       <AvatarPickerSheet

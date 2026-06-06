@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -7,11 +7,13 @@ import {
   Bell,
   CreditCard,
   ChevronRight,
+  FileText,
   Lightbulb,
   LogOut,
   Palette,
   Plug,
   ScrollText,
+  ShieldCheck,
   Sparkles,
   User,
   type LucideIcon,
@@ -106,6 +108,40 @@ export default function More() {
           {t("settings.nav.label")}
         </Text>
         {renderGroup(settings)}
+
+        {/* Legal — external web pages (Apple wants an accessible privacy policy) */}
+        <View className="overflow-hidden rounded-2xl border border-border bg-surface">
+          {[
+            {
+              key: "privacy",
+              label: t("settings.legal.privacy"),
+              icon: ShieldCheck,
+              url: "https://continuu.it/privacy",
+            },
+            {
+              key: "terms",
+              label: t("settings.legal.terms"),
+              icon: FileText,
+              url: "https://continuu.it/terms",
+            },
+          ].map((it, i) => {
+            const Icon = it.icon;
+            return (
+              <Pressable
+                key={it.key}
+                onPress={() => void Linking.openURL(it.url)}
+                className={
+                  "flex-row items-center gap-3 px-4 py-4 " +
+                  (i > 0 ? "border-t border-border" : "")
+                }
+              >
+                <Icon color={s.text} size={20} />
+                <Text className="text-base flex-1 text-text">{it.label}</Text>
+                <ChevronRight color={s.textMuted} size={18} />
+              </Pressable>
+            );
+          })}
+        </View>
 
         <Pressable
           onPress={() => supabase.auth.signOut()}

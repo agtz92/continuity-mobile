@@ -354,6 +354,25 @@
       "billing": "Facturación y plan",
       "plugins": "Integraciones"
     },
+    "deleteAccount": {
+      "title": "Eliminar cuenta",
+      "body": "Elimina permanentemente tu cuenta y todo lo que contiene — proyectos, tareas, ideas, rutinas y notas. No se puede deshacer.",
+      "subscriptionWarning": "Eliminar tu cuenta NO cancela tu suscripción. Si tienes un plan activo, cancélalo primero en la web.",
+      "manageSubscription": "Administrar suscripción",
+      "button": "Eliminar mi cuenta",
+      "deleting": "Eliminando…",
+      "confirm1Title": "¿Eliminar tu cuenta?",
+      "confirm1Body": "Esto borra permanentemente todos tus datos y no se puede deshacer. Tu suscripción NO se cancela automáticamente.",
+      "confirm1Cta": "Continuar",
+      "confirm2Title": "¿Estás completamente seguro?",
+      "confirm2Body": "Última oportunidad — esto es permanente.",
+      "confirm2Cta": "Eliminar para siempre",
+      "error": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
+    },
+    "legal": {
+      "privacy": "Política de privacidad",
+      "terms": "Términos de servicio"
+    },
     "profile": {
       "title": "Perfil",
       "description": "Información de tu cuenta.",

@@ -354,6 +354,25 @@
       "billing": "Billing & plan",
       "plugins": "Plugins"
     },
+    "deleteAccount": {
+      "title": "Delete account",
+      "body": "Permanently delete your account and everything in it — projects, tasks, ideas, routines and notes. This cannot be undone.",
+      "subscriptionWarning": "Deleting your account does NOT cancel your subscription. If you have an active plan, cancel it on the web first.",
+      "manageSubscription": "Manage subscription",
+      "button": "Delete my account",
+      "deleting": "Deleting…",
+      "confirm1Title": "Delete your account?",
+      "confirm1Body": "This permanently erases all your data and cannot be undone. Your subscription is NOT cancelled automatically.",
+      "confirm1Cta": "Continue",
+      "confirm2Title": "Are you absolutely sure?",
+      "confirm2Body": "Last chance — this is permanent.",
+      "confirm2Cta": "Delete forever",
+      "error": "We could not delete your account. Please try again."
+    },
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
     "profile": {
       "title": "Profile",
       "description": "Your account information.",
