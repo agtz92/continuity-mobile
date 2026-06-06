@@ -23,8 +23,12 @@ import { router } from "expo-router";
 export const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
-// Backend push endpoints don't exist yet — keep registration calls gated so the
-// client compiles and runs without erroring against a schema that lacks them.
+// Backend push (Fase 8) is IMPLEMENTED but not yet DEPLOYED. Keep this false so
+// the client doesn't call registerPushToken against a production schema that
+// still lacks it (that would error on every sign-in).
+//
+// ⚠️ DO NOT flip this to true on your own. Only the repo owner (alfredo) decides
+// when the backend is live — flip it ONLY when he explicitly says so.
 export const PUSH_BACKEND_READY = false;
 
 const DEVICE_ID_KEY = "continuity.deviceId";
