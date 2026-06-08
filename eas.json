@@ -20,6 +20,9 @@
     "preview": {
       "distribution": "internal",
       "channel": "preview",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://mhvmliwlhavjpdgpdzss.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_Jk4LRIUWlw57O84p9OYpfg_s0CzsIlQ",

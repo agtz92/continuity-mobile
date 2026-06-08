@@ -3,6 +3,7 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
+  SectionList,
   Text,
   TextInput,
   View,
@@ -242,6 +243,17 @@ export default function Log() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, boundaries]);
 
+  // Sections for the virtualized SectionList (drops empty buckets).
+  const sections = useMemo(
+    () =>
+      BUCKET_ORDER.map((bucket) => ({
+        key: bucket,
+        title: t(`views.log.buckets.${bucket}`),
+        data: grouped[bucket],
+      })).filter((s) => s.data.length > 0),
+    [grouped, t]
+  );
+
   const onDelete = async (id: string) => {
     if (await confirmAsync(t("views.log.deleteConfirm"))) deleteNote(id);
   };
@@ -315,8 +327,12 @@ export default function Log() {
           </Text>
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{ gap: 20, padding: 20, paddingTop: 4, paddingBottom: 96 }}
+        <SectionList
+          sections={sections}
+          keyExtractor={(a) => a.id}
+          contentContainerStyle={{ padding: 20, paddingTop: 4, paddingBottom: 96 }}
+          showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -324,54 +340,42 @@ export default function Log() {
               tintColor={c.accent}
             />
           }
-        >
-          {BUCKET_ORDER.map((bucket) => {
-            const entries = grouped[bucket];
-            if (entries.length === 0) return null;
+          renderSectionHeader={({ section }) => (
+            <Text className="mb-2 mt-4 px-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              {section.title} · {section.data.length}
+            </Text>
+          )}
+          renderItem={({ item: a }) => {
+            const proj = projects.find((p) => p.id === a.projectId);
+            const isNote = a.kind === "note";
             return (
-              <View key={bucket} className="gap-2">
-                <Text className="px-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-                  {t(`views.log.buckets.${bucket}`)} · {entries.length}
-                </Text>
-                {entries.map((a) => {
-                  const proj = projects.find((p) => p.id === a.projectId);
-                  const isNote = a.kind === "note";
-                  return (
-                    <View
-                      key={a.id}
-                      className="flex-row gap-3 rounded-lg border border-border bg-surface p-3"
-                    >
-                      <View style={{ marginTop: 2 }}>{iconFor(a.kind, c)}</View>
-                      <View className="min-w-0 flex-1">
-                        <Text className="mb-0.5 text-xs text-text-muted">
-                          {formatDate(a.created, locale)}
-                        </Text>
-                        {proj && (
-                          <Text className="mb-0.5 text-xs text-accent">
-                            {proj.name}
-                          </Text>
-                        )}
-                        <Text className="text-sm text-text">
-                          {describe(a, locale, t)}
-                        </Text>
-                      </View>
-                      {isNote && (
-                        <Pressable
-                          onPress={() => onDelete(a.id)}
-                          accessibilityRole="button"
-                          accessibilityLabel={t("views.log.deleteEntryAria")}
-                          hitSlop={8}
-                        >
-                          <X size={14} color={c.textMuted} />
-                        </Pressable>
-                      )}
-                    </View>
-                  );
-                })}
+              <View className="mb-2 flex-row gap-3 rounded-lg border border-border bg-surface p-3">
+                <View style={{ marginTop: 2 }}>{iconFor(a.kind, c)}</View>
+                <View className="min-w-0 flex-1">
+                  <Text className="mb-0.5 text-xs text-text-muted">
+                    {formatDate(a.created, locale)}
+                  </Text>
+                  {proj && (
+                    <Text className="mb-0.5 text-xs text-accent">{proj.name}</Text>
+                  )}
+                  <Text className="text-sm text-text">
+                    {describe(a, locale, t)}
+                  </Text>
+                </View>
+                {isNote && (
+                  <Pressable
+                    onPress={() => onDelete(a.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("views.log.deleteEntryAria")}
+                    hitSlop={8}
+                  >
+                    <X size={14} color={c.textMuted} />
+                  </Pressable>
+                )}
               </View>
             );
-          })}
-        </ScrollView>
+          }}
+        />
       )}
     </SafeAreaView>
   );

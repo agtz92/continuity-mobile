@@ -27,6 +27,8 @@ export default function DashboardLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Subtle cross-tab transition (react-navigation v7 bottom tabs).
+        animation: "shift",
         tabBarActiveTintColor: accent,
         tabBarInactiveTintColor: surfaces.textMuted,
         tabBarStyle: {

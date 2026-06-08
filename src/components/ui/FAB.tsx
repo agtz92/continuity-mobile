@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Pressable } from "react-native";
+import { selectionFeedback } from "@/lib/feedback";
 
 /**
  * Floating Action Button. Absolutely positioned bottom-right. On tab screens the
@@ -21,7 +22,10 @@ export function FAB({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        selectionFeedback();
+        onPress();
+      }}
       accessibilityRole="button"
       accessibilityLabel={label}
       className="absolute right-4 h-14 w-14 items-center justify-center rounded-full bg-accent shadow-lg active:opacity-90"

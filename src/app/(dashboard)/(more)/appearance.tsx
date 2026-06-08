@@ -16,6 +16,7 @@ import {
 import { UPDATE_NOTIFICATION_SETTINGS } from "@/lib/graphql";
 import { requestTour } from "@/lib/tour";
 import { toast } from "@/lib/toast";
+import { selectionFeedback } from "@/lib/feedback";
 
 function Pill({
   label,
@@ -28,7 +29,10 @@ function Pill({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        selectionFeedback();
+        onPress();
+      }}
       className={
         "rounded-full border px-3 py-1 " +
         (active ? "border-accent bg-accent" : "border-border bg-surface")

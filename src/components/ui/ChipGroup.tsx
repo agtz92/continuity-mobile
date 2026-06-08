@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
+import { selectionFeedback } from "@/lib/feedback";
 
 export type ChipOption<V extends string> = {
   value: V;
@@ -29,7 +30,10 @@ export function ChipGroup<V extends string>({
         return (
           <Pressable
             key={opt.value}
-            onPress={() => onChange(opt.value)}
+            onPress={() => {
+              selectionFeedback();
+              onChange(opt.value);
+            }}
             accessibilityRole="radio"
             accessibilityState={{ selected: active }}
             className={
