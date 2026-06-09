@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import type { Activity, Idea, Project, Task } from "@/lib/types";
 import {
-  computeStreak,
   daysActiveThisWeek,
   daysSince,
   hoursSince,
@@ -42,18 +41,13 @@ export function useProductivityStats({
   activities: Activity[];
 }) {
   // ---------------------------------------------------------------------------
-  // Streak + activity-day metrics. After the slice-2 unification, every
-  // meaningful event lives in `Activity` (notes, completed tasks, creates,
-  // status changes, etc.), so streak counting just maps over `activities`.
+  // Activity-day metrics. After the slice-2 unification, every meaningful
+  // event lives in `Activity` (notes, completed tasks, creates, status
+  // changes, etc.), so day counting just maps over `activities`.
   // ---------------------------------------------------------------------------
   const activityTimestamps = useMemo(
     () => activities.map((a) => a.created),
     [activities]
-  );
-
-  const streak = useMemo(
-    () => computeStreak(activityTimestamps),
-    [activityTimestamps]
   );
 
   const activeThisWeek = useMemo(
@@ -231,7 +225,6 @@ export function useProductivityStats({
   };
 
   return {
-    streak,
     activeThisWeek,
     projectProgressById,
     todayHoursByProject,

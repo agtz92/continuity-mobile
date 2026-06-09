@@ -17,7 +17,6 @@ import {
   BarChart3,
   CalendarDays,
   Clock,
-  Flame,
   Hourglass,
   Lightbulb,
   LineChart as LineIcon,
@@ -162,12 +161,8 @@ function StatTile({
 
 function CadencePanel({ cadence, t }: { cadence: CadenceStats; t: T }) {
   return (
-    <PanelCard title={t("analytics.cadence.title")} icon={<Flame size={16} color={AMBER} />}>
+    <PanelCard title={t("analytics.cadence.title")} icon={<CalendarDays size={16} color={AMBER} />}>
       <View className="gap-3">
-        <View className="flex-row gap-3">
-          <StatTile value={cadence.currentStreak} suffix="d" label={t("analytics.cadence.currentStreak")} />
-          <StatTile value={cadence.longestStreak} suffix="d" label={t("analytics.cadence.bestStreak")} />
-        </View>
         <View className="flex-row gap-3">
           <StatTile value={cadence.activeDaysInRange} label={t("analytics.cadence.activeDays")} />
           <StatTile value={cadence.totalActivityEvents} label={t("analytics.cadence.events")} />

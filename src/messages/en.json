@@ -219,11 +219,6 @@
       "launched": "Launched",
       "stalled": "Stalled",
       "thisWeek": "This week",
-      "streak": "Streak",
-      "streakRecord": "Streak · record",
-      "best": "Best",
-      "streakTooltipActive": "Current streak: {current, plural, one {# day} other {# days}} · Best: {best}",
-      "streakTooltipBest": "Best streak: {best, plural, one {# day} other {# days}}. Log activity today to start a new run.",
       "weekTooltip": "Active on {count} of 7 days this week"
     }
   },
@@ -631,8 +626,6 @@
     "loadError": "Couldn't load analytics",
     "cadence": {
       "title": "Cadence",
-      "currentStreak": "Current streak",
-      "bestStreak": "Best streak",
       "activeDays": "Active days",
       "events": "Events"
     },
@@ -715,12 +708,6 @@
         "afternoon": "Good afternoon",
         "evening": "Good evening"
       },
-      "streakCard": {
-        "title": "Streak",
-        "days": "{count, plural, one {# day} other {# days}}",
-        "nextMilestone": "Next goal: {days}d",
-        "best": "Best: {days}d"
-      },
       "counters": {
         "active": "Active",
         "launched": "Launched",
@@ -749,7 +736,6 @@
         "hiddenFooter": "{count, plural, one {# hidden · Customize} other {# hidden · Customize}}"
       },
       "sections": {
-        "streak": "Streak",
         "counters": "Counters",
         "stalledAlert": "Stalled alert",
         "todayFocus": "Today's Focus",

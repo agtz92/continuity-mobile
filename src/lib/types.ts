@@ -152,8 +152,6 @@ export type AnalyticsRange =
   | "ALL_TIME";
 
 export interface CadenceStats {
-  currentStreak: number;
-  longestStreak: number;
   activeDaysInRange: number;
   totalActivityEvents: number;
 }

@@ -61,47 +61,6 @@ export const weekStartISO = (ref: Date = new Date()) => {
   return toLocalISO(d);
 };
 
-/**
- * Given a list of activity timestamps (ISO strings), returns:
- * - current: consecutive days ending today (or 0 if today has no activity)
- * - best: longest historical run of consecutive active days
- */
-export const computeStreak = (
-  isoTimestamps: Array<string | null | undefined>
-): { current: number; best: number } => {
-  const days = new Set<string>();
-  for (const ts of isoTimestamps) {
-    if (!ts) continue;
-    days.add(toLocalISO(new Date(ts)));
-  }
-  if (days.size === 0) return { current: 0, best: 0 };
-
-  // Current streak: walk backwards from today.
-  let current = 0;
-  const cursor = new Date();
-  while (days.has(toLocalISO(cursor))) {
-    current += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  // Best streak: scan sorted days.
-  const sorted = [...days].sort();
-  let best = 0;
-  let run = 0;
-  let prevTime: number | null = null;
-  for (const iso of sorted) {
-    const t = new Date(iso + "T00:00:00").getTime();
-    if (prevTime !== null && t - prevTime === 86_400_000) {
-      run += 1;
-    } else {
-      run = 1;
-    }
-    best = Math.max(best, run);
-    prevTime = t;
-  }
-  return { current, best };
-};
-
 /** Count distinct days with activity within the current week (Mon..today). */
 export const daysActiveThisWeek = (
   isoTimestamps: Array<string | null | undefined>

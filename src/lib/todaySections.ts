@@ -12,7 +12,6 @@
  */
 
 export type TodaySectionId =
-  | "streak"
   | "counters"
   | "stalled-alert"
   | "today-focus"
@@ -32,7 +31,6 @@ export type TodaySectionMeta = {
 };
 
 export const TODAY_SECTIONS: readonly TodaySectionMeta[] = [
-  { id: "streak", labelKey: "streak", hideable: true },
   { id: "counters", labelKey: "counters", hideable: true },
   { id: "stalled-alert", labelKey: "stalledAlert", hideable: true },
   { id: "today-focus", labelKey: "todayFocus", hideable: false },

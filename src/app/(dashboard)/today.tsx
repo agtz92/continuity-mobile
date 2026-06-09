@@ -20,7 +20,6 @@ import {
   Clock,
   Edit2,
   Flag,
-  Flame,
   FolderPlus,
   Lightbulb,
   Moon,
@@ -68,14 +67,6 @@ const ORANGE_T = "rgb(251,146,60)";
 const AMBER_T = "rgb(251,191,36)";
 const PURPLE_T = "rgb(192,132,252)";
 
-const STREAK_MILESTONES = [7, 14, 30, 60, 100, 200, 365] as const;
-
-function streakNextGoal(current: number): number {
-  return (
-    STREAK_MILESTONES.find((m) => m > current) ??
-    Math.ceil((current + 1) / 100) * 100
-  );
-}
 
 function greetingKey(): "morning" | "afternoon" | "evening" {
   const h = new Date().getHours();
@@ -172,7 +163,6 @@ export default function Today() {
     projectProgressById,
     comebackProjectIds,
     comebackGapByProject,
-    streak,
   } = useProductivityStats({ projects, tasks, ideas, activities });
 
   const { toggleTask } = useTaskMutations();
@@ -280,12 +270,6 @@ export default function Today() {
   const activeProjects = projects.filter((p) => p.status === "active");
   const launchedCount = projects.filter((p) => p.status === "launched").length;
 
-  const streakCurrent = streak.current;
-  const streakBest = streak.best;
-  const streakGoal = streakNextGoal(streakCurrent);
-  const streakProgress =
-    streakGoal > 0 ? Math.min(1, streakCurrent / streakGoal) : 0;
-
   const counters: { id: string; label: string; value: number; tint: string }[] =
     [
       { id: "active", label: t("views.today.counters.active"), value: activeProjects.length, tint: c.accent },
@@ -342,7 +326,6 @@ export default function Today() {
 
   // -------- Section icon map for the customize-mode row -------- //
   const SECTION_ICON: Record<TodaySectionId, ReactNode> = {
-    streak: <Flame size={18} color={ORANGE_T} />,
     counters: <TrendingUp size={18} color={c.accent2} />,
     "stalled-alert": <Bell size={18} color={AMBER_T} />,
     "today-focus": <Target size={18} color={c.accent} />,
@@ -357,59 +340,6 @@ export default function Today() {
 
   // -------- Section nodes (rendered only when data exists) -------- //
   const sectionNodes: Partial<Record<TodaySectionId, ReactNode>> = {};
-
-  if (hasData && (streakCurrent > 0 || streakBest > 0)) {
-    sectionNodes.streak = (
-      <View
-        className="rounded-xl border p-4"
-        style={{
-          backgroundColor: `rgba(${ORANGE},0.1)`,
-          borderColor: `rgba(${ORANGE},0.3)`,
-        }}
-      >
-        <View className="mb-2 flex-row items-center gap-2">
-          <Flame size={18} color={ORANGE_T} />
-          <Text
-            className="text-sm font-medium uppercase tracking-wider"
-            style={{ color: ORANGE_T }}
-          >
-            {t("views.today.streakCard.title")}
-          </Text>
-          <Text
-            className="ml-auto text-xl font-bold"
-            style={{ color: ORANGE_T }}
-          >
-            {t("views.today.streakCard.days", { count: streakCurrent })}
-          </Text>
-        </View>
-        <View
-          className="h-2 overflow-hidden rounded-full"
-          style={{ backgroundColor: `rgba(${ORANGE},0.2)` }}
-        >
-          <View
-            className="h-full rounded-full"
-            style={{
-              width: `${streakProgress * 100}%`,
-              backgroundColor: ORANGE_T,
-            }}
-          />
-        </View>
-        <View className="mt-1.5 flex-row items-center justify-between">
-          <Text className="text-[11px]" style={{ color: `rgba(${ORANGE},0.9)` }}>
-            {t("views.today.streakCard.nextMilestone", { days: streakGoal })}
-          </Text>
-          {streakBest > 0 && (
-            <Text
-              className="text-[11px]"
-              style={{ color: `rgba(${ORANGE},0.9)` }}
-            >
-              {t("views.today.streakCard.best", { days: streakBest })}
-            </Text>
-          )}
-        </View>
-      </View>
-    );
-  }
 
   if (hasData) {
     sectionNodes.counters = (
