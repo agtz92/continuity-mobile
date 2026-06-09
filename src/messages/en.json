@@ -1,4 +1,28 @@
 {
+  "reportBug": {
+    "title": "Report a bug",
+    "description": "Found something broken? Tell us what happened — it goes straight to our team. This is a one-way inbox, so you won't get a reply here.",
+    "topicLabel": "Topic",
+    "topicPlaceholder": "Choose a topic or type your own",
+    "searchPlaceholder": "Search or type a topic…",
+    "useTyped": "Use «{query}»",
+    "messageLabel": "What happened?",
+    "messagePlaceholder": "Describe the bug: what you did, what you expected, and what actually happened.",
+    "submit": "Send report",
+    "sending": "Sending…",
+    "success": "Thanks! Your report was sent.",
+    "error": "Couldn't send your report. Please try again."
+  },
+  "bugTopics": {
+    "crash": "App crash / freeze",
+    "performance": "Slow performance",
+    "ui": "Visual / UI glitch",
+    "sync": "Data sync issue",
+    "notifications": "Notifications",
+    "account": "Login / account",
+    "billing": "Payments / subscription",
+    "other": "Other"
+  },
   "auth": {
     "login": {
       "title": "Welcome back",

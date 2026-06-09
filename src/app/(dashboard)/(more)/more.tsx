@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   BarChart3,
   Bell,
+  Bug,
   CreditCard,
   ChevronRight,
   FileText,
@@ -108,6 +109,15 @@ export default function More() {
           {t("settings.nav.label")}
         </Text>
         {renderGroup(settings)}
+
+        {renderGroup([
+          {
+            key: "reportBug",
+            label: t("reportBug.title"),
+            icon: Bug,
+            href: "/report-bug",
+          },
+        ])}
 
         {/* Legal — external web pages (Apple wants an accessible privacy policy) */}
         <View className="overflow-hidden rounded-2xl border border-border bg-surface">

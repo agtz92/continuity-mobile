@@ -1,4 +1,28 @@
 {
+  "reportBug": {
+    "title": "Reportar un bug",
+    "description": "¿Algo no funciona? Cuéntanos qué pasó — llega directo a nuestro equipo. Este buzón es de un solo sentido, así que no recibirás respuesta aquí.",
+    "topicLabel": "Tema",
+    "topicPlaceholder": "Elige un tema o escribe el tuyo",
+    "searchPlaceholder": "Busca o escribe un tema…",
+    "useTyped": "Usar «{query}»",
+    "messageLabel": "¿Qué pasó?",
+    "messagePlaceholder": "Describe el bug: qué hiciste, qué esperabas y qué ocurrió en realidad.",
+    "submit": "Enviar reporte",
+    "sending": "Enviando…",
+    "success": "¡Gracias! Tu reporte fue enviado.",
+    "error": "No se pudo enviar tu reporte. Inténtalo de nuevo."
+  },
+  "bugTopics": {
+    "crash": "La app se cierra / se congela",
+    "performance": "Rendimiento lento",
+    "ui": "Error visual / interfaz",
+    "sync": "Sincronización de datos",
+    "notifications": "Notificaciones",
+    "account": "Inicio de sesión / cuenta",
+    "billing": "Pagos / suscripción",
+    "other": "Otro"
+  },
   "auth": {
     "login": {
       "title": "Bienvenido de vuelta",

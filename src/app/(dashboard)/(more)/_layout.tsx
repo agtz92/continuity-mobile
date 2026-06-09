@@ -49,6 +49,10 @@ export default function MoreLayout() {
         name="google-tasks"
         options={{ ...headered, title: t("settings.plugins.googleTasks.title") }}
       />
+      <Stack.Screen
+        name="report-bug"
+        options={{ ...headered, title: t("reportBug.title") }}
+      />
     </Stack>
   );
 }
