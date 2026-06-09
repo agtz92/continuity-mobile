@@ -29,10 +29,13 @@ function ManageBillingLink() {
 
 /**
  * Step 4 — plan info (Apple-compliant). Three states:
- *  - replay: plan info + (non-exempt) manage-in-billing + "watch tour again" + Done.
- *  - first-time exempt: the beta thank-you note + "go to dashboard".
- *  - first-time non-exempt: plan info + manage-in-billing + "go to dashboard".
+ *  - replay: plan info + (non-exempt) manage-in-billing.
+ *  - first-time exempt: the beta thank-you note.
+ *  - first-time non-exempt: plan info + manage-in-billing.
  * Never shows prices, plan cards, or an in-app subscribe/checkout CTA.
+ *
+ * The primary button advances to step 5 (Personalize Today) via `onContinue`;
+ * onboarding completion and the "watch tour again" CTA now live on step 5.
  */
 export function Step4Plan({
   name,
@@ -40,16 +43,14 @@ export function Step4Plan({
   isExempt,
   replay,
   busy,
-  onFinish,
-  onWatchTour,
+  onContinue,
 }: {
   name: string;
   planLabel: string;
   isExempt: boolean;
   replay: boolean;
   busy: boolean;
-  onFinish: () => void;
-  onWatchTour: () => void;
+  onContinue: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -67,19 +68,9 @@ export function Step4Plan({
 
         {!isExempt && <ManageBillingLink />}
 
-        <Pressable
-          onPress={onWatchTour}
-          accessibilityRole="button"
-          className="items-center py-1"
-        >
-          <Text className="text-sm font-medium text-accent">
-            {t("onboarding.replay.replayTourButton")}
-          </Text>
-        </Pressable>
-
         <PrimaryButton
-          label={t("onboarding.replay.finishButton")}
-          onPress={onFinish}
+          label={t("onboarding.continue")}
+          onPress={onContinue}
           busy={busy}
         />
       </View>
@@ -105,8 +96,8 @@ export function Step4Plan({
         </View>
 
         <PrimaryButton
-          label={t("onboarding.step4Beta.primary")}
-          onPress={onFinish}
+          label={t("onboarding.continue")}
+          onPress={onContinue}
           busy={busy}
         />
       </View>
@@ -128,8 +119,8 @@ export function Step4Plan({
       <ManageBillingLink />
 
       <PrimaryButton
-        label={t("onboarding.step4Beta.primary")}
-        onPress={onFinish}
+        label={t("onboarding.continue")}
+        onPress={onContinue}
         busy={busy}
       />
     </View>

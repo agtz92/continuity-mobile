@@ -1,4 +1,11 @@
-import { Fragment, type ReactNode, useCallback, useMemo, useState } from "react";
+import {
+  Fragment,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   Pressable,
   RefreshControl,
@@ -52,6 +59,7 @@ import { FAB } from "@/components/ui/FAB";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
 import { RoutineRow } from "@/components/routines/RoutineRow";
+import { consumeCustomizeRequest, subscribeCustomize } from "@/lib/tour";
 import { TodaySectionEditRow } from "@/components/today/TodaySectionEditRow";
 import { TodayCustomizeBar } from "@/components/today/TodayCustomizeBar";
 import { HiddenSectionsFooter } from "@/components/today/HiddenSectionsFooter";
@@ -182,6 +190,16 @@ export default function Today() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const layout = useTodayLayout();
+
+  // Hand-off from onboarding step 5: open the layout editor when armed. The
+  // requester (onboarding) sets a one-shot flag before navigating here; we
+  // consume it on mount and also subscribe in case Today is already mounted.
+  useEffect(() => {
+    if (consumeCustomizeRequest()) layout.setEditMode(true);
+    return subscribeCustomize(() => layout.setEditMode(true));
+    // layout.setEditMode is a stable useState setter — subscribe once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const goCreate = (route: "/project-form" | "/task-form" | "/routine-form" | "/idea-form") => {
     setCreateOpen(false);

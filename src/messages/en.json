@@ -326,6 +326,13 @@
         "studio": "No limits, all features."
       }
     },
+    "step5": {
+      "heading": "Make Today yours.",
+      "sub": "Counters, focus, routines, sleeping projects — Today holds a lot. Keep what matters, hide the rest, drag to reorder.",
+      "hint": "It's the gear at the top of Today. Change your mind whenever.",
+      "primary": "Personalize Today",
+      "later": "Maybe later"
+    },
     "replay": {
       "banner": "Editing your setup. Saving applies to your account.",
       "planHeading": "Your plan.",

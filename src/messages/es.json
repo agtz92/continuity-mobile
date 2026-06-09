@@ -326,6 +326,13 @@
         "studio": "Sin límites, todo incluido."
       }
     },
+    "step5": {
+      "heading": "Haz tuyo el Today.",
+      "sub": "Contadores, foco, rutinas, proyectos dormidos — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
+      "hint": "Es el engrane arriba del Today. Cambia de opinión cuando quieras.",
+      "primary": "Personalizar Today",
+      "later": "Quizás después"
+    },
     "replay": {
       "banner": "Estás editando tu setup. Lo que guardes aplica a tu cuenta.",
       "planHeading": "Tu plan.",
