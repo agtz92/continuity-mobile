@@ -6,21 +6,23 @@ import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client/react";
 import {
   COMPLETE_ONBOARDING,
+  MARK_TOUR,
   ONBOARDING_STATE_QUERY,
   SET_ONBOARDING_STEP,
   UPDATE_NOTIFICATION_SETTINGS,
   UPDATE_PROFILE,
 } from "@/lib/graphql";
 import { supabase } from "@/lib/supabase";
-import { requestTour } from "@/lib/tour";
+import { requestCustomize, requestTour } from "@/lib/tour";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { TextButton } from "@/components/onboarding/controls";
 import { Step1Name } from "@/components/onboarding/Step1Name";
 import { Step2Theme } from "@/components/onboarding/Step2Theme";
 import { Step3Avatar } from "@/components/onboarding/Step3Avatar";
 import { Step4Plan } from "@/components/onboarding/Step4Plan";
+import { Step5Customize } from "@/components/onboarding/Step5Customize";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 type OnboardingState = {
   status: string;
@@ -60,6 +62,12 @@ export default function Onboarding() {
   const [completeOnboarding] = useMutation(COMPLETE_ONBOARDING, {
     // Block until the state query reflects "completed" so the root gate doesn't
     // briefly see stale "in_progress" and bounce us back to /onboarding.
+    awaitRefetchQueries: true,
+    refetchQueries: [{ query: ONBOARDING_STATE_QUERY }],
+  });
+  const [markTour] = useMutation(MARK_TOUR, {
+    // Block until cache reflects the skipped tour so the DashboardTour overlay
+    // (mounted in the (dashboard) layout) doesn't auto-start over the editor.
     awaitRefetchQueries: true,
     refetchQueries: [{ query: ONBOARDING_STATE_QUERY }],
   });
@@ -137,6 +145,23 @@ export default function Onboarding() {
   const watchTour = () => {
     requestTour();
     router.replace("/today");
+  };
+
+  // Step 5 primary: complete onboarding, then open the Today layout editor.
+  // First-time runs also skip the tour so the editor doesn't share the screen
+  // with the spotlight; replay leaves tour state untouched.
+  const finishWithCustomize = async () => {
+    setBusy(true);
+    try {
+      if (!replay) {
+        await completeOnboarding({ variables: { mode: "finished" } });
+        await markTour({ variables: { seen: false } }).catch(() => undefined);
+      }
+      requestCustomize();
+      router.replace("/today");
+    } catch {
+      setBusy(false); // errorLink surfaced a toast; let the user retry
+    }
   };
 
   // Step 1 → save name, advance.
@@ -266,12 +291,20 @@ export default function Onboarding() {
             isExempt={state.isBillingExempt}
             replay={replay}
             busy={busy}
+            onContinue={() => void goToStep(5)}
+          />
+        )}
+        {step === 5 && (
+          <Step5Customize
+            replay={replay}
+            busy={busy}
+            onCustomize={() => void finishWithCustomize()}
             onFinish={() => void finish()}
             onWatchTour={watchTour}
           />
         )}
 
-        {/* Back link on steps 2–4 (replay too). */}
+        {/* Back link on steps 2–5 (replay too). */}
         {step > 1 && (
           <View className="mt-6 items-center">
             <TextButton

@@ -27,3 +27,31 @@ export function subscribeTour(cb: () => void): () => void {
     listeners.delete(cb);
   };
 }
+
+// ── Today customize hand-off ────────────────────────────────────────────────
+// Same one-shot pub/sub, used by onboarding step 5 to open the Today layout
+// editor on the next Today mount. Kept separate from the tour flag so the two
+// hand-offs never consume each other.
+
+let customizePending = false;
+const customizeListeners = new Set<() => void>();
+
+/** Arm the Today customize editor. Fires listeners so an already-mounted Today opens it. */
+export function requestCustomize(): void {
+  customizePending = true;
+  customizeListeners.forEach((l) => l());
+}
+
+/** Read-and-clear the armed flag. Returns true at most once per request. */
+export function consumeCustomizeRequest(): boolean {
+  const v = customizePending;
+  customizePending = false;
+  return v;
+}
+
+export function subscribeCustomize(cb: () => void): () => void {
+  customizeListeners.add(cb);
+  return () => {
+    customizeListeners.delete(cb);
+  };
+}

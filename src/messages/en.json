@@ -1,4 +1,28 @@
 {
+  "reportBug": {
+    "title": "Report a bug",
+    "description": "Found something broken? Tell us what happened — it goes straight to our team. This is a one-way inbox, so you won't get a reply here.",
+    "topicLabel": "Topic",
+    "topicPlaceholder": "Choose a topic or type your own",
+    "searchPlaceholder": "Search or type a topic…",
+    "useTyped": "Use «{query}»",
+    "messageLabel": "What happened?",
+    "messagePlaceholder": "Describe the bug: what you did, what you expected, and what actually happened.",
+    "submit": "Send report",
+    "sending": "Sending…",
+    "success": "Thanks! Your report was sent.",
+    "error": "Couldn't send your report. Please try again."
+  },
+  "bugTopics": {
+    "crash": "App crash / freeze",
+    "performance": "Slow performance",
+    "ui": "Visual / UI glitch",
+    "sync": "Data sync issue",
+    "notifications": "Notifications",
+    "account": "Login / account",
+    "billing": "Payments / subscription",
+    "other": "Other"
+  },
   "auth": {
     "login": {
       "title": "Welcome back",
@@ -195,11 +219,6 @@
       "launched": "Launched",
       "stalled": "Stalled",
       "thisWeek": "This week",
-      "streak": "Streak",
-      "streakRecord": "Streak · record",
-      "best": "Best",
-      "streakTooltipActive": "Current streak: {current, plural, one {# day} other {# days}} · Best: {best}",
-      "streakTooltipBest": "Best streak: {best, plural, one {# day} other {# days}}. Log activity today to start a new run.",
       "weekTooltip": "Active on {count} of 7 days this week"
     }
   },
@@ -306,6 +325,13 @@
         "pro": "More room. AI can write.",
         "studio": "No limits, all features."
       }
+    },
+    "step5": {
+      "heading": "Make Today yours.",
+      "sub": "Counters, focus, routines, sleeping projects — Today holds a lot. Keep what matters, hide the rest, drag to reorder.",
+      "hint": "It's the gear at the top of Today. Change your mind whenever.",
+      "primary": "Personalize Today",
+      "later": "Maybe later"
     },
     "replay": {
       "banner": "Editing your setup. Saving applies to your account.",
@@ -607,8 +633,6 @@
     "loadError": "Couldn't load analytics",
     "cadence": {
       "title": "Cadence",
-      "currentStreak": "Current streak",
-      "bestStreak": "Best streak",
       "activeDays": "Active days",
       "events": "Events"
     },
@@ -691,12 +715,6 @@
         "afternoon": "Good afternoon",
         "evening": "Good evening"
       },
-      "streakCard": {
-        "title": "Streak",
-        "days": "{count, plural, one {# day} other {# days}}",
-        "nextMilestone": "Next goal: {days}d",
-        "best": "Best: {days}d"
-      },
       "counters": {
         "active": "Active",
         "launched": "Launched",
@@ -725,7 +743,6 @@
         "hiddenFooter": "{count, plural, one {# hidden · Customize} other {# hidden · Customize}}"
       },
       "sections": {
-        "streak": "Streak",
         "counters": "Counters",
         "stalledAlert": "Stalled alert",
         "todayFocus": "Today's Focus",

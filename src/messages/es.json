@@ -1,4 +1,28 @@
 {
+  "reportBug": {
+    "title": "Reportar un bug",
+    "description": "¿Algo no funciona? Cuéntanos qué pasó — llega directo a nuestro equipo. Este buzón es de un solo sentido, así que no recibirás respuesta aquí.",
+    "topicLabel": "Tema",
+    "topicPlaceholder": "Elige un tema o escribe el tuyo",
+    "searchPlaceholder": "Busca o escribe un tema…",
+    "useTyped": "Usar «{query}»",
+    "messageLabel": "¿Qué pasó?",
+    "messagePlaceholder": "Describe el bug: qué hiciste, qué esperabas y qué ocurrió en realidad.",
+    "submit": "Enviar reporte",
+    "sending": "Enviando…",
+    "success": "¡Gracias! Tu reporte fue enviado.",
+    "error": "No se pudo enviar tu reporte. Inténtalo de nuevo."
+  },
+  "bugTopics": {
+    "crash": "La app se cierra / se congela",
+    "performance": "Rendimiento lento",
+    "ui": "Error visual / interfaz",
+    "sync": "Sincronización de datos",
+    "notifications": "Notificaciones",
+    "account": "Inicio de sesión / cuenta",
+    "billing": "Pagos / suscripción",
+    "other": "Otro"
+  },
   "auth": {
     "login": {
       "title": "Bienvenido de vuelta",
@@ -195,11 +219,6 @@
       "launched": "Lanzados",
       "stalled": "Estancados",
       "thisWeek": "Esta semana",
-      "streak": "Racha",
-      "streakRecord": "Racha · récord",
-      "best": "Mejor",
-      "streakTooltipActive": "Racha actual: {current, plural, one {# día} other {# días}} · Mejor: {best}",
-      "streakTooltipBest": "Mejor racha: {best, plural, one {# día} other {# días}}. Registra actividad hoy para empezar una nueva.",
       "weekTooltip": "Activo {count} de 7 días esta semana"
     }
   },
@@ -306,6 +325,13 @@
         "pro": "Más espacio. La IA puede escribir.",
         "studio": "Sin límites, todo incluido."
       }
+    },
+    "step5": {
+      "heading": "Haz tuyo el Today.",
+      "sub": "Contadores, foco, rutinas, proyectos dormidos — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
+      "hint": "Es el engrane arriba del Today. Cambia de opinión cuando quieras.",
+      "primary": "Personalizar Today",
+      "later": "Quizás después"
     },
     "replay": {
       "banner": "Estás editando tu setup. Lo que guardes aplica a tu cuenta.",
@@ -607,8 +633,6 @@
     },
     "cadence": {
       "title": "Cadencia",
-      "currentStreak": "Racha actual",
-      "bestStreak": "Mejor racha",
       "activeDays": "Días activos",
       "events": "Eventos"
     },
@@ -691,12 +715,6 @@
         "afternoon": "Buenas tardes",
         "evening": "Buenas noches"
       },
-      "streakCard": {
-        "title": "Racha",
-        "days": "{count, plural, one {# día} other {# días}}",
-        "nextMilestone": "Próximo objetivo: {days}d",
-        "best": "Mejor: {days}d"
-      },
       "counters": {
         "active": "Activos",
         "launched": "Lanzados",
@@ -725,7 +743,6 @@
         "hiddenFooter": "{count, plural, one {# oculta · Personalizar} other {# ocultas · Personalizar}}"
       },
       "sections": {
-        "streak": "Racha",
         "counters": "Contadores",
         "stalledAlert": "Alerta de detenidos",
         "todayFocus": "Enfoque de hoy",
