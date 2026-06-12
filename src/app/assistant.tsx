@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -34,6 +34,7 @@ export default function AssistantScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const insets = useSafeAreaInsets();
   const {
     messages,
     streaming,
@@ -66,10 +67,15 @@ export default function AssistantScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg" edges={["top", "bottom"]}>
-      {/* Header. Full-screen modal goes under the status bar, so the top safe
-          inset (via SafeAreaView edges) keeps the title clear of the notch. */}
-      <View className="flex-row items-center gap-2 border-b border-border px-4 pb-3 pt-3">
+    <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
+      {/* Header. Full-screen modal goes under the status bar; pad the top by the
+          real safe-area inset (+8) so the close X clears the notch and stays
+          tappable. We pad explicitly instead of relying on the SafeAreaView top
+          edge because the modal's own host view reported a 0 inset on iOS. */}
+      <View
+        style={{ paddingTop: insets.top + 8 }}
+        className="flex-row items-center gap-2 border-b border-border px-4 pb-3"
+      >
         <View
           className="h-8 w-8 items-center justify-center rounded-full"
           style={{ backgroundColor: c.accent }}

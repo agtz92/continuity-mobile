@@ -7,6 +7,10 @@ import "@/lib/i18n";
 import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import {
+  SafeAreaProvider,
+  initialWindowMetrics,
+} from "react-native-safe-area-context";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { apolloClient } from "@/lib/apollo";
 import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
@@ -87,13 +91,20 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  // SafeAreaProvider must wrap the tree so SafeAreaView/useSafeAreaInsets report
+  // real insets everywhere — including the assistant's fullScreenModal, which
+  // renders in its own host view and otherwise saw 0 top inset (the close X
+  // landed under the notch and was untappable). initialWindowMetrics gives the
+  // correct inset on the very first frame, avoiding a flash of mis-padded UI.
   return (
-    <ApolloProvider client={apolloClient}>
-      <AuthProvider>
-        <ThemeProvider>
-          <RootNavigator />
-        </ThemeProvider>
-      </AuthProvider>
-    </ApolloProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <ApolloProvider client={apolloClient}>
+        <AuthProvider>
+          <ThemeProvider>
+            <RootNavigator />
+          </ThemeProvider>
+        </AuthProvider>
+      </ApolloProvider>
+    </SafeAreaProvider>
   );
 }

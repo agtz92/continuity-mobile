@@ -10,6 +10,16 @@ usuarios no notaban que el header era tocable. El botón se oculta solo cuando
 `canGoBack === false`. Las pantallas presentadas como **modal** usan su propia **X**
 (`ModalScaffold`); el chat usa una **X** propia en su header.
 
+## Safe-area — `SafeAreaProvider` en el root (obligatorio)
+
+`src/app/_layout.tsx` envuelve todo en `<SafeAreaProvider initialMetrics={initialWindowMetrics}>`.
+Sin él, `SafeAreaView`/`useSafeAreaInsets` reportaban **0** dentro del
+`fullScreenModal` del chat (host view propio) y la **X de cerrar quedaba bajo el
+notch, intocable**. El header del chat (`src/app/assistant.tsx`) ya no depende del
+edge `top` del `SafeAreaView`: aplica `paddingTop: insets.top + 8` explícito. Regla:
+cualquier pantalla presentada como modal/fullScreenModal debe padear con
+`useSafeAreaInsets()`, no confiar solo en el edge top.
+
 ## Onboarding (5 pasos) + paso "Personalizar Today"
 
 5 pasos: nombre · tema · avatar · plan · **personalizar Today**. El paso 4 avanza
