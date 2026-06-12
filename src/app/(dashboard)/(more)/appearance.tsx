@@ -61,6 +61,20 @@ export default function Appearance() {
     router.push("/today");
   };
 
+  // Theme/palette are owned per-user on the backend (ThemeProvider hydrates from
+  // it on launch/foreground). Persist the choice to the server too — not just
+  // local AsyncStorage — otherwise the next launch's server hydration re-applies
+  // the stale server value and *reverts* the user's change. Apply locally first
+  // for an instant flip; the backend write is non-fatal (error link toasts).
+  const changeTheme = (next: (typeof SUPPORTED_THEMES)[number]) => {
+    setTheme(next);
+    void updateSettings({ variables: { data: { theme: next } } }).catch(() => {});
+  };
+  const changePalette = (next: (typeof SUPPORTED_PALETTES)[number]) => {
+    setPalette(next);
+    void updateSettings({ variables: { data: { palette: next } } }).catch(() => {});
+  };
+
   const changeLocale = async (next: Locale) => {
     if (next === activeLocale) return;
     // Apply + persist locally first so the UI flips instantly even if the
@@ -112,7 +126,7 @@ export default function Appearance() {
               key={th}
               label={t(`settings.appearance.${THEME_LABEL_KEY[th]}`)}
               active={theme === th}
-              onPress={() => setTheme(th)}
+              onPress={() => changeTheme(th)}
             />
           ))}
         </View>
@@ -131,7 +145,7 @@ export default function Appearance() {
               key={pl}
               label={t(`settings.appearance.${PALETTE_LABEL_KEY[pl]}`)}
               active={palette === pl}
-              onPress={() => setPalette(pl)}
+              onPress={() => changePalette(pl)}
             />
           ))}
         </View>

@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { AppState, View, useColorScheme } from "react-native";
 import { vars } from "nativewind";
+import * as SplashScreen from "expo-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@apollo/client/react";
 import { useAuth } from "@/lib/auth";
@@ -70,15 +71,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme(); // "light" | "dark" | null
   const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
   const [palette, setPaletteState] = useState<Palette>(DEFAULT_PALETTE);
+  // Becomes true once the locally-persisted theme/palette have been read. The
+  // splash is held until then so the first painted frame is already in the
+  // user's theme (no default→stored flip flash).
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const [t, p] = await Promise.all([
-        AsyncStorage.getItem(THEME_KEY),
-        AsyncStorage.getItem(PALETTE_KEY),
-      ]);
-      if (isTheme(t)) setThemeState(t);
-      if (isPalette(p)) setPaletteState(p);
+      try {
+        const [t, p] = await Promise.all([
+          AsyncStorage.getItem(THEME_KEY),
+          AsyncStorage.getItem(PALETTE_KEY),
+        ]);
+        if (isTheme(t)) setThemeState(t);
+        if (isPalette(p)) setPaletteState(p);
+      } finally {
+        setHydrated(true);
+      }
     })();
   }, []);
 
@@ -89,7 +98,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // is consistent; we only apply on first load + explicit foreground refetch
   // (fresh network data), never on the reactive cache, so a local edit mid-
   // session isn't clobbered.
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
+
+  // Hide the native splash once the theme is hydrated AND auth has resolved, so
+  // the first visible frame is the correct screen in the correct theme rather
+  // than a blank/default flash. preventAutoHideAsync() is called in _layout.tsx.
+  useEffect(() => {
+    if (hydrated && !authLoading) SplashScreen.hideAsync().catch(() => {});
+  }, [hydrated, authLoading]);
+
   const { data: settings, refetch } = useQuery<{
     notificationSettings: {
       theme?: string | null;

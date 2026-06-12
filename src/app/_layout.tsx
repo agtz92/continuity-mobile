@@ -11,12 +11,19 @@ import {
   SafeAreaProvider,
   initialWindowMetrics,
 } from "react-native-safe-area-context";
+import * as SplashScreen from "expo-splash-screen";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { apolloClient } from "@/lib/apollo";
 import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { Toaster } from "@/components/ui/Toaster";
+
+// Keep the native splash up until the theme has hydrated from AsyncStorage and
+// auth has resolved (see ThemeProvider). Prevents the "blank, then everything
+// pops in — in the wrong theme" launch flash. Errors are ignored: a missed
+// preventAutoHide just means the splash hides on its default schedule.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function ThemedStatusBar() {
   const { effective } = useTheme();

@@ -20,6 +20,20 @@ edge `top` del `SafeAreaView`: aplica `paddingTop: insets.top + 8` explícito. R
 cualquier pantalla presentada como modal/fullScreenModal debe padear con
 `useSafeAreaInsets()`, no confiar solo en el edge top.
 
+## Arranque sin flash + tema persistente
+
+- **Splash hold:** `_layout.tsx` llama `SplashScreen.preventAutoHideAsync()` al cargar
+  el módulo; `ThemeProvider` hace `SplashScreen.hideAsync()` cuando `hydrated`
+  (AsyncStorage de tema/paleta leído) **y** el auth ya resolvió. Así el primer frame
+  visible ya está en el tema correcto — sin el "blanco → todo aparece (en light)".
+- **Tema no se revierte:** la pantalla *Appearance* (`(more)/appearance.tsx`) escribe
+  el tema/paleta **también al backend** (`updateNotificationSettings`), no solo a
+  AsyncStorage. El tema es propiedad del usuario en el servidor y `ThemeProvider` lo
+  re-hidrata en launch/foreground; si solo se guardaba local, la hidratación del
+  servidor re-aplicaba el valor viejo y **revertía** el cambio. `changeTheme`/
+  `changePalette` aplican local primero (flip instantáneo) y espejean al backend
+  (no-fatal). Mismo patrón que `changeLocale`.
+
 ## Onboarding (5 pasos) + paso "Personalizar Today"
 
 5 pasos: nombre · tema · avatar · plan · **personalizar Today**. El paso 4 avanza
