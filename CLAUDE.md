@@ -22,3 +22,15 @@ El usuario envía un reporte de bug que llega al **inbox de admin** (solo web). 
 - **Selector de tema:** `src/components/ui/BugTopicSelect.tsx` — trigger + `BottomSheet` con búsqueda y opción de **texto libre** ("Usar «…»"). Sigue el patrón de `ProjectSelect`.
 - **Fuente de verdad de temas:** `src/lib/bugTopics.ts` — **espejo exacto** de `continuity/frontend/src/lib/bugTopics.ts` (mismos `value` y orden). Etiquetas i18n `bugTopics.<value>`; textos en `reportBug.*` (`src/messages/{en,es}.json`). Recuerda ICU llave simple: `reportBug.useTyped` usa `{query}`.
 - **Datos:** `SUBMIT_BUG_REPORT` en `src/lib/graphql.ts` (`platform:"app"`) + hook `src/hooks/useReportMutations.ts` (devuelve boolean, errores se muestran con `toast` en la pantalla). Backend: app `core/feedback`.
+
+## Quick Notes — cuaderno tipo Notion (bajo "More")
+
+Notas con **secciones plegables** (toggles), **categorizables** y ligables a un proyecto o sueltas. Vive bajo el stack `(more)`, como Ideas. Espejo de la web (`continuity/frontend`); plan/wireframes: `../continuity/docs/quick-notes/PLAN.md`. Backend: app `core` (GraphQL Strawberry).
+
+- **Pantallas** (registradas en `(more)/_layout.tsx`, enlazadas desde `more.tsx` con icono `NotebookPen`, `href:"/quick-notes"`):
+  - Lista: `src/app/(dashboard)/(more)/quick-notes.tsx` — búsqueda, chips de filtro (Todas / categorías / Sueltas / Fijadas), cards con franja de color de categoría, pull-to-refresh, FAB.
+  - Editor: `src/app/(dashboard)/(more)/quick-note.tsx` (`?id=`) — título, categoría en chips, proyecto vía `ProjectSelect`, secciones, fijar/borrar. El título se re-siembra por `useEffect` sobre `note?.id` (estable mientras escribes, no pisa ediciones).
+- **Sección:** `src/components/notes/NoteSectionCard.tsx` — toggle plegable, guarda al perder foco, reorden con botones **▲▼** (sin gesto nativo de arrastre), y **toggle vista/edición** (👁/✎). Caret por `transform` inline (no className alternante — regla 4).
+- **Markdown:** `src/components/notes/MarkdownText.tsx` — renderer **propio sin dependencias** (RN `Text`/`View`; encabezados, listas, **negrita**, *cursiva*, `código`, enlaces vía `Linking`). ⚠️ El JSDoc **no** debe contener `*/` (cierra el bloque).
+- **Datos:** hooks `src/hooks/useQuickNotes.ts` (query lazy) y `useQuickNoteMutations.ts` (refetch `QUICK_NOTES_QUERY`, vía `@apollo/client/react`). Tipos `QuickNote`/`NoteSection` en `src/lib/types.ts`. Reusa `categoryChipColors`/`alpha` para colores (regla 5). i18n `views.quickNotes.*` (en/es, ICU llave simple).
+- **Onboarding:** el `DashboardTour` (`src/components/onboarding/DashboardTour.tsx`) tiene un coachmark de Notes (`STEPS` → `key:"stepNotes"`, icono `NotebookPen`, i18n `onboarding.tour.stepNotes`). Los puntos de progreso/`next()` se ajustan solos al tamaño de `STEPS`. La nota de ejemplo para usuarios nuevos la siembra el backend (seed). No se tocó `TOTAL_STEPS`.

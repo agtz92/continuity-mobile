@@ -20,6 +20,14 @@ export default function MoreLayout() {
     <Stack initialRouteName="more">
       <Stack.Screen name="more" options={{ headerShown: false }} />
       <Stack.Screen name="ideas" options={{ ...headered, title: t("tabs.ideas") }} />
+      <Stack.Screen
+        name="quick-notes"
+        options={{ ...headered, title: t("tabs.notes") }}
+      />
+      <Stack.Screen
+        name="quick-note"
+        options={{ ...headered, title: t("views.quickNotes.noteTitle") }}
+      />
       <Stack.Screen name="log" options={{ ...headered, title: t("tabs.log") }} />
       <Stack.Screen
         name="analytics"

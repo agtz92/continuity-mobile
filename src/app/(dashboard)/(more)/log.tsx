@@ -14,6 +14,7 @@ import {
   Calendar,
   CheckCircle2,
   FileText,
+  NotebookPen,
   RefreshCw,
   Rocket,
   Search,
@@ -47,6 +48,7 @@ const DELETED_KINDS: ActivityKind[] = [
   "task_deleted",
   "idea_deleted",
   "routine_deleted",
+  "quick_note_deleted",
 ];
 
 const EMERALD = "rgb(52,211,153)";
@@ -79,6 +81,8 @@ function iconFor(kind: ActivityKind, c: ThemeColors) {
       return <Sparkles size={14} color={AMBER} />;
     case "idea_promoted":
       return <Rocket size={14} color={PURPLE} />;
+    case "quick_note_created":
+      return <NotebookPen size={14} color={c.accent} />;
     case "project_status_changed":
       return <RefreshCw size={14} color={CYAN} />;
     case "project_due_date_changed":
@@ -88,6 +92,7 @@ function iconFor(kind: ActivityKind, c: ThemeColors) {
     case "task_deleted":
     case "idea_deleted":
     case "routine_deleted":
+    case "quick_note_deleted":
       return <Trash2 size={14} color={RED_70} />;
     default:
       return <FileText size={14} color={c.textMuted} />;
@@ -150,6 +155,10 @@ function describe(a: Activity, locale: string, t: Translate): string {
       return e("routineCompleted", { title });
     case "routine_deleted":
       return e("routineDeleted", { title });
+    case "quick_note_created":
+      return e("quickNoteCreated", { title });
+    case "quick_note_deleted":
+      return e("quickNoteDeleted", { title });
     default:
       return a.entityTitle;
   }

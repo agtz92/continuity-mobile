@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import {
   FolderKanban,
   ListChecks,
+  NotebookPen,
   Repeat,
   Sparkles,
   type LucideIcon,
@@ -16,10 +17,14 @@ import { useThemeColors } from "@/theme/useThemeColors";
 import { useThemeVars } from "@/theme/ThemeProvider";
 import { PrimaryButton, TextButton } from "./controls";
 
-const STEPS: { icon: LucideIcon; key: "step1" | "step2" | "step3" | "step4" }[] = [
+const STEPS: {
+  icon: LucideIcon;
+  key: "step1" | "step2" | "step3" | "stepNotes" | "step4";
+}[] = [
   { icon: FolderKanban, key: "step1" },
   { icon: ListChecks, key: "step2" },
   { icon: Repeat, key: "step3" },
+  { icon: NotebookPen, key: "stepNotes" },
   { icon: Sparkles, key: "step4" },
 ];
 
