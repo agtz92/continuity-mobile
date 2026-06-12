@@ -19,6 +19,7 @@ import { Field } from "@/components/ui/Field";
 import { ProjectSelect } from "@/components/ui/ProjectSelect";
 import { NoteSectionCard } from "@/components/notes/NoteSectionCard";
 import { categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { deleteFeedback, impactFeedback, selectionFeedback } from "@/lib/feedback";
 
 export default function QuickNoteEditor() {
   const { t } = useTranslation();
@@ -67,12 +68,19 @@ export default function QuickNoteEditor() {
   const move = (index: number, dir: -1 | 1) => {
     const target = index + dir;
     if (target < 0 || target >= sections.length) return;
+    selectionFeedback();
     const ids = sections.map((s) => s.id);
     [ids[index], ids[target]] = [ids[target], ids[index]];
     m.reorderSections(note.id, ids);
   };
 
+  const togglePin = () => {
+    impactFeedback("medium");
+    m.setPinned(note.id, !note.pinned);
+  };
+
   const handleDelete = async () => {
+    deleteFeedback();
     await m.deleteNote(note.id);
     router.back();
   };
@@ -99,7 +107,7 @@ export default function QuickNoteEditor() {
               style={{ color: c.text, fontSize: 20 }}
             />
             <Pressable
-              onPress={() => m.setPinned(note.id, !note.pinned)}
+              onPress={togglePin}
               hitSlop={8}
               accessibilityLabel={t("views.quickNotes.pin")}
             >

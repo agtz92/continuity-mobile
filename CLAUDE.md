@@ -20,6 +20,17 @@ edge `top` del `SafeAreaView`: aplica `paddingTop: insets.top + 8` explícito. R
 cualquier pantalla presentada como modal/fullScreenModal debe padear con
 `useSafeAreaInsets()`, no confiar solo en el edge top.
 
+## Haptics (`src/lib/feedback.ts`)
+
+Helpers guardados (import dinámico de `expo-haptics`, `default ?? mod` por interop):
+`confirmCompleted` (success, completar tarea/rutina), `selectionFeedback` (toggles,
+FAB, reordenar), `deleteFeedback` (patrón **Warning**, borrados) e `impactFeedback`
+(`light`/`medium`/`heavy`, taps satisfactorios: fijar nota, etc.). El borrado con
+confirm dispara `deleteFeedback` **desde `confirmAsync`** (`src/lib/confirm.ts`), así
+todos los deletes con confirmación (tareas/rutinas/ideas/proyectos) lo heredan en un
+solo punto; los borrados directos sin confirm (nota/sección en el editor) lo llaman
+en su `onPress`.
+
 ## Arranque sin flash + tema persistente
 
 - **Splash hold:** `_layout.tsx` llama `SplashScreen.preventAutoHideAsync()` al cargar

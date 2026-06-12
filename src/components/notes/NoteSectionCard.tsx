@@ -11,6 +11,7 @@ import {
 } from "lucide-react-native";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { MarkdownText } from "@/components/notes/MarkdownText";
+import { deleteFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
 
 /**
@@ -103,7 +104,10 @@ export function NoteSectionCard({
           <ChevronDown size={16} color={c.textMuted} />
         </Pressable>
         <Pressable
-          onPress={onDelete}
+          onPress={() => {
+            deleteFeedback();
+            onDelete();
+          }}
           hitSlop={6}
           accessibilityLabel={t("views.quickNotes.deleteSection")}
         >

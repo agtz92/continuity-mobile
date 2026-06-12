@@ -37,3 +37,29 @@ export function confirmCompleted(message: string): void {
 export function selectionFeedback(): void {
   void runHaptic((H) => H.selectionAsync());
 }
+
+/**
+ * Destructive feedback for deletes — the iOS "warning" notification pattern
+ * (a firmer double buzz) so removing a note/section/task feels deliberate.
+ */
+export function deleteFeedback(): void {
+  void runHaptic((H) => H.notificationAsync(H.NotificationFeedbackType.Warning));
+}
+
+/**
+ * A physical "tap" with selectable weight, for satisfying one-off actions:
+ * pinning, opening the assistant speed-dial, etc. Defaults to a light tap.
+ */
+export function impactFeedback(
+  strength: "light" | "medium" | "heavy" = "light",
+): void {
+  void runHaptic((H) =>
+    H.impactAsync(
+      strength === "heavy"
+        ? H.ImpactFeedbackStyle.Heavy
+        : strength === "medium"
+          ? H.ImpactFeedbackStyle.Medium
+          : H.ImpactFeedbackStyle.Light,
+    ),
+  );
+}
