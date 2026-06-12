@@ -20,6 +20,21 @@ edge `top` del `SafeAreaView`: aplica `paddingTop: insets.top + 8` explícito. R
 cualquier pantalla presentada como modal/fullScreenModal debe padear con
 `useSafeAreaInsets()`, no confiar solo en el edge top.
 
+## Asistente "Loop" + FAB speed-dial
+
+El asistente IA se llama **Loop** (mascota de marca). Strings en `assistant.*`
+(`title:"Loop"`, `buttonLabel:"Abrir Loop"/"Open Loop"`, `openTooltip`,
+`message.working`); se mantiene "Claude" solo en `subtitle` como crédito del modelo.
+Mismo rebautizo en el repo web (`continuity/frontend`).
+
+`src/components/ui/FAB.tsx` es un **speed-dial**: al tocar el `+` se despliegan dos
+acciones etiquetadas — la acción primaria de la pantalla (crear) y **"Abrir Loop"**
+(`Sparkles`, `router.push("/assistant")`), horneada en el componente para que TODAS
+las pantallas con FAB expongan el asistente sin wiring por pantalla. Un scrim a
+pantalla completa cierra; el icono `+` rota 45° (se lee como ×). Haptics: `impact`
+light al abrir, `selection` al elegir. La firma del FAB no cambió (`icon/onPress/
+label/bottomOffset`), así que los 6 call sites siguen igual.
+
 ## Haptics (`src/lib/feedback.ts`)
 
 Helpers guardados (import dinámico de `expo-haptics`, `default ?? mod` por interop):

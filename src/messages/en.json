@@ -67,11 +67,11 @@
     }
   },
   "assistant": {
-    "title": "Assistant",
+    "title": "Loop",
     "subtitle": "Read-only Claude beta",
     "subtitleReadWrite": "Claude beta — reads & updates",
-    "buttonLabel": "Ask Claude",
-    "openTooltip": "Ask Claude about your projects",
+    "buttonLabel": "Open Loop",
+    "openTooltip": "Open Loop to ask about your projects",
     "newChat": "New conversation",
     "close": "Close",
     "send": "Send",
@@ -86,7 +86,7 @@
     },
     "message": {
       "thinking": "Thinking…",
-      "working": "Claude is working…"
+      "working": "Loop is working…"
     },
     "tools": {
       "running": "Running",
