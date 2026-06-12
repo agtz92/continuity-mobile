@@ -357,6 +357,10 @@
         "title": "Routines are what you do without thinking.",
         "body": "The stuff that happens every day. Track it here. The rest is noise."
       },
+      "stepNotes": {
+        "title": "Notes are your notebook.",
+        "body": "Reference you keep coming back to — accounts, contacts, checklists. Group it into collapsible sections, link it to a project or leave it loose. It's under More."
+      },
       "step4": {
         "title": "Stuck? Ask your AI.",
         "body": "This button opens the assistant. It reads your projects and tasks, and answers in your context."

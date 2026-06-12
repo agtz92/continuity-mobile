@@ -357,6 +357,10 @@
         "title": "Las routines son lo que haces sin pensar.",
         "body": "Lo que pasa todos los días. Trackéalo aquí. Lo demás es ruido."
       },
+      "stepNotes": {
+        "title": "Notes es tu cuaderno.",
+        "body": "Lo que consultas una y otra vez — cuentas, contactos, checklists. Agrúpalo en secciones plegables, ligalo a un proyecto o déjalo suelto. Está en Más."
+      },
       "step4": {
         "title": "¿Atorado? Pregúntale a tu IA.",
         "body": "Este botón abre el asistente. Lee tus proyectos y tasks, y te responde con tu contexto."
