@@ -228,6 +228,7 @@
     "tasks": "Tasks",
     "routines": "Routines",
     "ideas": "Ideas",
+    "notes": "Notes",
     "log": "Log",
     "analytics": "Analytics",
     "more": "More"
@@ -975,6 +976,41 @@
       "noMatch": "No ideas match \"{query}\"",
       "promote": "Promote to project"
     },
+    "quickNotes": {
+      "title": "Quick Notes",
+      "subtitle": "Your notebook inside Continuity. Capture notes, group them into collapsible sections, and link them to a project or keep them standalone.",
+      "noteTitle": "Note",
+      "search": "Search notes and sections...",
+      "newNote": "New note",
+      "addFirst": "Create first note",
+      "empty": "No notes yet.",
+      "noMatch": "No notes match \"{query}\"",
+      "loading": "Loading notes...",
+      "untitled": "Untitled note",
+      "standalone": "standalone",
+      "sectionCount": "{count, plural, =0 {No sections} one {# section} other {# sections}}",
+      "titlePlaceholder": "Note title",
+      "category": "Category",
+      "noCategory": "No category",
+      "project": "Project",
+      "noProject": "No project",
+      "pin": "Pin note",
+      "addSection": "Add collapsible section",
+      "sectionHeading": "Section title",
+      "sectionBody": "Write here... (Markdown supported)",
+      "deleteSection": "Delete section",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "edit": "Edit",
+      "preview": "Preview",
+      "filters": {
+        "all": "All",
+        "loose": "Standalone",
+        "pinned": "Pinned"
+      }
+    },
     "log": {
       "title": "Activity Log",
       "search": "Search log entries or project...",
@@ -1015,7 +1051,9 @@
         "ideaPromoted": "Promoted {title} → project",
         "routineCreated": "Created routine {title}",
         "routineCompleted": "Completed routine {title}",
-        "routineDeleted": "Deleted routine {title}"
+        "routineDeleted": "Deleted routine {title}",
+        "quickNoteCreated": "Created note {title}",
+        "quickNoteDeleted": "Deleted note {title}"
       }
     }
   },

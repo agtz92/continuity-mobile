@@ -228,6 +228,7 @@
     "tasks": "Tareas",
     "routines": "Rutinas",
     "ideas": "Ideas",
+    "notes": "Notas",
     "log": "Bitácora",
     "analytics": "Analíticas",
     "more": "Más"
@@ -975,6 +976,41 @@
       "noMatch": "No hay ideas que coincidan con \"{query}\"",
       "promote": "Promover a proyecto"
     },
+    "quickNotes": {
+      "title": "Quick Notes",
+      "subtitle": "Tu cuaderno dentro de Continuity. Captura notas, agrúpalas en secciones plegables y enlázalas a un proyecto o déjalas sueltas.",
+      "noteTitle": "Nota",
+      "search": "Buscar en notas y secciones...",
+      "newNote": "Nueva nota",
+      "addFirst": "Crear primera nota",
+      "empty": "Aún no tienes notas.",
+      "noMatch": "No hay notas que coincidan con \"{query}\"",
+      "loading": "Cargando notas...",
+      "untitled": "Nota sin título",
+      "standalone": "suelta",
+      "sectionCount": "{count, plural, =0 {Sin secciones} one {# sección} other {# secciones}}",
+      "titlePlaceholder": "Título de la nota",
+      "category": "Categoría",
+      "noCategory": "Sin categoría",
+      "project": "Proyecto",
+      "noProject": "Sin proyecto",
+      "pin": "Fijar nota",
+      "addSection": "Agregar sección plegable",
+      "sectionHeading": "Título de la sección",
+      "sectionBody": "Escribe aquí... (admite Markdown)",
+      "deleteSection": "Eliminar sección",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "collapse": "Plegar",
+      "expand": "Desplegar",
+      "edit": "Editar",
+      "preview": "Vista",
+      "filters": {
+        "all": "Todas",
+        "loose": "Sueltas",
+        "pinned": "Fijadas"
+      }
+    },
     "log": {
       "title": "Bitácora",
       "search": "Buscar entradas o proyecto...",
@@ -1015,7 +1051,9 @@
         "ideaPromoted": "Promoviste {title} a proyecto",
         "routineCreated": "Creaste la rutina {title}",
         "routineCompleted": "Completaste la rutina {title}",
-        "routineDeleted": "Eliminaste la rutina {title}"
+        "routineDeleted": "Eliminaste la rutina {title}",
+        "quickNoteCreated": "Creaste la nota {title}",
+        "quickNoteDeleted": "Eliminaste la nota {title}"
       }
     }
   },

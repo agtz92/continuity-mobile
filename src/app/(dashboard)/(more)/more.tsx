@@ -11,6 +11,7 @@ import {
   FileText,
   Lightbulb,
   LogOut,
+  NotebookPen,
   Palette,
   Plug,
   ScrollText,
@@ -39,6 +40,12 @@ export default function More() {
       href: "/assistant",
     },
     { key: "ideas", label: t("tabs.ideas"), icon: Lightbulb, href: "/ideas" },
+    {
+      key: "quick-notes",
+      label: t("tabs.notes"),
+      icon: NotebookPen,
+      href: "/quick-notes",
+    },
     { key: "log", label: t("tabs.log"), icon: ScrollText, href: "/log" },
     {
       key: "analytics",
