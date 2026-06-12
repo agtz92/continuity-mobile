@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
+import { HeaderBackButton } from "@/components/ui/HeaderBackButton";
 
 export default function MoreLayout() {
   const { t } = useTranslation();
@@ -14,6 +15,12 @@ export default function MoreLayout() {
     headerTintColor: s.text,
     headerTitleStyle: { color: s.text },
     headerShadowVisible: false,
+    // Explicit, clearly-visible back arrow — the default native chevron was
+    // too subtle and users couldn't tell the header was tappable.
+    headerBackVisible: false,
+    headerLeft: (props: { canGoBack?: boolean }) => (
+      <HeaderBackButton canGoBack={props.canGoBack} />
+    ),
   } as const;
 
   return (

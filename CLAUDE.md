@@ -1,5 +1,15 @@
 @AGENTS.md
 
+## Navegación — back button visible en el stack `(more)`
+
+Todas las pantallas con header del stack `(more)` usan un **`headerLeft` compartido**
+(`src/components/ui/HeaderBackButton.tsx`, flecha `ArrowLeft` temática) definido en
+`(more)/_layout.tsx` con `headerBackVisible:false`. Motivo: el chevron nativo de iOS
+era demasiado sutil (a veces solo la flecha, etiquetada con el título previo) y los
+usuarios no notaban que el header era tocable. El botón se oculta solo cuando
+`canGoBack === false`. Las pantallas presentadas como **modal** usan su propia **X**
+(`ModalScaffold`); el chat usa una **X** propia en su header.
+
 ## Onboarding (5 pasos) + paso "Personalizar Today"
 
 5 pasos: nombre · tema · avatar · plan · **personalizar Today**. El paso 4 avanza
