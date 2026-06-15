@@ -21,6 +21,7 @@ async function authHeaders(): Promise<Record<string, string>> {
   return {
     Authorization: `Bearer ${session.access_token}`,
     "Content-Type": "application/json",
+    "X-Continuity-Client": "mobile",
   };
 }
 

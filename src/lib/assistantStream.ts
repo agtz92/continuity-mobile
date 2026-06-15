@@ -83,6 +83,7 @@ export async function streamChat(args: StreamArgs): Promise<void> {
       Authorization: `Bearer ${session.access_token}`,
       "Content-Type": "application/json",
       Accept: "text/event-stream",
+      "X-Continuity-Client": "mobile",
     },
     body: JSON.stringify({
       conversation_id: args.conversationId,

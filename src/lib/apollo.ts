@@ -11,7 +11,12 @@ if (!graphqlUrl) {
   throw new Error("Missing EXPO_PUBLIC_GRAPHQL_URL");
 }
 
-const httpLink = new HttpLink({ uri: graphqlUrl });
+// `X-Continuity-Client` lets the backend attribute interactions to a channel
+// (web vs mobile) for admin metrics. Bucketing only — never used for authz.
+const httpLink = new HttpLink({
+  uri: graphqlUrl,
+  headers: { "X-Continuity-Client": "mobile" },
+});
 
 const authLink = new SetContextLink(async (prevContext) => {
   const {
