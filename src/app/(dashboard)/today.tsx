@@ -58,6 +58,19 @@ import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { FAB } from "@/components/ui/FAB";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
+import {
+  StalledProjectModal,
+  type StalledChoice,
+} from "@/components/projects/StalledProjectModal";
+import {
+  PauseProjectModal,
+  type PauseNotes,
+} from "@/components/projects/PauseProjectModal";
+import {
+  KillProjectModal,
+  type KillNotes,
+} from "@/components/projects/KillProjectModal";
+import { useProjectClosure } from "@/hooks/useProjectClosure";
 import { RoutineRow } from "@/components/routines/RoutineRow";
 import { consumeCustomizeRequest, subscribeCustomize } from "@/lib/tour";
 import { TodaySectionEditRow } from "@/components/today/TodaySectionEditRow";
@@ -164,7 +177,7 @@ export default function Today() {
   });
 
   const {
-    sleepingProjects,
+    stalledProjects,
     closableProjects,
     staleIdeas,
     todayHoursByProject,
@@ -175,6 +188,51 @@ export default function Today() {
 
   const { toggleTask } = useTaskMutations();
   const { completeOccurrence, uncompleteOccurrence } = useRoutineMutations();
+  const closure = useProjectClosure();
+
+  // Stalled decision queue: one modal per stalled project, in order. Projects
+  // the user has already resolved (or chose to skip) this session are tracked
+  // so they don't re-appear until the next reload.
+  const [resolvedStalledIds, setResolvedStalledIds] = useState<Set<string>>(
+    new Set()
+  );
+  const stalledQueue = stalled.filter((p) => !resolvedStalledIds.has(p.id));
+  const currentStalled = stalledQueue[0] ?? null;
+  const [stalledPauseOpen, setStalledPauseOpen] = useState(false);
+  const [stalledKillOpen, setStalledKillOpen] = useState(false);
+
+  const markStalledResolved = (id: string) =>
+    setResolvedStalledIds((prev) => new Set(prev).add(id));
+
+  const onStalledChoice = (choice: StalledChoice) => {
+    if (!currentStalled) return;
+    if (choice === "active") {
+      void closure.setStatus(currentStalled, "active");
+      markStalledResolved(currentStalled.id);
+    } else if (choice === "pause") {
+      setStalledPauseOpen(true);
+    } else {
+      setStalledKillOpen(true);
+    }
+  };
+
+  const onStalledPause = async (notes: PauseNotes) => {
+    if (!currentStalled) return;
+    const ok = await closure.pause(currentStalled, notes);
+    if (ok) {
+      setStalledPauseOpen(false);
+      markStalledResolved(currentStalled.id);
+    }
+  };
+
+  const onStalledKill = async (notes: KillNotes) => {
+    if (!currentStalled) return;
+    const ok = await closure.kill(currentStalled, notes);
+    if (ok) {
+      setStalledKillOpen(false);
+      markStalledResolved(currentStalled.id);
+    }
+  };
 
   const [refreshing, setRefreshing] = useState(false);
   const [showTodayFocus, setShowTodayFocus] = useState(true);
@@ -953,7 +1011,7 @@ export default function Today() {
     );
   }
 
-  if (sleepingProjects.length > 0) {
+  if (stalledProjects.length > 0) {
     sectionNodes.sleeping = (
       <CollapsibleSection
         open={showSleeping}
@@ -969,13 +1027,13 @@ export default function Today() {
             }}
           >
             <Text className="text-xs" style={{ color: AMBER_T }}>
-              {sleepingProjects.length}
+              {stalledProjects.length}
             </Text>
           </View>
         }
       >
         <View className="gap-2">
-          {sleepingProjects.map(({ project, days, bucket }) => (
+          {stalledProjects.map(({ project, days, bucket }) => (
             <View
               key={project.id}
               className="flex-row items-center gap-3 rounded-xl border border-border bg-surface p-3"
@@ -1324,6 +1382,30 @@ export default function Today() {
           />
         </View>
       </BottomSheet>
+
+      <StalledProjectModal
+        key={currentStalled?.id ?? "none"}
+        visible={
+          currentStalled !== null && !stalledPauseOpen && !stalledKillOpen
+        }
+        project={currentStalled}
+        saving={closure.saving}
+        onResolve={onStalledChoice}
+      />
+      <PauseProjectModal
+        visible={stalledPauseOpen}
+        projectName={currentStalled?.name ?? ""}
+        saving={closure.saving}
+        onCancel={() => setStalledPauseOpen(false)}
+        onConfirm={onStalledPause}
+      />
+      <KillProjectModal
+        visible={stalledKillOpen}
+        projectName={currentStalled?.name ?? ""}
+        saving={closure.saving}
+        onCancel={() => setStalledKillOpen(false)}
+        onConfirm={onStalledKill}
+      />
     </SafeAreaView>
   );
 }

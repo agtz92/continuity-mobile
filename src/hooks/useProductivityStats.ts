@@ -23,11 +23,15 @@ export type ProjectProgress = {
   todayEffortHours: number;
 };
 
-export type SleepingProject = {
+export type StalledProject = {
   project: Project;
   days: number;
   bucket: "7-14" | "15-30" | "30+";
 };
+
+/** Soft "idle" hint (D9): active/idea projects untouched a while. Not a status. */
+export type IdleProject = { project: Project; days: number };
+const IDLE_BADGE_DAYS = 7;
 
 export function useProductivityStats({
   projects,
@@ -109,18 +113,31 @@ export function useProductivityStats({
   }, [projects, projectProgressById]);
 
   // ---------------------------------------------------------------------------
-  // Sleeping projects: active/idea status with ≥7 days idle, bucketed for the
-  // "rescue" rail. Sorted oldest-first to surface the most-abandoned at the top.
+  // Stalled projects: the real persisted `stalled` status (auto-set by the
+  // backend at 14 days idle). Days measured from `stalledAt` (fallback to last
+  // activity), bucketed for the rail. Sorted oldest-first.
   // ---------------------------------------------------------------------------
-  const sleepingProjects = useMemo<SleepingProject[]>(() => {
-    const out: SleepingProject[] = [];
+  const stalledProjects = useMemo<StalledProject[]>(() => {
+    const out: StalledProject[] = [];
     for (const p of projects) {
-      if (!["active", "idea"].includes(p.status)) continue;
-      const days = daysSince(p.lastActivity) ?? 0;
-      if (days < 7) continue;
-      const bucket: SleepingProject["bucket"] =
+      if (p.status !== "stalled") continue;
+      const days = daysSince(p.stalledAt || p.lastActivity) ?? 0;
+      const bucket: StalledProject["bucket"] =
         days <= 14 ? "7-14" : days <= 30 ? "15-30" : "30+";
       out.push({ project: p, days, bucket });
+    }
+    return out.sort((a, b) => b.days - a.days);
+  }, [projects]);
+
+  // Soft idle hint for active/idea projects untouched for a while (D9). This is
+  // a visual nudge only — ideas never auto-stall, so this never changes status.
+  const idleProjects = useMemo<IdleProject[]>(() => {
+    const out: IdleProject[] = [];
+    for (const p of projects) {
+      if (p.status !== "active" && p.status !== "idea") continue;
+      const days = daysSince(p.lastActivity) ?? 0;
+      if (days < IDLE_BADGE_DAYS) continue;
+      out.push({ project: p, days });
     }
     return out.sort((a, b) => b.days - a.days);
   }, [projects]);
@@ -228,7 +245,8 @@ export function useProductivityStats({
     activeThisWeek,
     projectProgressById,
     todayHoursByProject,
-    sleepingProjects,
+    stalledProjects,
+    idleProjects,
     comebackProjectIds,
     comebackGapByProject,
     comebackHoursLeft,

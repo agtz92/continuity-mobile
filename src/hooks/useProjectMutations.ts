@@ -26,8 +26,15 @@ export function useProjectMutations() {
     priority: Priority;
     categoryId: string | null;
     dueDate: string | null;
+    // Optional closure notes — only sent on the relevant transition.
+    pausedContext?: string;
+    pausedNextAction?: string;
+    pausedBlocker?: string;
+    killedReason?: string;
+    killedLearnings?: string;
+    killedWouldRestart?: string;
   }): Promise<boolean> => {
-    const data = {
+    const data: Record<string, unknown> = {
       name: p.name,
       description: p.description,
       why: p.why,
@@ -37,6 +44,16 @@ export function useProjectMutations() {
       categoryId: p.categoryId,
       dueDate: p.dueDate,
     };
+    // Only include closure notes when provided so we never overwrite stored
+    // notes with empty strings on unrelated edits.
+    if (p.pausedContext !== undefined) data.pausedContext = p.pausedContext;
+    if (p.pausedNextAction !== undefined)
+      data.pausedNextAction = p.pausedNextAction;
+    if (p.pausedBlocker !== undefined) data.pausedBlocker = p.pausedBlocker;
+    if (p.killedReason !== undefined) data.killedReason = p.killedReason;
+    if (p.killedLearnings !== undefined) data.killedLearnings = p.killedLearnings;
+    if (p.killedWouldRestart !== undefined)
+      data.killedWouldRestart = p.killedWouldRestart;
     try {
       if (p.id) {
         await updateProject({ variables: { id: p.id, data } });

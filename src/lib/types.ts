@@ -4,6 +4,7 @@ export type ProjectStatus =
   | "stalled"
   | "paused"
   | "launched"
+  | "killed"
   | "archived";
 
 export type Priority = "critical" | "high" | "medium" | "low";
@@ -27,6 +28,26 @@ export interface Project {
   lastActivity: string;
   created: string;
   dueDate: string | null;
+  // Closure notes (paused). Empty string when unset (backend default="").
+  pausedContext?: string;
+  pausedNextAction?: string;
+  pausedBlocker?: string;
+  pausedAt?: string | null;
+  // Closure notes (killed).
+  killedReason?: string;
+  killedLearnings?: string;
+  killedWouldRestart?: string;
+  killedAt?: string | null;
+  killedAiReflection?: string;
+  // Stalled (auto-detected at 14 days idle).
+  stalledAt?: string | null;
+}
+
+export interface GraveyardInsight {
+  body: string;
+  deathsCount: number;
+  computedAt: string | null;
+  isStale: boolean;
 }
 
 export interface ProjectNote {

@@ -239,6 +239,7 @@
     "stalled": "Estancado",
     "paused": "Pausado",
     "launched": "Lanzado",
+    "killed": "Cancelado",
     "archived": "Archivado",
     "all": "Todos",
     "allStatuses": "Todos los estados"
@@ -754,7 +755,7 @@
         "routinesToday": "Rutinas para hoy",
         "doneToday": "Hecho hoy",
         "closeable": "Proyectos por cerrar",
-        "sleeping": "Proyectos durmiendo",
+        "sleeping": "Proyectos estancados",
         "staleIdeas": "Ideas estancadas",
         "activeProjects": "Proyectos activos",
         "launchedWithTasks": "Lanzados con tareas abiertas"
@@ -826,7 +827,7 @@
         "tasksAway": "Solo {count, plural, one {# tarea} other {# tareas}} para terminar."
       },
       "sleeping": {
-        "title": "Proyectos durmiendo",
+        "title": "Proyectos estancados",
         "daysIdle": "{count}d sin actividad",
         "resume": "Retomar"
       },
@@ -1059,6 +1060,9 @@
         "quickNoteCreated": "Creaste la nota {title}",
         "quickNoteDeleted": "Eliminaste la nota {title}"
       }
+    },
+    "graveyard": {
+      "title": "Cementerio"
     }
   },
   "taskRow": {

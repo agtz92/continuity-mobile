@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { Check, Plus, Search, SlidersHorizontal } from "lucide-react-native";
 import type { Project, ProjectStatus } from "@/lib/types";
 import { priorityRank } from "@/lib/types";
-import { daysSince, isDueToday, isOverdue } from "@/lib/date";
+import { isDueToday, isOverdue } from "@/lib/date";
 import { STATUS_FILTER_ORDER } from "@/lib/status";
 import { PROJECT_SORT_MODES, type ProjectSortMode } from "@/lib/priority";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -49,10 +49,6 @@ export default function Projects() {
     const counts: Record<string, number> = { all: projects.length };
     for (const p of projects) {
       counts[p.status] = (counts[p.status] ?? 0) + 1;
-      const idle = daysSince(p.lastActivity) ?? 0;
-      if (["active", "idea"].includes(p.status) && idle >= 7) {
-        counts.stalled = (counts.stalled ?? 0) + 1;
-      }
     }
     return counts;
   }, [projects]);
@@ -73,11 +69,6 @@ export default function Projects() {
 
     const matchesStatus = (p: Project) => {
       if (statusFilter === "all") return true;
-      if (statusFilter === "stalled") {
-        if (p.status === "stalled") return true;
-        const idle = daysSince(p.lastActivity) ?? 0;
-        return ["active", "idea"].includes(p.status) && idle >= 7;
-      }
       return p.status === statusFilter;
     };
 
@@ -87,8 +78,7 @@ export default function Projects() {
       const pt = tasksByProject(p.id);
       if (pt.some((tk) => !tk.done && isOverdue(tk.dueDate))) return 0;
       if (pt.some((tk) => !tk.done && isDueToday(tk.dueDate))) return 1;
-      const idle = daysSince(p.lastActivity) ?? 0;
-      if (["active", "idea"].includes(p.status) && idle >= 7) return 2;
+      if (p.status === "stalled") return 2;
       return 3;
     };
     const recentTs = (p: Project) => new Date(p.lastActivity).getTime();

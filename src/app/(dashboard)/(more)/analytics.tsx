@@ -337,6 +337,7 @@ function StatusBreakdownPanel({
     "stalled",
     "paused",
     "launched",
+    "killed",
     "archived",
   ];
   const STATUS_COLOR: Record<ProjectStatus, string> = {
@@ -345,6 +346,7 @@ function StatusBreakdownPanel({
     stalled: ROSE,
     paused: c.textMuted,
     launched: c.accent2,
+    killed: "rgb(239,68,68)",
     archived: c.textMuted,
   };
   return (

@@ -19,10 +19,15 @@ import {
   type ProjectStatus,
 } from "@/lib/types";
 
+// Paused/killed are intentionally NOT selectable here: those transitions
+// require closure notes (collected by the Pause/Kill modals on the project
+// detail screen) and the backend rejects them without notes. Stalled is
+// auto-detected by the backend, so it's shown only when a project is already
+// stalled (so editing doesn't silently flip it). Killed projects are revived
+// from the Graveyard, not edited back to life here.
 const STATUS_OPTIONS: ProjectStatus[] = [
   "idea",
   "active",
-  "paused",
   "launched",
   "archived",
 ];
@@ -103,7 +108,14 @@ export default function ProjectForm() {
     }
   };
 
-  const statusOptions: ChipOption<ProjectStatus>[] = STATUS_OPTIONS.map((s) => ({
+  // Include the project's current status even if it's not normally selectable
+  // (stalled/paused/killed), so the chip group reflects reality. The user can
+  // still switch to a normal status from here; closure-note transitions live on
+  // the detail screen.
+  const optionValues: ProjectStatus[] = STATUS_OPTIONS.includes(status)
+    ? STATUS_OPTIONS
+    : [...STATUS_OPTIONS, status];
+  const statusOptions: ChipOption<ProjectStatus>[] = optionValues.map((s) => ({
     value: s,
     label: t(`status.${s}`),
   }));

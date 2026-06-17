@@ -5,6 +5,7 @@ import {
   Lightbulb,
   Pause,
   Rocket,
+  Skull,
   Zap,
 } from "lucide-react-native";
 import type { ProjectStatus } from "@/lib/types";
@@ -41,6 +42,10 @@ export const statusConfig: Record<
     color: "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30",
     icon: Rocket,
   },
+  killed: {
+    color: "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30",
+    icon: Skull,
+  },
   archived: {
     color: "bg-text-muted/20 text-text-muted border-text-muted/30",
     icon: Archive,
@@ -57,6 +62,7 @@ export const statusBorderClass: Record<ProjectStatus, string> = {
   stalled: "border-l-amber-500/60",
   paused: "border-l-slate-500/60",
   launched: "border-l-blue-500/60",
+  killed: "border-l-red-500/60",
   archived: "border-l-text-muted",
 };
 
@@ -67,6 +73,7 @@ export const STATUS_FILTER_ORDER: Array<"all" | ProjectStatus> = [
   "idea",
   "paused",
   "launched",
+  "killed",
   "archived",
 ];
 

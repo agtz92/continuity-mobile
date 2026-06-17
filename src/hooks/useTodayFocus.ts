@@ -7,12 +7,8 @@ import type {
   RoutineOccurrence,
   Task,
 } from "@/lib/types";
-import {
-  daysSince,
-  isCompletedToday,
-  isDueToday,
-  isOverdue,
-} from "@/lib/date";
+import { isCompletedToday, isDueToday, isOverdue } from "@/lib/date";
+import { isDailyViewStatus } from "@/lib/projectStatus";
 
 export type FocusItem = {
   type: "overdue" | "today" | "stalled" | "nextStep";
@@ -57,21 +53,35 @@ export function useTodayFocus({
   routines: Routine[];
   routineOccurrences: RoutineOccurrence[];
 }) {
+  // Stalled is now a real persisted status (auto-set by the backend at 14 days
+  // idle), not a client-derived 7-day heuristic.
   const stalled = useMemo(
-    () =>
-      projects.filter(
-        (p) =>
-          ["active", "idea"].includes(p.status) &&
-          (daysSince(p.lastActivity) ?? 0) >= 7
-      ),
+    () => projects.filter((p) => p.status === "stalled"),
     [projects]
   );
+
+  // A task counts for Today if it's standalone (no project) or its project is
+  // in a daily-view status (active/idea/launched). Tasks under paused/stalled/
+  // killed/archived projects are excluded.
+  const projectStatusById = useMemo(() => {
+    const m = new Map<string, Project["status"]>();
+    for (const p of projects) m.set(p.id, p.status);
+    return m;
+  }, [projects]);
+
+  const taskInDailyView = useMemo(() => {
+    return (t: Task): boolean => {
+      if (!t.projectId) return true;
+      const status = projectStatusById.get(t.projectId);
+      return status != null && isDailyViewStatus(status);
+    };
+  }, [projectStatusById]);
 
   const todayFocus = useMemo(() => {
     const focus: FocusItem[] = [];
 
     tasks
-      .filter((t) => !t.done && isOverdue(t.dueDate))
+      .filter((t) => !t.done && isOverdue(t.dueDate) && taskInDailyView(t))
       .forEach((t) =>
         focus.push({
           type: "overdue",
@@ -81,7 +91,7 @@ export function useTodayFocus({
       );
 
     tasks
-      .filter((t) => !t.done && isDueToday(t.dueDate))
+      .filter((t) => !t.done && isDueToday(t.dueDate) && taskInDailyView(t))
       .forEach((t) =>
         focus.push({
           type: "today",
@@ -106,13 +116,17 @@ export function useTodayFocus({
       });
 
     return { items: focus.slice(0, 6), total: focus.length };
-  }, [projects, tasks, stalled]);
+  }, [projects, tasks, stalled, taskInDailyView]);
 
   const todayTaskCounts = useMemo(() => {
-    const overdue = tasks.filter((t) => !t.done && isOverdue(t.dueDate)).length;
-    const dueToday = tasks.filter((t) => !t.done && isDueToday(t.dueDate)).length;
+    const overdue = tasks.filter(
+      (t) => !t.done && isOverdue(t.dueDate) && taskInDailyView(t)
+    ).length;
+    const dueToday = tasks.filter(
+      (t) => !t.done && isDueToday(t.dueDate) && taskInDailyView(t)
+    ).length;
     return { overdue, dueToday, total: overdue + dueToday };
-  }, [tasks]);
+  }, [tasks, taskInDailyView]);
 
   const todayEffortHours = useMemo(() => {
     const sum = tasks
@@ -120,11 +134,12 @@ export function useTodayFocus({
         (t) =>
           !t.done &&
           (isOverdue(t.dueDate) || isDueToday(t.dueDate)) &&
-          t.effortHours != null
+          t.effortHours != null &&
+          taskInDailyView(t)
       )
       .reduce((acc, t) => acc + (t.effortHours as number), 0);
     return Math.round(sum * 10) / 10;
-  }, [tasks]);
+  }, [tasks, taskInDailyView]);
 
   const doneTodayItems = useMemo(() => {
     const items: DoneItem[] = [];

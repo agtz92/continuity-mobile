@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Pencil, Plus, Trash2 } from "lucide-react-native";
+import { HeartPulse, Pause, Pencil, Plus, Skull, Trash2, Zap } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Task } from "@/lib/types";
 import { priorityStripeClass } from "@/lib/priority";
@@ -9,8 +10,20 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { useProjectNoteMutations } from "@/hooks/useProjectNoteMutations";
+import { useProjectClosure } from "@/hooks/useProjectClosure";
 import { TaskRow } from "@/components/tasks/TaskRow";
 import { ShowMoreList } from "@/components/ui/ShowMoreList";
+import { StatusBadge } from "@/components/projects/StatusBadge";
+import { WelcomeBackCard } from "@/components/projects/WelcomeBackCard";
+import {
+  PauseProjectModal,
+  type PauseNotes,
+} from "@/components/projects/PauseProjectModal";
+import {
+  KillProjectModal,
+  type KillNotes,
+} from "@/components/projects/KillProjectModal";
+import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
@@ -65,6 +78,12 @@ export default function ProjectDetail() {
   const { toggleTask, deleteTask } = useTaskMutations();
   const { deleteProject } = useProjectMutations();
   const { remove: removeNote } = useProjectNoteMutations();
+  const closure = useProjectClosure();
+
+  const [pauseOpen, setPauseOpen] = useState(false);
+  const [killOpen, setKillOpen] = useState(false);
+  const [reviveOpen, setReviveOpen] = useState(false);
+  const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const project = projects.find((p) => p.id === id);
   const projectTasks = tasks.filter((tk) => tk.projectId === id);
@@ -148,6 +167,73 @@ export default function ProjectDetail() {
     if (ok) router.back();
   };
 
+  const onPauseConfirm = async (notes: PauseNotes) => {
+    const ok = await closure.pause(project, notes);
+    if (ok) setPauseOpen(false);
+  };
+  const onKillConfirm = async (notes: KillNotes) => {
+    const ok = await closure.kill(project, notes);
+    if (ok) setKillOpen(false);
+  };
+  const onResume = () => {
+    void closure.setStatus(project, "active");
+    setWelcomeDismissed(true);
+  };
+  const onRevive = async (target: "active" | "idea") => {
+    const ok = await closure.setStatus(project, target);
+    if (ok) setReviveOpen(false);
+  };
+
+  const showWelcomeBack = project.status === "paused" && !welcomeDismissed;
+
+  // Status actions available from the detail screen, gated by current status.
+  const statusActions: {
+    key: string;
+    label: string;
+    icon: React.ReactNode;
+    onPress: () => void;
+    tint: string;
+  }[] = [];
+  if (
+    project.status === "active" ||
+    project.status === "idea" ||
+    project.status === "stalled" ||
+    project.status === "launched"
+  ) {
+    statusActions.push({
+      key: "pause",
+      label: "Pause",
+      icon: <Pause size={15} color={c.textMuted} />,
+      onPress: () => setPauseOpen(true),
+      tint: c.textMuted,
+    });
+    statusActions.push({
+      key: "kill",
+      label: "Kill",
+      icon: <Skull size={15} color="rgb(220,38,38)" />,
+      onPress: () => setKillOpen(true),
+      tint: "rgb(220,38,38)",
+    });
+  }
+  if (project.status === "paused" || project.status === "stalled") {
+    statusActions.unshift({
+      key: "resume",
+      label: "Reactivate",
+      icon: <Zap size={15} color={c.accent} />,
+      onPress: onResume,
+      tint: c.accent,
+    });
+  }
+  if (project.status === "killed") {
+    statusActions.push({
+      key: "revive",
+      label: "Revive",
+      icon: <HeartPulse size={15} color={c.accent} />,
+      onPress: () => setReviveOpen(true),
+      tint: c.accent,
+    });
+  }
+
   return (
     <View className="flex-1 bg-bg">
       <Stack.Screen
@@ -182,11 +268,7 @@ export default function ProjectDetail() {
         <View className="flex-row flex-wrap items-center gap-2">
           <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[project.priority]}`} />
           <Text className="text-base text-text-muted">{t(`priority.${project.priority}`)}</Text>
-          <View className="rounded-full border border-border bg-surface px-2.5 py-0.5">
-            <Text className="text-xs text-text-muted">
-              {t(`status.${project.status}`)}
-            </Text>
-          </View>
+          <StatusBadge status={project.status} />
           {cat && catColors && (
             <View
               className="rounded-full border px-2.5 py-0.5"
@@ -198,6 +280,34 @@ export default function ProjectDetail() {
             </View>
           )}
         </View>
+
+        {showWelcomeBack && (
+          <WelcomeBackCard
+            project={project}
+            reactivating={closure.saving}
+            onReactivate={onResume}
+            onDismiss={() => setWelcomeDismissed(true)}
+          />
+        )}
+
+        {statusActions.length > 0 && (
+          <View className="flex-row flex-wrap gap-2">
+            {statusActions.map((a) => (
+              <Pressable
+                key={a.key}
+                onPress={a.onPress}
+                disabled={closure.saving}
+                accessibilityRole="button"
+                className="flex-row items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2"
+              >
+                {a.icon}
+                <Text className="text-sm font-medium" style={{ color: a.tint }}>
+                  {a.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
 
         <View
           className="rounded-lg border px-3 py-2.5"
@@ -366,6 +476,29 @@ export default function ProjectDetail() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <PauseProjectModal
+        visible={pauseOpen}
+        projectName={project.name}
+        saving={closure.saving}
+        onCancel={() => setPauseOpen(false)}
+        onConfirm={onPauseConfirm}
+      />
+      <KillProjectModal
+        visible={killOpen}
+        projectName={project.name}
+        saving={closure.saving}
+        onCancel={() => setKillOpen(false)}
+        onConfirm={onKillConfirm}
+      />
+      <ReviveProjectModal
+        visible={reviveOpen}
+        projectName={project.name}
+        wouldRestart={project.killedWouldRestart}
+        saving={closure.saving}
+        onCancel={() => setReviveOpen(false)}
+        onRevive={onRevive}
+      />
     </View>
   );
 }

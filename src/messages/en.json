@@ -239,6 +239,7 @@
     "stalled": "Stalled",
     "paused": "Paused",
     "launched": "Launched",
+    "killed": "Killed",
     "archived": "Archived",
     "all": "All",
     "allStatuses": "All statuses"
@@ -754,7 +755,7 @@
         "routinesToday": "Routines for today",
         "doneToday": "Done today",
         "closeable": "Closeable projects",
-        "sleeping": "Sleeping projects",
+        "sleeping": "Stalled projects",
         "staleIdeas": "Stale ideas",
         "activeProjects": "Active projects",
         "launchedWithTasks": "Launched with open tasks"
@@ -826,7 +827,7 @@
         "tasksAway": "Only {count, plural, one {# task} other {# tasks}} away from finishing."
       },
       "sleeping": {
-        "title": "Sleeping projects",
+        "title": "Stalled projects",
         "daysIdle": "{count}d idle",
         "resume": "Resume"
       },
@@ -1059,6 +1060,9 @@
         "quickNoteCreated": "Created note {title}",
         "quickNoteDeleted": "Deleted note {title}"
       }
+    },
+    "graveyard": {
+      "title": "Graveyard"
     }
   },
   "taskRow": {

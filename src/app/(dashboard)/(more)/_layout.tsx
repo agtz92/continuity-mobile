@@ -37,6 +37,10 @@ export default function MoreLayout() {
       />
       <Stack.Screen name="log" options={{ ...headered, title: t("tabs.log") }} />
       <Stack.Screen
+        name="graveyard"
+        options={{ ...headered, title: t("views.graveyard.title") }}
+      />
+      <Stack.Screen
         name="analytics"
         options={{ ...headered, title: t("tabs.analytics") }}
       />

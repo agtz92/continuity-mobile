@@ -1,5 +1,19 @@
 import { gql } from "@apollo/client";
 
+// Closure fields shared by every project selection so they round-trip.
+const PROJECT_CLOSURE_FIELDS = `
+  pausedContext
+  pausedNextAction
+  pausedBlocker
+  pausedAt
+  killedReason
+  killedLearnings
+  killedWouldRestart
+  killedAt
+  killedAiReflection
+  stalledAt
+`;
+
 export const ME_QUERY = gql`
   query Me {
     me {
@@ -835,6 +849,7 @@ export const DASHBOARD_QUERY = gql`
         lastActivity
         created
         dueDate
+        ${PROJECT_CLOSURE_FIELDS}
       }
       tasks {
         id
@@ -1047,6 +1062,7 @@ export const CREATE_PROJECT = gql`
       lastActivity
       created
       dueDate
+      ${PROJECT_CLOSURE_FIELDS}
     }
   }
 `;
@@ -1065,6 +1081,18 @@ export const UPDATE_PROJECT = gql`
       lastActivity
       created
       dueDate
+      ${PROJECT_CLOSURE_FIELDS}
+    }
+  }
+`;
+
+export const GRAVEYARD_INSIGHT_QUERY = gql`
+  query GraveyardInsight {
+    graveyardInsight {
+      body
+      deathsCount
+      computedAt
+      isStale
     }
   }
 `;

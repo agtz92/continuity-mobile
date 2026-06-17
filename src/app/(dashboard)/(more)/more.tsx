@@ -16,6 +16,7 @@ import {
   Plug,
   ScrollText,
   ShieldCheck,
+  Skull,
   Sparkles,
   User,
   type LucideIcon,
@@ -47,6 +48,12 @@ export default function More() {
       href: "/quick-notes",
     },
     { key: "log", label: t("tabs.log"), icon: ScrollText, href: "/log" },
+    {
+      key: "graveyard",
+      label: t("views.graveyard.title"),
+      icon: Skull,
+      href: "/graveyard",
+    },
     {
       key: "analytics",
       label: t("tabs.analytics"),
