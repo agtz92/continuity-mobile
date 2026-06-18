@@ -6,7 +6,8 @@ import {
   Text,
   View,
 } from "react-native";
-import { HeartPulse, RefreshCw, Skull, Sparkles } from "lucide-react-native";
+import { HeartPulse, RefreshCw, Sparkles } from "lucide-react-native";
+import { Tombstone } from "@/components/icons/Tombstone";
 import type { Project } from "@/lib/types";
 import { daysSince } from "@/lib/date";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -113,7 +114,7 @@ export default function Graveyard() {
 
       {killed.length === 0 ? (
         <View className="items-center gap-2 rounded-xl border border-border bg-surface p-8">
-          <Skull size={28} color={c.textMuted} />
+          <Tombstone size={28} color={c.textMuted} />
           <Text className="text-center text-sm text-text-muted">
             Nothing here yet. Killed projects land in the graveyard as a library
             of what didn't work.

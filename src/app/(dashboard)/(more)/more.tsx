@@ -16,11 +16,11 @@ import {
   Plug,
   ScrollText,
   ShieldCheck,
-  Skull,
   Sparkles,
   User,
   type LucideIcon,
 } from "lucide-react-native";
+import { Tombstone } from "@/components/icons/Tombstone";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
@@ -51,7 +51,8 @@ export default function More() {
     {
       key: "graveyard",
       label: t("views.graveyard.title"),
-      icon: Skull,
+      // Tombstone is a plain SVG component; cast to satisfy the LucideIcon slot.
+      icon: Tombstone as unknown as LucideIcon,
       href: "/graveyard",
     },
     {
