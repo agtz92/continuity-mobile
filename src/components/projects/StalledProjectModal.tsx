@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react-native";
 import { daysSince } from "@/lib/date";
 import type { Project } from "@/lib/types";
@@ -16,10 +17,10 @@ export type StalledChoice = "active" | "pause" | "kill";
  * "keep Active" resolves here (status -> active); "pause"/"kill" hand off to the
  * Pause/Kill modals (the parent opens those after this resolves).
  */
-const OPTIONS: { value: StalledChoice; label: string }[] = [
-  { value: "active", label: "I'm still working on it (keep Active)" },
-  { value: "pause", label: "I need to pause it" },
-  { value: "kill", label: "It's dead. Kill it." },
+const OPTION_KEYS: { value: StalledChoice; key: string }[] = [
+  { value: "active", key: "closure.stalled.optionActive" },
+  { value: "pause", key: "closure.stalled.optionPause" },
+  { value: "kill", key: "closure.stalled.optionKill" },
 ];
 
 export function StalledProjectModal({
@@ -33,6 +34,7 @@ export function StalledProjectModal({
   saving: boolean;
   onResolve: (choice: StalledChoice) => void;
 }) {
+  const { t } = useTranslation();
   const c = useThemeColors();
   const [choice, setChoice] = useState<StalledChoice | null>(null);
 
@@ -47,8 +49,8 @@ export function StalledProjectModal({
       visible={visible}
       onClose={() => {}}
       dismissible={false}
-      title={`You haven't touched "${project.name}" in ${days} days.`}
-      subtitle="What do you want to do with it?"
+      title={t("closure.stalled.title", { name: project.name, count: days })}
+      subtitle={t("closure.stalled.subtitle")}
       footer={
         <Pressable
           onPress={() => choice && onResolve(choice)}
@@ -64,13 +66,13 @@ export function StalledProjectModal({
               (canSave ? "text-bg" : "text-text-muted")
             }
           >
-            Make the call
+            {t("closure.stalled.confirm")}
           </Text>
         </Pressable>
       }
     >
       <View className="gap-2">
-        {OPTIONS.map((opt) => {
+        {OPTION_KEYS.map((opt) => {
           const active = choice === opt.value;
           return (
             <Pressable
@@ -90,12 +92,14 @@ export function StalledProjectModal({
               >
                 {active && <Check size={13} color={c.accent} />}
               </View>
-              <Text className="flex-1 text-base text-text">{opt.label}</Text>
+              <Text className="flex-1 text-base text-text">{t(opt.key)}</Text>
             </Pressable>
           );
         })}
       </View>
-      <Text className="text-xs text-text-muted">No drifting. Make the call.</Text>
+      <Text className="text-xs text-text-muted">
+        {t("closure.stalled.footer")}
+      </Text>
     </ClosureModalShell>
   );
 }

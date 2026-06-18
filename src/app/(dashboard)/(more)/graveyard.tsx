@@ -6,13 +6,16 @@ import {
   Text,
   View,
 } from "react-native";
-import { HeartPulse, RefreshCw, Sparkles } from "lucide-react-native";
+import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { HeartPulse, MessageCircle, RefreshCw, Sparkles } from "lucide-react-native";
 import { Tombstone } from "@/components/icons/Tombstone";
 import type { Project } from "@/lib/types";
 import { daysSince } from "@/lib/date";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useGraveyardInsight } from "@/hooks/useGraveyardInsight";
 import { useProjectClosure } from "@/hooks/useProjectClosure";
+import { countsTowardCap, usePlan } from "@/hooks/usePlan";
 import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -29,10 +32,13 @@ function Note({ label, body }: { label: string; body: string }) {
 }
 
 export default function Graveyard() {
+  const { t } = useTranslation();
+  const router = useRouter();
   const c = useThemeColors();
   const { projects, refetch } = useDashboardData();
   const { insight } = useGraveyardInsight();
   const closure = useProjectClosure();
+  const { cap } = usePlan();
 
   const [reviveTarget, setReviveTarget] = useState<Project | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -44,6 +50,11 @@ export default function Graveyard() {
         .sort((a, b) =>
           (b.killedAt ?? b.lastActivity).localeCompare(a.killedAt ?? a.lastActivity)
         ),
+    [projects]
+  );
+
+  const activeUsed = useMemo(
+    () => projects.filter((p) => countsTowardCap(p.status)).length,
     [projects]
   );
 
@@ -65,6 +76,12 @@ export default function Graveyard() {
     const ok = await closure.setStatus(reviveTarget, target);
     if (ok) setReviveTarget(null);
   };
+
+  const askLoop = () =>
+    router.push({
+      pathname: "/assistant",
+      params: { prompt: t("views.graveyard.askLoopPrompt") },
+    });
 
   const showAutopsy = !!insight && insight.deathsCount >= 3 && !!insight.body;
 
@@ -92,22 +109,32 @@ export default function Graveyard() {
           <View className="flex-row items-center gap-2">
             <Sparkles size={16} color={c.accent2} />
             <Text className="text-sm font-semibold text-accent-2">
-              Pattern across your graveyard
+              {t("views.graveyard.patternTitle")}
             </Text>
           </View>
           <Text className="text-sm leading-snug text-text">{insight!.body}</Text>
+          <Pressable
+            onPress={askLoop}
+            accessibilityRole="button"
+            className="mt-1 flex-row items-center gap-1.5 self-start rounded-lg border px-3 py-2"
+            style={{ borderColor: alpha(c.accent2, 0.4) }}
+          >
+            <MessageCircle size={14} color={c.accent2} />
+            <Text className="text-sm font-medium text-accent-2">
+              {t("views.graveyard.askLoop")}
+            </Text>
+          </Pressable>
         </View>
       ) : (
         <View className="gap-1.5 rounded-xl border border-border bg-surface p-4">
           <View className="flex-row items-center gap-2">
             <Sparkles size={16} color={c.textMuted} />
             <Text className="text-sm font-semibold text-text">
-              No pattern yet
+              {t("views.graveyard.noPatternTitle")}
             </Text>
           </View>
           <Text className="text-sm text-text-muted">
-            Once you have 3 killed projects, Loop looks for patterns in what
-            didn't work.
+            {t("views.graveyard.noPatternBody")}
           </Text>
         </View>
       )}
@@ -116,14 +143,16 @@ export default function Graveyard() {
         <View className="items-center gap-2 rounded-xl border border-border bg-surface p-8">
           <Tombstone size={28} color={c.textMuted} />
           <Text className="text-center text-sm text-text-muted">
-            Nothing here yet. Killed projects land in the graveyard as a library
-            of what didn't work.
+            {t("views.graveyard.empty")}
           </Text>
         </View>
       ) : (
         <>
           <Text className="text-xs text-text-muted">
-            would restart {wouldRestartCount} of {killed.length}
+            {t("views.graveyard.wouldRestartCount", {
+              count: wouldRestartCount,
+              total: killed.length,
+            })}
           </Text>
           {killed.map((p) => (
             <View
@@ -136,7 +165,9 @@ export default function Graveyard() {
                     {p.name}
                   </Text>
                   <Text className="text-xs text-text-muted">
-                    lived {daysSince(p.created) ?? 0} days
+                    {t("views.graveyard.lived", {
+                      count: daysSince(p.created) ?? 0,
+                    })}
                   </Text>
                 </View>
                 {(p.killedWouldRestart ?? "").trim() ? (
@@ -148,14 +179,25 @@ export default function Graveyard() {
                     }}
                   >
                     <RefreshCw size={11} color={c.accent} />
-                    <Text className="text-[11px] text-accent">would restart</Text>
+                    <Text className="text-[11px] text-accent">
+                      {t("views.graveyard.wouldRestartBadge")}
+                    </Text>
                   </View>
                 ) : null}
               </View>
 
-              <Note label="Why killed" body={p.killedReason ?? ""} />
-              <Note label="Learnings" body={p.killedLearnings ?? ""} />
-              <Note label="Would restart" body={p.killedWouldRestart ?? ""} />
+              <Note
+                label={t("views.graveyard.whyKilled")}
+                body={p.killedReason ?? ""}
+              />
+              <Note
+                label={t("views.graveyard.learnings")}
+                body={p.killedLearnings ?? ""}
+              />
+              <Note
+                label={t("views.graveyard.wouldRestart")}
+                body={p.killedWouldRestart ?? ""}
+              />
 
               {!!(p.killedAiReflection ?? "").trim() && (
                 <View
@@ -168,7 +210,7 @@ export default function Graveyard() {
                   <View className="flex-row items-center gap-1.5">
                     <Sparkles size={13} color={c.accent2} />
                     <Text className="text-[10px] font-semibold uppercase tracking-wider text-accent-2">
-                      AI
+                      {t("views.graveyard.ai")}
                     </Text>
                   </View>
                   <Text className="text-sm leading-snug text-text">
@@ -185,7 +227,9 @@ export default function Graveyard() {
                 style={{ borderColor: c.border }}
               >
                 <HeartPulse size={15} color={c.accent} />
-                <Text className="text-sm font-medium text-accent">Revive</Text>
+                <Text className="text-sm font-medium text-accent">
+                  {t("views.graveyard.revive")}
+                </Text>
               </Pressable>
             </View>
           ))}
@@ -196,6 +240,8 @@ export default function Graveyard() {
         visible={reviveTarget !== null}
         projectName={reviveTarget?.name ?? ""}
         wouldRestart={reviveTarget?.killedWouldRestart}
+        activeUsed={activeUsed}
+        activeCap={cap ?? undefined}
         saving={closure.saving}
         onCancel={() => setReviveTarget(null)}
         onRevive={onRevive}

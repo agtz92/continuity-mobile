@@ -11,6 +11,7 @@ import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { useProjectNoteMutations } from "@/hooks/useProjectNoteMutations";
 import { useProjectClosure } from "@/hooks/useProjectClosure";
+import { countsTowardCap, usePlan } from "@/hooks/usePlan";
 import { TaskRow } from "@/components/tasks/TaskRow";
 import { ShowMoreList } from "@/components/ui/ShowMoreList";
 import { StatusBadge } from "@/components/projects/StatusBadge";
@@ -79,6 +80,9 @@ export default function ProjectDetail() {
   const { deleteProject } = useProjectMutations();
   const { remove: removeNote } = useProjectNoteMutations();
   const closure = useProjectClosure();
+  const { cap } = usePlan();
+
+  const activeUsed = projects.filter((p) => countsTowardCap(p.status)).length;
 
   const [pauseOpen, setPauseOpen] = useState(false);
   const [killOpen, setKillOpen] = useState(false);
@@ -495,6 +499,8 @@ export default function ProjectDetail() {
         visible={reviveOpen}
         projectName={project.name}
         wouldRestart={project.killedWouldRestart}
+        activeUsed={activeUsed}
+        activeCap={cap ?? undefined}
         saving={closure.saving}
         onCancel={() => setReviveOpen(false)}
         onRevive={onRevive}

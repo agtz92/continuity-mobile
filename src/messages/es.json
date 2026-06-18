@@ -1062,7 +1062,76 @@
       }
     },
     "graveyard": {
-      "title": "Cementerio"
+      "title": "Cementerio",
+      "patternTitle": "Patrón en tu cementerio",
+      "noPatternTitle": "Aún no hay patrón",
+      "noPatternBody": "Cuando tengas 3 proyectos cancelados, Loop busca patrones en lo que no funcionó.",
+      "empty": "Aún no hay nada aquí. Los proyectos cancelados llegan al cementerio como una biblioteca de lo que no funcionó.",
+      "wouldRestartCount": "reiniciarías {count} de {total}",
+      "lived": "vivió {count, plural, one {# día} other {# días}}",
+      "wouldRestartBadge": "reiniciarías",
+      "whyKilled": "Por qué lo cancelaste",
+      "learnings": "Aprendizajes",
+      "wouldRestart": "Lo reiniciarías",
+      "ai": "IA",
+      "revive": "Revivir",
+      "askLoop": "Pídele a Loop que profundice",
+      "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué cancelo mis proyectos?"
+    }
+  },
+  "closure": {
+    "pause": {
+      "title": "Pausando \"{name}\"",
+      "subtitle": "Antes de pausarlo, escríbele algo a la versión de ti que volverá a esto. Tres preguntas rápidas. Dos minutos en total.",
+      "contextLabel": "¿En qué punto exacto te estás deteniendo?",
+      "contextPlaceholder": "ej., \"Terminé el hero. Atascado en la lógica de precios.\"",
+      "nextActionLabel": "¿Cuál es la siguiente acción concreta cuando vuelvas?",
+      "nextActionPlaceholder": "ej., \"Escribir el texto de la tabla comparativa de precios.\"",
+      "blockerLabel": "¿Qué te está bloqueando ahora mismo? (opcional)",
+      "blockerPlaceholder": "ej., \"Necesito hablar con 2 usuarios antes de decidir la estrategia de precios.\"",
+      "why": "Por qué lo pedimos: tu yo futuro no recordará esto. Tu yo pasado le debe una nota a tu yo futuro.",
+      "confirm": "Pausar proyecto"
+    },
+    "kill": {
+      "title": "Cancelando \"{name}\"",
+      "subtitle": "Cancelar es una forma de terminar. Merece un ritual de cierre.",
+      "reasonLabel": "¿Por qué lo estás cancelando?",
+      "reasonPlaceholder": "ej., \"El alcance no paraba de crecer y nunca validé la suposición central.\"",
+      "learningsLabel": "¿Qué aprendiste de esto?",
+      "learningsPlaceholder": "ej., \"Debí lanzar un MVP de 1 semana antes de construir 5 meses de infraestructura.\"",
+      "wouldRestartLabel": "¿Lo empezarías de nuevo con lo que sabes ahora? (opcional)",
+      "wouldRestartPlaceholder": "ej., \"Sí, pero con un alcance mucho menor y 2 entrevistas con usuarios primero.\"",
+      "why": "Lo guardamos en tu Cementerio de Proyectos. No es una lápida, es una biblioteca de lo que no funcionó para que no lo repitas.",
+      "confirm": "Cancelar con intención"
+    },
+    "stalled": {
+      "title": "No tocas \"{name}\" desde hace {count, plural, one {# día} other {# días}}.",
+      "subtitle": "¿Qué quieres hacer con esto?",
+      "optionActive": "Sigo trabajando en esto (mantener Activo)",
+      "optionPause": "Necesito pausarlo",
+      "optionKill": "Está muerto. Cancélalo.",
+      "confirm": "Toma la decisión",
+      "footer": "Nada de irse a la deriva. Toma la decisión."
+    },
+    "welcomeBack": {
+      "title": "Bienvenido de vuelta a \"{name}\"",
+      "pausedAgo": "Pausaste esto hace {count, plural, one {# día} other {# días}}.",
+      "whereStopped": "Dónde te detuviste:",
+      "nextAction": "Tu siguiente acción era:",
+      "blocker": "Qué te estaba bloqueando:",
+      "ready": "¿Listo para retomarlo?",
+      "reactivate": "Reactivar proyecto",
+      "keepPaused": "Mantener pausado"
+    },
+    "revive": {
+      "title": "¿Revivir \"{name}\"?",
+      "subtitle": "Lo cancelaste una vez, a propósito. Traerlo de vuelta está bien. Solo entra con lo que aprendiste.",
+      "wouldRestartLabel": "Dijiste que lo reiniciarías así:",
+      "capLine": "Vuelve a contar para tu plan — {used} / {cap} activos",
+      "bringBackAs": "Tráelo de vuelta como:",
+      "active": "Activo",
+      "idea": "Idea (revalidar)",
+      "leaveDead": "Déjalo muerto"
     }
   },
   "taskRow": {

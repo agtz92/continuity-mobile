@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { ClosureModalShell } from "./ClosureModalShell";
@@ -29,6 +30,7 @@ export function PauseProjectModal({
   onCancel: () => void;
   onConfirm: (notes: PauseNotes) => void;
 }) {
+  const { t } = useTranslation();
   const [context, setContext] = useState("");
   const [nextAction, setNextAction] = useState("");
   const [blocker, setBlocker] = useState("");
@@ -50,8 +52,8 @@ export function PauseProjectModal({
       visible={visible}
       onClose={onCancel}
       dismissible={!saving}
-      title={`Pausing "${projectName}"`}
-      subtitle="Before you pause this, write something for the version of you who will come back to it. Three quick prompts. Two minutes total."
+      title={t("closure.pause.title", { name: projectName })}
+      subtitle={t("closure.pause.subtitle")}
       footer={
         <Pressable
           onPress={handleConfirm}
@@ -67,41 +69,38 @@ export function PauseProjectModal({
               (canSave ? "text-bg" : "text-text-muted")
             }
           >
-            Pause project
+            {t("closure.pause.confirm")}
           </Text>
         </Pressable>
       }
     >
-      <Field label="Where exactly are you stopping?">
+      <Field label={t("closure.pause.contextLabel")}>
         <FormInput
           value={context}
           onChangeText={setContext}
           multiline
           autoFocus
-          placeholder={'e.g., "Finished hero section. Stuck on pricing logic."'}
+          placeholder={t("closure.pause.contextPlaceholder")}
         />
       </Field>
-      <Field label="What's the very next action when you return?">
+      <Field label={t("closure.pause.nextActionLabel")}>
         <FormInput
           value={nextAction}
           onChangeText={setNextAction}
           multiline
-          placeholder={'e.g., "Write the pricing comparison table copy."'}
+          placeholder={t("closure.pause.nextActionPlaceholder")}
         />
       </Field>
-      <Field label="What's blocking you right now? (optional)">
+      <Field label={t("closure.pause.blockerLabel")}>
         <FormInput
           value={blocker}
           onChangeText={setBlocker}
           multiline
-          placeholder={
-            'e.g., "Need to talk to 2 users before deciding on pricing strategy."'
-          }
+          placeholder={t("closure.pause.blockerPlaceholder")}
         />
       </Field>
       <Text className="text-xs leading-snug text-text-muted">
-        Why we ask: Future you will not remember this. Past you owes future you a
-        note.
+        {t("closure.pause.why")}
       </Text>
     </ClosureModalShell>
   );

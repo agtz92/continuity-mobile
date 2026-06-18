@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text } from "react-native";
+import { useTranslation } from "react-i18next";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { ClosureModalShell } from "./ClosureModalShell";
@@ -28,6 +29,7 @@ export function KillProjectModal({
   onCancel: () => void;
   onConfirm: (notes: KillNotes) => void;
 }) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
   const [learnings, setLearnings] = useState("");
   const [wouldRestart, setWouldRestart] = useState("");
@@ -49,8 +51,8 @@ export function KillProjectModal({
       visible={visible}
       onClose={onCancel}
       dismissible={!saving}
-      title={`Killing "${projectName}"`}
-      subtitle="Killing is a form of finishing. It deserves a closing ritual."
+      title={t("closure.kill.title", { name: projectName })}
+      subtitle={t("closure.kill.subtitle")}
       footer={
         <Pressable
           onPress={handleConfirm}
@@ -67,45 +69,38 @@ export function KillProjectModal({
             }
             style={canSave ? { color: "white" } : undefined}
           >
-            Kill with intention
+            {t("closure.kill.confirm")}
           </Text>
         </Pressable>
       }
     >
-      <Field label="Why are you killing this?">
+      <Field label={t("closure.kill.reasonLabel")}>
         <FormInput
           value={reason}
           onChangeText={setReason}
           multiline
           autoFocus
-          placeholder={
-            'e.g., "The scope kept growing and I never validated the core assumption."'
-          }
+          placeholder={t("closure.kill.reasonPlaceholder")}
         />
       </Field>
-      <Field label="What did you learn from it?">
+      <Field label={t("closure.kill.learningsLabel")}>
         <FormInput
           value={learnings}
           onChangeText={setLearnings}
           multiline
-          placeholder={
-            'e.g., "I should have shipped a 1-week MVP before building 5 months of infrastructure."'
-          }
+          placeholder={t("closure.kill.learningsPlaceholder")}
         />
       </Field>
-      <Field label="Would you start it again with what you know now? (optional)">
+      <Field label={t("closure.kill.wouldRestartLabel")}>
         <FormInput
           value={wouldRestart}
           onChangeText={setWouldRestart}
           multiline
-          placeholder={
-            'e.g., "Yes, but with a much smaller scope and 2 user interviews first."'
-          }
+          placeholder={t("closure.kill.wouldRestartPlaceholder")}
         />
       </Field>
       <Text className="text-xs leading-snug text-text-muted">
-        We save this in your Project Graveyard. Not a tombstone, a library of
-        what didn't work so you don't repeat it.
+        {t("closure.kill.why")}
       </Text>
     </ClosureModalShell>
   );

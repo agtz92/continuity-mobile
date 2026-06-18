@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   AlertCircle,
@@ -33,6 +33,7 @@ const AMBER_T = "rgb(251,191,36)";
 export default function AssistantScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const params = useLocalSearchParams<{ prompt?: string }>();
   const c = useThemeColors();
   const insets = useSafeAreaInsets();
   const {
@@ -46,7 +47,14 @@ export default function AssistantScreen() {
     newConversation,
   } = useAssistant();
 
-  const [input, setInput] = useState("");
+  // Seed the input from a `prompt` route param exactly once on mount (e.g. from
+  // the Graveyard "Ask Loop to go deeper" action). The useState initializer runs
+  // a single time, so this never clobbers later edits. We pre-fill the text
+  // input rather than auto-send so the user can review/edit before sending.
+  const [input, setInput] = useState(() => {
+    const p = Array.isArray(params.prompt) ? params.prompt[0] : params.prompt;
+    return (p ?? "").slice(0, MAX_INPUT_CHARS);
+  });
   const [deepMode, setDeepMode] = useState(false);
 
   const canWrite = plan !== "free";

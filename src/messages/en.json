@@ -1062,7 +1062,76 @@
       }
     },
     "graveyard": {
-      "title": "Graveyard"
+      "title": "Graveyard",
+      "patternTitle": "Pattern across your graveyard",
+      "noPatternTitle": "No pattern yet",
+      "noPatternBody": "Once you have 3 killed projects, Loop looks for patterns in what didn't work.",
+      "empty": "Nothing here yet. Killed projects land in the graveyard as a library of what didn't work.",
+      "wouldRestartCount": "would restart {count} of {total}",
+      "lived": "lived {count, plural, one {# day} other {# days}}",
+      "wouldRestartBadge": "would restart",
+      "whyKilled": "Why killed",
+      "learnings": "Learnings",
+      "wouldRestart": "Would restart",
+      "ai": "AI",
+      "revive": "Revive",
+      "askLoop": "Ask Loop to go deeper",
+      "askLoopPrompt": "Analyze my graveyard: what pattern is there in why I kill my projects?"
+    }
+  },
+  "closure": {
+    "pause": {
+      "title": "Pausing \"{name}\"",
+      "subtitle": "Before you pause this, write something for the version of you who will come back to it. Three quick prompts. Two minutes total.",
+      "contextLabel": "Where exactly are you stopping?",
+      "contextPlaceholder": "e.g., \"Finished hero section. Stuck on pricing logic.\"",
+      "nextActionLabel": "What's the very next action when you return?",
+      "nextActionPlaceholder": "e.g., \"Write the pricing comparison table copy.\"",
+      "blockerLabel": "What's blocking you right now? (optional)",
+      "blockerPlaceholder": "e.g., \"Need to talk to 2 users before deciding on pricing strategy.\"",
+      "why": "Why we ask: Future you will not remember this. Past you owes future you a note.",
+      "confirm": "Pause project"
+    },
+    "kill": {
+      "title": "Killing \"{name}\"",
+      "subtitle": "Killing is a form of finishing. It deserves a closing ritual.",
+      "reasonLabel": "Why are you killing this?",
+      "reasonPlaceholder": "e.g., \"The scope kept growing and I never validated the core assumption.\"",
+      "learningsLabel": "What did you learn from it?",
+      "learningsPlaceholder": "e.g., \"I should have shipped a 1-week MVP before building 5 months of infrastructure.\"",
+      "wouldRestartLabel": "Would you start it again with what you know now? (optional)",
+      "wouldRestartPlaceholder": "e.g., \"Yes, but with a much smaller scope and 2 user interviews first.\"",
+      "why": "We save this in your Project Graveyard. Not a tombstone, a library of what didn't work so you don't repeat it.",
+      "confirm": "Kill with intention"
+    },
+    "stalled": {
+      "title": "You haven't touched \"{name}\" in {count, plural, one {# day} other {# days}}.",
+      "subtitle": "What do you want to do with it?",
+      "optionActive": "I'm still working on it (keep Active)",
+      "optionPause": "I need to pause it",
+      "optionKill": "It's dead. Kill it.",
+      "confirm": "Make the call",
+      "footer": "No drifting. Make the call."
+    },
+    "welcomeBack": {
+      "title": "Welcome back to \"{name}\"",
+      "pausedAgo": "You paused this {count, plural, one {# day} other {# days}} ago.",
+      "whereStopped": "Where you stopped:",
+      "nextAction": "Your next action was:",
+      "blocker": "What was blocking you:",
+      "ready": "Ready to pick this back up?",
+      "reactivate": "Reactivate project",
+      "keepPaused": "Keep paused"
+    },
+    "revive": {
+      "title": "Revive \"{name}\"?",
+      "subtitle": "You killed this once, on purpose. Bringing it back is fine. Just go in with what you learned.",
+      "wouldRestartLabel": "You said you'd restart it like this:",
+      "capLine": "Counts against your plan again — {used} / {cap} active",
+      "bringBackAs": "Bring it back as:",
+      "active": "Active",
+      "idea": "Idea (re-validate)",
+      "leaveDead": "Leave it dead"
     }
   },
   "taskRow": {
