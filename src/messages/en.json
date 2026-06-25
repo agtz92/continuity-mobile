@@ -227,6 +227,7 @@
     "projects": "Projects",
     "tasks": "Tasks",
     "routines": "Routines",
+    "calendar": "Calendar",
     "ideas": "Ideas",
     "notes": "Notes",
     "log": "Log",
@@ -715,6 +716,18 @@
     }
   },
   "views": {
+    "calendar": {
+      "viewDay": "Day",
+      "viewWeek": "Week",
+      "viewMonth": "Month",
+      "today": "Today",
+      "showTasks": "Show tasks",
+      "load": "Load",
+      "allDay": "All day",
+      "now": "now",
+      "dash": "—",
+      "empty": "Nothing scheduled here"
+    },
     "today": {
       "greeting": {
         "morning": "Good morning",

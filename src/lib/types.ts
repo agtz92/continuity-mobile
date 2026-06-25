@@ -76,6 +76,8 @@ export interface Task {
   completedAt: string | null;
   created: string;
   effortHours: number | null;
+  dueTime: string | null; // "HH:MM:SS" or null = all-day
+  durationMinutes: number | null;
   blockers: TaskBlocker[];
 }
 
@@ -147,6 +149,8 @@ export interface Routine {
   archived: boolean;
   created: string;
   projectId: string | null;
+  timeOfDay: string | null; // "HH:MM:SS" or null = all-day
+  durationMinutes: number | null;
 }
 
 export interface RoutineOccurrence {

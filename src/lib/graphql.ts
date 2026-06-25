@@ -860,6 +860,8 @@ export const DASHBOARD_QUERY = gql`
         completedAt
         created
         effortHours
+        dueTime
+        durationMinutes
         blockers {
           id
           blockedTaskId
@@ -916,6 +918,8 @@ export const DASHBOARD_QUERY = gql`
         archived
         created
         projectId
+        timeOfDay
+        durationMinutes
       }
       routineOccurrences {
         id

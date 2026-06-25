@@ -6,6 +6,7 @@ import {
   BarChart3,
   Bell,
   Bug,
+  Calendar,
   CreditCard,
   ChevronRight,
   FileText,
@@ -39,6 +40,12 @@ export default function More() {
       label: t("assistant.buttonLabel"),
       icon: Sparkles,
       href: "/assistant",
+    },
+    {
+      key: "calendar",
+      label: t("tabs.calendar"),
+      icon: Calendar,
+      href: "/calendar",
     },
     { key: "ideas", label: t("tabs.ideas"), icon: Lightbulb, href: "/ideas" },
     {
