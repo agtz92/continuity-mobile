@@ -79,6 +79,21 @@ import { HiddenSectionsFooter } from "@/components/today/HiddenSectionsFooter";
 import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
+/**
+ * Pantalla "Hoy": tablero de entrada de la app. Orquesta 10+ secciones derivadas
+ * de los hooks de dashboard (foco del día, rutinas, completadas hoy, proyectos
+ * cerrables, dormidos, ideas viejas, activos y lanzados) más la cola de decisión
+ * de proyectos stalled, el modo de personalización del orden/visibilidad de
+ * secciones y el FAB de creación.
+ *
+ * TODO: refactor — extraer TodaySectionRenderer + StalledProjectQueue + hook
+ * useTodayCalculations; mover colores/horizontes a theme/colors.ts y
+ * lib/dateConstants.ts (ver AUDITORIA_CODIGO.md).
+ */
+
+// Tuplas RGB "r,g,b" (sin envolver en rgb()) para poder componer alphas inline
+// vía `rgba(${RED},0.3)`. Los *_T son los hex tintados ya resueltos para texto/
+// iconos. Hardcodeadas porque no dependen del tema (semáforo overdue/today/idle).
 const RED = "239,68,68";
 const ORANGE = "249,115,22";
 const AMBER = "245,158,11";
@@ -138,6 +153,12 @@ function CreateOption({
   );
 }
 
+/**
+ * Componente raíz de la pantalla "Hoy". Consume los hooks de datos/derivados,
+ * arma cada sección como nodo en `sectionNodes` (solo si tiene datos) y los
+ * renderiza en el orden/visibilidad que dicta `useTodayLayout`. Maneja además la
+ * cola de proyectos stalled (un modal a la vez) y el modo de edición de layout.
+ */
 export default function Today() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -204,6 +225,9 @@ export default function Today() {
   const markStalledResolved = (id: string) =>
     setResolvedStalledIds((prev) => new Set(prev).add(id));
 
+  // Despacha la elección del modal de stalled: "active" resuelve de inmediato
+  // (muta status vía closure y saca el proyecto de la cola); "pause"/"kill"
+  // abren su modal de notas, que confirma y resuelve recién al guardar.
   const onStalledChoice = (choice: StalledChoice) => {
     if (!currentStalled) return;
     if (choice === "active") {
@@ -304,6 +328,9 @@ export default function Today() {
     return { name: proj.name, color: cat?.color ?? "emerald" };
   };
 
+  // Ocurrencias de rutina pendientes hoy + atrasadas: expande cada rutina activa
+  // a sus fechas de vencimiento en una ventana de 14 días hacia atrás y descarta
+  // las ya completadas. El lookback recupera atrasos recientes sin inflar la lista.
   const todayRoutineItems = useMemo(() => {
     const today = todayLocalISODate();
     const lookback = new Date();
@@ -322,6 +349,8 @@ export default function Today() {
     return items;
   }, [routines, routineOccurrences]);
 
+  // Separa las ocurrencias en atrasadas (fecha < hoy) vs. del día para los chips
+  // del header de la sección de rutinas.
   const todayRoutineCounts = useMemo(() => {
     const today = todayLocalISODate();
     const overdue = todayRoutineItems.filter(
@@ -333,6 +362,8 @@ export default function Today() {
     return { overdue, dueToday, total: overdue + dueToday };
   }, [todayRoutineItems]);
 
+  // Suma de horas de esfuerzo estimado de las rutinas pendientes hoy (redondeada
+  // a 1 decimal) para el badge de carga del header.
   const todayRoutineEffortHours = useMemo(() => {
     const sum = todayRoutineItems.reduce(
       (acc, it) => acc + (it.routine.effortHours ?? 0),
@@ -346,6 +377,7 @@ export default function Today() {
   const activeProjects = projects.filter((p) => p.status === "active");
   const launchedCount = projects.filter((p) => p.status === "launched").length;
 
+  // Tarjetas-resumen de la cinta horizontal superior (un conteo global por tipo).
   const counters: { id: string; label: string; value: number; tint: string }[] =
     [
       { id: "active", label: t("views.today.counters.active"), value: activeProjects.length, tint: c.accent },
@@ -415,8 +447,14 @@ export default function Today() {
   };
 
   // -------- Section nodes (rendered only when data exists) -------- //
+  // Cada sección se construye como nodo en este mapa y SOLO si tiene datos; el
+  // render final (más abajo) recorre `layout.order`, filtra ocultas y pinta los
+  // nodos presentes. Supuesto: el hook de layout es la única fuente de orden y
+  // visibilidad — aquí solo decidimos existencia por datos, nunca posición.
   const sectionNodes: Partial<Record<TodaySectionId, ReactNode>> = {};
 
+  // Sección: counters — cinta horizontal de totales globales (siempre visible si
+  // hay algún dato).
   if (hasData) {
     sectionNodes.counters = (
       <ScrollView
@@ -441,6 +479,8 @@ export default function Today() {
     );
   }
 
+  // Sección: stalled-alert — banner ámbar con los proyectos detenidos; cada chip
+  // navega al proyecto. Es distinta de la cola de modales de decisión (más abajo).
   if (stalled.length > 0) {
     sectionNodes["stalled-alert"] = (
       <View
@@ -482,6 +522,8 @@ export default function Today() {
     );
   }
 
+  // Sección: today-focus — lista priorizada de qué atender hoy (overdue / due
+  // today / stalled / next step). Siempre presente (incluso vacía muestra hint).
   sectionNodes["today-focus"] = (
     <CollapsibleSection
       open={showTodayFocus}
@@ -661,6 +703,8 @@ export default function Today() {
     </CollapsibleSection>
   );
 
+  // Sección: routines-today — ocurrencias de rutina pendientes/atrasadas; cada
+  // fila puede completar/descompletar in situ (muta vía useRoutineMutations).
   if (todayRoutineItems.length > 0) {
     sectionNodes["routines-today"] = (
       <CollapsibleSection
@@ -729,6 +773,8 @@ export default function Today() {
     );
   }
 
+  // Sección: done-today — lo completado hoy (tareas, rutinas y logs/notas)
+  // unificado, con filtro task/log y horas por proyecto. Permite deshacer.
   if (doneTodayItems.length > 0) {
     sectionNodes["done-today"] = (
       <CollapsibleSection
@@ -935,6 +981,8 @@ export default function Today() {
     );
   }
 
+  // Sección: closeable — proyectos a punto de cerrarse: "almost there" (con
+  // barra de % de avance) y "quick wins" (pocas tareas para terminar).
   if (closableTotal > 0) {
     sectionNodes.closeable = (
       <CollapsibleSection
@@ -1011,6 +1059,8 @@ export default function Today() {
     );
   }
 
+  // Sección: sleeping — proyectos "dormidos" (inactivos N días), con punto de
+  // color según el bucket de inactividad (7-14 / 15-30 / 30+). Acción: reanudar.
   if (stalledProjects.length > 0) {
     sectionNodes.sleeping = (
       <CollapsibleSection
@@ -1089,6 +1139,8 @@ export default function Today() {
     );
   }
 
+  // Sección: stale-ideas — banner morado que invita a revisar ideas viejas;
+  // tap lleva a la bandeja de ideas.
   if (staleIdeas.length > 0) {
     sectionNodes["stale-ideas"] = (
       <Pressable
@@ -1115,6 +1167,8 @@ export default function Today() {
     );
   }
 
+  // Sección: active-projects — proyectos en curso como tarjetas compactas con
+  // stats de esfuerzo y resaltado de "comeback" (regreso tras una pausa).
   if (activeProjects.length > 0) {
     sectionNodes["active-projects"] = (
       <CollapsibleSection
@@ -1160,6 +1214,8 @@ export default function Today() {
     );
   }
 
+  // Sección: launched-with-tasks — proyectos ya lanzados que aún tienen tareas
+  // abiertas (mantenimiento post-lanzamiento), como tarjetas compactas.
   if (launchedWithOpenTasks.length > 0) {
     sectionNodes["launched-with-tasks"] = (
       <CollapsibleSection
@@ -1216,6 +1272,8 @@ export default function Today() {
     drag: t("views.today.customize.dragToReorder"),
   };
 
+  // Filas del editor de layout en el orden actual del usuario: mapea cada id a su
+  // metadata y descarta ids huérfanos (secciones removidas del catálogo).
   const editRows: TodaySectionMeta[] = layout.order
     .map((id) => TODAY_SECTIONS.find((s) => s.id === id))
     .filter((s): s is TodaySectionMeta => Boolean(s));
@@ -1246,6 +1304,8 @@ export default function Today() {
 
   // -------- Render -------- //
 
+  // Modo edición de layout: reemplaza toda la pantalla por una lista arrastrable
+  // para reordenar/ocultar secciones; al salir se refresca para reflejar cambios.
   if (layout.editMode) {
     return (
       <GestureHandlerRootView className="flex-1 bg-bg">
@@ -1325,6 +1385,8 @@ export default function Today() {
           </Pressable>
         </View>
 
+        {/* Render de secciones: orden y visibilidad mandados por el hook de
+            layout; los nodos ausentes (sin datos) se saltan sin dejar hueco. */}
         {layout.order
           .filter((id) => !layout.hidden.has(id))
           .map((id) => {
@@ -1383,6 +1445,9 @@ export default function Today() {
         </View>
       </BottomSheet>
 
+      {/* Cola de decisión de stalled: solo el primero sin resolver es "current"
+          y se muestra un modal a la vez. La `key` por id remonta el modal entre
+          proyectos para resetear su estado interno. */}
       <StalledProjectModal
         key={currentStalled?.id ?? "none"}
         visible={

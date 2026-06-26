@@ -47,7 +47,7 @@ export default function Projects() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ProjectStatus>("all");
-  const [sortMode, setSortMode] = useState<ProjectSortMode>("smart");
+  const [sortMode, setSortMode] = useState<ProjectSortMode>("manual");
   const [sortSheet, setSortSheet] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 

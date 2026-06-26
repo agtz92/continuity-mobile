@@ -1,3 +1,12 @@
+/**
+ * Pantalla de analítica de la app móvil (Expo/React Native).
+ * Agrupa ~9 paneles intercambiables por chip: cadencia, gráfico de actividad,
+ * breakdown por estado/categoría, salud del backlog, heatmap por día de semana,
+ * top proyectos, proyectos dormidos / ideas viejas, funnel de ideas y esfuerzo.
+ * Los gráficos se dibujan a mano con react-native-svg (no hay lib de charts).
+ *
+ * TODO: refactor — extraer ActivityChart y un *Panel.tsx por gráfico + lib/analyticsConfig.ts (RANGES/CHIPS/buckets/STATUS_COLOR) (ver AUDITORIA_CODIGO.md)
+ */
 import { Fragment, type ReactNode, useState } from "react";
 import {
   Pressable,
@@ -78,6 +87,8 @@ type ChipId =
   | "funnel"
   | "effort";
 
+// El orden de CHIPS define el orden visual de los selectores; difiere a propósito
+// del orden de declaración de ChipId (funnel/effort se adelantan a topProjects/sleeping).
 const CHIPS: ChipId[] = [
   "activity",
   "cadence",
@@ -100,6 +111,9 @@ const RANGES: { value: AnalyticsRange; key: "7d" | "30d" | "90d" | "1y" | "all" 
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
+/** Tarjeta contenedora común a todos los paneles: encabezado (icono + título +
+ *  subtítulo opcional) sobre un cuerpo arbitrario. Unifica el chrome para que cada
+ *  panel solo aporte su contenido. */
 function PanelCard({
   title,
   subtitle,
@@ -127,6 +141,9 @@ function PanelCard({
   );
 }
 
+/** Casilla de métrica reutilizable (valor grande + etiqueta, sufijo y color de tono
+ *  opcionales). Con `icon` la etiqueta va arriba junto al icono; sin él va debajo,
+ *  para acomodar tanto tiles compactas como destacadas. */
 function StatTile({
   value,
   suffix,
@@ -172,6 +189,13 @@ function CadencePanel({ cadence, t }: { cadence: CadenceStats; t: T }) {
   );
 }
 
+/**
+ * Gráfico de líneas (actualizaciones vs. tareas completadas por día) dibujado a mano
+ * en SVG. El ancho se mide con onLayout porque SVG necesita píxeles absolutos, no
+ * porcentajes; las escalas xAt/yAt mapean índice y valor al área de trazado interior.
+ * Supuestos: `max` mínimo 1 evita división por cero con series vacías/planas; con un
+ * solo punto se dibujan círculos en vez de polilíneas.
+ */
 function ActivityChart({ series, t }: { series: ActivityPoint[]; t: T }) {
   const c = useThemeColors();
   const [width, setWidth] = useState(0);
@@ -182,6 +206,8 @@ function ActivityChart({ series, t }: { series: ActivityPoint[]; t: T }) {
   );
 
   const H = 180;
+  // Padding interno del lienzo SVG: izquierda mayor para las etiquetas del eje Y,
+  // inferior para las fechas del eje X.
   const PAD_L = 26;
   const PAD_R = 10;
   const PAD_T = 12;
@@ -189,10 +215,14 @@ function ActivityChart({ series, t }: { series: ActivityPoint[]; t: T }) {
   const plotW = Math.max(0, width - PAD_L - PAD_R);
   const plotH = H - PAD_T - PAD_B;
 
+  // xAt: índice → x (centra el único punto si n<=1). yAt: valor → y (invertido:
+  // SVG crece hacia abajo, así que 0 queda al fondo del área de trazado).
   const xAt = (i: number) =>
     n <= 1 ? PAD_L + plotW / 2 : PAD_L + (i / (n - 1)) * plotW;
   const yAt = (v: number) => PAD_T + (1 - v / max) * plotH;
 
+  // tickEvery limita a ~7 etiquetas de fecha sin importar el rango.
+  // gridVals: 3 líneas (0/medio/max) salvo cuando max<2, donde "medio" sería ruido.
   const tickEvery = Math.max(1, Math.ceil(n / 7));
   const gridVals = max >= 2 ? [0, max / 2, max] : [0, max];
 
@@ -294,6 +324,9 @@ function ActivityChart({ series, t }: { series: ActivityPoint[]; t: T }) {
   );
 }
 
+/** Barra de progreso horizontal de una sola fila (etiqueta + conteo encima, barra
+ *  rellena por porcentaje debajo). Usada en el breakdown por estado; el ancho se
+ *  deriva de count/total y se pinta con el color del estado. */
 function StatusBar({
   label,
   count,
@@ -319,6 +352,9 @@ function StatusBar({
   );
 }
 
+/** Panel doble: distribución de proyectos por estado (barras) y por categoría (filas
+ *  con punto de color). STATUS_ORDER fija un orden semántico estable (idea→archived)
+ *  en lugar del orden con que lleguen los datos; los estados con conteo 0 se omiten. */
 function StatusBreakdownPanel({
   statusCounts,
   categoryBreakdown,
@@ -340,6 +376,9 @@ function StatusBreakdownPanel({
     "killed",
     "archived",
   ];
+  // Color por estado: algunos salen del tema (active/launched/muted) para respetar la
+  // paleta del usuario; killed es rojo fijo porque ningún acento del tema comunica
+  // "matado" de forma fiable.
   const STATUS_COLOR: Record<ProjectStatus, string> = {
     idea: AMBER,
     active: c.accent,
@@ -455,6 +494,9 @@ function BacklogPanel({ backlog, t, c }: { backlog: BacklogHealth; t: T; c: Them
   );
 }
 
+/** Heatmap de actividad por día de semana (lun→dom). La intensidad relativa al
+ *  máximo modula la opacidad del verde; el suelo de 0.08 deja visibles las celdas en
+ *  cero. weekday se asume 1=lunes..7=domingo para alinear con las KEYS. */
 function WeekdayHeatmap({ heatmap, t }: { heatmap: WeekdayBucket[]; t: T }) {
   const KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
   const max = Math.max(1, ...heatmap.map((b) => b.count));
@@ -486,6 +528,8 @@ function WeekdayHeatmap({ heatmap, t }: { heatmap: WeekdayBucket[]; t: T }) {
   );
 }
 
+/** Indicador de variación vs. periodo previo: flecha + cifra coloreada según signo
+ *  (acento al subir, rosa al bajar, guion neutro en 0). */
 function Delta({ value, c }: { value: number; c: ThemeColors }) {
   if (value === 0) {
     return (
@@ -564,6 +608,9 @@ function SleepingStalePanel({
   stale: StaleIdeaRow[];
   t: T;
 }) {
+  // Tono del badge según los días inactivos del proyecto, en rangos crecientes de
+  // urgencia: "7-14" ámbar, "15-30" naranja, "30+" rosa. `base` es el RGB crudo para
+  // componer fondo/borde con alpha; `text` el color sólido de la etiqueta.
   const BUCKET: Record<SleepingProjectRow["bucket"], { base: string; text: string }> = {
     "7-14": { base: "245,158,11", text: AMBER },
     "15-30": { base: "249,115,22", text: ORANGE },
@@ -700,6 +747,11 @@ function EffortPanel({ effort, t }: { effort: EffortStats; t: T }) {
   );
 }
 
+/**
+ * Componente raíz de la pantalla. Maneja el rango temporal y el chip activo, dispara
+ * la carga vía useAnalyticsData(range) y pull-to-refresh. Solo se muestra un panel a
+ * la vez (el del chip activo) para no saturar la vista móvil ni recalcular todos.
+ */
 export default function Analytics() {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -717,6 +769,9 @@ export default function Analytics() {
     }
   };
 
+  // Mapea el chip activo a su panel concreto, inyectando el slice de datos que cada
+  // uno necesita. Devuelve null si los datos aún no llegaron (estados de carga/error
+  // los maneja el render principal).
   const renderPanel = (id: ChipId): ReactNode => {
     if (!analytics) return null;
     switch (id) {
