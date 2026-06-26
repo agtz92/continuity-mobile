@@ -1276,6 +1276,8 @@
       "selectBlockingTask": "Selecciona una tarea bloqueante…",
       "addBlocker": "Agregar",
       "externalBlockerPlaceholder": "Bloqueo externo (ej. esperando al cliente)",
+      "searchTaskPlaceholder": "Buscar tarea…",
+      "noBlockerTasks": "No hay otras tareas para seleccionar",
       "unknownTask": "Tarea desconocida",
       "chips": {
         "today": "Hoy",

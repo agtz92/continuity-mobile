@@ -1276,6 +1276,8 @@
       "selectBlockingTask": "Select a blocking task…",
       "addBlocker": "Add",
       "externalBlockerPlaceholder": "External blocker (e.g. waiting on client)",
+      "searchTaskPlaceholder": "Search task…",
+      "noBlockerTasks": "No other tasks to select",
       "unknownTask": "Unknown task",
       "chips": {
         "today": "Today",
