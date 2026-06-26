@@ -12,6 +12,7 @@ const PROJECT_CLOSURE_FIELDS = `
   killedAt
   killedAiReflection
   stalledAt
+  position
 `;
 
 export const ME_QUERY = gql`
@@ -1086,6 +1087,15 @@ export const UPDATE_PROJECT = gql`
       created
       dueDate
       ${PROJECT_CLOSURE_FIELDS}
+    }
+  }
+`;
+
+export const REORDER_PROJECTS = gql`
+  mutation ReorderProjects($orderedIds: [ID!]!) {
+    reorderProjects(orderedIds: $orderedIds) {
+      id
+      position
     }
   }
 `;

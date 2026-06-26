@@ -949,11 +949,21 @@
       "sortBy": {
         "label": "Orden",
         "smart": "Inteligente",
+        "manual": "Mi orden",
         "priority": "Por prioridad",
         "recent": "Actividad reciente",
         "name": "Nombre",
         "status": "Por estado"
       },
+      "sections": {
+        "attention": "Necesitan atención",
+        "risk": "En riesgo",
+        "rest": "El resto"
+      },
+      "orderChanged": "El orden cambió con tus ediciones.",
+      "reorder": "Reordenar",
+      "manualHint": "Mantén presionado y arrastra para reordenar.",
+      "manualFilteredHint": "Quita filtros y búsqueda para reordenar.",
       "openFullView": "Abrir proyecto",
       "detail": {
         "title": "Detalle del proyecto",

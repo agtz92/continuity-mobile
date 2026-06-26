@@ -27,6 +27,7 @@ export const PRIORITY_FILTER_ORDER: Array<"all" | Priority> = [
 
 export type ProjectSortMode =
   | "smart"
+  | "manual"
   | "priority"
   | "recent"
   | "name"
@@ -34,6 +35,7 @@ export type ProjectSortMode =
 
 export const PROJECT_SORT_MODES: ProjectSortMode[] = [
   "smart",
+  "manual",
   "priority",
   "recent",
   "name",

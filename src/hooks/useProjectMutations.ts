@@ -3,6 +3,7 @@ import {
   CREATE_PROJECT,
   DASHBOARD_QUERY,
   DELETE_PROJECT,
+  REORDER_PROJECTS,
   UPDATE_PROJECT,
 } from "@/lib/graphql";
 import { confirmAsync } from "@/lib/confirm";
@@ -14,6 +15,9 @@ export function useProjectMutations() {
   const [createProject] = useMutation(CREATE_PROJECT, refetchAfter);
   const [updateProject] = useMutation(UPDATE_PROJECT, refetchAfter);
   const [deleteProject] = useMutation(DELETE_PROJECT, refetchAfter);
+  // No refetch: the mutation returns {id, position} per project, which Apollo
+  // merges into the normalized cache so the list re-sorts without a round-trip.
+  const [reorderProjectsMut] = useMutation(REORDER_PROJECTS);
 
   /** Save (create or update). Returns true on success, false on failure. */
   const saveProject = async (p: {
@@ -81,9 +85,30 @@ export function useProjectMutations() {
     }
   };
 
+  /** Persist the manual order ("Mi orden"). Optimistically writes each
+   * project's new `position` so the drag sticks instantly. Returns true ok. */
+  const reorderProjects = async (orderedIds: string[]): Promise<boolean> => {
+    try {
+      await reorderProjectsMut({
+        variables: { orderedIds },
+        optimisticResponse: {
+          reorderProjects: orderedIds.map((id, idx) => ({
+            __typename: "Project",
+            id,
+            position: idx,
+          })),
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return {
     saveProject,
     deleteProject: deleteProjectWithConfirm,
+    reorderProjects,
     /** Raw mutations for cases like backup import that need direct access. */
     raw: { createProject, deleteProject },
   };

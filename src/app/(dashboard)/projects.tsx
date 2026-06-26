@@ -9,19 +9,34 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import DraggableFlatList, {
+  ScaleDecorator,
+  type RenderItemParams,
+} from "react-native-draggable-flatlist";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Check, Plus, Search, SlidersHorizontal } from "lucide-react-native";
+import {
+  ArrowUpDown,
+  Check,
+  GripVertical,
+  Plus,
+  Search,
+  SlidersHorizontal,
+} from "lucide-react-native";
 import type { Project, ProjectStatus } from "@/lib/types";
 import { priorityRank } from "@/lib/types";
 import { isDueToday, isOverdue } from "@/lib/date";
 import { STATUS_FILTER_ORDER } from "@/lib/status";
 import { PROJECT_SORT_MODES, type ProjectSortMode } from "@/lib/priority";
+import { useStableLayout, type LayoutEntry } from "@/lib/useStableLayout";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useProjectMutations } from "@/hooks/useProjectMutations";
+import { selectionFeedback } from "@/lib/feedback";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { FAB } from "@/components/ui/FAB";
-import { useThemeColors } from "@/theme/useThemeColors";
+import { useThemeColors, alpha } from "@/theme/useThemeColors";
 
 export default function Projects() {
   const { t, i18n } = useTranslation();
@@ -53,8 +68,10 @@ export default function Projects() {
     return counts;
   }, [projects]);
 
-  const visible = useMemo(() => {
-    const q = search.trim().toLowerCase();
+  const { reorderProjects } = useProjectMutations();
+
+  const q = search.trim().toLowerCase();
+  const filtered = useMemo(() => {
     const matchesSearch = (p: Project) => {
       if (!q) return true;
       const cat = p.categoryId ? categoryById[p.categoryId]?.name ?? "" : "";
@@ -66,16 +83,17 @@ export default function Projects() {
         cat.toLowerCase().includes(q)
       );
     };
+    const matchesStatus = (p: Project) =>
+      statusFilter === "all" || p.status === statusFilter;
+    return projects.filter((p) => matchesSearch(p) && matchesStatus(p));
+  }, [projects, categoryById, q, statusFilter]);
 
-    const matchesStatus = (p: Project) => {
-      if (statusFilter === "all") return true;
-      return p.status === statusFilter;
-    };
-
-    const tasksByProject = (id: string) =>
-      tasks.filter((tk) => tk.projectId === id);
+  // Sort + Smart sectioning. (B) Alphabetical is the stable final tiebreaker
+  // everywhere; lastActivity only matters in "recent" (no longer a secondary
+  // key that flings edited projects to the top of their band).
+  const { sorted, sectionById } = useMemo(() => {
     const urgencyBucket = (p: Project) => {
-      const pt = tasksByProject(p.id);
+      const pt = tasks.filter((tk) => tk.projectId === p.id);
       if (pt.some((tk) => !tk.done && isOverdue(tk.dueDate))) return 0;
       if (pt.some((tk) => !tk.done && isDueToday(tk.dueDate))) return 1;
       if (p.status === "stalled") return 2;
@@ -87,11 +105,11 @@ export default function Projects() {
 
     const compare = (a: Project, b: Project) => {
       switch (sortMode) {
+        case "manual":
+          return (a.position ?? 0) - (b.position ?? 0) || byName(a, b);
         case "priority": {
           const d = priorityRank(a.priority) - priorityRank(b.priority);
-          if (d !== 0) return d;
-          const r = recentTs(b) - recentTs(a);
-          return r !== 0 ? r : byName(a, b);
+          return d !== 0 ? d : byName(a, b);
         }
         case "recent": {
           const r = recentTs(b) - recentTs(a);
@@ -104,9 +122,7 @@ export default function Projects() {
           const sb = STATUS_FILTER_ORDER.indexOf(b.status);
           if (sa !== sb) return sa - sb;
           const pd = priorityRank(a.priority) - priorityRank(b.priority);
-          if (pd !== 0) return pd;
-          const r = recentTs(b) - recentTs(a);
-          return r !== 0 ? r : byName(a, b);
+          return pd !== 0 ? pd : byName(a, b);
         }
         case "smart":
         default: {
@@ -114,21 +130,88 @@ export default function Projects() {
           const bb = urgencyBucket(b);
           if (ba !== bb) return ba - bb;
           const pd = priorityRank(a.priority) - priorityRank(b.priority);
-          if (pd !== 0) return pd;
-          const r = recentTs(b) - recentTs(a);
-          return r !== 0 ? r : byName(a, b);
+          return pd !== 0 ? pd : byName(a, b);
         }
       }
     };
 
-    return projects
-      .filter((p) => matchesSearch(p) && matchesStatus(p))
-      .sort(compare);
-  }, [projects, tasks, categoryById, search, statusFilter, sortMode, i18n.language]);
+    const s = [...filtered].sort(compare);
+    const map = new Map<string, string>();
+    for (const p of s) {
+      const b = urgencyBucket(p);
+      map.set(p.id, b <= 1 ? "attention" : b === 2 ? "risk" : "rest");
+    }
+    return { sorted: s, sectionById: map };
+  }, [filtered, tasks, sortMode, i18n.language]);
+
+  const ideal: LayoutEntry[] = useMemo(
+    () =>
+      sorted.map((p) => ({
+        id: p.id,
+        section: sortMode === "smart" ? sectionById.get(p.id) ?? null : null,
+      })),
+    [sorted, sectionById, sortMode]
+  );
+  const liveIds = useMemo(() => new Set(filtered.map((p) => p.id)), [filtered]);
+  const layoutSignature = [sortMode, statusFilter, q].join("|");
+  const { entries, isStale, resync } = useStableLayout(
+    ideal,
+    liveIds,
+    layoutSignature
+  );
+  const projectById = useMemo(() => {
+    const m = new Map<string, Project>();
+    for (const p of projects) m.set(p.id, p);
+    return m;
+  }, [projects]);
+
+  // (D) Manual drag only when no filters/search narrow the set.
+  const manualDragEnabled =
+    sortMode === "manual" && !q && statusFilter === "all";
+
+  const onManualDragEnd = (next: Project[]) => {
+    selectionFeedback();
+    void reorderProjects(next.map((p) => p.id));
+  };
 
   const statusChips = STATUS_FILTER_ORDER.filter(
     (s) => s === "all" || (statusCounts[s] ?? 0) > 0
   );
+
+  const renderCard = (project: Project) => (
+    <ProjectCardCompact
+      project={project}
+      projectTasks={tasks.filter((tk) => tk.projectId === project.id)}
+      variant={project.status === "launched" ? "launched" : "active"}
+      categoryById={categoryById}
+      onPress={() =>
+        router.push({ pathname: "/project/[id]", params: { id: project.id } })
+      }
+    />
+  );
+
+  // Flat list of rows for non-manual modes: section headers (Smart) interleaved
+  // with project cards, walking the frozen layout so edits don't reshuffle.
+  type ListRow =
+    | { type: "header"; key: string; label: string }
+    | { type: "project"; key: string; project: Project };
+  const listRows: ListRow[] = [];
+  {
+    let currentSection: string | null = null;
+    for (const entry of entries) {
+      const p = projectById.get(entry.id);
+      if (!p) continue;
+      if (sortMode === "smart" && entry.section !== currentSection) {
+        currentSection = entry.section;
+        listRows.push({
+          type: "header",
+          key: `sec-${entry.section}`,
+          label: t(`views.projects.sections.${entry.section}`),
+        });
+      }
+      listRows.push({ type: "project", key: p.id, project: p });
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
@@ -214,7 +297,7 @@ export default function Projects() {
             {t("views.projects.empty")}
           </Text>
         </View>
-      ) : visible.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-3 px-5">
           <Text className="text-base text-center text-text-muted">
             {search.trim()
@@ -235,10 +318,43 @@ export default function Projects() {
             </Pressable>
           )}
         </View>
+      ) : sortMode === "manual" && manualDragEnabled ? (
+        // (D) Drag to reorder — persisted as "Mi orden".
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <View className="flex-row items-center gap-1.5 px-5 pb-1">
+            <ArrowUpDown size={12} color={c.textMuted} />
+            <Text className="text-xs text-text-muted">
+              {t("views.projects.manualHint")}
+            </Text>
+          </View>
+          <DraggableFlatList
+            data={sorted}
+            keyExtractor={(p) => p.id}
+            contentContainerStyle={{ gap: 12, padding: 20, paddingTop: 4 }}
+            onDragEnd={({ data }) => onManualDragEnd(data)}
+            renderItem={({ item, drag, isActive }: RenderItemParams<Project>) => (
+              <ScaleDecorator>
+                <View className="flex-row items-center gap-2">
+                  <Pressable
+                    onLongPress={drag}
+                    disabled={isActive}
+                    hitSlop={8}
+                    className="py-2"
+                  >
+                    <GripVertical size={18} color={c.textMuted} />
+                  </Pressable>
+                  <View className="flex-1">{renderCard(item)}</View>
+                </View>
+              </ScaleDecorator>
+            )}
+          />
+        </GestureHandlerRootView>
       ) : (
+        // (A/C) Frozen layout; Smart adds section headers. A stale banner lets
+        // the user re-sort on demand instead of rows jumping mid-edit.
         <FlatList
-          data={visible}
-          keyExtractor={(p) => p.id}
+          data={listRows}
+          keyExtractor={(row) => row.key}
           contentContainerStyle={{ gap: 12, padding: 20, paddingTop: 4 }}
           refreshControl={
             <RefreshControl
@@ -247,17 +363,47 @@ export default function Projects() {
               tintColor={c.accent}
             />
           }
-          renderItem={({ item }) => (
-            <ProjectCardCompact
-              project={item}
-              projectTasks={tasks.filter((tk) => tk.projectId === item.id)}
-              variant={item.status === "launched" ? "launched" : "active"}
-              categoryById={categoryById}
-              onPress={() =>
-                router.push({ pathname: "/project/[id]", params: { id: item.id } })
-              }
-            />
-          )}
+          ListHeaderComponent={
+            sortMode === "manual" ? (
+              <View className="flex-row items-center gap-1.5 pb-2">
+                <ArrowUpDown size={12} color={c.textMuted} />
+                <Text className="text-xs text-text-muted">
+                  {t("views.projects.manualFilteredHint")}
+                </Text>
+              </View>
+            ) : isStale ? (
+              <View
+                className="mb-1 flex-row items-center justify-between gap-3 rounded-lg border px-3 py-2"
+                style={{
+                  borderColor: alpha(c.accent, 0.3),
+                  backgroundColor: alpha(c.accent, 0.1),
+                }}
+              >
+                <Text className="flex-1 text-sm text-text-muted">
+                  {t("views.projects.orderChanged")}
+                </Text>
+                <Pressable
+                  onPress={resync}
+                  className="flex-row items-center gap-1.5 rounded-md border px-3 py-1.5"
+                  style={{ borderColor: alpha(c.accent, 0.3) }}
+                >
+                  <ArrowUpDown size={12} color={c.accent} />
+                  <Text className="text-xs" style={{ color: c.accent }}>
+                    {t("views.projects.reorder")}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null
+          }
+          renderItem={({ item }) =>
+            item.type === "header" ? (
+              <Text className="px-1 pt-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                {item.label}
+              </Text>
+            ) : (
+              renderCard(item.project)
+            )
+          }
         />
       )}
 

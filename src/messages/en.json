@@ -949,11 +949,21 @@
       "sortBy": {
         "label": "Sort",
         "smart": "Smart",
+        "manual": "My order",
         "priority": "By priority",
         "recent": "Recent activity",
         "name": "Name",
         "status": "By status"
       },
+      "sections": {
+        "attention": "Needs attention",
+        "risk": "At risk",
+        "rest": "Everything else"
+      },
+      "orderChanged": "The order changed with your edits.",
+      "reorder": "Re-sort",
+      "manualHint": "Hold and drag to reorder your projects.",
+      "manualFilteredHint": "Clear filters and search to reorder projects.",
       "openFullView": "Open project",
       "detail": {
         "title": "Project detail",

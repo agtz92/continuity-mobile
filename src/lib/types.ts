@@ -41,6 +41,8 @@ export interface Project {
   killedAiReflection?: string;
   // Stalled (auto-detected at 14 days idle).
   stalledAt?: string | null;
+  /** Manual order ("Mi orden" sort). Dense 0..N once reordered; 0 by default. */
+  position?: number;
 }
 
 export interface GraveyardInsight {
