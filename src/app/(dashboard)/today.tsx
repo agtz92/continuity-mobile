@@ -22,10 +22,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Bell,
-  CheckCircle2,
   ChevronRight,
   Clock,
-  Edit2,
   Flag,
   FolderPlus,
   Lightbulb,
@@ -37,7 +35,6 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  Undo2,
   Zap,
 } from "lucide-react-native";
 import type { Routine } from "@/lib/types";
@@ -80,6 +77,8 @@ import { consumeCustomizeRequest, subscribeCustomize } from "@/lib/tour";
 import { TodaySectionEditRow } from "@/components/today/TodaySectionEditRow";
 import { TodayCustomizeBar } from "@/components/today/TodayCustomizeBar";
 import { HiddenSectionsFooter } from "@/components/today/HiddenSectionsFooter";
+import { TodayFocusSection } from "@/components/today/TodayFocusSection";
+import { DoneTodaySection } from "@/components/today/DoneTodaySection";
 import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -263,16 +262,11 @@ export default function Today() {
   };
 
   const [refreshing, setRefreshing] = useState(false);
-  const [showTodayFocus, setShowTodayFocus] = useState(true);
   const [showRoutinesToday, setShowRoutinesToday] = useState(true);
-  const [showDoneToday, setShowDoneToday] = useState(false);
   const [showCloseable, setShowCloseable] = useState(false);
   const [showSleeping, setShowSleeping] = useState(false);
   const [showActive, setShowActive] = useState(false);
   const [showLaunched, setShowLaunched] = useState(false);
-  const [doneTodayFilter, setDoneTodayFilter] = useState<"all" | "task" | "log">(
-    "all"
-  );
   const [createOpen, setCreateOpen] = useState(false);
 
   const layout = useTodayLayout();
@@ -367,44 +361,6 @@ export default function Today() {
     day: "numeric",
   });
 
-  const focusTypeColor = (type: string) =>
-    type === "overdue"
-      ? RED_T
-      : type === "today"
-      ? ORANGE_T
-      : type === "stalled"
-      ? AMBER_T
-      : c.accent;
-  const focusBorder = (type: string) =>
-    type === "overdue"
-      ? `rgba(${RED},0.3)`
-      : type === "today"
-      ? `rgba(${ORANGE},0.3)`
-      : type === "stalled"
-      ? `rgba(${AMBER},0.3)`
-      : c.border;
-
-  const effortBadge = (hours: number) => (
-    <View
-      className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-      style={{
-        backgroundColor: alpha(c.accent2, 0.15),
-        borderColor: alpha(c.accent2, 0.3),
-      }}
-    >
-      <Clock size={10} color={c.accent2} />
-      <Text className="text-xs text-accent-2">{hours}h</Text>
-    </View>
-  );
-
-  const taskCount = doneTodayItems.filter((i) => i.kind === "task").length;
-  const logCount = doneTodayItems.filter((i) => i.kind === "log").length;
-  const visibleDone =
-    doneTodayFilter === "all"
-      ? doneTodayItems
-      : doneTodayItems.filter((i) => i.kind === doneTodayFilter);
-  const toggleDoneFilter = (kind: "task" | "log") =>
-    setDoneTodayFilter((cur) => (cur === kind ? "all" : kind));
 
   // -------- Section icon map for the customize-mode row -------- //
   const SECTION_ICON: Record<TodaySectionId, ReactNode> = {
@@ -499,182 +455,14 @@ export default function Today() {
   // Sección: today-focus — lista priorizada de qué atender hoy (overdue / due
   // today / stalled / next step). Siempre presente (incluso vacía muestra hint).
   sectionNodes["today-focus"] = (
-    <CollapsibleSection
-      open={showTodayFocus}
-      onToggle={() => setShowTodayFocus((s) => !s)}
-      icon={<Target size={18} color={c.accent} />}
-      title={t("views.today.focus.title")}
-      rightSlot={
-        todayTaskCounts.total > 0 ? (
-          <View className="flex-row flex-wrap items-center gap-2">
-            <View
-              className="flex-row items-center gap-1.5 rounded-full border px-2.5 py-1"
-              style={{
-                backgroundColor: `rgba(${ORANGE},0.2)`,
-                borderColor: `rgba(${ORANGE},0.4)`,
-              }}
-            >
-              <Target size={11} color={ORANGE_T} />
-              <Text className="text-xs font-medium" style={{ color: ORANGE_T }}>
-                {t("views.today.focus.tasksLabel", {
-                  count: todayTaskCounts.total,
-                })}
-              </Text>
-              {todayTaskCounts.overdue > 0 && (
-                <Text className="text-xs font-semibold" style={{ color: RED_T }}>
-                  {t("views.today.focus.overdueExtra", {
-                    count: todayTaskCounts.overdue,
-                  })}
-                </Text>
-              )}
-            </View>
-            {todayEffortHours > 0 && (
-              <View
-                className="flex-row items-center gap-1 rounded-full border px-2.5 py-1"
-                style={{
-                  backgroundColor: alpha(c.accent2, 0.15),
-                  borderColor: alpha(c.accent2, 0.4),
-                }}
-              >
-                <Clock size={11} color={c.accent2} />
-                <Text className="text-xs font-medium text-accent-2">
-                  {t("views.today.focus.totalHoursLabel", {
-                    hours: todayEffortHours,
-                  })}
-                </Text>
-              </View>
-            )}
-          </View>
-        ) : null
-      }
-    >
-      {todayFocus.items.length === 0 ? (
-        <View className="items-center rounded-xl border border-border bg-surface p-8">
-          <Text className="text-base mb-3 text-text-muted">
-            {t("views.today.focus.emptyTitle")}
-          </Text>
-          <Text className="text-center text-sm text-text-muted">
-            {projects.length === 0
-              ? t("views.today.focus.emptyHintFirst")
-              : t("views.today.focus.emptyHintNext")}
-          </Text>
-        </View>
-      ) : (
-        <View className="gap-3">
-          {todayFocus.items.map((item, idx) => {
-            const late =
-              item.type === "overdue" && item.task?.dueDate
-                ? daysOverdue(item.task.dueDate)
-                : null;
-            return (
-              <View
-                key={idx}
-                className="rounded-xl border bg-surface p-4"
-                style={{ borderColor: focusBorder(item.type) }}
-              >
-                <View className="flex-row items-center gap-3">
-                  {item.task && (
-                    <Pressable
-                      onPress={() => toggleTask(item.task!)}
-                      accessibilityLabel={t("views.today.focus.markDone")}
-                      hitSlop={8}
-                    >
-                      <CheckCircle2 size={20} color={c.textMuted} />
-                    </Pressable>
-                  )}
-                  <Pressable
-                    className="min-w-0 flex-1"
-                    onPress={
-                      item.project
-                        ? () => jumpToProject(item.project!.id)
-                        : undefined
-                    }
-                    disabled={!item.project}
-                  >
-                    <View className="mb-1 flex-row flex-wrap items-center gap-2">
-                      <Text
-                        className="text-xs font-medium uppercase tracking-wider"
-                        style={{ color: focusTypeColor(item.type) }}
-                      >
-                        {t(
-                          item.type === "today"
-                            ? "views.today.focus.labels.dueToday"
-                            : item.type === "overdue"
-                            ? "views.today.focus.labels.overdue"
-                            : item.type === "stalled"
-                            ? "views.today.focus.labels.stalled"
-                            : "views.today.focus.labels.nextStep"
-                        )}
-                      </Text>
-                      {late !== null && (
-                        <View
-                          className="rounded border px-1.5 py-0.5"
-                          style={{
-                            backgroundColor: `rgba(${RED},0.25)`,
-                            borderColor: `rgba(${RED},0.5)`,
-                          }}
-                        >
-                          <Text
-                            className="text-[10px] font-semibold"
-                            style={{ color: RED_T }}
-                          >
-                            {t("views.today.focus.daysLate", { count: late })}
-                          </Text>
-                        </View>
-                      )}
-                      {item.project && (
-                        <Text className="text-xs text-text-muted">
-                          · {item.project.name}
-                        </Text>
-                      )}
-                    </View>
-                    <View className="flex-row flex-wrap items-center gap-2">
-                      <Text className="text-base text-text">
-                        {item.task
-                          ? item.task.title
-                          : item.type === "stalled" && item.project
-                          ? t("views.today.focus.daysIdleLine", {
-                              name: item.project.name,
-                              count: daysSince(item.project.lastActivity) ?? 0,
-                            })
-                          : item.project?.nextStep}
-                      </Text>
-                      {item.task?.effortHours != null &&
-                        effortBadge(item.task.effortHours)}
-                    </View>
-                  </Pressable>
-                </View>
-              </View>
-            );
-          })}
-          {todayFocus.total > todayFocus.items.length && (
-            <Pressable
-              onPress={() => router.push("/tasks")}
-              className="flex-row items-center justify-center gap-2 self-start rounded-lg border px-4 py-2"
-              style={{
-                backgroundColor: `rgba(${ORANGE},0.1)`,
-                borderColor: `rgba(${ORANGE},0.3)`,
-              }}
-            >
-              <Text className="text-sm font-medium" style={{ color: ORANGE_T }}>
-                {t("views.today.focus.viewAll")}
-              </Text>
-              <View
-                className="rounded-full px-1.5 py-0.5"
-                style={{ backgroundColor: `rgba(${ORANGE},0.3)` }}
-              >
-                <Text className="text-xs" style={{ color: ORANGE_T }}>
-                  {t("views.today.focus.moreCount", {
-                    count: todayFocus.total - todayFocus.items.length,
-                  })}
-                </Text>
-              </View>
-              <ChevronRight size={14} color={ORANGE_T} />
-            </Pressable>
-          )}
-        </View>
-      )}
-    </CollapsibleSection>
+    <TodayFocusSection
+      todayFocus={todayFocus}
+      todayTaskCounts={todayTaskCounts}
+      todayEffortHours={todayEffortHours}
+      projects={projects}
+      toggleTask={toggleTask}
+      jumpToProject={jumpToProject}
+    />
   );
 
   // Sección: routines-today — ocurrencias de rutina pendientes/atrasadas; cada
@@ -751,207 +539,15 @@ export default function Today() {
   // unificado, con filtro task/log y horas por proyecto. Permite deshacer.
   if (doneTodayItems.length > 0) {
     sectionNodes["done-today"] = (
-      <CollapsibleSection
-        open={showDoneToday}
-        onToggle={() => setShowDoneToday((s) => !s)}
-        icon={<Sparkles size={18} color={c.accent} />}
-        title={t("views.today.doneToday.title")}
-        rightSlot={
-          <View className="flex-row flex-wrap items-center gap-1.5">
-            {taskCount > 0 && (
-              <Pressable
-                onPress={() => toggleDoneFilter("task")}
-                className="flex-row items-center gap-1 rounded-full border px-2 py-0.5"
-                style={{
-                  backgroundColor: alpha(
-                    c.accent,
-                    doneTodayFilter === "task" ? 0.25 : 0.1
-                  ),
-                  borderColor: alpha(
-                    c.accent,
-                    doneTodayFilter === "task" ? 0.6 : 0.3
-                  ),
-                }}
-              >
-                <CheckCircle2 size={11} color={c.accent} />
-                <Text className="text-xs text-accent">
-                  {t("views.today.doneToday.tasksLabel", { count: taskCount })}
-                </Text>
-              </Pressable>
-            )}
-            {logCount > 0 && (
-              <Pressable
-                onPress={() => toggleDoneFilter("log")}
-                className="flex-row items-center gap-1 rounded-full border px-2 py-0.5"
-                style={{
-                  backgroundColor: alpha(
-                    c.accent2,
-                    doneTodayFilter === "log" ? 0.25 : 0.1
-                  ),
-                  borderColor: alpha(
-                    c.accent2,
-                    doneTodayFilter === "log" ? 0.6 : 0.3
-                  ),
-                }}
-              >
-                <TrendingUp size={11} color={c.accent2} />
-                <Text className="text-xs text-accent-2">
-                  {t("views.today.doneToday.logsLabel", { count: logCount })}
-                </Text>
-              </Pressable>
-            )}
-            {doneTodayEffortHours > 0 && (
-              <View
-                className="flex-row items-center gap-1 rounded-full border px-2 py-0.5"
-                style={{
-                  backgroundColor: alpha(c.accent2, 0.15),
-                  borderColor: alpha(c.accent2, 0.4),
-                }}
-              >
-                <Clock size={11} color={c.accent2} />
-                <Text className="text-xs text-accent-2">
-                  {t("views.today.doneToday.hoursWorkedLabel", {
-                    hours: doneTodayEffortHours,
-                  })}
-                </Text>
-              </View>
-            )}
-          </View>
-        }
-      >
-        <View className="gap-3 rounded-xl border border-border bg-surface p-3">
-          {todayHoursByProject.length > 0 && (
-            <View className="flex-row flex-wrap items-center gap-1.5 border-b border-border pb-2">
-              <Text className="mr-1 text-[10px] uppercase tracking-wider text-text-muted">
-                {t("views.today.doneToday.hoursByProject")}
-              </Text>
-              {todayHoursByProject.map(({ project, hours }) => (
-                <Pressable
-                  key={project.id}
-                  onPress={() => jumpToProject(project.id)}
-                  className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-                  style={{
-                    backgroundColor: alpha(c.accent, 0.1),
-                    borderColor: alpha(c.accent, 0.3),
-                  }}
-                >
-                  <Clock size={10} color={c.accent} />
-                  <Text className="text-xs text-accent">
-                    {project.name} · {hours}h
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          )}
-          <View className="gap-2">
-            {visibleDone.map((item) => {
-              if (item.kind === "task") {
-                const proj = projects.find((p) => p.id === item.task.projectId);
-                return (
-                  <View
-                    key={`task-${item.task.id}`}
-                    className="flex-row items-start gap-2 border-l-2 pl-2.5"
-                    style={{ borderColor: alpha(c.accent, 0.4) }}
-                  >
-                    <CheckCircle2 size={16} color={c.accent} />
-                    <View className="min-w-0 flex-1">
-                      <View className="mb-0.5 flex-row flex-wrap items-center gap-1.5">
-                        <Text className="text-[10px] font-medium uppercase tracking-wider text-accent">
-                          {t("views.today.doneToday.task")}
-                        </Text>
-                        {proj && (
-                          <Pressable onPress={() => jumpToProject(proj.id)}>
-                            <Text className="text-xs text-text-muted">
-                              · {proj.name}
-                            </Text>
-                          </Pressable>
-                        )}
-                      </View>
-                      <View className="flex-row flex-wrap items-center gap-2">
-                        <Text className="text-sm text-text-muted line-through">
-                          {item.task.title}
-                        </Text>
-                        {item.task.effortHours != null &&
-                          effortBadge(item.task.effortHours)}
-                      </View>
-                    </View>
-                    <Pressable
-                      onPress={() => toggleTask(item.task)}
-                      accessibilityLabel={t("views.today.doneToday.undoAria")}
-                      hitSlop={8}
-                    >
-                      <Undo2 size={14} color={c.textMuted} />
-                    </Pressable>
-                  </View>
-                );
-              }
-              if (item.kind === "routine") {
-                return (
-                  <View
-                    key={`routine-${item.occurrenceId}`}
-                    className="flex-row items-start gap-2 border-l-2 pl-2.5"
-                    style={{ borderColor: alpha(c.accent, 0.4) }}
-                  >
-                    <CheckCircle2 size={16} color={c.accent} />
-                    <View className="min-w-0 flex-1">
-                      <View className="mb-0.5 flex-row flex-wrap items-center gap-1.5">
-                        <Text className="text-[10px] font-medium uppercase tracking-wider text-accent">
-                          {t("views.today.doneToday.routine")}
-                        </Text>
-                      </View>
-                      <View className="flex-row flex-wrap items-center gap-2">
-                        <Text className="text-sm text-text-muted">
-                          {item.title}
-                        </Text>
-                        {item.effortHours != null &&
-                          effortBadge(item.effortHours)}
-                      </View>
-                    </View>
-                    <Pressable
-                      onPress={() => uncompleteOccurrence(item.occurrenceId)}
-                      accessibilityLabel={t("views.today.doneToday.undoAria")}
-                      hitSlop={8}
-                    >
-                      <Undo2 size={14} color={c.textMuted} />
-                    </Pressable>
-                  </View>
-                );
-              }
-              const proj = item.projectId
-                ? projects.find((p) => p.id === item.projectId)
-                : undefined;
-              return (
-                <View
-                  key={`log-${item.source}-${item.id}`}
-                  className="flex-row items-start gap-2 border-l-2 pl-2.5"
-                  style={{ borderColor: alpha(c.accent2, 0.4) }}
-                >
-                  <TrendingUp size={16} color={c.accent2} />
-                  <View className="min-w-0 flex-1">
-                    <View className="mb-0.5 flex-row flex-wrap items-center gap-1.5">
-                      <Text className="text-[10px] font-medium uppercase tracking-wider text-accent-2">
-                        {t(
-                          item.source === "projectNote"
-                            ? "views.today.doneToday.note"
-                            : "views.today.doneToday.log"
-                        )}
-                      </Text>
-                      {proj && (
-                        <Pressable onPress={() => jumpToProject(proj.id)}>
-                          <Text className="text-xs text-text-muted">
-                            · {proj.name}
-                          </Text>
-                        </Pressable>
-                      )}
-                    </View>
-                    <Text className="text-sm text-text-muted">{item.text}</Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-      </CollapsibleSection>
+      <DoneTodaySection
+        doneTodayItems={doneTodayItems}
+        doneTodayEffortHours={doneTodayEffortHours}
+        todayHoursByProject={todayHoursByProject}
+        projects={projects}
+        jumpToProject={jumpToProject}
+        toggleTask={toggleTask}
+        uncompleteOccurrence={uncompleteOccurrence}
+      />
     );
   }
 

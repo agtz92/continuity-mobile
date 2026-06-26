@@ -279,6 +279,29 @@ export interface EffortStats {
   effortHoursByProject: EffortProjectRow[];
 }
 
+export interface LoopToolRow {
+  tool: string;
+  count: number;
+}
+
+export interface LoopDailyPoint {
+  day: string;
+  messages: number;
+  deepMessages: number;
+}
+
+export interface LoopStats {
+  messagesSent: number;
+  messagesDeltaVsPrev: number;
+  conversations: number;
+  actionsTaken: number;
+  activeDays: number;
+  deepMessages: number;
+  connectorInteractions: number;
+  daily: LoopDailyPoint[];
+  topTools: LoopToolRow[];
+}
+
 export interface AnalyticsData {
   range: AnalyticsRange;
   rangeStart: string | null;
@@ -294,6 +317,7 @@ export interface AnalyticsData {
   staleIdeas: StaleIdeaRow[];
   ideaFunnel: IdeaFunnel;
   effort: EffortStats;
+  loop: LoopStats;
 }
 
 /**

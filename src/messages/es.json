@@ -629,6 +629,7 @@
     "loadError": "No se pudieron cargar las analíticas",
     "chips": {
       "activity": "Actividad",
+      "loop": "Loop",
       "cadence": "Cadencia",
       "status": "Estado",
       "backlog": "Backlog",
@@ -637,6 +638,22 @@
       "sleeping": "Durmiendo",
       "funnel": "Embudo",
       "effort": "Esfuerzo"
+    },
+    "loop": {
+      "title": "Loop",
+      "subtitle": "Tu uso del asistente Loop",
+      "empty": "Aún no has usado Loop en este rango.",
+      "messages": "Mensajes",
+      "conversations": "Conversaciones",
+      "actions": "Acciones",
+      "activeDays": "Días activos",
+      "chartMessages": "Mensajes",
+      "chartDeep": "Profundos",
+      "topTools": "Acciones más usadas",
+      "topToolsEmpty": "Loop no ejecutó acciones en este rango.",
+      "surfaces": "Por superficie",
+      "inApp": "En la app",
+      "connector": "Conector de Claude"
     },
     "cadence": {
       "title": "Cadencia",
@@ -1027,12 +1044,15 @@
       "sectionHeading": "Título de la sección",
       "sectionBody": "Escribe aquí... (admite Markdown)",
       "deleteSection": "Eliminar sección",
+      "copy": "Copiar",
+      "copied": "Copiado",
       "moveUp": "Subir",
       "moveDown": "Bajar",
       "collapse": "Plegar",
       "expand": "Desplegar",
       "edit": "Editar",
       "preview": "Vista",
+      "drag": "Arrastrar para reordenar",
       "filters": {
         "all": "Todas",
         "loose": "Sueltas",

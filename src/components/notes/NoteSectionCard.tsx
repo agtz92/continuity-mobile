@@ -2,39 +2,40 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import {
+  Check,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
+  Copy,
   Eye,
+  GripVertical,
   Pencil,
   Trash2,
 } from "lucide-react-native";
+import * as Clipboard from "expo-clipboard";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { MarkdownText } from "@/components/notes/MarkdownText";
-import { deleteFeedback } from "@/lib/feedback";
+import { deleteFeedback, impactFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
 
 /**
  * One collapsible section (Notion-style toggle) inside a Quick Note. Holds its
  * own draft for heading/body and persists on blur — the parent only sees
- * committed values. Mounted with `key={section.id}` by the editor.
+ * committed values. Mounted with `key={section.id}` by the editor. Reordered by
+ * long-pressing the grip handle (react-native-draggable-flatlist owns the
+ * gesture and hands `onDrag`/`isActive` in); a copy button puts the section text
+ * on the clipboard.
  */
 export function NoteSectionCard({
   section,
   onSave,
   onDelete,
-  onMoveUp,
-  onMoveDown,
-  canMoveUp,
-  canMoveDown,
+  onDrag,
+  isActive,
 }: {
   section: NoteSection;
   onSave: (data: { heading: string; body: string; collapsed: boolean }) => void;
   onDelete: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
+  onDrag: () => void;
+  isActive: boolean;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -42,6 +43,7 @@ export function NoteSectionCard({
   const [editing, setEditing] = useState(!section.body.trim());
   const [heading, setHeading] = useState(section.heading);
   const [body, setBody] = useState(section.body);
+  const [copied, setCopied] = useState(false);
 
   const persist = (next: Partial<{ heading: string; body: string; collapsed: boolean }>) => {
     onSave({ heading, body, collapsed: !open, ...next });
@@ -53,8 +55,28 @@ export function NoteSectionCard({
     persist({ collapsed: !nextOpen });
   };
 
+  const copy = async () => {
+    impactFeedback("light");
+    await Clipboard.setStringAsync(body);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
-    <View className="overflow-hidden rounded-xl border border-border bg-surface">
+    <View
+      className="overflow-hidden rounded-xl border border-border bg-surface"
+      style={
+        isActive
+          ? {
+              shadowColor: c.accent,
+              shadowOpacity: 0.3,
+              shadowOffset: { width: 0, height: 4 },
+              shadowRadius: 12,
+              elevation: 8,
+            }
+          : undefined
+      }
+    >
       <View className="flex-row items-center gap-2 px-3 py-2.5">
         <Pressable onPress={toggle} hitSlop={8} accessibilityState={{ expanded: open }}>
           <View style={{ transform: [{ rotate: open ? "90deg" : "0deg" }] }}>
@@ -86,22 +108,25 @@ export function NoteSectionCard({
           </Pressable>
         ) : null}
         <Pressable
-          onPress={onMoveUp}
-          disabled={!canMoveUp}
+          onPress={copy}
           hitSlop={6}
-          style={{ opacity: canMoveUp ? 1 : 0.3 }}
-          accessibilityLabel={t("views.quickNotes.moveUp")}
+          accessibilityLabel={
+            copied ? t("views.quickNotes.copied") : t("views.quickNotes.copy")
+          }
         >
-          <ChevronUp size={16} color={c.textMuted} />
+          {copied ? (
+            <Check size={15} color={c.accent} />
+          ) : (
+            <Copy size={15} color={c.textMuted} />
+          )}
         </Pressable>
         <Pressable
-          onPress={onMoveDown}
-          disabled={!canMoveDown}
+          onLongPress={onDrag}
+          delayLongPress={150}
           hitSlop={6}
-          style={{ opacity: canMoveDown ? 1 : 0.3 }}
-          accessibilityLabel={t("views.quickNotes.moveDown")}
+          accessibilityLabel={t("views.quickNotes.drag")}
         >
-          <ChevronDown size={16} color={c.textMuted} />
+          <GripVertical size={16} color={c.textMuted} />
         </Pressable>
         <Pressable
           onPress={() => {

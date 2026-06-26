@@ -70,6 +70,24 @@ export const ANALYTICS_QUERY = gql`
           hours
         }
       }
+      loop {
+        messagesSent
+        messagesDeltaVsPrev
+        conversations
+        actionsTaken
+        activeDays
+        deepMessages
+        connectorInteractions
+        daily {
+          day
+          messages
+          deepMessages
+        }
+        topTools {
+          tool
+          count
+        }
+      }
     }
   }
 `;

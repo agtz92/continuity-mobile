@@ -8,6 +8,7 @@ import type { AnalyticsRange } from "@/lib/types";
 
 export type ChipId =
   | "activity"
+  | "loop"
   | "cadence"
   | "status"
   | "backlog"
@@ -21,6 +22,7 @@ export type ChipId =
 // del orden de declaración de ChipId (funnel/effort se adelantan a topProjects/sleeping).
 export const CHIPS: ChipId[] = [
   "activity",
+  "loop",
   "cadence",
   "status",
   "backlog",
