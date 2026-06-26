@@ -41,8 +41,12 @@ import {
   Zap,
 } from "lucide-react-native";
 import type { Routine } from "@/lib/types";
-import { daysOverdue, daysSince, todayLocalISODate, toLocalISO } from "@/lib/date";
-import { completedDatesFor, computeDueDates } from "@/lib/recurrence";
+import { daysOverdue, daysSince } from "@/lib/date";
+import {
+  computeTodayRoutineItems,
+  routineCounts,
+  routineEffortHours,
+} from "@/components/today/todayRoutines";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTodayFocus } from "@/hooks/useTodayFocus";
 import { useProductivityStats } from "@/hooks/useProductivityStats";
@@ -328,49 +332,19 @@ export default function Today() {
     return { name: proj.name, color: cat?.color ?? "emerald" };
   };
 
-  // Ocurrencias de rutina pendientes hoy + atrasadas: expande cada rutina activa
-  // a sus fechas de vencimiento en una ventana de 14 días hacia atrás y descarta
-  // las ya completadas. El lookback recupera atrasos recientes sin inflar la lista.
-  const todayRoutineItems = useMemo(() => {
-    const today = todayLocalISODate();
-    const lookback = new Date();
-    lookback.setDate(lookback.getDate() - 14);
-    const backStart = toLocalISO(lookback);
-    const items: { routine: Routine; scheduledDate: string }[] = [];
-    for (const r of routines) {
-      if (r.archived) continue;
-      const done = completedDatesFor(routineOccurrences, r.id);
-      const dates = computeDueDates(r, backStart, today);
-      for (const d of dates) {
-        if (!done.has(d)) items.push({ routine: r, scheduledDate: d });
-      }
-    }
-    items.sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
-    return items;
-  }, [routines, routineOccurrences]);
-
-  // Separa las ocurrencias en atrasadas (fecha < hoy) vs. del día para los chips
-  // del header de la sección de rutinas.
-  const todayRoutineCounts = useMemo(() => {
-    const today = todayLocalISODate();
-    const overdue = todayRoutineItems.filter(
-      (it) => it.scheduledDate < today
-    ).length;
-    const dueToday = todayRoutineItems.filter(
-      (it) => it.scheduledDate === today
-    ).length;
-    return { overdue, dueToday, total: overdue + dueToday };
-  }, [todayRoutineItems]);
-
-  // Suma de horas de esfuerzo estimado de las rutinas pendientes hoy (redondeada
-  // a 1 decimal) para el badge de carga del header.
-  const todayRoutineEffortHours = useMemo(() => {
-    const sum = todayRoutineItems.reduce(
-      (acc, it) => acc + (it.routine.effortHours ?? 0),
-      0
-    );
-    return Math.round(sum * 10) / 10;
-  }, [todayRoutineItems]);
+  // Rutinas pendientes hoy + agregados; la lógica vive en ../../../components/today/todayRoutines.
+  const todayRoutineItems = useMemo(
+    () => computeTodayRoutineItems(routines, routineOccurrences),
+    [routines, routineOccurrences]
+  );
+  const todayRoutineCounts = useMemo(
+    () => routineCounts(todayRoutineItems),
+    [todayRoutineItems]
+  );
+  const todayRoutineEffortHours = useMemo(
+    () => routineEffortHours(todayRoutineItems),
+    [todayRoutineItems]
+  );
 
   const closableTotal =
     closableProjects.quickWins.length + closableProjects.almostThere.length;

@@ -64,6 +64,7 @@ import {
   useThemeColors,
   type ThemeColors,
 } from "@/theme/useThemeColors";
+import { CHIPS, RANGES, type ChipId } from "@/lib/analyticsConfig";
 
 const AMBER = "rgb(251,191,36)";
 const ROSE = "rgb(251,113,133)";
@@ -75,39 +76,6 @@ const ORANGE = "rgb(251,146,60)";
 const YELLOW = "rgb(250,204,21)";
 const EMERALD = "rgb(52,211,153)";
 const BLUE = "rgb(96,165,250)";
-
-type ChipId =
-  | "activity"
-  | "cadence"
-  | "status"
-  | "backlog"
-  | "weekday"
-  | "topProjects"
-  | "sleeping"
-  | "funnel"
-  | "effort";
-
-// El orden de CHIPS define el orden visual de los selectores; difiere a propósito
-// del orden de declaración de ChipId (funnel/effort se adelantan a topProjects/sleeping).
-const CHIPS: ChipId[] = [
-  "activity",
-  "cadence",
-  "status",
-  "backlog",
-  "weekday",
-  "funnel",
-  "effort",
-  "topProjects",
-  "sleeping",
-];
-
-const RANGES: { value: AnalyticsRange; key: "7d" | "30d" | "90d" | "1y" | "all" }[] = [
-  { value: "LAST_7_DAYS", key: "7d" },
-  { value: "LAST_30_DAYS", key: "30d" },
-  { value: "LAST_90_DAYS", key: "90d" },
-  { value: "LAST_365_DAYS", key: "1y" },
-  { value: "ALL_TIME", key: "all" },
-];
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
