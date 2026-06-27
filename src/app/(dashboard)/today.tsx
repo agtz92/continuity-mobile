@@ -22,8 +22,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   Bell,
-  ChevronRight,
-  Clock,
   Flag,
   FolderPlus,
   Lightbulb,
@@ -37,8 +35,6 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react-native";
-import type { Routine } from "@/lib/types";
-import { daysOverdue, daysSince } from "@/lib/date";
 import {
   computeTodayRoutineItems,
   routineCounts,
@@ -55,10 +51,8 @@ import {
   type TodaySectionId,
   type TodaySectionMeta,
 } from "@/lib/todaySections";
-import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { FAB } from "@/components/ui/FAB";
 import { BottomSheet } from "@/components/ui/BottomSheet";
-import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
 import {
   StalledProjectModal,
   type StalledChoice,
@@ -72,13 +66,22 @@ import {
   type KillNotes,
 } from "@/components/projects/KillProjectModal";
 import { useProjectClosure } from "@/hooks/useProjectClosure";
-import { RoutineRow } from "@/components/routines/RoutineRow";
 import { consumeCustomizeRequest, subscribeCustomize } from "@/lib/tour";
 import { TodaySectionEditRow } from "@/components/today/TodaySectionEditRow";
 import { TodayCustomizeBar } from "@/components/today/TodayCustomizeBar";
 import { HiddenSectionsFooter } from "@/components/today/HiddenSectionsFooter";
 import { TodayFocusSection } from "@/components/today/TodayFocusSection";
 import { DoneTodaySection } from "@/components/today/DoneTodaySection";
+import {
+  ActiveProjectsSection,
+  CloseableSection,
+  CountersSection,
+  LaunchedWithTasksSection,
+  RoutinesTodaySection,
+  SleepingSection,
+  StaleIdeasSection,
+  StalledAlertSection,
+} from "@/components/today/sections";
 import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -113,13 +116,6 @@ function greetingKey(): "morning" | "afternoon" | "evening" {
   if (h >= 12 && h < 19) return "afternoon";
   return "evening";
 }
-
-/** Fixed-palette tint for the sleeping-project dot, keyed by idle bucket. */
-const sleepingDot: Record<"7-14" | "15-30" | "30+", string> = {
-  "7-14": AMBER_T,
-  "15-30": ORANGE_T,
-  "30+": RED_T,
-};
 
 const MOBILE_ONLY_SECTIONS: ReadonlySet<TodaySectionId> = new Set([
   // Mobile is the primary surface, so nothing is technically "mobile-only"
@@ -262,11 +258,6 @@ export default function Today() {
   };
 
   const [refreshing, setRefreshing] = useState(false);
-  const [showRoutinesToday, setShowRoutinesToday] = useState(true);
-  const [showCloseable, setShowCloseable] = useState(false);
-  const [showSleeping, setShowSleeping] = useState(false);
-  const [showActive, setShowActive] = useState(false);
-  const [showLaunched, setShowLaunched] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const layout = useTodayLayout();
@@ -317,14 +308,6 @@ export default function Today() {
     tasks.length > 0 ||
     ideas.length > 0 ||
     routines.length > 0;
-
-  const resolveRoutineProject = (r: Routine) => {
-    if (!r.projectId) return undefined;
-    const proj = projects.find((p) => p.id === r.projectId);
-    if (!proj) return undefined;
-    const cat = proj.categoryId ? categoryById[proj.categoryId] : undefined;
-    return { name: proj.name, color: cat?.color ?? "emerald" };
-  };
 
   // Rutinas pendientes hoy + agregados; la lógica vive en ../../../components/today/todayRoutines.
   const todayRoutineItems = useMemo(
@@ -386,69 +369,14 @@ export default function Today() {
   // Sección: counters — cinta horizontal de totales globales (siempre visible si
   // hay algún dato).
   if (hasData) {
-    sectionNodes.counters = (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2 pr-3"
-      >
-        {counters.map((co) => (
-          <View
-            key={co.id}
-            className="min-w-[120px] rounded-xl border border-border bg-surface px-4 py-3"
-          >
-            <Text className="text-[11px] uppercase tracking-wider text-text-muted">
-              {co.label}
-            </Text>
-            <Text className="mt-0.5 text-2xl font-bold" style={{ color: co.tint }}>
-              {co.value}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-    );
+    sectionNodes.counters = <CountersSection counters={counters} />;
   }
 
   // Sección: stalled-alert — banner ámbar con los proyectos detenidos; cada chip
   // navega al proyecto. Es distinta de la cola de modales de decisión (más abajo).
   if (stalled.length > 0) {
     sectionNodes["stalled-alert"] = (
-      <View
-        className="rounded-xl border p-4"
-        style={{
-          backgroundColor: `rgba(${AMBER},0.1)`,
-          borderColor: `rgba(${AMBER},0.3)`,
-        }}
-      >
-        <View className="flex-row items-start gap-3">
-          <Bell size={18} color={AMBER_T} />
-          <View className="flex-1">
-            <Text className="mb-1 font-semibold" style={{ color: AMBER_T }}>
-              {t("views.today.stalledAlert.title", { count: stalled.length })}
-            </Text>
-            <Text className="text-sm" style={{ color: `rgba(${AMBER},0.9)` }}>
-              {t("views.today.stalledAlert.subtitleLead")}{" "}
-              <Text className="font-bold">
-                {t("views.today.stalledAlert.subtitleEmphasis")}
-              </Text>
-            </Text>
-            <View className="mt-3 flex-row flex-wrap gap-2">
-              {stalled.map((p) => (
-                <Pressable
-                  key={p.id}
-                  onPress={() => jumpToProject(p.id)}
-                  className="rounded-md px-3 py-1.5"
-                  style={{ backgroundColor: `rgba(${AMBER},0.2)` }}
-                >
-                  <Text className="text-xs" style={{ color: AMBER_T }}>
-                    {p.name} · {daysSince(p.lastActivity)}d
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </View>
-      </View>
+      <StalledAlertSection stalled={stalled} jumpToProject={jumpToProject} />
     );
   }
 
@@ -469,69 +397,15 @@ export default function Today() {
   // fila puede completar/descompletar in situ (muta vía useRoutineMutations).
   if (todayRoutineItems.length > 0) {
     sectionNodes["routines-today"] = (
-      <CollapsibleSection
-        open={showRoutinesToday}
-        onToggle={() => setShowRoutinesToday((s) => !s)}
-        icon={<Repeat size={18} color={c.accent2} />}
-        title={t("views.today.routines.title")}
-        rightSlot={
-          todayRoutineCounts.total > 0 ? (
-            <View className="flex-row flex-wrap items-center gap-2">
-              <View
-                className="flex-row items-center gap-1.5 rounded-full border px-2.5 py-1"
-                style={{
-                  backgroundColor: `rgba(${ORANGE},0.2)`,
-                  borderColor: `rgba(${ORANGE},0.4)`,
-                }}
-              >
-                <Repeat size={11} color={ORANGE_T} />
-                <Text className="text-xs font-medium" style={{ color: ORANGE_T }}>
-                  {t("views.today.routines.routinesLabel", {
-                    count: todayRoutineCounts.total,
-                  })}
-                </Text>
-                {todayRoutineCounts.overdue > 0 && (
-                  <Text className="text-xs font-semibold" style={{ color: RED_T }}>
-                    {t("views.today.routines.overdueExtra", {
-                      count: todayRoutineCounts.overdue,
-                    })}
-                  </Text>
-                )}
-              </View>
-              {todayRoutineEffortHours > 0 && (
-                <View
-                  className="flex-row items-center gap-1 rounded-full border px-2.5 py-1"
-                  style={{
-                    backgroundColor: alpha(c.accent2, 0.15),
-                    borderColor: alpha(c.accent2, 0.4),
-                  }}
-                >
-                  <Clock size={11} color={c.accent2} />
-                  <Text className="text-xs font-medium text-accent-2">
-                    {t("views.today.routines.totalHoursLabel", {
-                      hours: todayRoutineEffortHours,
-                    })}
-                  </Text>
-                </View>
-              )}
-            </View>
-          ) : null
-        }
-      >
-        <View className="gap-3">
-          {todayRoutineItems.map((it) => (
-            <RoutineRow
-              key={`${it.routine.id}-${it.scheduledDate}`}
-              routine={it.routine}
-              scheduledDate={it.scheduledDate}
-              occurrenceId={null}
-              project={resolveRoutineProject(it.routine)}
-              onComplete={completeOccurrence}
-              onUncomplete={uncompleteOccurrence}
-            />
-          ))}
-        </View>
-      </CollapsibleSection>
+      <RoutinesTodaySection
+        todayRoutineItems={todayRoutineItems}
+        todayRoutineCounts={todayRoutineCounts}
+        todayRoutineEffortHours={todayRoutineEffortHours}
+        projects={projects}
+        categoryById={categoryById}
+        completeOccurrence={completeOccurrence}
+        uncompleteOccurrence={uncompleteOccurrence}
+      />
     );
   }
 
@@ -555,77 +429,7 @@ export default function Today() {
   // barra de % de avance) y "quick wins" (pocas tareas para terminar).
   if (closableTotal > 0) {
     sectionNodes.closeable = (
-      <CollapsibleSection
-        open={showCloseable}
-        onToggle={() => setShowCloseable((s) => !s)}
-        icon={<Flag size={18} color={c.accent} />}
-        title={t("views.today.closeable.title")}
-        rightSlot={
-          <View
-            className="rounded-full border px-2 py-0.5"
-            style={{
-              backgroundColor: alpha(c.accent, 0.1),
-              borderColor: alpha(c.accent, 0.3),
-            }}
-          >
-            <Text className="text-xs text-accent">{closableTotal}</Text>
-          </View>
-        }
-      >
-        <View className="gap-3">
-          {closableProjects.almostThere.map((sp) => {
-            const pct = Math.round(sp.donePct * 100);
-            return (
-              <Pressable
-                key={`almost-${sp.project.id}`}
-                onPress={() => jumpToProject(sp.project.id)}
-                className="rounded-xl border p-4"
-                style={{
-                  backgroundColor: alpha(c.accent, 0.05),
-                  borderColor: alpha(c.accent, 0.3),
-                }}
-              >
-                <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
-                  {t("views.today.closeable.almostThereChip", { pct })}
-                </Text>
-                <Text className="text-base mb-2 font-semibold text-text">
-                  {sp.project.name}
-                </Text>
-                <View className="mb-2 h-1.5 overflow-hidden rounded-full bg-border">
-                  <View
-                    className="h-full"
-                    style={{ width: `${pct}%`, backgroundColor: c.accent }}
-                  />
-                </View>
-                <Text className="text-xs text-text-muted">
-                  {t("views.today.closeable.tasksLeft", {
-                    count: sp.openCount,
-                    done: sp.doneCount,
-                    total: sp.totalCount,
-                  })}
-                </Text>
-              </Pressable>
-            );
-          })}
-          {closableProjects.quickWins.map((sp) => (
-            <Pressable
-              key={`quick-${sp.project.id}`}
-              onPress={() => jumpToProject(sp.project.id)}
-              className="rounded-xl border border-border bg-surface p-4"
-            >
-              <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
-                {t("views.today.closeable.quickWin")}
-              </Text>
-              <Text className="text-base mb-2 font-semibold text-text">
-                {sp.project.name}
-              </Text>
-              <Text className="text-xs text-text-muted">
-                {t("views.today.closeable.tasksAway", { count: sp.openCount })}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </CollapsibleSection>
+      <CloseableSection closableProjects={closableProjects} jumpToProject={jumpToProject} />
     );
   }
 
@@ -633,154 +437,29 @@ export default function Today() {
   // color según el bucket de inactividad (7-14 / 15-30 / 30+). Acción: reanudar.
   if (stalledProjects.length > 0) {
     sectionNodes.sleeping = (
-      <CollapsibleSection
-        open={showSleeping}
-        onToggle={() => setShowSleeping((s) => !s)}
-        icon={<Moon size={18} color={AMBER_T} />}
-        title={t("views.today.sleeping.title")}
-        rightSlot={
-          <View
-            className="rounded-full border px-2 py-0.5"
-            style={{
-              backgroundColor: `rgba(${AMBER},0.1)`,
-              borderColor: `rgba(${AMBER},0.3)`,
-            }}
-          >
-            <Text className="text-xs" style={{ color: AMBER_T }}>
-              {stalledProjects.length}
-            </Text>
-          </View>
-        }
-      >
-        <View className="gap-2">
-          {stalledProjects.map(({ project, days, bucket }) => (
-            <View
-              key={project.id}
-              className="flex-row items-center gap-3 rounded-xl border border-border bg-surface p-3"
-            >
-              <View
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: sleepingDot[bucket] }}
-              />
-              <View className="min-w-0 flex-1">
-                <View className="flex-row flex-wrap items-center gap-2">
-                  <Pressable onPress={() => jumpToProject(project.id)}>
-                    <Text className="text-base font-semibold text-text">
-                      {project.name}
-                    </Text>
-                  </Pressable>
-                  <View
-                    className="rounded border px-2 py-0.5"
-                    style={{
-                      backgroundColor: `rgba(${AMBER},0.15)`,
-                      borderColor: `rgba(${AMBER},0.3)`,
-                    }}
-                  >
-                    <Text className="text-xs" style={{ color: AMBER_T }}>
-                      {t("views.today.sleeping.daysIdle", { count: days })}
-                    </Text>
-                  </View>
-                </View>
-                {project.nextStep && (
-                  <Text
-                    className="mt-0.5 text-xs text-text-muted"
-                    numberOfLines={1}
-                  >
-                    → {project.nextStep}
-                  </Text>
-                )}
-              </View>
-              <Pressable
-                onPress={() => jumpToProject(project.id)}
-                className="rounded-md border px-3 py-1.5"
-                style={{
-                  backgroundColor: alpha(c.accent, 0.15),
-                  borderColor: alpha(c.accent, 0.4),
-                }}
-              >
-                <Text className="text-xs text-accent">
-                  {t("views.today.sleeping.resume")}
-                </Text>
-              </Pressable>
-            </View>
-          ))}
-        </View>
-      </CollapsibleSection>
+      <SleepingSection stalledProjects={stalledProjects} jumpToProject={jumpToProject} />
     );
   }
 
   // Sección: stale-ideas — banner morado que invita a revisar ideas viejas;
   // tap lleva a la bandeja de ideas.
   if (staleIdeas.length > 0) {
-    sectionNodes["stale-ideas"] = (
-      <Pressable
-        onPress={() => router.push("/ideas")}
-        className="rounded-xl border p-4"
-        style={{
-          backgroundColor: `rgba(${PURPLE},0.05)`,
-          borderColor: `rgba(${PURPLE},0.3)`,
-        }}
-      >
-        <View className="flex-row items-start gap-3">
-          <Lightbulb size={18} color={PURPLE_T} />
-          <View className="flex-1">
-            <Text className="mb-1 font-semibold" style={{ color: PURPLE_T }}>
-              {t("views.today.staleIdeas.title", { count: staleIdeas.length })}
-            </Text>
-            <Text className="text-sm" style={{ color: `rgba(${PURPLE},0.8)` }}>
-              {t("views.today.staleIdeas.subtitle")}
-            </Text>
-          </View>
-          <ChevronRight size={18} color={PURPLE_T} />
-        </View>
-      </Pressable>
-    );
+    sectionNodes["stale-ideas"] = <StaleIdeasSection staleIdeas={staleIdeas} />;
   }
 
   // Sección: active-projects — proyectos en curso como tarjetas compactas con
   // stats de esfuerzo y resaltado de "comeback" (regreso tras una pausa).
   if (activeProjects.length > 0) {
     sectionNodes["active-projects"] = (
-      <CollapsibleSection
-        open={showActive}
-        onToggle={() => setShowActive((s) => !s)}
-        icon={<Zap size={18} color={c.accent} />}
-        title={t("views.today.active.title")}
-        rightSlot={
-          <View
-            className="rounded-full border px-2 py-0.5"
-            style={{
-              backgroundColor: alpha(c.accent, 0.1),
-              borderColor: alpha(c.accent, 0.3),
-            }}
-          >
-            <Text className="text-xs text-accent">{activeProjects.length}</Text>
-          </View>
-        }
-      >
-        <View className="gap-3">
-          {activeProjects.map((p) => {
-            const stats = projectProgressById.get(p.id);
-            return (
-              <ProjectCardCompact
-                key={p.id}
-                project={p}
-                projectTasks={tasks.filter((tt) => tt.projectId === p.id)}
-                variant="active"
-                categoryById={categoryById}
-                totalEffortHours={stats?.totalEffortHours}
-                todayEffortHours={stats?.todayEffortHours}
-                comebackGapDays={
-                  comebackProjectIds.has(p.id)
-                    ? comebackGapByProject.get(p.id) ?? null
-                    : null
-                }
-                onPress={() => jumpToProject(p.id)}
-              />
-            );
-          })}
-        </View>
-      </CollapsibleSection>
+      <ActiveProjectsSection
+        activeProjects={activeProjects}
+        tasks={tasks}
+        categoryById={categoryById}
+        projectProgressById={projectProgressById}
+        comebackProjectIds={comebackProjectIds}
+        comebackGapByProject={comebackGapByProject}
+        jumpToProject={jumpToProject}
+      />
     );
   }
 
@@ -788,48 +467,14 @@ export default function Today() {
   // abiertas (mantenimiento post-lanzamiento), como tarjetas compactas.
   if (launchedWithOpenTasks.length > 0) {
     sectionNodes["launched-with-tasks"] = (
-      <CollapsibleSection
-        open={showLaunched}
-        onToggle={() => setShowLaunched((s) => !s)}
-        icon={<Rocket size={18} color={c.accent2} />}
-        title={t("views.today.launched.title")}
-        rightSlot={
-          <View
-            className="rounded-full border px-2 py-0.5"
-            style={{
-              backgroundColor: alpha(c.accent2, 0.1),
-              borderColor: alpha(c.accent2, 0.3),
-            }}
-          >
-            <Text className="text-xs text-accent-2">
-              {launchedWithOpenTasks.length}
-            </Text>
-          </View>
-        }
-      >
-        <View className="gap-3">
-          {launchedWithOpenTasks.map(({ project: p, projectTasks }) => {
-            const stats = projectProgressById.get(p.id);
-            return (
-              <ProjectCardCompact
-                key={p.id}
-                project={p}
-                projectTasks={projectTasks}
-                variant="launched"
-                categoryById={categoryById}
-                totalEffortHours={stats?.totalEffortHours}
-                todayEffortHours={stats?.todayEffortHours}
-                comebackGapDays={
-                  comebackProjectIds.has(p.id)
-                    ? comebackGapByProject.get(p.id) ?? null
-                    : null
-                }
-                onPress={() => jumpToProject(p.id)}
-              />
-            );
-          })}
-        </View>
-      </CollapsibleSection>
+      <LaunchedWithTasksSection
+        launchedWithOpenTasks={launchedWithOpenTasks}
+        categoryById={categoryById}
+        projectProgressById={projectProgressById}
+        comebackProjectIds={comebackProjectIds}
+        comebackGapByProject={comebackGapByProject}
+        jumpToProject={jumpToProject}
+      />
     );
   }
 

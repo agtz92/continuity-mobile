@@ -33,33 +33,20 @@ Extraídas las **2 secciones grandes** + módulos compartidos:
 | `src/components/today/EffortBadge.tsx` | badge de horas compartido (antes el helper `effortBadge`, usado por ambas secciones) |
 | `src/components/today/todayColors.ts` | tuplas de color del semáforo (RED/ORANGE/AMBER/PURPLE + `_T`) y `sleepingDot` |
 | `src/components/today/todayRoutines.ts` | lógica pura de rutinas de hoy (cómputo + counts + horas) — extraído antes |
+| `src/components/today/sections.tsx` | las **8 secciones chicas** (counters, stalled-alert, routines-today, closeable, sleeping, stale-ideas, active-projects, launched-with-tasks) — `resolveRoutineProject` movido dentro de `RoutinesTodaySection`; colores/`sleepingDot` desde `todayColors.ts` |
 
-`today.tsx` ahora arma esas secciones como `<TodayFocusSection .../>` /
-`<DoneTodaySection .../>`. Se limpiaron helpers/estado/imports muertos.
+`today.tsx` (**1450 → 691**) ahora solo deriva datos y arma `sectionNodes` con
+`<XSection .../>` + el modo personalizar + la cola de stalled. **Las 10 secciones
+están extraídas.** Se limpiaron helpers/estado/imports muertos.
+
+> Quedan en `today.tsx` algunas tuplas de color locales (`RED`/`ORANGE`/…) que
+> aún usan `SECTION_ICON` y el arreglo `counters`; las extraídas usan
+> `todayColors.ts`. Unificar del todo es opcional (inocuo).
 
 ### `src/app/(dashboard)/(more)/analytics.tsx`
 - `src/lib/analyticsConfig.ts`: `ChipId` + `CHIPS` + `RANGES` (config de paneles/rangos).
 
 ## Pendiente (mismo patrón, mecánico)
-
-### `today.tsx` — 8 secciones chicas restantes
-Siguen inline; extraer cada una a un `src/components/today/sections.tsx` (o
-archivos individuales), igual que en web (`continuity/frontend/src/components/today/sections.tsx`):
-`counters`, `stalled-alert`, `routines-today`, `closeable`, `sleeping`,
-`stale-ideas`, `active-projects`, `launched-with-tasks`.
-
-Notas para hacerlo:
-- `jumpToProject(id)` se pasa como prop (lo usan casi todas).
-- `routines-today` necesita `resolveRoutineProject` (mover adentro; depende de
-  `projects` + `categoryById`) y usa `RoutineRow` + `completeOccurrence`/
-  `uncompleteOccurrence`/`editRoutine`.
-- `active-projects` / `launched-with-tasks` usan `ProjectCardCompact` +
-  `projectProgressById`/`comebackProjectIds`/`comebackGapByProject`.
-- `sleeping` usa `sleepingDot` (ya en `todayColors.ts`) — importarlo.
-- Las tuplas de color (`RED`/`ORANGE`/…) hoy están **duplicadas**: definidas
-  local en `today.tsx` (las usan las secciones inline) **y** en `todayColors.ts`
-  (las usan las extraídas). Al terminar de extraer, borrar las locales y que
-  `today.tsx` importe de `todayColors.ts`.
 
 ### `analytics.tsx` — paneles + chart
 Extraer `PanelCard` (componente contenedor compartido por todos los paneles) y
