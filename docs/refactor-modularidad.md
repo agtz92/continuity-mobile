@@ -43,16 +43,19 @@ están extraídas.** Se limpiaron helpers/estado/imports muertos.
 > aún usan `SECTION_ICON` y el arreglo `counters`; las extraídas usan
 > `todayColors.ts`. Unificar del todo es opcional (inocuo).
 
-### `src/app/(dashboard)/(more)/analytics.tsx`
+### `src/app/(dashboard)/(more)/analytics.tsx` (**1091 → 244**)
 - `src/lib/analyticsConfig.ts`: `ChipId` + `CHIPS` + `RANGES` (config de paneles/rangos).
+- `src/components/analytics/panels.tsx`: **todos los paneles** (`CadencePanel`,
+  `ActivityChart`, `LoopPanel`, `StatusBreakdownPanel`, `BacklogPanel`,
+  `WeekdayHeatmap`, `TopProjectsPanel`, `SleepingStalePanel`, `IdeaFunnelPanel`,
+  `EffortPanel`) + las piezas compartidas (`PanelCard`, `StatTile`, `StatusBar`,
+  `Delta`) + tuplas de color + `type T`. La pantalla `analytics.tsx` queda con el
+  estado, `useAnalyticsData`, el selector de chips y el switch `renderPanel`.
 
-## Pendiente (mismo patrón, mecánico)
+## Pendiente
 
-### `analytics.tsx` — paneles + chart
-Extraer `PanelCard` (componente contenedor compartido por todos los paneles) y
-`ActivityChart` (el SVG; depende de `PanelCard`) a `src/components/analytics/`,
-y luego cada panel del `renderPanel` switch. El acoplamiento a `PanelCard` es la
-razón por la que no se hizo aún sin verificación visual.
+Mobile **completamente descompuesto** (today + analytics). No quedan pendientes de
+modularidad en mobile.
 
 ## Cómo verificar al continuar
 ```bash
