@@ -6,7 +6,7 @@ App **React Native / Expo** (port de la web Continuity). Repo **separado** y **p
 
 - **Fases 0–7 + 9 completas** (auth, UI, hooks, 8 pantallas, modales CRUD, asistente IA, settings, onboarding + tour).
 - **Fase 8 (push):** cliente listo y commiteado pero **gateado** (`PUSH_BACKEND_READY=false` en `src/lib/notifications.ts`) — falta backend.
-- **Fase 10 (account deletion + polish):** pendiente, necesita endpoint backend (requisito Apple).
+- **Fase 10 (account deletion):** ✅ **HECHO** (al 2026-06-26). Mutation `deleteAccount` en backend (`core/account_deletion.py` + `core/schema.py`) y borrado con **doble confirmación** en la app (`(more)/profile.tsx`, `DELETE_ACCOUNT`). Cumple el requisito de Apple. (El "polish" general sigue siendo trabajo continuo.)
 - **Fase 11:** **primer build en TestFlight ya subido.** Bundle id `it.continuu.app`. App Store Connect app id `6777210188`.
 
 Plan completo y detalle por fase: `../continuity/docs/plan-desarrollo-app-movil.md` (repo web `continuity`, en `docs/`). Ese doc tiene el bloque "⭐ Estado actual" arriba.
