@@ -81,7 +81,7 @@ El usuario envía un reporte de bug que llega al **inbox de admin** (solo web). 
 - **Pantalla:** `src/app/(dashboard)/(more)/report-bug.tsx`, registrada como `Stack.Screen` en `(more)/_layout.tsx` y enlazada desde el menú "más" (`more.tsx`, icono `Bug`, `href:"/report-bug"`).
 - **Selector de tema:** `src/components/ui/BugTopicSelect.tsx` — trigger + `BottomSheet` con búsqueda y opción de **texto libre** ("Usar «…»"). Sigue el patrón de `ProjectSelect`.
 - **Fuente de verdad de temas:** `src/lib/bugTopics.ts` — **espejo exacto** de `continuity/frontend/src/lib/bugTopics.ts` (mismos `value` y orden). Etiquetas i18n `bugTopics.<value>`; textos en `reportBug.*` (`src/messages/{en,es}.json`). Recuerda ICU llave simple: `reportBug.useTyped` usa `{query}`.
-- **Datos:** `SUBMIT_BUG_REPORT` en `src/lib/graphql.ts` (`platform:"app"`) + hook `src/hooks/useReportMutations.ts` (devuelve boolean, errores se muestran con `toast` en la pantalla). Backend: app `core/feedback`.
+- **Datos:** `SUBMIT_BUG_REPORT` en `src/lib/graphql/feedback.ts` (`platform:"app"`) + hook `src/hooks/useReportMutations.ts` (devuelve boolean, errores se muestran con `toast` en la pantalla). Backend: app `core/feedback`. (Nota: `src/lib/graphql.ts` se partió en `src/lib/graphql/<dominio>.ts` + barrel; el import `@/lib/graphql` sigue igual.)
 
 ## Quick Notes — cuaderno tipo Notion (bajo "More")
 
