@@ -1,5 +1,11 @@
 # Refactor de modularidad — app mobile
 
+> **⚑ NOTA (2026-06-28):** El tracker canónico de deuda de modularidad (web + móvil) es
+> `continuity/AUDITORIA_CODIGO.md`. Ese reporte marca una **regresión pendiente** que este
+> doc da por cerrada: `components/analytics/panels.tsx` (923 líneas) quedó como god-file tras
+> mover los paneles fuera de `analytics.tsx`. La sección "Pendiente" de abajo ("completamente
+> descompuesto") está desactualizada en ese punto — ver AUDITORIA para el estado vigente.
+
 Estado del refactor de modularidad/legibilidad en el repo **mobile**, espejo del
 trabajo guiado por `AUDITORIA_CODIGO.md` del repo web (`continuity/`). Documento
 para **evaluar y continuar después**.
