@@ -23,6 +23,7 @@ import {
   type CalendarView,
 } from "@/lib/calendar";
 import { confirmCompleted } from "@/lib/feedback";
+import { isDailyViewStatus } from "@/lib/projectStatus";
 import type { CalendarHandlers } from "@/components/calendar/parts";
 import { WeekAgenda } from "@/components/calendar/WeekAgenda";
 import { MonthGrid } from "@/components/calendar/MonthGrid";
@@ -69,14 +70,30 @@ export default function Calendar() {
     return { fromISO: w[0][0], toISO: w[w.length - 1][6], days: [] as string[], weeks: w };
   }, [view, refISO, refDate]);
 
-  const tByDay = useMemo(() => tasksByDay(tasks, fromISO, toISO), [tasks, fromISO, toISO]);
-  const rByDay = useMemo(
-    () => routineItemsByDay(routines, routineOccurrences, fromISO, toISO),
-    [routines, routineOccurrences, fromISO, toISO]
-  );
   const projectsById = useMemo(
     () => new Map(projects.map((p) => [p.id, p])),
     [projects]
+  );
+  // Mirror Today/Tasks: tasks of a closed project (paused/stalled/killed/
+  // archived) are withdrawn from the calendar; standalone tasks and tasks of a
+  // live project stay. Keeps the calendar in sync with the other task views.
+  const visibleTasks = useMemo(
+    () =>
+      tasks.filter((task) => {
+        if (!task.projectId) return true;
+        const parent = projectsById.get(task.projectId);
+        return parent ? isDailyViewStatus(parent.status) : true;
+      }),
+    [tasks, projectsById]
+  );
+
+  const tByDay = useMemo(
+    () => tasksByDay(visibleTasks, fromISO, toISO),
+    [visibleTasks, fromISO, toISO]
+  );
+  const rByDay = useMemo(
+    () => routineItemsByDay(routines, routineOccurrences, fromISO, toISO),
+    [routines, routineOccurrences, fromISO, toISO]
   );
 
   const handlers: CalendarHandlers = {
