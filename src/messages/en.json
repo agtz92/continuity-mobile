@@ -741,6 +741,11 @@
       "showTasks": "Show tasks",
       "load": "Load",
       "allDay": "All day",
+      "withTime": "With time",
+      "allDayMore": "Show {count} more",
+      "allDayLess": "Show less",
+      "openDay": "Open day",
+      "activities": "{count, plural, one {# activity} other {# activities}}",
       "now": "now",
       "dash": "—",
       "empty": "Nothing scheduled here"

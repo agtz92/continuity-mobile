@@ -741,6 +741,11 @@
       "showTasks": "Ver tareas",
       "load": "Carga",
       "allDay": "Todo el día",
+      "withTime": "Con hora",
+      "allDayMore": "Ver {count} más",
+      "allDayLess": "Ver menos",
+      "openDay": "Abrir día",
+      "activities": "{count, plural, one {# actividad} other {# actividades}}",
       "now": "ahora",
       "dash": "—",
       "empty": "Nada agendado aquí"
