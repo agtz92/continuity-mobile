@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { HeartPulse, Pause, Pencil, Plus, Skull, Trash2, Zap } from "lucide-react-native";
+import { HeartPulse, Pause, Pencil, Plus, Rocket, Skull, Trash2, Zap } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Task } from "@/lib/types";
 import { priorityStripeClass } from "@/lib/priority";
 import { confirmAsync } from "@/lib/confirm";
+import { todayLocalISODate } from "@/lib/date";
+import { toast } from "@/lib/toast";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
@@ -76,7 +78,7 @@ export default function ProjectDetail() {
 
   const { projects, tasks, activities, notesByProject, categoryById, initialLoading } =
     useDashboardData();
-  const { toggleTask, deleteTask } = useTaskMutations();
+  const { toggleTask, deleteTask, saveTask } = useTaskMutations();
   const { deleteProject } = useProjectMutations();
   const { remove: removeNote } = useProjectNoteMutations();
   const closure = useProjectClosure();
@@ -154,6 +156,19 @@ export default function ProjectDetail() {
   const cat = project.categoryId ? categoryById[project.categoryId] : undefined;
   const catColors = cat ? categoryChipColors(cat.color, c) : null;
 
+  // Quick action on overdue rows: rewrite the due date to today.
+  const moveTaskToToday = async (task: Task) => {
+    const ok = await saveTask({
+      id: task.id,
+      title: task.title,
+      projectId: task.projectId,
+      dueDate: todayLocalISODate(),
+      done: task.done,
+      effortHours: task.effortHours,
+    });
+    if (ok) toast.success(t("taskRow.movedToast"), 2000);
+  };
+
   const renderTask = (task: Task) => (
     <TaskRow
       task={task}
@@ -163,6 +178,7 @@ export default function ProjectDetail() {
       onEdit={(tk) =>
         router.push({ pathname: "/task-form", params: { id: tk.id } })
       }
+      onMoveToday={moveTaskToToday}
     />
   );
 
@@ -183,6 +199,9 @@ export default function ProjectDetail() {
     void closure.setStatus(project, "active");
     setWelcomeDismissed(true);
   };
+  // The success close: mark the project shipped. No notes modal (mirrors web,
+  // where "launched" is just another status in the selector).
+  const onLaunch = () => void closure.setStatus(project, "launched");
   const onRevive = async (target: "active" | "idea") => {
     const ok = await closure.setStatus(project, target);
     if (ok) setReviveOpen(false);
@@ -198,6 +217,19 @@ export default function ProjectDetail() {
     onPress: () => void;
     tint: string;
   }[] = [];
+  if (
+    project.status === "active" ||
+    project.status === "idea" ||
+    project.status === "stalled"
+  ) {
+    statusActions.push({
+      key: "launch",
+      label: "Launch",
+      icon: <Rocket size={15} color={c.accent2} />,
+      onPress: onLaunch,
+      tint: c.accent2,
+    });
+  }
   if (
     project.status === "active" ||
     project.status === "idea" ||

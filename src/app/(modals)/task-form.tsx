@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Lock, X } from "lucide-react-native";
 import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { ModalDeleteButton } from "@/components/ui/ModalDeleteButton";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { DateField } from "@/components/ui/DateField";
@@ -74,7 +75,8 @@ export default function TaskForm() {
   const params = useLocalSearchParams<{ id?: string; projectId?: string }>();
   const c = useThemeColors();
   const { tasks, projects } = useDashboardData();
-  const { saveTask, addTaskBlocker, removeTaskBlocker } = useTaskMutations();
+  const { saveTask, deleteTask, addTaskBlocker, removeTaskBlocker } =
+    useTaskMutations();
 
   const existing = params.id ? tasks.find((tk) => tk.id === params.id) : null;
 
@@ -139,6 +141,12 @@ export default function TaskForm() {
     });
     setSaving(false);
     if (ok) router.back();
+  };
+
+  const handleDelete = async () => {
+    if (!existing?.id) return;
+    await deleteTask(existing.id);
+    router.back();
   };
 
   return (
@@ -302,6 +310,15 @@ export default function TaskForm() {
             </View>
           </View>
         </Field>
+      )}
+
+      {existing?.id && (
+        <ModalDeleteButton
+          label={t("modals.task.deleteButton")}
+          confirmTitle={t("modals.task.deleteConfirm")}
+          confirmBody={t("modals.task.deleteConfirmBody")}
+          onConfirm={handleDelete}
+        />
       )}
     </ModalScaffold>
   );

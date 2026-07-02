@@ -127,8 +127,7 @@ export function DayGrid({
         <RoutineChip
           item={item}
           colors={colors}
-          onComplete={handlers.onCompleteOccurrence}
-          onUncomplete={handlers.onUncompleteOccurrence}
+          onOpen={handlers.onOpenRoutine}
         />
       ),
     });
@@ -311,8 +310,9 @@ export function DayGrid({
                       HOUR_PX
                   );
                   return (
-                    <View
+                    <Pressable
                       key={`${item.routine.id}-${item.scheduledDate}`}
+                      onPress={() => handlers.onOpenRoutine(item.routine.id)}
                       style={{
                         position: "absolute",
                         top: topFor(start),
@@ -343,7 +343,7 @@ export function DayGrid({
                       >
                         {item.routine.title}
                       </Text>
-                    </View>
+                    </Pressable>
                   );
                 })}
 

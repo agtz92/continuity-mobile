@@ -9,7 +9,6 @@ import {
   ListChecks,
 } from "lucide-react-native";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { useRoutineMutations } from "@/hooks/useRoutineMutations";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { todayLocalISODate, toLocalISO } from "@/lib/date";
@@ -41,7 +40,6 @@ export default function Calendar() {
   const { projects, tasks, routines, routineOccurrences, categoryById, refetch } =
     useDashboardData();
   const { toggleTask } = useTaskMutations();
-  const { completeOccurrence, uncompleteOccurrence } = useRoutineMutations();
 
   const [view, setView] = useState<CalendarView>("week");
   const [refISO, setRefISO] = useState(todayISO);
@@ -108,11 +106,9 @@ export default function Calendar() {
       await toggleTask(task);
       if (!wasDone) confirmCompleted(t("taskRow.completedToast"));
     },
-    onCompleteOccurrence: async (routineId, scheduledDate) => {
-      await completeOccurrence(routineId, scheduledDate);
-      confirmCompleted(t("routineRow.completedToast"));
-    },
-    onUncompleteOccurrence: (occurrenceId) => uncompleteOccurrence(occurrenceId),
+    // Routines aren't completable from the calendar — tapping opens edit.
+    onOpenRoutine: (id) =>
+      router.push({ pathname: "/routine-form", params: { id } }),
   };
 
   const shift = (dir: number) => {

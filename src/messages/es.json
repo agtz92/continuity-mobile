@@ -1189,12 +1189,19 @@
     "dueToday": "Para hoy",
     "addDate": "Agregar fecha",
     "blocked": "Bloqueada",
-    "completedToast": "✓ Tarea completada"
+    "completedToast": "✓ Tarea completada",
+    "overdueDays": "Vencida · {count, plural, one {# día} other {# días}}",
+    "todayBadge": "Hoy",
+    "moveToToday": "Mover a hoy",
+    "reschedule": "Reprogramar",
+    "movedToast": "✓ Movida a hoy"
   },
   "routineRow": {
     "markDone": "Marcar como hecha",
     "markNotDone": "Marcar como no hecha",
     "today": "Para hoy",
+    "overdueDays": "Vencida · {count, plural, one {# día} other {# días}}",
+    "todayBadge": "Hoy",
     "editAria": "Editar rutina",
     "archiveAria": "Archivar rutina",
     "unarchiveAria": "Reactivar rutina",
@@ -1269,6 +1276,9 @@
     "task": {
       "newTitle": "Nueva tarea",
       "editTitle": "Editar tarea",
+      "deleteButton": "Borrar tarea",
+      "deleteConfirm": "¿Borrar esta tarea?",
+      "deleteConfirmBody": "Esta acción no se puede deshacer.",
       "titleField": "Título *",
       "project": "Proyecto",
       "noProject": "Sin proyecto",
@@ -1304,6 +1314,9 @@
     "routine": {
       "newTitle": "Nueva rutina",
       "editTitle": "Editar rutina",
+      "deleteButton": "Borrar rutina",
+      "deleteConfirm": "¿Borrar esta rutina?",
+      "deleteConfirmBody": "Esta acción no se puede deshacer.",
       "titleField": "Título *",
       "description": "Descripción",
       "descriptionPlaceholder": "Opcional — un recordatorio breve.",

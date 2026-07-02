@@ -118,8 +118,7 @@ export function WeekAgenda({
                       key={`${item.routine.id}-${item.scheduledDate}`}
                       item={item}
                       colors={colors}
-                      onComplete={handlers.onCompleteOccurrence}
-                      onUncomplete={handlers.onUncompleteOccurrence}
+                      onOpen={handlers.onOpenRoutine}
                     />
                   ))}
                 </>

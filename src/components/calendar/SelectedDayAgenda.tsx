@@ -84,8 +84,7 @@ export function SelectedDayAgenda({
           <RoutineChip
             item={item}
             colors={colors}
-            onComplete={handlers.onCompleteOccurrence}
-            onUncomplete={handlers.onUncompleteOccurrence}
+            onOpen={handlers.onOpenRoutine}
           />
         ),
       });
@@ -132,8 +131,7 @@ export function SelectedDayAgenda({
         <RoutineChip
           item={item}
           colors={colors}
-          onComplete={handlers.onCompleteOccurrence}
-          onUncomplete={handlers.onUncompleteOccurrence}
+          onOpen={handlers.onOpenRoutine}
         />
       ),
     });

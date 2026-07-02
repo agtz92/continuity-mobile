@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { ModalDeleteButton } from "@/components/ui/ModalDeleteButton";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { DateField } from "@/components/ui/DateField";
@@ -57,7 +58,7 @@ export default function RoutineForm() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; projectId?: string }>();
   const { routines, projects } = useDashboardData();
-  const { saveRoutine } = useRoutineMutations();
+  const { saveRoutine, deleteRoutine } = useRoutineMutations();
 
   const existing = params.id
     ? routines.find((r) => r.id === params.id)
@@ -150,6 +151,12 @@ export default function RoutineForm() {
     });
     setSaving(false);
     if (ok) router.back();
+  };
+
+  const handleDelete = async () => {
+    if (!existing?.id) return;
+    await deleteRoutine(existing.id);
+    router.back();
   };
 
   const recurrenceOptions: ChipOption<RecurrenceType>[] = RECURRENCE_TYPES.map(
@@ -334,6 +341,15 @@ export default function RoutineForm() {
             {error}
           </Text>
         </View>
+      )}
+
+      {existing?.id && (
+        <ModalDeleteButton
+          label={t("modals.routine.deleteButton")}
+          confirmTitle={t("modals.routine.deleteConfirm")}
+          confirmBody={t("modals.routine.deleteConfirmBody")}
+          onConfirm={handleDelete}
+        />
       )}
     </ModalScaffold>
   );

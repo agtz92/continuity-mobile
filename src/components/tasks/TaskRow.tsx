@@ -1,24 +1,32 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
-import { CalendarPlus, CheckCircle2, Clock, Lock, X } from "lucide-react-native";
+import {
+  CalendarCheck,
+  CalendarClock,
+  CalendarPlus,
+  Clock,
+  Lock,
+} from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Project, Task } from "@/lib/types";
-import { isDueToday, isOverdue } from "@/lib/date";
+import { daysOverdue, isDueToday, isOverdue } from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { TaskToggle } from "./TaskToggle";
 
 const RED = "239,68,68"; // red-500
-const ORANGE = "249,115,22"; // orange-500
+const AMBER = "245,158,11"; // amber-500
 const RED_400 = "rgb(248,113,113)";
-const ORANGE_400 = "rgb(251,146,60)";
 const AMBER_400 = "rgb(251,191,36)";
 const GRAY = "107,114,128"; // gray-500
 
 /**
- * Bordered task row: checkbox + title + project/due meta + delete. When
- * `onSchedule` is set and the task has no due date, an inline "Add date" action
- * appears. Border tints red (overdue) / orange (due today).
+ * Bordered task row (mirror of the web `tasks/TaskRow.tsx`). Row anatomy
+ * (designer pass): circular TaskToggle · 3px urgency spine on the left edge ·
+ * solid OVERDUE/TODAY badge that explains the drift ("Vencida · 3 días") ·
+ * inline quick actions on overdue rows ("Mover a hoy" / "Reprogramar") so the
+ * next decision is one tap away instead of buried in the edit modal.
  *
  * Marking done gives instant confirmation (success haptic + toast) and an
  * optimistic checked state, then the row fades out (Animated exiting) when the
@@ -28,16 +36,20 @@ export function TaskRow({
   task,
   project,
   onToggle,
-  onDelete,
   onSchedule,
   onEdit,
+  onMoveToday,
 }: {
   task: Task;
   project: Project | undefined;
   onToggle: (t: Task) => void | Promise<void>;
-  onDelete: (id: string) => void | Promise<void>;
+  // Delete moved into the edit modal (task-form); tapping the row opens it.
+  // Kept optional so existing call sites don't break.
+  onDelete?: (id: string) => void | Promise<void>;
   onSchedule?: (t: Task) => void;
   onEdit?: (t: Task) => void;
+  /** One-tap "due date → today" for overdue rows. */
+  onMoveToday?: (t: Task) => void | Promise<void>;
 }) {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
@@ -46,11 +58,20 @@ export function TaskRow({
   const overdue = !done && isOverdue(task.dueDate);
   const dueToday = !done && isDueToday(task.dueDate);
   const isBlocked = !done && task.blockers.length > 0;
+  const lateDays = overdue ? daysOverdue(task.dueDate) : null;
+  const blockReason = isBlocked
+    ? task.blockers.find((b) => b.externalDescription)?.externalDescription
+    : undefined;
 
   const borderColor = overdue
     ? `rgba(${RED},0.3)`
     : dueToday
-    ? `rgba(${ORANGE},0.3)`
+    ? `rgba(${AMBER},0.3)`
+    : c.border;
+  const spineColor = overdue
+    ? `rgb(${RED})`
+    : dueToday
+    ? `rgb(${AMBER})`
     : c.border;
 
   const handleToggle = () => {
@@ -69,19 +90,23 @@ export function TaskRow({
       layout={LinearTransition.duration(220)}
     >
       <View
-        className="flex-row items-center gap-3 rounded-lg border bg-surface p-3"
-        style={{ borderColor, opacity: isBlocked ? 0.6 : 1 }}
+        className="flex-row items-start gap-3 rounded-lg border bg-surface p-3"
+        style={{
+          borderColor,
+          borderLeftWidth: 3,
+          borderLeftColor: spineColor,
+          opacity: isBlocked ? 0.6 : 1,
+        }}
       >
-        <Pressable
-          onPress={handleToggle}
-          accessibilityRole="button"
-          accessibilityLabel={
-            done ? t("taskRow.markNotDone") : t("taskRow.markDone")
-          }
-          hitSlop={8}
-        >
-          <CheckCircle2 size={18} color={done ? c.accent : c.textMuted} />
-        </Pressable>
+        <View className="mt-0.5">
+          <TaskToggle
+            done={done}
+            overdue={overdue}
+            blocked={isBlocked}
+            onToggle={handleToggle}
+            label={done ? t("taskRow.markNotDone") : t("taskRow.markDone")}
+          />
+        </View>
 
         <Pressable
           className="min-w-0 flex-1"
@@ -109,37 +134,72 @@ export function TaskRow({
                 <Text className="text-xs text-accent-2">{task.effortHours}h</Text>
               </View>
             )}
+          </View>
+          <View className="mt-1 flex-row flex-wrap items-center gap-x-2 gap-y-1">
+            {overdue && lateDays !== null && (
+              <View
+                className="rounded px-1.5 py-0.5"
+                style={{
+                  backgroundColor: `rgba(${RED},0.2)`,
+                  borderWidth: 1,
+                  borderColor: `rgba(${RED},0.4)`,
+                }}
+              >
+                <Text
+                  className="text-[10px] font-semibold uppercase tracking-wide"
+                  style={{ color: RED_400 }}
+                >
+                  {t("taskRow.overdueDays", { count: lateDays })}
+                </Text>
+              </View>
+            )}
+            {dueToday && (
+              <View
+                className="rounded px-1.5 py-0.5"
+                style={{
+                  backgroundColor: `rgba(${AMBER},0.2)`,
+                  borderWidth: 1,
+                  borderColor: `rgba(${AMBER},0.4)`,
+                }}
+              >
+                <Text
+                  className="text-[10px] font-semibold uppercase tracking-wide"
+                  style={{ color: AMBER_400 }}
+                >
+                  {t("taskRow.todayBadge")}
+                </Text>
+              </View>
+            )}
             {isBlocked && (
               <View
-                className="flex-row items-center gap-1 rounded border px-2 py-0.5"
+                className="max-w-[240px] flex-row items-center gap-1 rounded px-1.5 py-0.5"
                 style={{
                   backgroundColor: `rgba(${GRAY},0.1)`,
+                  borderWidth: 1,
                   borderColor: `rgba(${GRAY},0.3)`,
                 }}
               >
                 <Lock size={10} color={`rgb(${GRAY})`} />
-                <Text className="text-xs" style={{ color: `rgb(${GRAY})` }}>
+                <Text
+                  numberOfLines={1}
+                  className="text-[10px] font-semibold"
+                  style={{ color: `rgb(${GRAY})` }}
+                >
                   {t("taskRow.blocked")}
+                  {blockReason ? ` · ${blockReason}` : ""}
                 </Text>
               </View>
             )}
-          </View>
-          <View className="mt-0.5 flex-row flex-wrap items-center gap-x-2">
             {project && (
               <Text className="text-xs text-text-muted">{project.name}</Text>
             )}
             {task.dueDate ? (
-              <Text
-                className="text-xs"
-                style={{
-                  color: overdue ? RED_400 : dueToday ? ORANGE_400 : c.textMuted,
-                }}
-              >
-                ·{" "}
-                {dueToday
-                  ? t("taskRow.dueToday")
-                  : new Date(task.dueDate).toLocaleDateString(i18n.language)}
-              </Text>
+              !overdue &&
+              !dueToday && (
+                <Text className="text-xs" style={{ color: c.textMuted }}>
+                  · {new Date(task.dueDate).toLocaleDateString(i18n.language)}
+                </Text>
+              )
             ) : onSchedule ? (
               <Pressable
                 className="flex-row items-center gap-1"
@@ -153,15 +213,36 @@ export function TaskRow({
               </Pressable>
             ) : null}
           </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => onDelete(task.id)}
-          accessibilityRole="button"
-          accessibilityLabel={t("taskRow.deleteAria")}
-          hitSlop={8}
-        >
-          <X size={16} color={c.textMuted} />
+          {overdue && (onMoveToday || onEdit) && (
+            <View className="mt-2 flex-row items-center gap-1.5">
+              {onMoveToday && (
+                <Pressable
+                  onPress={() => onMoveToday(task)}
+                  className="flex-row items-center gap-1 rounded-md border px-2 py-1"
+                  style={{ borderColor: alpha(c.accent, 0.35) }}
+                  hitSlop={4}
+                >
+                  <CalendarCheck size={12} color={c.accent} />
+                  <Text className="text-[11px]" style={{ color: c.accent }}>
+                    {t("taskRow.moveToToday")}
+                  </Text>
+                </Pressable>
+              )}
+              {onEdit && (
+                <Pressable
+                  onPress={() => onEdit(task)}
+                  className="flex-row items-center gap-1 rounded-md border px-2 py-1"
+                  style={{ borderColor: c.border }}
+                  hitSlop={4}
+                >
+                  <CalendarClock size={12} color={c.textMuted} />
+                  <Text className="text-[11px]" style={{ color: c.textMuted }}>
+                    {t("taskRow.reschedule")}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          )}
         </Pressable>
       </View>
     </Animated.View>

@@ -28,6 +28,8 @@ import {
 } from "@/lib/date";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
+import { isDailyViewStatus } from "@/lib/projectStatus";
+import { toast } from "@/lib/toast";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { FAB } from "@/components/ui/FAB";
 import { TaskRow } from "@/components/tasks/TaskRow";
@@ -81,6 +83,24 @@ export default function Tasks() {
     return toLocalISO(d);
   }, []);
 
+  // Mirror web TasksView + Today/Calendar: tasks of a closed project
+  // (paused/stalled/killed/archived) are withdrawn here; standalone tasks and
+  // tasks of a live project stay. Manage closed-project tasks from the project
+  // detail / graveyard instead.
+  const projectStatusById = useMemo(
+    () => new Map(projects.map((p) => [p.id, p.status])),
+    [projects]
+  );
+  const visibleTasks = useMemo(
+    () =>
+      tasks.filter((task) => {
+        if (!task.projectId) return true;
+        const status = projectStatusById.get(task.projectId);
+        return status ? isDailyViewStatus(status) : true;
+      }),
+    [tasks, projectStatusById]
+  );
+
   const matchesProject = (task: Task, d: TaskFilterDraft) =>
     d.projectIds.size === 0 || d.projectIds.has(task.projectId);
   const matchesCompleted = (task: Task, d: TaskFilterDraft) =>
@@ -94,14 +114,14 @@ export default function Tasks() {
     matchesBlocked(task, filter);
 
   const previewCount = (d: TaskFilterDraft) =>
-    tasks.filter(
+    visibleTasks.filter(
       (task) =>
         matchesProject(task, d) &&
         matchesCompleted(task, d) &&
         matchesBlocked(task, d)
     ).length;
 
-  const hasUnassigned = tasks.some((task) => !task.projectId);
+  const hasUnassigned = visibleTasks.some((task) => !task.projectId);
   const activeFilterCount =
     filter.projectIds.size +
     (filter.showCompleted ? 0 : 1) +
@@ -118,8 +138,11 @@ export default function Tasks() {
   };
 
   const filteredTasks = useMemo(
-    () => tasks.filter((task) => matchesSearch(task) && passesUserFilter(task)),
-    [tasks, projects, q, filter]
+    () =>
+      visibleTasks.filter(
+        (task) => matchesSearch(task) && passesUserFilter(task)
+      ),
+    [visibleTasks, projects, q, filter]
   );
 
   const buckets = useMemo(() => {
@@ -191,6 +214,12 @@ export default function Tasks() {
       effortHours: task.effortHours,
     });
 
+  // Quick action on overdue rows: same write as scheduleToday, plus feedback.
+  const moveTaskToToday = async (task: Task) => {
+    const ok = await scheduleToday(task);
+    if (ok) toast.success(t("taskRow.movedToast"), 2000);
+  };
+
   const renderRow = (task: Task, canSchedule?: boolean) => (
     <TaskRow
       key={task.id}
@@ -202,6 +231,7 @@ export default function Tasks() {
       onEdit={(tk) =>
         router.push({ pathname: "/task-form", params: { id: tk.id } })
       }
+      onMoveToday={moveTaskToToday}
     />
   );
 

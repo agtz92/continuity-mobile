@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { View, Text, Pressable } from "react-native";
-import { CheckCircle2, ChevronRight, Clock, Target } from "lucide-react-native";
+import {
+  CalendarCheck,
+  CalendarClock,
+  ChevronRight,
+  Clock,
+  Target,
+} from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import type { Project, Task } from "@/lib/types";
-import { daysOverdue, daysSince } from "@/lib/date";
+import { daysOverdue, daysSince, todayLocalISODate } from "@/lib/date";
+import { useTaskMutations } from "@/hooks/useTaskMutations";
+import { toast } from "@/lib/toast";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { TaskToggle } from "@/components/tasks/TaskToggle";
 import type { useTodayFocus } from "@/hooks/useTodayFocus";
 import { EffortBadge } from "./EffortBadge";
 import { RED, RED_T, ORANGE, ORANGE_T, AMBER, AMBER_T } from "./todayColors";
@@ -39,6 +48,19 @@ export function TodayFocusSection({
   const { t } = useTranslation();
   const c = useThemeColors();
   const router = useRouter();
+  const { saveTask } = useTaskMutations();
+  // Quick action on overdue focus cards: rewrite the due date to today.
+  const moveTaskToToday = async (task: Task) => {
+    const ok = await saveTask({
+      id: task.id,
+      title: task.title,
+      projectId: task.projectId,
+      dueDate: todayLocalISODate(),
+      done: task.done,
+      effortHours: task.effortHours,
+    });
+    if (ok) toast.success(t("taskRow.movedToast"), 2000);
+  };
 
   const focusTypeColor = (type: string) =>
     type === "overdue"
@@ -56,6 +78,14 @@ export function TodayFocusSection({
       : type === "stalled"
       ? `rgba(${AMBER},0.3)`
       : c.border;
+  // Left urgency spine — homologates the focus card with the TaskRow/RoutineRow
+  // redesign (red overdue, amber today/stalled, accent next-step).
+  const focusSpine = (type: string) =>
+    type === "overdue"
+      ? `rgb(${RED})`
+      : type === "today" || type === "stalled"
+      ? `rgb(${AMBER})`
+      : c.accent;
 
   return (
     <CollapsibleSection
@@ -129,17 +159,20 @@ export function TodayFocusSection({
               <View
                 key={idx}
                 className="rounded-xl border bg-surface p-4"
-                style={{ borderColor: focusBorder(item.type) }}
+                style={{
+                  borderColor: focusBorder(item.type),
+                  borderLeftWidth: 3,
+                  borderLeftColor: focusSpine(item.type),
+                }}
               >
                 <View className="flex-row items-center gap-3">
                   {item.task && (
-                    <Pressable
-                      onPress={() => toggleTask(item.task!)}
-                      accessibilityLabel={t("views.today.focus.markDone")}
-                      hitSlop={8}
-                    >
-                      <CheckCircle2 size={20} color={c.textMuted} />
-                    </Pressable>
+                    <TaskToggle
+                      done={false}
+                      overdue={item.type === "overdue"}
+                      onToggle={() => toggleTask(item.task!)}
+                      label={t("views.today.focus.markDone")}
+                    />
                   )}
                   <Pressable
                     className="min-w-0 flex-1"
@@ -201,6 +234,43 @@ export function TodayFocusSection({
                       {item.task?.effortHours != null &&
                         <EffortBadge hours={item.task.effortHours} />}
                     </View>
+                    {item.type === "overdue" && item.task && (
+                      <View className="mt-2 flex-row items-center gap-1.5">
+                        <Pressable
+                          onPress={() => moveTaskToToday(item.task!)}
+                          className="flex-row items-center gap-1 rounded-md border px-2 py-1"
+                          style={{ borderColor: alpha(c.accent, 0.35) }}
+                          hitSlop={4}
+                        >
+                          <CalendarCheck size={12} color={c.accent} />
+                          <Text
+                            className="text-[11px]"
+                            style={{ color: c.accent }}
+                          >
+                            {t("taskRow.moveToToday")}
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          onPress={() =>
+                            router.push({
+                              pathname: "/task-form",
+                              params: { id: item.task!.id },
+                            })
+                          }
+                          className="flex-row items-center gap-1 rounded-md border px-2 py-1"
+                          style={{ borderColor: c.border }}
+                          hitSlop={4}
+                        >
+                          <CalendarClock size={12} color={c.textMuted} />
+                          <Text
+                            className="text-[11px]"
+                            style={{ color: c.textMuted }}
+                          >
+                            {t("taskRow.reschedule")}
+                          </Text>
+                        </Pressable>
+                      </View>
+                    )}
                   </Pressable>
                 </View>
               </View>

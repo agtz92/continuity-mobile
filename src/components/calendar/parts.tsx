@@ -18,11 +18,9 @@ export interface CalendarHandlers {
   onOpenProject: (projectId: string) => void;
   onOpenTask: (taskId: string) => void;
   onToggleTask: (task: Task) => void | Promise<void>;
-  onCompleteOccurrence: (
-    routineId: string,
-    scheduledDate: string
-  ) => void | Promise<void>;
-  onUncompleteOccurrence: (occurrenceId: string) => void | Promise<void>;
+  // Routines aren't completable from the calendar — tapping one opens its edit
+  // detail instead (completion happens from the Routines/Today views).
+  onOpenRoutine: (routineId: string) => void;
 }
 
 const projectColors = (
@@ -112,25 +110,20 @@ export function TaskChip({
   );
 }
 
-/** A routine occurrence chip; tap toggles complete/uncomplete. */
+/** A routine occurrence chip; tap opens the routine's edit detail. The
+ *  completed state is shown read-only (calendar doesn't toggle routines). */
 export function RoutineChip({
   item,
   colors,
-  onComplete,
-  onUncomplete,
+  onOpen,
 }: {
   item: RoutineItem;
   colors: ThemeColors;
-  onComplete: (routineId: string, scheduledDate: string) => void | Promise<void>;
-  onUncomplete: (occurrenceId: string) => void | Promise<void>;
+  onOpen: (routineId: string) => void;
 }) {
-  const toggle = () => {
-    if (item.completed && item.occurrenceId) onUncomplete(item.occurrenceId);
-    else if (!item.completed) onComplete(item.routine.id, item.scheduledDate);
-  };
   return (
     <Pressable
-      onPress={toggle}
+      onPress={() => onOpen(item.routine.id)}
       className="flex-row items-center gap-2 rounded-md border px-2 py-1.5"
       style={{
         backgroundColor: alpha(colors.accent, 0.12),

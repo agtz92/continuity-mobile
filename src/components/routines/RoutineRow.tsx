@@ -4,23 +4,22 @@ import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
 import {
   Archive,
   ArchiveRestore,
-  CheckCircle2,
   Clock,
   Pencil,
   Repeat,
-  X,
 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Routine } from "@/lib/types";
 import { describeRecurrence } from "@/lib/recurrence";
-import { todayLocalISODate } from "@/lib/date";
+import { daysOverdue, todayLocalISODate } from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { TaskToggle } from "@/components/tasks/TaskToggle";
 
 const RED = "239,68,68"; // red-500
-const ORANGE = "249,115,22"; // orange-500
+const AMBER = "245,158,11"; // amber-500
 const RED_400 = "rgb(248,113,113)";
-const ORANGE_400 = "rgb(251,146,60)";
+const AMBER_400 = "rgb(251,191,36)";
 
 /**
  * Row for a single routine occurrence. `scheduledDate` is the day this row
@@ -78,10 +77,17 @@ export function RoutineRow({
     }
   };
 
+  const lateDays = overdue ? daysOverdue(scheduledDate) : null;
+
   const borderColor = overdue
     ? `rgba(${RED},0.3)`
     : dueToday
-    ? `rgba(${ORANGE},0.3)`
+    ? `rgba(${AMBER},0.3)`
+    : c.border;
+  const spineColor = overdue
+    ? `rgb(${RED})`
+    : dueToday
+    ? `rgb(${AMBER})`
     : c.border;
 
   const projectDot = project ? categoryChipColors(project.color, c).dot : null;
@@ -98,18 +104,17 @@ export function RoutineRow({
     >
       <View
         className="flex-row items-center gap-3 rounded-lg border bg-surface p-3"
-        style={{ borderColor }}
+        style={{ borderColor, borderLeftWidth: 3, borderLeftColor: spineColor }}
       >
-        <Pressable
-          onPress={handleToggle}
-          accessibilityRole="button"
-          accessibilityLabel={
+        <TaskToggle
+          done={isDone}
+          overdue={overdue}
+          kind="routine"
+          onToggle={handleToggle}
+          label={
             isDone ? t("routineRow.markNotDone") : t("routineRow.markDone")
           }
-          hitSlop={8}
-        >
-          <CheckCircle2 size={18} color={isDone ? c.accent : c.textMuted} />
-        </Pressable>
+        />
 
         <Pressable
           className="min-w-0 flex-1"
@@ -146,19 +151,46 @@ export function RoutineRow({
               </View>
             )}
           </View>
-          <View className="mt-0.5 flex-row flex-wrap items-center gap-x-2">
-            <Text
-              className="text-xs"
-              style={{
-                color: overdue ? RED_400 : dueToday ? ORANGE_400 : c.textMuted,
-              }}
-            >
-              {dueToday
-                ? t("routineRow.today")
-                : new Date(scheduledDate + "T00:00:00").toLocaleDateString(
-                    i18n.language
-                  )}
-            </Text>
+          <View className="mt-0.5 flex-row flex-wrap items-center gap-x-2 gap-y-1">
+            {overdue && lateDays !== null ? (
+              <View
+                className="rounded px-1.5 py-0.5"
+                style={{
+                  backgroundColor: `rgba(${RED},0.2)`,
+                  borderWidth: 1,
+                  borderColor: `rgba(${RED},0.4)`,
+                }}
+              >
+                <Text
+                  className="text-[10px] font-semibold uppercase tracking-wide"
+                  style={{ color: RED_400 }}
+                >
+                  {t("routineRow.overdueDays", { count: lateDays })}
+                </Text>
+              </View>
+            ) : dueToday ? (
+              <View
+                className="rounded px-1.5 py-0.5"
+                style={{
+                  backgroundColor: `rgba(${AMBER},0.2)`,
+                  borderWidth: 1,
+                  borderColor: `rgba(${AMBER},0.4)`,
+                }}
+              >
+                <Text
+                  className="text-[10px] font-semibold uppercase tracking-wide"
+                  style={{ color: AMBER_400 }}
+                >
+                  {t("routineRow.todayBadge")}
+                </Text>
+              </View>
+            ) : (
+              <Text className="text-xs" style={{ color: c.textMuted }}>
+                {new Date(scheduledDate + "T00:00:00").toLocaleDateString(
+                  i18n.language
+                )}
+              </Text>
+            )}
             {project && (
               <View className="flex-row items-center gap-1">
                 <View
@@ -202,16 +234,6 @@ export function RoutineRow({
             ) : (
               <Archive size={14} color={c.textMuted} />
             )}
-          </Pressable>
-        )}
-        {onDelete && (
-          <Pressable
-            onPress={() => onDelete(routine.id)}
-            accessibilityRole="button"
-            accessibilityLabel={t("routineRow.deleteAria")}
-            hitSlop={8}
-          >
-            <X size={16} color={c.textMuted} />
           </Pressable>
         )}
       </View>

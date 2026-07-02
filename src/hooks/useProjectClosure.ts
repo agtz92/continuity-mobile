@@ -53,10 +53,13 @@ export function useProjectClosure() {
     return ok;
   };
 
-  /** Resume/revive: set status back with no notes (stored notes are kept). */
+  /**
+   * Set status with no notes modal (stored notes are kept). Used for
+   * resume/revive ("active"/"idea") and the success close ("launched").
+   */
   const setStatus = async (
     p: Project,
-    status: "active" | "idea"
+    status: "active" | "idea" | "launched"
   ): Promise<boolean> => {
     setSaving(true);
     const ok = await saveProject({ ...base(p), status });
