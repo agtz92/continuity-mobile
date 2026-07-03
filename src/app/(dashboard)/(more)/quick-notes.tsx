@@ -15,6 +15,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useQuickNotes } from "@/hooks/useQuickNotes";
 import { useQuickNoteMutations } from "@/hooks/useQuickNoteMutations";
 import { FAB } from "@/components/ui/FAB";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
 import type { QuickNote } from "@/lib/types";
 
@@ -144,9 +145,7 @@ export default function QuickNotes() {
       )}
 
       {initialLoading && quickNotes.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton variant="card" />
       ) : quickNotes.length === 0 ? (
         <View className="flex-1 items-center justify-center gap-4 px-5">
           <Text className="text-base text-center text-text-muted">

@@ -94,3 +94,30 @@ Notas con **secciones plegables** (toggles), **categorizables** y ligables a un 
 - **Markdown:** `src/components/notes/MarkdownText.tsx` — renderer **propio sin dependencias** (RN `Text`/`View`; encabezados, listas, **negrita**, *cursiva*, `código`, enlaces vía `Linking`). ⚠️ El JSDoc **no** debe contener `*/` (cierra el bloque).
 - **Datos:** hooks `src/hooks/useQuickNotes.ts` (query lazy) y `useQuickNoteMutations.ts` (refetch `QUICK_NOTES_QUERY`, vía `@apollo/client/react`). Tipos `QuickNote`/`NoteSection` en `src/lib/types.ts`. Reusa `categoryChipColors`/`alpha` para colores (regla 5). i18n `views.quickNotes.*` (en/es, ICU llave simple).
 - **Onboarding:** el `DashboardTour` (`src/components/onboarding/DashboardTour.tsx`) tiene un coachmark de Notes (`STEPS` → `key:"stepNotes"`, icono `NotebookPen`, i18n `onboarding.tour.stepNotes`). Los puntos de progreso/`next()` se ajustan solos al tamaño de `STEPS`. La nota de ejemplo para usuarios nuevos la siembra el backend (seed). No se tocó `TOTAL_STEPS`.
+
+## Calendario — vistas Día/Semana/Mes
+
+Pantalla `src/app/(dashboard)/(more)/calendar.tsx` (bajo "More"). Los sub-views y chips se comparten en `src/components/calendar/` y la lógica de fechas en `src/lib/calendar.ts`. **Espejo de la web** (`continuity/frontend`, mismos archivos), con dos adaptaciones al ancho del teléfono.
+
+- **Vista Día** (`DayGrid.tsx`): invierte la jerarquía del espacio. Los items **sin hora** van en una **lista vertical legible** ("Todo el día · N", colapsa a partir de 4 con "Ver N más"), no en la tira de chips vieja. La **rejilla horaria solo se dibuja si hay eventos con hora** (`timedCount > 0`) — un día todo-all-day ya no deja la rejilla 7–21 vacía ocupando la pantalla. Sección "Con hora · N" aparte.
+- **Vista Mes** (`MonthGrid.tsx`): cada celda muestra hasta **2 micro-barras con el color de categoría** de sus items (+N si hay más); la carga se movió del punto al **tinte del número del día** (ámbar/rojo). **Un tap SELECCIONA** el día → su agenda se renderiza **debajo** de la matriz (`SelectedDayAgenda.tsx`, con "Abrir día →"); tap en el día **ya seleccionado** (o "Abrir día") entra a la vista Día. O sea, **un tap ≠ navegar**. Al cambiar de mes la selección se reubica sola (hoy si es visible, si no el día 1).
+- **Vista Semana** = `WeekAgenda.tsx` (lista vertical), no `WeekGrid` de columnas como la web (adaptación al ancho).
+- **Chips** (`parts.tsx`, `ProjectChip`/`TaskChip`/`RoutineChip`) tienen prop **`size`**: `sm` (escala densa de celdas Semana/Mes) o `md` (renglón cómodo, usado por la lista del Día y el panel de agenda).
+- **Las rutinas NO se completan desde el calendario** (decisión de producto). `RoutineChip` y el bloque de rutina con hora **navegan a la edición** (`routine-form`) vía `handlers.onOpenRoutine`. `CalendarHandlers` **ya no tiene** `onCompleteOccurrence`/`onUncompleteOccurrence`. El estado "completada" se ve (tachado + opacidad) pero es de solo lectura.
+
+## Filas de tarea/rutina + borrar en el detalle (no en la fila)
+
+Rediseño de `TaskRow`/`RoutineRow` (`src/components/tasks|routines/`) por nota de diseñador — homologado con la web.
+
+- **`TaskToggle` compartido** (`src/components/tasks/TaskToggle.tsx`) es el control de completar de toda fila de tarea/rutina: círculo de **24px** (vacío = "lléname"), se llena con accent + palomita al completar; **rojo** si vencida, candado si bloqueada, **punteado + ↻** para rutina. Reemplazó al `CheckCircle2` de 18px que se leía como decoración.
+- **Spine de urgencia** de 3px en el borde izquierdo (rojo vencida / ámbar hoy / neutro) + **badges sólidos** "Vencida · Nd" / "Hoy" (i18n `taskRow.overdueDays`/`todayBadge`, **plural ICU**). Filas vencidas exponen acciones rápidas **"Mover a hoy"** / **"Reprogramar"**.
+- **Borrar NO vive en la fila** — se movió al **detalle de edición** para evitar el mis-tap junto al toggle. `ModalDeleteButton` (`src/components/ui/ModalDeleteButton.tsx`) usa **`confirmAsync`** (Alert nativo + haptic warning) al final de `task-form`/`routine-form`. Las filas conservan `onDelete?` **opcional sin usar** (con comentario) para no romper los ~call sites; el tap en la fila abre la edición. (En web el confirm es de dos pasos inline, no Alert.)
+- **Today's Focus** (`src/components/today/TodayFocusSection.tsx`) es un **componente aparte** a propósito: lista cosas **mixtas** en una lista priorizada (tareas vencidas/hoy + **proyectos estancados** + **próximos pasos**), por eso no reusa `TaskRow`. Comparte el **lenguaje visual** (mismo `TaskToggle` + spine + badges), no el componente.
+
+## Detalle de proyecto — cierre y "Launch"
+
+`src/app/project/[id].tsx` ofrece acciones de status gateadas por el estado actual: **Launch** (Rocket, éxito) para active/idea/stalled → `closure.setStatus(project,"launched")` **sin modal de notas** (espejo del selector de status de la web); **Pause**/**Kill** con sus modales de notas; **Reactivate**/**Revive**. `useProjectClosure.setStatus` acepta `"active" | "idea" | "launched"`. ⚠️ Las etiquetas de estos botones están **hardcodeadas en inglés** (deuda pendiente de i18n, igual que sus vecinas).
+
+## Ocultar tareas de proyectos cerrados
+
+Las tareas de un proyecto **paused/stalled/killed/archived** se retiran de las vistas diarias; las **standalone** y las de proyectos vivos se quedan. Filtro por `isDailyViewStatus(project.status)` (`src/lib/projectStatus.ts`) en **tres lugares**: Today (`useTodayFocus`), página de Tasks (`(dashboard)/tasks.tsx`, `visibleTasks`) y Calendario (`calendar.tsx`, `visibleTasks`). Gestiona esas tareas desde el detalle de proyecto / graveyard.

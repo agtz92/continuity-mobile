@@ -37,6 +37,8 @@ npx expo start --dev-client
 
 Dev build y TestFlight comparten bundle id → solo una instalada a la vez.
 
+**Gotcha `.env.local`:** el dev-client carga el JS desde Metro (`expo start`), y Metro lee las `EXPO_PUBLIC_*` de `.env`/`.env.local` — **NO** de `eas.json` (esas solo se hornean en el build cloud de EAS). Sin `.env.local` la app crashea con `Missing EXPO_PUBLIC_SUPABASE_URL` (`src/lib/supabase.ts`). Copia `.env.example` → `.env.local` (valores publishables, gitignored). Metro usa el puerto **8081** por defecto; si quedó ocupado por un Metro viejo, mátalo y reinicia con `--clear` para que tome el env nuevo.
+
 ## Convenciones de tema/rutas
 
 - `useThemeColors()` → `{bg,surface,border,text,textMuted,accent,accent2}` (hex). `alpha(hex,n)`.

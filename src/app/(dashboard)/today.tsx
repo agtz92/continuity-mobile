@@ -53,6 +53,7 @@ import {
 } from "@/lib/todaySections";
 import { FAB } from "@/components/ui/FAB";
 import { BottomSheet } from "@/components/ui/BottomSheet";
+import { TodaySkeleton } from "@/components/ui/Skeletons";
 import {
   StalledProjectModal,
   type StalledChoice,
@@ -171,6 +172,7 @@ export default function Today() {
     routines,
     routineOccurrences,
     categoryById,
+    initialLoading,
     refetch,
   } = useDashboardData();
 
@@ -518,6 +520,16 @@ export default function Today() {
   );
 
   // -------- Render -------- //
+
+  // First load (no data yet): show a spinner instead of the fully-built empty
+  // sections, which otherwise flash blank until the dashboard query resolves.
+  if (initialLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
+        <TodaySkeleton />
+      </SafeAreaView>
+    );
+  }
 
   // Modo edición de layout: reemplaza toda la pantalla por una lista arrastrable
   // para reordenar/ocultar secciones; al salir se refresca para reflejar cambios.

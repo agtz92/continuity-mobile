@@ -14,6 +14,7 @@ import { Lightbulb, Plus, Search } from "lucide-react-native";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useIdeaMutations } from "@/hooks/useIdeaMutations";
 import { FAB } from "@/components/ui/FAB";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 const PURPLE = "168,85,247";
@@ -77,9 +78,7 @@ export default function Ideas() {
       </View>
 
       {initialLoading && ideas.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton variant="card" />
       ) : ideas.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">

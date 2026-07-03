@@ -28,6 +28,7 @@ import type { CalendarHandlers } from "@/components/calendar/parts";
 import { WeekAgenda } from "@/components/calendar/WeekAgenda";
 import { MonthGrid } from "@/components/calendar/MonthGrid";
 import { DayGrid } from "@/components/calendar/DayGrid";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { SelectedDayAgenda } from "@/components/calendar/SelectedDayAgenda";
 
 export default function Calendar() {
@@ -37,7 +38,7 @@ export default function Calendar() {
   const locale = i18n.language || "en";
   const todayISO = todayLocalISODate();
 
-  const { projects, tasks, routines, routineOccurrences, categoryById, refetch } =
+  const { projects, tasks, routines, routineOccurrences, categoryById, initialLoading, refetch } =
     useDashboardData();
   const { toggleTask } = useTaskMutations();
 
@@ -188,6 +189,15 @@ export default function Calendar() {
       </Text>
     </Pressable>
   );
+
+  // First load: spinner instead of flashing the "nothing scheduled" empty state.
+  if (initialLoading) {
+    return (
+      <View className="flex-1 bg-bg pt-4">
+        <ListSkeleton />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-bg">

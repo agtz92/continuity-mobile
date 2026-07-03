@@ -34,6 +34,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { selectionFeedback } from "@/lib/feedback";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { FAB } from "@/components/ui/FAB";
 import { useThemeColors, alpha } from "@/theme/useThemeColors";
@@ -288,9 +289,7 @@ export default function Projects() {
       </View>
 
       {initialLoading && projects.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton variant="card" />
       ) : projects.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">

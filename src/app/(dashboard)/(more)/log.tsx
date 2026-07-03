@@ -25,6 +25,7 @@ import {
 import type { Activity, ActivityKind } from "@/lib/types";
 import { toLocalISO, todayLocalISODate, weekStartISO } from "@/lib/date";
 import { confirmAsync } from "@/lib/confirm";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useNoteMutations } from "@/hooks/useNoteMutations";
 import { useThemeColors, type ThemeColors } from "@/theme/useThemeColors";
@@ -318,9 +319,7 @@ export default function Log() {
       </View>
 
       {initialLoading && activities.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton />
       ) : activities.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">

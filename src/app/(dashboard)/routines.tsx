@@ -24,6 +24,7 @@ import { completedDatesFor, computeDueDates } from "@/lib/recurrence";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useRoutineMutations } from "@/hooks/useRoutineMutations";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { FAB } from "@/components/ui/FAB";
 import { RoutineRow } from "@/components/routines/RoutineRow";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
@@ -255,9 +256,7 @@ export default function Routines() {
       </View>
 
       {initialLoading && routines.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton />
       ) : routines.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">

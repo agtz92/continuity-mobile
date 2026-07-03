@@ -31,6 +31,7 @@ import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { isDailyViewStatus } from "@/lib/projectStatus";
 import { toast } from "@/lib/toast";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { ListSkeleton } from "@/components/ui/Skeletons";
 import { FAB } from "@/components/ui/FAB";
 import { TaskRow } from "@/components/tasks/TaskRow";
 import {
@@ -312,9 +313,7 @@ export default function Tasks() {
       </View>
 
       {initialLoading && tasks.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">…</Text>
-        </View>
+        <ListSkeleton />
       ) : tasks.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">
