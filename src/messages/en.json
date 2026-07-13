@@ -187,7 +187,9 @@
     "noActiveSubscription": "This account has no active Stripe subscription.",
     "billingNotConfigured": "Billing isn't configured yet. Let us know if this keeps happening.",
     "unauthenticated": "Your session expired. Please sign in again.",
-    "badInput": "The information you submitted is invalid. Check and try again."
+    "badInput": "The information you submitted is invalid. Check and try again.",
+    "connectionLost": "We couldn't reach the server. Please try again in a moment.",
+    "generic": "Something went wrong. Please try again."
   },
   "common": {
     "loading": "Loading…",

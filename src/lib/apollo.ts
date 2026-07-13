@@ -4,6 +4,7 @@ import { ErrorLink } from "@apollo/client/link/error";
 import { CombinedGraphQLErrors, ServerError } from "@apollo/client/errors";
 import { supabase } from "./supabase";
 import { toast } from "./toast";
+import i18n from "./i18n";
 
 const graphqlUrl = process.env.EXPO_PUBLIC_GRAPHQL_URL;
 
@@ -31,31 +32,44 @@ const authLink = new SetContextLink(async (prevContext) => {
   };
 });
 
+// All user-facing copy is localized via the global i18n instance (usable
+// outside React). Transient server/connection hiccups — `DB_UNAVAILABLE` from
+// the backend, 5xx, or a stale pooled connection after the app sat backgrounded
+// for days ("server closed the connection unexpectedly") — show a localized
+// retry message and, critically, do NOT sign the user out.
 const errorLink = new ErrorLink(({ error }) => {
   if (CombinedGraphQLErrors.is(error)) {
     let unauthenticated = false;
     for (const gqlError of error.errors) {
-      if (gqlError.extensions?.code === "UNAUTHENTICATED") {
+      const code = gqlError.extensions?.code;
+      if (code === "UNAUTHENTICATED") {
         unauthenticated = true;
-      } else {
+      } else if (code === "DB_UNAVAILABLE") {
+        toast.error(i18n.t("errors.connectionLost"));
+      } else if (gqlError.message) {
+        // App-level errors carry a human message from the backend.
         toast.error(gqlError.message);
+      } else {
+        toast.error(i18n.t("errors.generic"));
       }
     }
     if (unauthenticated) {
-      toast.error("Your session expired. Please sign in again.");
+      toast.error(i18n.t("errors.unauthenticated"));
       void supabase.auth.signOut();
     }
     return;
   }
 
   if (ServerError.is(error) && error.statusCode === 401) {
-    toast.error("Your session expired. Please sign in again.");
+    toast.error(i18n.t("errors.unauthenticated"));
     void supabase.auth.signOut();
     return;
   }
 
   if (error) {
-    toast.error(error.message || "Network error. Please try again.");
+    // 5xx, or a reachability failure (offline / DNS / connection reset) — all
+    // transient. Show the localized retry message, never raw transport text.
+    toast.error(i18n.t("errors.connectionLost"));
   }
 });
 

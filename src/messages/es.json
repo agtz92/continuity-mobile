@@ -211,7 +211,9 @@
     "noActiveSubscription": "Esta cuenta no tiene una suscripción activa en Stripe.",
     "billingNotConfigured": "El sistema de pagos aún no está configurado. Avísanos si esto persiste.",
     "unauthenticated": "Tu sesión expiró. Inicia sesión de nuevo.",
-    "badInput": "La información que enviaste no es válida. Revisa e inténtalo otra vez."
+    "badInput": "La información que enviaste no es válida. Revisa e inténtalo otra vez.",
+    "connectionLost": "No pudimos conectar con el servidor. Inténtalo de nuevo en un momento.",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
   },
   "dashboard": {
     "header": {
