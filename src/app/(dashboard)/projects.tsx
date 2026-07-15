@@ -61,13 +61,23 @@ export default function Projects() {
     }
   };
 
+  // Killed projects live in the Graveyard, not the main list: once killed a
+  // project drops out of Projects entirely (it stays visible in the Graveyard).
+  // Excluding them here feeds every downstream computation — the list, status
+  // counts, the empty state — a killed-free set; the "killed" count becomes 0 so
+  // its chip auto-hides. Other terminal states (e.g. archived) stay filterable.
+  const visibleProjects = useMemo(
+    () => projects.filter((p) => p.status !== "killed"),
+    [projects]
+  );
+
   const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: projects.length };
-    for (const p of projects) {
+    const counts: Record<string, number> = { all: visibleProjects.length };
+    for (const p of visibleProjects) {
       counts[p.status] = (counts[p.status] ?? 0) + 1;
     }
     return counts;
-  }, [projects]);
+  }, [visibleProjects]);
 
   const { reorderProjects } = useProjectMutations();
 
@@ -86,8 +96,8 @@ export default function Projects() {
     };
     const matchesStatus = (p: Project) =>
       statusFilter === "all" || p.status === statusFilter;
-    return projects.filter((p) => matchesSearch(p) && matchesStatus(p));
-  }, [projects, categoryById, q, statusFilter]);
+    return visibleProjects.filter((p) => matchesSearch(p) && matchesStatus(p));
+  }, [visibleProjects, categoryById, q, statusFilter]);
 
   // Sort + Smart sectioning. (B) Alphabetical is the stable final tiebreaker
   // everywhere; lastActivity only matters in "recent" (no longer a secondary
@@ -162,9 +172,9 @@ export default function Projects() {
   );
   const projectById = useMemo(() => {
     const m = new Map<string, Project>();
-    for (const p of projects) m.set(p.id, p);
+    for (const p of visibleProjects) m.set(p.id, p);
     return m;
-  }, [projects]);
+  }, [visibleProjects]);
 
   // (D) Manual drag only when no filters/search narrow the set.
   const manualDragEnabled =
@@ -233,7 +243,7 @@ export default function Projects() {
           />
         </View>
 
-        {projects.length > 0 && (
+        {visibleProjects.length > 0 && (
           <View className="flex-row items-center gap-2">
             <ScrollView
               horizontal
@@ -288,9 +298,9 @@ export default function Projects() {
         )}
       </View>
 
-      {initialLoading && projects.length === 0 ? (
+      {initialLoading && visibleProjects.length === 0 ? (
         <ListSkeleton variant="card" />
-      ) : projects.length === 0 ? (
+      ) : visibleProjects.length === 0 ? (
         <View className="flex-1 items-center justify-center px-5">
           <Text className="text-base text-center text-text-muted">
             {t("views.projects.empty")}
