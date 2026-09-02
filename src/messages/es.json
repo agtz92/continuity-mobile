@@ -481,6 +481,8 @@
       "popular": "Más popular",
       "manageSubscription": "Administrar suscripción",
       "manageOnWebHint": "Los cambios de plan, métodos de pago y facturas se administran en la web.",
+      "manageInStoreHint": "Compraste esta suscripción en {store}. Los cambios de plan y la cancelación se hacen ahí mismo.",
+      "storeManagedBlurb": "Tu suscripción se administra desde {store}.",
       "cancelSubscription": "Bajar a Free",
       "downgradeToProButton": "Bajar a Pro",
       "billingPeriod": {

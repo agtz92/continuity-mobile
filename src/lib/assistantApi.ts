@@ -38,6 +38,14 @@ export type UsageSnapshot = {
   had_retention_offer: boolean;
   subscription_period: "monthly" | "annual" | null;
   cancel_at_period_end: boolean;
+  /** Which channel sold the current plan. "" for free and exempt accounts. */
+  billing_source: "" | "stripe" | "apple" | "google";
+  /**
+   * True when Apple or Google owns this subscription — the user manages it in
+   * the store, not on our web billing page. See the backend doc
+   * `docs/integracion-pagos-web-y-movil.md`.
+   */
+  store_managed: boolean;
 };
 
 export async function getUsage(): Promise<UsageSnapshot> {

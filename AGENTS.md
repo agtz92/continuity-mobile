@@ -1,5 +1,9 @@
 # Continuity Mobile — guía para agentes
 
+> **Pagos, precios y suscripciones — fuente de verdad:** [Integración de pagos web y móvil](../backend/docs/integracion-pagos-web-y-movil.md).
+> Lo que este documento diga sobre Stripe, cobros, planes de pago o tiendas es
+> contexto; ante cualquier diferencia, manda ese. Ojo con la **regla 10**: cambió.
+
 App **React Native / Expo** (port de la web Continuity). Repo **separado** y **público**: `github.com/agtz92/continuity-mobile` (branch `master`). Consume el mismo backend GraphQL (`agtz92/continuity_backend`, otro repo — **no se toca**).
 
 ## Estado actual (2026-06-05)
@@ -22,7 +26,11 @@ Plan completo y detalle por fase: `../continuity/docs/plan-desarrollo-app-movil.
 7. **i18n = ICU (llave simple)** vía `i18next-icu`: `{count}`, `{count, plural, one {# x} other {# y}}`. **NUNCA** `{{count}}` (doble llave i18next — no interpola, se ve literal).
 8. **Polyfills (`src/lib/polyfills.ts`) NO deben tocar `global.fetch`** (rompe el login de Supabase). El anon key de Supabase es publishable (seguro en cliente).
 9. **OAuth (Supabase) requiere `flowType:"pkce"`** en `createClient` (ya está). Solo cierra el round-trip en dev build / standalone, NO en Expo Go.
-10. **Apple/billing:** sin IAP en V1, billing **read-only**. NUNCA precios, plan cards ni "Suscribirme" in-app; solo link externo `Linking.openURL("https://continuu.it/settings/billing")`. El admin portal queda excluido del móvil.
+10. **Apple/billing — la regla cambió (2026-08-05).** Fuente de verdad: [`../backend/docs/integracion-pagos-web-y-movil.md`](../backend/docs/integracion-pagos-web-y-movil.md). El backend ya soporta compras in-app; **falta el paywall nativo** (productos de tienda y claves de RevenueCat pendientes). Mientras tanto:
+    - **Hoy, sin paywall:** billing sigue **read-only**. NADA de precios, plan cards ni "Suscribirme" — vender una suscripción digital in-app sin StoreKit es justo lo que App Review rechaza. "Administrar" abre el gestor nativo si la compra fue de tienda (`store_managed` en `/usage/`), y `https://continuu.it/settings/billing` en cualquier otro caso.
+    - **Cuando llegue el paywall:** los precios se leen **de la tienda** (nunca hardcodeados, o divergen de la moneda local), **Restaurar compras es obligatorio** (motivo frecuente de rechazo), y hacen falta enlaces a términos y privacidad junto al botón de compra más el texto de renovación automática. La app **no** se auto-otorga el plan leyendo el recibo local: compra y luego le pregunta al backend.
+    - **Nunca** dirigir al usuario a pagar fuera de la app una vez que exista el paywall.
+    - El admin portal sigue excluido del móvil.
 11. **`.env.local`** tiene secretos y está gitignored — NO commitear. Solo `.env.example`.
 
 ## Iteración en device

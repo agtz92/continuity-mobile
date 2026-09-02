@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ExternalLink } from "lucide-react-native";
@@ -8,6 +8,10 @@ import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const WEB_BILLING_URL = "https://continuu.it/settings/billing";
+// Native subscription managers. A plan bought in a store can only be changed
+// or cancelled there, so pointing at our web page would be a dead end.
+const APPLE_SUBSCRIPTIONS_URL = "itms-apps://apps.apple.com/account/subscriptions";
+const PLAY_SUBSCRIPTIONS_URL = "https://play.google.com/store/account/subscriptions";
 const AMBER = "245,158,11";
 const AMBER_T = "rgb(251,191,36)";
 
@@ -55,6 +59,16 @@ export default function Billing() {
   const renewsAt = usage?.plan_renews_at ?? null;
   const subscriptionPeriod = usage?.subscription_period ?? null;
   const cancelScheduled = usage?.cancel_at_period_end ?? false;
+  const storeManaged = usage?.store_managed ?? false;
+  const boughtOnGoogle = usage?.billing_source === "google";
+
+  // Where "manage" should take the user. A store purchase is managed by the
+  // store that sold it; anything else lives on the web billing page.
+  const manageUrl = storeManaged
+    ? boughtOnGoogle || Platform.OS === "android"
+      ? PLAY_SUBSCRIPTIONS_URL
+      : APPLE_SUBSCRIPTIONS_URL
+    : WEB_BILLING_URL;
 
   const planLabel =
     plan === "studio"
@@ -97,6 +111,12 @@ export default function Billing() {
         {isExempt ? (
           <Text className="text-xs text-text-muted">
             {t("settings.billing.exemptBlurb", { plan: planLabel })}
+          </Text>
+        ) : storeManaged ? (
+          <Text className="text-xs text-text-muted">
+            {t("settings.billing.storeManagedBlurb", {
+              store: boughtOnGoogle ? "Google Play" : "App Store",
+            })}
           </Text>
         ) : cancelScheduled && renewsAt ? (
           <View
@@ -159,10 +179,16 @@ export default function Billing() {
         </View>
       </View>
 
-      {/* Manage on web — Apple rules: no prices, no subscribe CTA in-app. */}
+      {/*
+        Manage the subscription wherever it was bought. Until the in-app
+        paywall ships (see backend docs/integracion-pagos-web-y-movil.md,
+        phase 4) this screen still stays read-only: no prices, no plan cards,
+        no "Subscribe" CTA, because selling a digital subscription in-app
+        without StoreKit is exactly what App Review rejects.
+      */}
       {!isExempt && (
         <Pressable
-          onPress={() => void Linking.openURL(WEB_BILLING_URL)}
+          onPress={() => void Linking.openURL(manageUrl)}
           accessibilityRole="button"
           className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
         >
@@ -175,7 +201,11 @@ export default function Billing() {
         </Pressable>
       )}
       <Text className="px-1 text-center text-xs text-text-muted">
-        {t("settings.billing.manageOnWebHint")}
+        {storeManaged
+          ? t("settings.billing.manageInStoreHint", {
+              store: boughtOnGoogle ? "Google Play" : "App Store",
+            })
+          : t("settings.billing.manageOnWebHint")}
       </Text>
     </ScrollView>
   );

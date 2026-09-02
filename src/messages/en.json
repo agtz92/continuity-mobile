@@ -481,6 +481,8 @@
       "popular": "Most popular",
       "manageSubscription": "Manage subscription",
       "manageOnWebHint": "Plan changes, payment methods, and invoices are managed on the web.",
+      "manageInStoreHint": "You bought this subscription on {store}. Plan changes and cancellation happen there.",
+      "storeManagedBlurb": "Your subscription is managed through {store}.",
       "cancelSubscription": "Downgrade to Free",
       "downgradeToProButton": "Downgrade to Pro",
       "billingPeriod": {
