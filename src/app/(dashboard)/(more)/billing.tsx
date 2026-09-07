@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Linking, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ExternalLink } from "lucide-react-native";
@@ -8,10 +8,6 @@ import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const WEB_BILLING_URL = "https://continuu.it/settings/billing";
-// Native subscription managers. A plan bought in a store can only be changed
-// or cancelled there, so pointing at our web page would be a dead end.
-const APPLE_SUBSCRIPTIONS_URL = "itms-apps://apps.apple.com/account/subscriptions";
-const PLAY_SUBSCRIPTIONS_URL = "https://play.google.com/store/account/subscriptions";
 const AMBER = "245,158,11";
 const AMBER_T = "rgb(251,191,36)";
 
@@ -59,16 +55,14 @@ export default function Billing() {
   const renewsAt = usage?.plan_renews_at ?? null;
   const subscriptionPeriod = usage?.subscription_period ?? null;
   const cancelScheduled = usage?.cancel_at_period_end ?? false;
-  const storeManaged = usage?.store_managed ?? false;
   const boughtOnGoogle = usage?.billing_source === "google";
+  const boughtInStore = usage?.billing_source === "apple" || boughtOnGoogle;
 
-  // Where "manage" should take the user. A store purchase is managed by the
-  // store that sold it; anything else lives on the web billing page.
-  const manageUrl = storeManaged
-    ? boughtOnGoogle || Platform.OS === "android"
-      ? PLAY_SUBSCRIPTIONS_URL
-      : APPLE_SUBSCRIPTIONS_URL
-    : WEB_BILLING_URL;
+  // The server decides where "manage" goes, so this screen and the web can't
+  // drift apart. It falls back to the web billing page for accounts with
+  // nothing to manage — free and exempt — which is also where someone lands
+  // if they want to start paying.
+  const manageUrl = usage?.manage_url ?? WEB_BILLING_URL;
 
   const planLabel =
     plan === "studio"
@@ -112,7 +106,7 @@ export default function Billing() {
           <Text className="text-xs text-text-muted">
             {t("settings.billing.exemptBlurb", { plan: planLabel })}
           </Text>
-        ) : storeManaged ? (
+        ) : boughtInStore ? (
           <Text className="text-xs text-text-muted">
             {t("settings.billing.storeManagedBlurb", {
               store: boughtOnGoogle ? "Google Play" : "App Store",
@@ -201,7 +195,7 @@ export default function Billing() {
         </Pressable>
       )}
       <Text className="px-1 text-center text-xs text-text-muted">
-        {storeManaged
+        {boughtInStore
           ? t("settings.billing.manageInStoreHint", {
               store: boughtOnGoogle ? "Google Play" : "App Store",
             })
