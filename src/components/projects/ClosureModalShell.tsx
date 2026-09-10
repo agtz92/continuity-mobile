@@ -82,7 +82,7 @@ export function ClosureModalShell({
               )}
             </View>
             {!!subtitle && (
-              <Text className="px-5 pb-1 text-sm leading-snug text-text-muted">
+              <Text className="font-sans px-5 pb-1 text-sm leading-snug text-text-muted">
                 {subtitle}
               </Text>
             )}

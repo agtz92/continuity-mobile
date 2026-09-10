@@ -61,7 +61,7 @@ export function Step4Plan({
           <Text className="text-3xl font-sans-bold text-text">
             {t("onboarding.replay.planHeading")}
           </Text>
-          <Text className="text-base text-text-muted">
+          <Text className="font-sans text-base text-text-muted">
             {t("onboarding.replay.planInfo", { plan: planLabel })}
           </Text>
         </View>
@@ -84,10 +84,10 @@ export function Step4Plan({
           <Text className="text-3xl font-sans-bold text-text">
             {t("onboarding.step4Beta.heading", { name })}
           </Text>
-          <Text className="text-base leading-relaxed text-text-muted">
+          <Text className="font-sans text-base leading-relaxed text-text-muted">
             {t("onboarding.step4Beta.body", { plan: planLabel })}
           </Text>
-          <Text className="text-base leading-relaxed text-text-muted">
+          <Text className="font-sans text-base leading-relaxed text-text-muted">
             {t("onboarding.step4Beta.body2")}
           </Text>
           <Text className="text-base font-sans-medium text-text">
@@ -111,7 +111,7 @@ export function Step4Plan({
         <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.replay.planHeading")}
         </Text>
-        <Text className="text-base text-text-muted">
+        <Text className="font-sans text-base text-text-muted">
           {t("onboarding.replay.planInfo", { plan: planLabel })}
         </Text>
       </View>

@@ -48,8 +48,10 @@ export default function DashboardLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        // Subtle cross-tab transition (react-navigation v7 bottom tabs).
-        animation: "shift",
+        // La transición entre pestañas (`animation:"shift"`) está QUITADA a
+        // propósito: es el otro sospechoso de la pantalla en blanco, porque es
+        // justo lo que corre al tocar la barra. Si tras el arreglo de
+        // `CollapsibleSection` el problema no vuelve, se puede reponer.
         tabBarActiveTintColor: accent,
         tabBarInactiveTintColor: surfaces.textMuted,
         tabBarStyle: {
@@ -109,3 +111,7 @@ export default function DashboardLayout() {
     </>
   );
 }
+
+// `expo-router` monta esto en vez de dejar el hueco en blanco cuando una
+// pantalla de este árbol revienta al renderizar. Ver `ui/RouteError`.
+export { RouteError as ErrorBoundary } from "@/components/ui/RouteError";

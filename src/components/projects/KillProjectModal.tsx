@@ -101,7 +101,7 @@ export function KillProjectModal({
           placeholder={t("closure.kill.wouldRestartPlaceholder")}
         />
       </Field>
-      <Text className="text-xs leading-snug text-text-muted">
+      <Text className="font-sans text-xs leading-snug text-text-muted">
         {t("closure.kill.why")}
       </Text>
     </ClosureModalShell>

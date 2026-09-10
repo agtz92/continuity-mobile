@@ -228,7 +228,7 @@ export function CaptureSheet({
                 }}
               >
                 <Text
-                  className="text-[11px] uppercase tracking-wider"
+                  className="font-sans text-[11px] uppercase tracking-wider"
                   style={{ color: active ? c.accent : c.text4 }}
                 >
                   {t(`capture.kind.${k}`)}
@@ -265,7 +265,7 @@ export function CaptureSheet({
                 className="rounded-md px-2.5 py-1"
                 style={{ borderWidth: 1, borderColor: c.line[22] }}
               >
-                <Text className="text-xs text-text-2">{project.name}</Text>
+                <Text className="font-sans text-xs text-text-2">{project.name}</Text>
               </Pressable>
             ))}
           </View>
@@ -283,7 +283,7 @@ export function CaptureSheet({
               }}
             >
               <Text
-                className="text-[11px] uppercase tracking-wider"
+                className="font-sans text-[11px] uppercase tracking-wider"
                 style={{ color: c.accent }}
               >
                 {`# ${parsed.project.name}`}
@@ -295,7 +295,7 @@ export function CaptureSheet({
               className="rounded-md px-2 py-0.5"
               style={{ borderWidth: 1, borderColor: c.line[22] }}
             >
-              <Text className="text-[11px] text-text-2">{dateLabel}</Text>
+              <Text className="font-sans text-[11px] text-text-2">{dateLabel}</Text>
             </View>
           )}
           {parsed.durationMinutes !== null && (
@@ -303,7 +303,7 @@ export function CaptureSheet({
               className="rounded-md px-2 py-0.5"
               style={{ borderWidth: 1, borderColor: c.line[22] }}
             >
-              <Text className="text-[11px] text-text-2">
+              <Text className="font-sans text-[11px] text-text-2">
                 {t("capture.duration", { minutes: parsed.durationMinutes })}
               </Text>
             </View>
@@ -313,7 +313,7 @@ export function CaptureSheet({
               className="rounded-md px-2 py-0.5"
               style={{ borderWidth: 1, borderColor: alpha(c.signal, 0.5) }}
             >
-              <Text className="text-[11px]" style={{ color: c.signal }}>
+              <Text className="font-sans text-[11px]" style={{ color: c.signal }}>
                 {parsed.blockerReason || t("capture.blockedNoReason")}
               </Text>
             </View>
@@ -321,12 +321,12 @@ export function CaptureSheet({
         </View>
 
         {needsProject && parsed.projectId === null && (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("capture.updateNeedsProject")}
           </Text>
         )}
         {parsed.projectCandidates.length > 0 && (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("capture.ambiguous", {
               names: parsed.projectCandidates
                 .slice(0, 3)
@@ -336,11 +336,11 @@ export function CaptureSheet({
           </Text>
         )}
         {parsed.unresolved.length > 0 && (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("capture.unresolved", { tokens: parsed.unresolved.join(" ") })}
           </Text>
         )}
-        <Text className="text-xs text-text-muted">{t("capture.syntax")}</Text>
+        <Text className="font-sans text-xs text-text-muted">{t("capture.syntax")}</Text>
       </View>
     </BottomSheet>
   );

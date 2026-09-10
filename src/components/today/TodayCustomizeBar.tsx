@@ -38,7 +38,7 @@ export function TodayCustomizeBar({
         style={{ backgroundColor: c.surface, borderColor: c.border }}
       >
         <RotateCcw size={14} color={c.textMuted} />
-        <Text className="text-sm text-text-muted">{labels.reset}</Text>
+        <Text className="font-sans text-sm text-text-muted">{labels.reset}</Text>
       </Pressable>
       <Pressable
         onPress={onExit}

@@ -162,7 +162,7 @@ export default function Notifications() {
             <Text className="text-base font-sans-medium text-text">
               {t("settings.notifications.telegram")}
             </Text>
-            <Text className="mt-0.5 text-xs text-text-muted">
+            <Text className="font-sans mt-0.5 text-xs text-text-muted">
               {connected
                 ? t("settings.notifications.channel.connected")
                 : pollingForLink
@@ -176,7 +176,7 @@ export default function Notifications() {
               accessibilityRole="button"
               className="rounded-lg border border-border px-3 py-1.5 active:opacity-80"
             >
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 {t("settings.notifications.channel.disconnect")}
               </Text>
             </Pressable>
@@ -201,7 +201,7 @@ export default function Notifications() {
             </Pressable>
           )}
         </View>
-        <Text className="mt-3 text-xs text-text-muted">
+        <Text className="font-sans mt-3 text-xs text-text-muted">
           {t("settings.notifications.whatsappSoon")}
         </Text>
       </Section>
@@ -246,7 +246,7 @@ export default function Notifications() {
         <View className="mt-3">
           <Field label={t("settings.notifications.timezone")}>
             <View className="flex-row items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5">
-              <Text className="text-base flex-1 text-text" numberOfLines={1}>
+              <Text className="font-sans text-base flex-1 text-text" numberOfLines={1}>
                 {settings.timezone || "—"}
               </Text>
               {deviceTz && deviceTz !== settings.timezone && (
@@ -288,7 +288,7 @@ export default function Notifications() {
             />
           </Field>
         </View>
-        <Text className="mt-3 text-xs text-text-muted">
+        <Text className="font-sans mt-3 text-xs text-text-muted">
           {t("settings.notifications.dailyDigestHint")}
         </Text>
       </Section>
@@ -323,7 +323,7 @@ export default function Notifications() {
             />
           </Field>
         </View>
-        <Text className="mt-3 text-xs text-text-muted">
+        <Text className="font-sans mt-3 text-xs text-text-muted">
           {t("settings.notifications.dueRemindersHint")}
         </Text>
         <View className="mt-3 h-px bg-border" />
@@ -368,7 +368,7 @@ function ToggleRow({
 }) {
   return (
     <View className="flex-row items-center justify-between py-1">
-      <Text className="flex-1 pr-3 text-sm text-text">{label}</Text>
+      <Text className="font-sans flex-1 pr-3 text-sm text-text">{label}</Text>
       <Switch
         value={value}
         onValueChange={onValueChange}

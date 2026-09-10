@@ -69,7 +69,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "check-tokens": "node scripts/check-tokens.mjs"
+    "check-parity": "node scripts/check-tokens.mjs"
   },
   "private": true
 }

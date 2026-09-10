@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
 import { Spine, spineStrikesTitle } from "@/components/ui/Spine";
 import { CoolingRule } from "@/components/ui/CoolingRule";
 import { BlockerBadge } from "@/components/ui/BlockerBadge";
@@ -59,7 +60,7 @@ function Section({
         </Meta>
         {count != null && count > 0 && (
           <View className="rounded-full border border-border bg-surface px-2 py-0.5">
-            <Text className="text-[10px] tabular-nums text-text-muted">
+            <Text className="font-sans text-[10px] tabular-nums text-text-muted">
               {count}
             </Text>
           </View>
@@ -143,14 +144,8 @@ export default function ProjectDetail() {
   };
 
   const headerOptions = {
-    headerShown: true,
+    ...headerOptionsFor(s),
     title: project?.name ?? t("views.projects.detail.title"),
-    headerStyle: { backgroundColor: s.surface },
-    headerTintColor: s.text,
-    headerTitleStyle: { color: s.text },
-    headerShadowVisible: false,
-    // Chevron only — hide the leaked "(dashboard)" back label.
-    headerBackButtonDisplayMode: "minimal",
   } as const;
 
   if (initialLoading && !project) {
@@ -166,7 +161,7 @@ export default function ProjectDetail() {
     return (
       <View className="flex-1 items-center justify-center bg-bg px-6">
         <Stack.Screen options={headerOptions} />
-        <Text className="text-base text-center text-text-muted">
+        <Text className="font-sans text-base text-center text-text-muted">
           {t("views.projects.empty")}
         </Text>
       </View>
@@ -412,9 +407,9 @@ export default function ProjectDetail() {
             {t("views.projects.card.nextStep")}
           </Meta>
           {project.nextStep ? (
-            <Text className="text-sm text-text">→ {project.nextStep}</Text>
+            <Text className="font-sans text-sm text-text">→ {project.nextStep}</Text>
           ) : (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("views.projects.card.nextStepEmpty")}
             </Text>
           )}
@@ -422,9 +417,9 @@ export default function ProjectDetail() {
 
         <Section title={t("views.projects.card.whyMatters")}>
           {project.why ? (
-            <Text className="text-sm text-text-muted">{project.why}</Text>
+            <Text className="font-sans text-sm text-text-muted">{project.why}</Text>
           ) : (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("views.projects.card.whyEmpty")}
             </Text>
           )}
@@ -432,9 +427,9 @@ export default function ProjectDetail() {
 
         <Section title={t("views.projects.card.description")}>
           {project.description ? (
-            <Text className="text-sm text-text-muted">{project.description}</Text>
+            <Text className="font-sans text-sm text-text-muted">{project.description}</Text>
           ) : (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("views.projects.card.descriptionEmpty")}
             </Text>
           )}
@@ -442,7 +437,7 @@ export default function ProjectDetail() {
 
         <Section title={t("views.projects.card.tasks")}>
           {projectTasks.length === 0 ? (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("views.projects.card.noTasks")}
             </Text>
           ) : (
@@ -468,7 +463,7 @@ export default function ProjectDetail() {
             className="mt-1 flex-row items-center gap-1.5 self-start rounded-md border border-border bg-surface px-3 py-1.5"
           >
             <Plus size={14} color={c.textMuted} />
-            <Text className="text-xs text-text-muted">
+            <Text className="font-sans text-xs text-text-muted">
               {t("modals.task.newTitle")}
             </Text>
           </Pressable>
@@ -479,7 +474,7 @@ export default function ProjectDetail() {
           count={projectUpdates.length}
         >
           {projectUpdates.length === 0 ? (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("views.projects.card.noUpdates")}
             </Text>
           ) : (
@@ -489,14 +484,14 @@ export default function ProjectDetail() {
               itemKey={(a) => a.id}
               renderItem={(a) => (
                 <View className="flex-row gap-2 py-0.5">
-                  <Text className="w-24 shrink-0 text-xs text-text-muted">
+                  <Text className="font-sans w-24 shrink-0 text-xs text-text-muted">
                     {new Date(a.created).toLocaleDateString(locale, {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
                     })}
                   </Text>
-                  <Text className="flex-1 text-sm text-text-muted">{a.note}</Text>
+                  <Text className="font-sans flex-1 text-sm text-text-muted">{a.note}</Text>
                 </View>
               )}
             />
@@ -505,7 +500,7 @@ export default function ProjectDetail() {
 
         <Section title={t("views.projects.card.notes")} count={notes.length}>
           {notes.length === 0 ? (
-            <Text className="text-sm italic text-text-muted">
+            <Text className="font-sans text-sm italic text-text-muted">
               {t("notes.empty")}
             </Text>
           ) : (
@@ -539,13 +534,13 @@ export default function ProjectDetail() {
                     </View>
                     {!!preview && (
                       <Text
-                        className="mb-1.5 text-sm text-text-muted"
+                        className="font-sans mb-1.5 text-sm text-text-muted"
                         numberOfLines={3}
                       >
                         {preview}
                       </Text>
                     )}
-                    <Text className="text-[10px] uppercase tracking-wider text-text-muted">
+                    <Text className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
                       {relativeTime(n.updatedAt)}
                     </Text>
                   </View>
@@ -562,7 +557,7 @@ export default function ProjectDetail() {
             style={{ backgroundColor: alpha(c.signal, 0.1) }}
           >
             <Trash2 size={14} color={c.signal} />
-            <Text className="text-xs" style={{ color: c.signal }}>
+            <Text className="font-sans text-xs" style={{ color: c.signal }}>
               {t("common.delete")}
             </Text>
           </Pressable>

@@ -94,7 +94,7 @@ export function StalledAlertSection({
             <Text className="mb-1 font-sans-semibold" style={{ color: c.accent }}>
               {t("views.today.stalledAlert.title", { count: stalled.length })}
             </Text>
-            <Text className="text-sm" style={{ color: alpha(c.accent, 0.9) }}>
+            <Text className="font-sans text-sm" style={{ color: alpha(c.accent, 0.9) }}>
               {t("views.today.stalledAlert.subtitleLead")}{" "}
               <Text className="font-sans-bold">
                 {t("views.today.stalledAlert.subtitleEmphasis")}
@@ -108,7 +108,7 @@ export function StalledAlertSection({
                   className="rounded-md px-3 py-1.5"
                   style={{ backgroundColor: alpha(c.accent, 0.2) }}
                 >
-                  <Text className="text-xs" style={{ color: c.accent }}>
+                  <Text className="font-sans text-xs" style={{ color: c.accent }}>
                     {p.name} · {daysSince(p.lastActivity)}d
                   </Text>
                 </Pressable>
@@ -233,7 +233,7 @@ export function CloseableSection({
               borderColor: alpha(c.accent, 0.3),
             }}
           >
-            <Text className="text-xs text-accent">{closableTotal}</Text>
+            <Text className="font-sans text-xs text-accent">{closableTotal}</Text>
           </View>
         }
       >
@@ -262,7 +262,7 @@ export function CloseableSection({
                     style={{ width: `${pct}%`, backgroundColor: c.accent }}
                   />
                 </View>
-                <Text className="text-xs text-text-muted">
+                <Text className="font-sans text-xs text-text-muted">
                   {t("views.today.closeable.tasksLeft", {
                     count: sp.openCount,
                     done: sp.doneCount,
@@ -284,7 +284,7 @@ export function CloseableSection({
               <Text className="text-base mb-2 font-sans-semibold text-text">
                 {sp.project.name}
               </Text>
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 {t("views.today.closeable.tasksAway", { count: sp.openCount })}
               </Text>
             </Pressable>
@@ -320,7 +320,7 @@ export function SleepingSection({
               borderColor: alpha(c.accent, 0.3),
             }}
           >
-            <Text className="text-xs" style={{ color: c.accent }}>
+            <Text className="font-sans text-xs" style={{ color: c.accent }}>
               {stalledProjects.length}
             </Text>
           </View>
@@ -350,14 +350,14 @@ export function SleepingSection({
                       borderColor: alpha(c.accent, 0.3),
                     }}
                   >
-                    <Text className="text-xs" style={{ color: c.accent }}>
+                    <Text className="font-sans text-xs" style={{ color: c.accent }}>
                       {t("views.today.sleeping.daysIdle", { count: days })}
                     </Text>
                   </View>
                 </View>
                 {project.nextStep && (
                   <Text
-                    className="mt-0.5 text-xs text-text-muted"
+                    className="font-sans mt-0.5 text-xs text-text-muted"
                     numberOfLines={1}
                   >
                     → {project.nextStep}
@@ -372,7 +372,7 @@ export function SleepingSection({
                   borderColor: alpha(c.accent, 0.4),
                 }}
               >
-                <Text className="text-xs text-accent">
+                <Text className="font-sans text-xs text-accent">
                   {t("views.today.sleeping.resume")}
                 </Text>
               </Pressable>
@@ -409,7 +409,7 @@ export function StaleIdeasSection({
             <Text className="mb-1 font-sans-semibold" style={{ color: c.text3 }}>
               {t("views.today.staleIdeas.title", { count: staleIdeas.length })}
             </Text>
-            <Text className="text-sm" style={{ color: alpha(c.text3, 0.8) }}>
+            <Text className="font-sans text-sm" style={{ color: alpha(c.text3, 0.8) }}>
               {t("views.today.staleIdeas.subtitle")}
             </Text>
           </View>
@@ -450,7 +450,7 @@ export function ActiveProjectsSection({
               borderColor: alpha(c.accent, 0.3),
             }}
           >
-            <Text className="text-xs text-accent">{activeProjects.length}</Text>
+            <Text className="font-sans text-xs text-accent">{activeProjects.length}</Text>
           </View>
         }
       >
@@ -510,7 +510,7 @@ export function LaunchedWithTasksSection({
               borderColor: alpha(c.closed, 0.3),
             }}
           >
-            <Text className="text-xs" style={{ color: c.closed }}>
+            <Text className="font-sans text-xs" style={{ color: c.closed }}>
               {launchedWithOpenTasks.length}
             </Text>
           </View>

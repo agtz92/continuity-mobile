@@ -161,7 +161,7 @@ export function DayGrid({
     <View className="gap-4">
       {showLoad && (
         <View className="flex-row items-center gap-2">
-          <Text className="text-xs" style={{ color: colors.textMuted }}>
+          <Text className="font-sans text-xs" style={{ color: colors.textMuted }}>
             ≈ {load.hours}h
           </Text>
           <View className="flex-1">
@@ -190,7 +190,7 @@ export function DayGrid({
               ) : (
                 <ChevronDown size={14} color={colors.accent} />
               )}
-              <Text className="text-xs" style={{ color: colors.accent }}>
+              <Text className="font-sans text-xs" style={{ color: colors.accent }}>
                 {expanded ? lessLabel : moreLabel(hiddenCount)}
               </Text>
             </Pressable>
@@ -225,7 +225,7 @@ export function DayGrid({
                     }}
                   >
                     <Text
-                      className="px-1 pt-0.5"
+                      className="font-sans px-1 pt-0.5"
                       style={{ color: colors.textMuted, fontSize: 10 }}
                     >
                       {new Date(2000, 0, 1, h).toLocaleTimeString(locale, {
@@ -288,7 +288,7 @@ export function DayGrid({
                         {t.title}
                       </Text>
                       {project && (
-                        <Text
+                        <Text className="font-sans"
                           numberOfLines={1}
                           style={{ color: cc.text, opacity: 0.7, fontSize: 10 }}
                         >
@@ -335,7 +335,7 @@ export function DayGrid({
                       <Repeat size={11} color={colors.accent} />
                       <Text
                         numberOfLines={1}
-                        className="flex-1 text-xs"
+                        className="font-sans flex-1 text-xs"
                         style={{
                           color: colors.accent,
                           textDecorationLine: item.completed ? "line-through" : "none",
@@ -370,7 +370,7 @@ export function DayGrid({
                         backgroundColor: colors.accent,
                       }}
                     />
-                    <Text
+                    <Text className="font-sans"
                       style={{
                         position: "absolute",
                         left: 12,
@@ -393,7 +393,7 @@ export function DayGrid({
 
       {allDayItems.length === 0 && timedCount === 0 && (
         <Text
-          className="px-1 py-2 text-xs italic"
+          className="font-sans px-1 py-2 text-xs italic"
           style={{ color: colors.textMuted }}
         >
           {emptyLabel}

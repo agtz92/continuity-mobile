@@ -43,7 +43,11 @@ export function MessageList({
       }
     >
       {messages.map((m) => (
-        <Message key={m.id} message={m} />
+        <Message
+          key={m.id}
+          message={m}
+          streaming={streaming && m.id === last?.id}
+        />
       ))}
       {showWorking && (
         <View className="flex-row items-center gap-2 pl-9">
@@ -61,7 +65,7 @@ export function MessageList({
               style={{ backgroundColor: c.accent, opacity: 0.3 }}
             />
           </View>
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("assistant.message.working")}
           </Text>
         </View>

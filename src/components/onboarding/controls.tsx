@@ -47,7 +47,7 @@ export function TextButton({
       hitSlop={8}
       style={disabled ? { opacity: 0.5 } : undefined}
     >
-      <Text className="text-sm text-text-muted">{label}</Text>
+      <Text className="font-sans text-sm text-text-muted">{label}</Text>
     </Pressable>
   );
 }

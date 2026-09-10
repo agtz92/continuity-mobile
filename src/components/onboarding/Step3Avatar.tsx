@@ -39,7 +39,7 @@ export function Step3Avatar({
         <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step3.heading", { name })}
         </Text>
-        <Text className="text-base text-text-muted">
+        <Text className="font-sans text-base text-text-muted">
           {t("onboarding.step3.sub")}
         </Text>
       </View>
@@ -76,7 +76,7 @@ export function Step3Avatar({
                       />
                       <Text
                         numberOfLines={1}
-                        className="text-[11px] text-text-muted"
+                        className="font-sans text-[11px] text-text-muted"
                       >
                         {t(`avatars.names.${a.nameKey}`)}
                       </Text>

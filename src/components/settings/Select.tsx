@@ -37,7 +37,7 @@ export function Select({
         className="flex-row items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5"
         style={disabled ? { opacity: 0.4 } : undefined}
       >
-        <Text className="text-base text-text">{selected?.label ?? "—"}</Text>
+        <Text className="font-sans text-base text-text">{selected?.label ?? "—"}</Text>
         <ChevronDown size={16} color={c.textMuted} />
       </Pressable>
 

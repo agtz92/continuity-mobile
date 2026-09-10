@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Animated,
   Easing,
+  Keyboard,
   Modal,
   PanResponder,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -122,11 +124,41 @@ export function BottomSheet({
     }),
   ).current;
 
-  const maxHeight = screenH * 0.9;
+  // Alto del teclado, para levantar la hoja por encima de él.
+  //
+  // La hoja vive dentro de un `<Modal>` alineado abajo, y iOS **no** mueve eso
+  // solo: el teclado se abría encima y tapaba justo lo que ibas a tocar — las
+  // opciones de "reportar un bug", los botones de la captura rápida. Un
+  // `KeyboardAvoidingView` no sirve aquí porque el Modal tiene su propio host
+  // view y mide mal; medir el teclado y padear a mano sí.
+  //
+  // `will*` en iOS para que la hoja se mueva **con** la animación del teclado y
+  // no un frame después; Android solo emite los `did*`.
+  const [keyboardH, setKeyboardH] = useState(0);
+  useEffect(() => {
+    const show = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hide = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const subs = [
+      Keyboard.addListener(show, (e) => setKeyboardH(e.endCoordinates.height)),
+      Keyboard.addListener(hide, () => setKeyboardH(0)),
+    ];
+    return () => subs.forEach((x) => x.remove());
+  }, []);
+
+  // Con el teclado abierto la hoja no puede seguir midiendo 90% de pantalla: lo
+  // que sobra queda debajo del teclado, que es exactamente el bug.
+  const available = screenH - keyboardH;
+  const maxHeight = available * 0.92;
   const heightStyle =
     initialHeight === "auto"
       ? { maxHeight }
-      : { height: screenH * (initialHeight === "half" ? 0.5 : 0.9), maxHeight };
+      : {
+          height: Math.min(
+            screenH * (initialHeight === "half" ? 0.5 : 0.9),
+            maxHeight
+          ),
+          maxHeight,
+        };
 
   return (
     <Modal
@@ -153,7 +185,10 @@ export function BottomSheet({
 
         <View pointerEvents="box-none" className="flex-1 justify-end">
           <Animated.View
-            style={[heightStyle, { transform: [{ translateY }] }]}
+            style={[
+              heightStyle,
+              { transform: [{ translateY }], marginBottom: keyboardH },
+            ]}
             className="rounded-t-xl border-t border-border bg-surface"
           >
             <View {...pan.panHandlers} className="items-center pb-1 pt-2">
@@ -183,12 +218,12 @@ export function BottomSheet({
             {footer && (
               <View
                 className="border-t border-border bg-surface px-4 py-3"
-                style={{ paddingBottom: insets.bottom + 12 }}
+                style={{ paddingBottom: (keyboardH ? 0 : insets.bottom) + 12 }}
               >
                 {footer}
               </View>
             )}
-            {!footer && <View style={{ height: insets.bottom }} />}
+            {!footer && <View style={{ height: keyboardH ? 0 : insets.bottom }} />}
           </Animated.View>
         </View>
       </View>

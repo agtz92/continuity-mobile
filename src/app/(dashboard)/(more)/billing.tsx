@@ -1,4 +1,6 @@
 import { useCallback, useState } from "react";
+import { Skeleton } from "@/components/ui/Skeletons";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Meta } from "@/components/ui/Meta";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
@@ -25,18 +27,29 @@ export default function Billing() {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const [usage, setUsage] = useState<UsageSnapshot | null>(null);
+  // Sin esto la pantalla afirmaba cosas que no sabía. Con `usage` en null los
+  // valores caían por defecto a "free", así que un usuario de Studio veía
+  // **un segundo el botón de mejorar plan** antes de que llegara la respuesta;
+  // y si la petición fallaba, se quedaba viendo Free para siempre. Un plan no
+  // se pinta hasta que el servidor dice cuál es.
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
   // Refetch each time the screen gains focus so the plan reflects any change the
   // user just made on the web billing page (which we open externally).
   useFocusEffect(
     useCallback(() => {
       let active = true;
+      setStatus((prev) => (prev === "ready" ? prev : "loading"));
       getUsage()
         .then((u) => {
-          if (active) setUsage(u);
+          if (!active) return;
+          setUsage(u);
+          setStatus("ready");
         })
         .catch(() => {
-          /* assistant backend may be offline — leave usage null */
+          // El backend del asistente puede estar caído. Se dice, no se
+          // disimula pintando el plan gratuito.
+          if (active) setStatus("error");
         });
       return () => {
         active = false;
@@ -75,6 +88,37 @@ export default function Billing() {
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString(i18n.language);
 
+  if (status === "loading") {
+    return (
+      <View className="flex-1 gap-4 bg-bg p-5">
+        <Skeleton h={160} r={14} />
+        <Skeleton h={48} r={10} />
+      </View>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <View className="flex-1 bg-bg px-5">
+        <EmptyState
+          title={t("settings.billing.loadErrorTitle")}
+          body={t("settings.billing.loadErrorBody")}
+          actions={
+            <Pressable
+              onPress={() => setStatus("loading")}
+              className="rounded-md border px-4 py-2"
+              style={{ borderColor: c.accent }}
+            >
+              <Text className="font-sans-medium text-sm" style={{ color: c.accent }}>
+                {t("routeError.retry")}
+              </Text>
+            </Pressable>
+          }
+        />
+      </View>
+    );
+  }
+
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       {/* Current plan card */}
@@ -102,11 +146,11 @@ export default function Billing() {
         </View>
 
         {isExempt ? (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("settings.billing.exemptBlurb", { plan: planLabel })}
           </Text>
         ) : boughtInStore ? (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("settings.billing.storeManagedBlurb", {
               store: boughtOnGoogle ? "Google Play" : "App Store",
             })}
@@ -126,7 +170,7 @@ export default function Billing() {
                 {t("settings.billing.cancelScheduled")}
               </Text>
             </View>
-            <Text className="text-xs leading-snug" style={{ color: c.accent }}>
+            <Text className="font-sans text-xs leading-snug" style={{ color: c.accent }}>
               {t("settings.billing.cancelScheduledBlurb", {
                 plan: planLabel,
                 date: fmtDate(renewsAt),
@@ -135,11 +179,11 @@ export default function Billing() {
             </Text>
           </View>
         ) : plan === "free" ? (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("settings.billing.freeBlurb")}
           </Text>
         ) : renewsAt ? (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("settings.billing.renewsAtWithDays", {
               date: fmtDate(renewsAt),
               days: daysUntil(renewsAt),
@@ -148,7 +192,7 @@ export default function Billing() {
         ) : null}
 
         {subscriptionPeriod && !isExempt && (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {subscriptionPeriod === "annual"
               ? t("settings.billing.billingPeriod.currentAnnual")
               : t("settings.billing.billingPeriod.currentMonthly")}
@@ -193,7 +237,7 @@ export default function Billing() {
           </Text>
         </Pressable>
       )}
-      <Text className="px-1 text-center text-xs text-text-muted">
+      <Text className="font-sans px-1 text-center text-xs text-text-muted">
         {boughtInStore
           ? t("settings.billing.manageInStoreHint", {
               store: boughtOnGoogle ? "Google Play" : "App Store",
@@ -207,7 +251,7 @@ export default function Billing() {
 function UsageRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between rounded-lg border border-border bg-bg px-3 py-2.5">
-      <Text className="text-xs text-text-muted">{label}</Text>
+      <Text className="font-sans text-xs text-text-muted">{label}</Text>
       <Text className="text-sm font-sans-medium text-text">{value}</Text>
     </View>
   );

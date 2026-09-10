@@ -59,7 +59,7 @@ export default function Ideas() {
         <ScreenTitle>
           {t("views.ideas.title")}
         </ScreenTitle>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("views.ideas.subtitle")}
         </Text>
         {ideas.length > 0 && (
@@ -121,12 +121,12 @@ export default function Ideas() {
                 </Text>
               </View>
               {!!i.why && (
-                <Text className="mb-2 text-sm italic" style={{ color: c.text3 }}>
+                <Text className="font-sans mb-2 text-sm italic" style={{ color: c.text3 }}>
                   → {i.why}
                 </Text>
               )}
               {!!i.description && (
-                <Text className="mb-3 text-sm text-text-muted">
+                <Text className="font-sans mb-3 text-sm text-text-muted">
                   {i.description}
                 </Text>
               )}
@@ -149,7 +149,7 @@ export default function Ideas() {
                   }
                   className="rounded-md bg-border px-3 py-1.5"
                 >
-                  <Text className="text-xs text-text-muted">
+                  <Text className="font-sans text-xs text-text-muted">
                     {t("common.edit")}
                   </Text>
                 </Pressable>
@@ -157,7 +157,7 @@ export default function Ideas() {
                   onPress={() => deleteIdea(i.id)}
                   className="rounded-md bg-border px-3 py-1.5"
                 >
-                  <Text className="text-xs text-text-muted">
+                  <Text className="font-sans text-xs text-text-muted">
                     {t("common.delete")}
                   </Text>
                 </Pressable>

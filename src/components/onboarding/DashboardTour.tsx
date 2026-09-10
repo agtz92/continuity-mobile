@@ -129,10 +129,10 @@ export function DashboardTour() {
             <Text className="text-2xl font-sans-bold text-text">
               {t("onboarding.tour.finalCta.title")}
             </Text>
-            <Text className="text-base leading-relaxed text-text-muted">
+            <Text className="font-sans text-base leading-relaxed text-text-muted">
               {t("onboarding.tour.finalCta.body")}
             </Text>
-            <Text className="text-sm leading-relaxed text-text-muted">
+            <Text className="font-sans text-sm leading-relaxed text-text-muted">
               {t("onboarding.tour.finalCta.more")}
             </Text>
             <PrimaryButton
@@ -158,7 +158,7 @@ export function DashboardTour() {
                 {t(`onboarding.tour.${current.key}.title`)}
               </Text>
             </View>
-            <Text className="text-base leading-relaxed text-text-muted">
+            <Text className="font-sans text-base leading-relaxed text-text-muted">
               {t(`onboarding.tour.${current.key}.body`)}
             </Text>
 

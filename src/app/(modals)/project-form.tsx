@@ -230,7 +230,7 @@ export default function ProjectForm() {
                 className="flex-row items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5"
               >
                 <Plus size={13} color={c.textMuted} />
-                <Text className="text-sm text-text-muted">{t("common.new")}</Text>
+                <Text className="font-sans text-sm text-text-muted">{t("common.new")}</Text>
               </Pressable>
             </View>
           </View>
@@ -280,7 +280,7 @@ export default function ProjectForm() {
                 }}
                 className="rounded-lg border border-border bg-border px-4 py-2"
               >
-                <Text className="text-sm text-text">{t("common.cancel")}</Text>
+                <Text className="font-sans text-sm text-text">{t("common.cancel")}</Text>
               </Pressable>
             </View>
           </View>

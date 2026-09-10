@@ -13,7 +13,7 @@ export function Placeholder({
     <View className="flex-1 items-center justify-center gap-2 bg-bg p-6">
       <ScreenTitle>{title}</ScreenTitle>
       {subtitle ? (
-        <Text className="text-center text-text-muted">{subtitle}</Text>
+        <Text className="font-sans text-center text-text-muted">{subtitle}</Text>
       ) : null}
     </View>
   );

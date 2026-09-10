@@ -167,7 +167,7 @@ export default function GoogleTasks() {
           <Text className="text-sm font-sans-medium text-text">
             {t("settings.plugins.googleTasks.title")}
           </Text>
-          <Text className="mt-0.5 text-xs text-text-muted">
+          <Text className="font-sans mt-0.5 text-xs text-text-muted">
             {connected && connection?.email
               ? t("settings.plugins.googleTasks.connectedAs", {
                   email: connection.email,
@@ -183,7 +183,7 @@ export default function GoogleTasks() {
             className="rounded-lg border border-border px-3 py-1.5 active:opacity-80"
             style={disconnecting ? { opacity: 0.5 } : undefined}
           >
-            <Text className="text-sm text-text">
+            <Text className="font-sans text-sm text-text">
               {t("settings.plugins.googleTasks.disconnectButton")}
             </Text>
           </Pressable>
@@ -211,11 +211,11 @@ export default function GoogleTasks() {
       {connected && (
         <View className="gap-4 rounded-xl border border-border bg-surface p-5">
           {listsQuery.loading && !listsQuery.data ? (
-            <Text className="text-sm text-text-muted">
+            <Text className="font-sans text-sm text-text-muted">
               {t("settings.plugins.googleTasks.loadingLists")}
             </Text>
           ) : lists.length === 0 ? (
-            <Text className="text-sm text-text-muted">
+            <Text className="font-sans text-sm text-text-muted">
               {t("settings.plugins.googleTasks.noLists")}
             </Text>
           ) : (
@@ -294,7 +294,7 @@ function MappingRow({
 
   return (
     <View className="gap-1.5">
-      <Text className="text-sm text-text">{list.title}</Text>
+      <Text className="font-sans text-sm text-text">{list.title}</Text>
       <Select
         title={list.title}
         value={value}

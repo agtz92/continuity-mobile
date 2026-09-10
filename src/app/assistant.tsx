@@ -156,7 +156,7 @@ export default function AssistantScreen() {
             }}
           >
             <AlertCircle size={14} color={c.signal} />
-            <Text className="flex-1 text-xs" style={{ color: c.signal }}>
+            <Text className="font-sans flex-1 text-xs" style={{ color: c.signal }}>
               {error}
             </Text>
           </View>

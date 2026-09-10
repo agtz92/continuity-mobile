@@ -58,7 +58,7 @@ export function WeekAgenda({
           >
             <View className="w-11 items-center">
               <Text
-                className="text-[11px] uppercase"
+                className="font-sans text-[11px] uppercase"
                 style={{ color: colors.textMuted }}
               >
                 {d.toLocaleDateString(locale, { weekday: "short" })}
@@ -87,7 +87,7 @@ export function WeekAgenda({
             <View className="flex-1 gap-1.5">
               {showLoad && !empty && <LoadBar load={load} colors={colors} />}
               {empty ? (
-                <Text className="text-xs italic" style={{ color: colors.textMuted }}>
+                <Text className="font-sans text-xs italic" style={{ color: colors.textMuted }}>
                   {emptyLabel}
                 </Text>
               ) : (

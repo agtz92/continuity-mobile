@@ -280,7 +280,7 @@ export default function Projects() {
                       {label}
                     </Text>
                     <Text
-                      className={
+                      className={"font-sans " + 
                         "text-[10px] " + (active ? "text-bg" : "text-text-muted")
                       }
                     >
@@ -295,7 +295,7 @@ export default function Projects() {
               className="flex-row items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5"
             >
               <SlidersHorizontal size={14} color={c.textMuted} />
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 {t(`views.projects.sortBy.${sortMode}`)}
               </Text>
             </Pressable>
@@ -357,7 +357,7 @@ export default function Projects() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <View className="flex-row items-center gap-1.5 px-5 pb-1">
             <ArrowUpDown size={12} color={c.textMuted} />
-            <Text className="text-xs text-text-muted">
+            <Text className="font-sans text-xs text-text-muted">
               {t("views.projects.manualHint")}
             </Text>
           </View>
@@ -401,7 +401,7 @@ export default function Projects() {
             sortMode === "manual" ? (
               <View className="flex-row items-center gap-1.5 pb-2">
                 <ArrowUpDown size={12} color={c.textMuted} />
-                <Text className="text-xs text-text-muted">
+                <Text className="font-sans text-xs text-text-muted">
                   {t("views.projects.manualFilteredHint")}
                 </Text>
               </View>
@@ -413,7 +413,7 @@ export default function Projects() {
                   backgroundColor: alpha(c.accent, 0.1),
                 }}
               >
-                <Text className="flex-1 text-sm text-text-muted">
+                <Text className="font-sans flex-1 text-sm text-text-muted">
                   {t("views.projects.orderChanged")}
                 </Text>
                 <Pressable
@@ -422,7 +422,7 @@ export default function Projects() {
                   style={{ borderColor: alpha(c.accent, 0.3) }}
                 >
                   <ArrowUpDown size={12} color={c.accent} />
-                  <Text className="text-xs" style={{ color: c.accent }}>
+                  <Text className="font-sans text-xs" style={{ color: c.accent }}>
                     {t("views.projects.reorder")}
                   </Text>
                 </Pressable>
@@ -458,7 +458,7 @@ export default function Projects() {
                 }}
                 className="flex-row items-center justify-between rounded-lg px-3 py-3"
               >
-                <Text className={"text-base " + (active ? "text-accent" : "text-text")}>
+                <Text className={"font-sans " + "text-base " + (active ? "text-accent" : "text-text")}>
                   {t(`views.projects.sortBy.${m}`)}
                 </Text>
                 {active && <Check size={18} color={c.accent} />}

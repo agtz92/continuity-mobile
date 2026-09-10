@@ -66,7 +66,7 @@ export default function Login() {
             <Text className="text-3xl font-sans-bold text-text">
               {t("auth.login.title")}
             </Text>
-            <Text className="text-base text-text-muted">{t("auth.login.subtitle")}</Text>
+            <Text className="font-sans text-base text-text-muted">{t("auth.login.subtitle")}</Text>
           </View>
 
           <View className="gap-3">
@@ -104,12 +104,12 @@ export default function Login() {
               onPress={() => router.push("/reset-password")}
               className="self-end"
             >
-              <Text className="text-sm text-accent">
+              <Text className="font-sans text-sm text-accent">
                 {t("auth.login.forgot")}
               </Text>
             </Pressable>
 
-            {error && <Text className="text-signal">{error}</Text>}
+            {error && <Text className="font-sans text-signal">{error}</Text>}
 
             <Pressable
               onPress={onSignIn}
@@ -125,7 +125,7 @@ export default function Login() {
 
           <View className="flex-row items-center gap-3">
             <View className="h-px flex-1 bg-border" />
-            <Text className="text-base text-text-muted">{t("auth.divider")}</Text>
+            <Text className="font-sans text-base text-text-muted">{t("auth.divider")}</Text>
             <View className="h-px flex-1 bg-border" />
           </View>
 
@@ -141,7 +141,7 @@ export default function Login() {
           </Pressable>
 
           <View className="flex-row justify-center gap-1">
-            <Text className="text-base text-text-muted">{t("auth.login.noAccount")}</Text>
+            <Text className="font-sans text-base text-text-muted">{t("auth.login.noAccount")}</Text>
             <Pressable onPress={() => router.push("/signup")}>
               <Text className="text-base font-sans-semibold text-accent">
                 {t("auth.login.signUpLink")}

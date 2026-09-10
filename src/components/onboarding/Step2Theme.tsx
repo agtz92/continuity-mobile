@@ -32,7 +32,7 @@ export function Step2Theme({
         <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step2.heading")}
         </Text>
-        <Text className="text-base text-text-muted">
+        <Text className="font-sans text-base text-text-muted">
           {t("onboarding.step2.sub")}
         </Text>
       </View>

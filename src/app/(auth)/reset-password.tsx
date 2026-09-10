@@ -51,11 +51,11 @@ export default function ResetPassword() {
             <Text className="text-3xl font-sans-bold text-text">
               {t("auth.reset.title")}
             </Text>
-            <Text className="text-base text-text-muted">{t("auth.reset.subtitle")}</Text>
+            <Text className="font-sans text-base text-text-muted">{t("auth.reset.subtitle")}</Text>
           </View>
 
           {sent ? (
-            <Text className="text-base text-text">{t("auth.reset.sent")}</Text>
+            <Text className="font-sans text-base text-text">{t("auth.reset.sent")}</Text>
           ) : (
             <View className="gap-3">
               <View className="gap-1">
@@ -74,7 +74,7 @@ export default function ResetPassword() {
                 />
               </View>
 
-              {error && <Text className="text-signal">{error}</Text>}
+              {error && <Text className="font-sans text-signal">{error}</Text>}
 
               <Pressable
                 onPress={onSend}

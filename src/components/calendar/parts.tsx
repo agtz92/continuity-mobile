@@ -67,7 +67,7 @@ export function ProjectChip({
         className="rounded-full px-1.5"
         style={{ backgroundColor: alpha(cc.text, 0.2) }}
       >
-        <Text style={{ color: cc.text, fontSize: 10 }}>{tasks.length}</Text>
+        <Text className="font-sans" style={{ color: cc.text, fontSize: 10 }}>{tasks.length}</Text>
       </View>
     </Pressable>
   );
@@ -94,12 +94,12 @@ export function TaskChip({
         <Check size={14} color={colors.textMuted} />
       </Pressable>
       <Pressable className="flex-1" onPress={() => onOpenTask(task.id)}>
-        <Text numberOfLines={1} className="text-xs" style={{ color: colors.text }}>
+        <Text numberOfLines={1} className="font-sans text-xs" style={{ color: colors.text }}>
           {task.title}
         </Text>
       </Pressable>
       {task.effortHours != null && (
-        <Text style={{ color: colors.textMuted, fontSize: 10 }}>
+        <Text className="font-sans" style={{ color: colors.textMuted, fontSize: 10 }}>
           {task.effortHours}h
         </Text>
       )}
@@ -135,7 +135,7 @@ export function RoutineChip({
       )}
       <Text
         numberOfLines={1}
-        className="flex-1 text-xs"
+        className="font-sans flex-1 text-xs"
         style={{
           color: colors.accent,
           textDecorationLine: item.completed ? "line-through" : "none",

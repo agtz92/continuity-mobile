@@ -65,7 +65,7 @@ export function TodaySectionEditRow({
             className="rounded-md px-1.5 py-0.5"
             style={{ backgroundColor: c.border }}
           >
-            <Text className="text-[10px] uppercase tracking-wider text-text-muted">
+            <Text className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
               {badge}
             </Text>
           </View>
@@ -79,7 +79,7 @@ export function TodaySectionEditRow({
             }}
           >
             <Text
-              className="text-[10px] uppercase tracking-wider"
+              className="font-sans text-[10px] uppercase tracking-wider"
               style={{ color: c.accent }}
             >
               {labels.hide}

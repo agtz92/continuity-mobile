@@ -113,6 +113,10 @@
       "tooLong": "El mensaje es demasiado largo.",
       "sessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
       "unknown": "Algo salió mal."
+    },
+    "markdown": {
+      "writingTable": "escribiendo tabla…",
+      "moreRows": "{count, plural, one {# fila más} other {# filas más}}"
     }
   },
   "common": {
@@ -566,7 +570,9 @@
       "checkoutSuccess": "¡Listo! Tu plan se activará en cuanto Stripe confirme el pago.",
       "checkoutCancelled": "Cancelaste el pago. Cuando quieras, vuelve a intentarlo.",
       "checkoutError": "No se pudo abrir el checkout. Intenta de nuevo en unos segundos.",
-      "portalError": "No se pudo abrir el portal. Intenta de nuevo en unos segundos."
+      "portalError": "No se pudo abrir el portal. Intenta de nuevo en unos segundos.",
+      "loadErrorTitle": "No se pudo leer tu plan",
+      "loadErrorBody": "El servicio de facturación no respondió. En tu cuenta no cambió nada — es esta pantalla la que ahora mismo no puede confirmar en qué plan estás."
     },
     "plugins": {
       "title": "Integraciones",
@@ -1877,5 +1883,11 @@
       "note": "Nota guardada.",
       "update": "Update guardado."
     }
+  },
+  "routeError": {
+    "title": "Esta pantalla se rompió",
+    "body": "Algo falló al dibujarla. No fue nada que hicieras, y no se perdió nada tuyo. Reintenta, o vuelve atrás y entra otra vez.",
+    "retry": "Reintentar",
+    "detailLabel": "Qué pasó"
   }
 }

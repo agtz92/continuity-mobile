@@ -113,6 +113,10 @@
       "tooLong": "Message too long.",
       "sessionExpired": "Session expired. Sign in again.",
       "unknown": "Something went wrong."
+    },
+    "markdown": {
+      "writingTable": "writing table…",
+      "moreRows": "{count, plural, one {# more row} other {# more rows}}"
     }
   },
   "notifications": {
@@ -566,7 +570,9 @@
       "checkoutSuccess": "All set! Your plan will activate as soon as Stripe confirms the payment.",
       "checkoutCancelled": "You cancelled the payment. Try again whenever you're ready.",
       "checkoutError": "Couldn't open checkout. Please try again in a moment.",
-      "portalError": "Couldn't open the billing portal. Please try again in a moment."
+      "portalError": "Couldn't open the billing portal. Please try again in a moment.",
+      "loadErrorTitle": "Couldn't read your plan",
+      "loadErrorBody": "The billing service didn't answer. Nothing changed on your account — this screen just can't confirm what plan you're on right now."
     },
     "plugins": {
       "title": "Plugins",
@@ -1877,5 +1883,11 @@
       "note": "Note saved.",
       "update": "Update saved."
     }
+  },
+  "routeError": {
+    "title": "This screen broke",
+    "body": "Something failed while drawing it. Nothing you did — and nothing of yours was lost. Retry, or go back and come in again.",
+    "retry": "Retry",
+    "detailLabel": "What happened"
   }
 }

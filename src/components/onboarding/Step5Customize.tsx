@@ -37,14 +37,14 @@ export function Step5Customize({
         <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step5.heading")}
         </Text>
-        <Text className="text-base leading-relaxed text-text-muted">
+        <Text className="font-sans text-base leading-relaxed text-text-muted">
           {t("onboarding.step5.sub")}
         </Text>
       </View>
 
       <View className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4">
         <Settings2 size={20} color={c.textMuted} />
-        <Text className="flex-1 text-sm text-text-muted">
+        <Text className="font-sans flex-1 text-sm text-text-muted">
           {t("onboarding.step5.hint")}
         </Text>
       </View>
@@ -76,7 +76,7 @@ export function Step5Customize({
         className="items-center py-1"
         style={busy ? { opacity: 0.5 } : undefined}
       >
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {replay
             ? t("onboarding.replay.finishButton")
             : t("onboarding.step5.later")}

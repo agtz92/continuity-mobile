@@ -69,7 +69,7 @@ export function MonthGrid({
         {weekdayLabels.map((w, i) => (
           <Text
             key={i}
-            className="flex-1 text-center text-[10px] uppercase"
+            className="font-sans flex-1 text-center text-[10px] uppercase"
             style={{ color: colors.textMuted }}
           >
             {w}
@@ -149,7 +149,7 @@ export function MonthGrid({
                   ))}
                   {hidden > 0 && (
                     <Text
-                      className="text-center"
+                      className="font-sans text-center"
                       style={{ color: colors.textMuted, fontSize: 8 }}
                     >
                       +{hidden}

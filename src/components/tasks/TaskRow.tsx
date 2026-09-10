@@ -112,7 +112,7 @@ export function TaskRow({
         >
           <View className="flex-row flex-wrap items-center gap-2">
             <Text
-              className={
+              className={"font-sans " + 
                 "text-base " +
                 (done ? "text-text-muted line-through" : "text-text")
               }
@@ -179,12 +179,12 @@ export function TaskRow({
               </View>
             )}
             {project && (
-              <Text className="text-xs text-text-muted">{project.name}</Text>
+              <Text className="font-sans text-xs text-text-muted">{project.name}</Text>
             )}
             {task.dueDate ? (
               !overdue &&
               !dueToday && (
-                <Text className="text-xs" style={{ color: c.textMuted }}>
+                <Text className="font-sans text-xs" style={{ color: c.textMuted }}>
                   · {new Date(task.dueDate).toLocaleDateString(i18n.language)}
                 </Text>
               )
@@ -195,7 +195,7 @@ export function TaskRow({
                 hitSlop={6}
               >
                 <CalendarPlus size={12} color={c.accent} />
-                <Text className="text-xs" style={{ color: c.accent }}>
+                <Text className="font-sans text-xs" style={{ color: c.accent }}>
                   {t("taskRow.addDate")}
                 </Text>
               </Pressable>
@@ -211,7 +211,7 @@ export function TaskRow({
                   hitSlop={4}
                 >
                   <CalendarCheck size={12} color={c.accent} />
-                  <Text className="text-[11px]" style={{ color: c.accent }}>
+                  <Text className="font-sans text-[11px]" style={{ color: c.accent }}>
                     {t("taskRow.moveToToday")}
                   </Text>
                 </Pressable>
@@ -224,7 +224,7 @@ export function TaskRow({
                   hitSlop={4}
                 >
                   <CalendarClock size={12} color={c.textMuted} />
-                  <Text className="text-[11px]" style={{ color: c.textMuted }}>
+                  <Text className="font-sans text-[11px]" style={{ color: c.textMuted }}>
                     {t("taskRow.reschedule")}
                   </Text>
                 </Pressable>

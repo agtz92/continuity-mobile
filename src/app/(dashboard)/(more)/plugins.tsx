@@ -36,7 +36,7 @@ export default function Plugins() {
           <Text className="text-sm font-sans-medium text-text">
             {t("settings.plugins.googleTasks.name")}
           </Text>
-          <Text className="mt-0.5 text-xs text-text-muted" numberOfLines={1}>
+          <Text className="font-sans mt-0.5 text-xs text-text-muted" numberOfLines={1}>
             {t("settings.plugins.googleTasks.shortDescription")}
           </Text>
         </View>
@@ -49,7 +49,7 @@ export default function Plugins() {
           }}
         >
           <Text
-            className="text-xs"
+            className="font-sans text-xs"
             style={{ color: connected ? c.accent : c.textMuted }}
           >
             {connected
@@ -60,7 +60,7 @@ export default function Plugins() {
         <ChevronRight size={16} color={c.textMuted} />
       </Pressable>
 
-      <Text className="px-1 text-xs text-text-muted">
+      <Text className="font-sans px-1 text-xs text-text-muted">
         {t("settings.plugins.comingSoonBody")}
       </Text>
     </ScrollView>

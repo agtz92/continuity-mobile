@@ -184,7 +184,7 @@ export default function Calendar() {
       }}
     >
       {icon}
-      <Text className="text-xs" style={{ color: active ? c.accent : c.textMuted }}>
+      <Text className="font-sans text-xs" style={{ color: active ? c.accent : c.textMuted }}>
         {label}
       </Text>
     </Pressable>
@@ -248,7 +248,7 @@ export default function Calendar() {
             className="rounded-md border px-3 py-1.5"
             style={{ borderColor: c.border }}
           >
-            <Text className="text-xs" style={{ color: c.textMuted }}>
+            <Text className="font-sans text-xs" style={{ color: c.textMuted }}>
               {t("views.calendar.today")}
             </Text>
           </Pressable>
@@ -277,7 +277,7 @@ export default function Calendar() {
             className="items-center rounded-xl border py-12"
             style={{ borderColor: c.border, backgroundColor: c.surface }}
           >
-            <Text className="text-sm italic" style={{ color: c.textMuted }}>
+            <Text className="font-sans text-sm italic" style={{ color: c.textMuted }}>
               {t("views.calendar.empty")}
             </Text>
           </View>

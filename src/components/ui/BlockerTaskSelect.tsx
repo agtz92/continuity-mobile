@@ -70,7 +70,7 @@ export function BlockerTaskSelect({
         accessibilityRole="button"
         className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
       >
-        <Text className="flex-1 text-base text-text-muted" numberOfLines={1}>
+        <Text className="font-sans flex-1 text-base text-text-muted" numberOfLines={1}>
           {t("modals.task.selectBlockingTask")}
         </Text>
         <ChevronDown size={18} color={c.textMuted} />
@@ -93,7 +93,7 @@ export function BlockerTaskSelect({
             autoCorrect={false}
           />
           {groups.length === 0 ? (
-            <Text className="px-3 py-4 text-center text-base text-text-muted">
+            <Text className="font-sans px-3 py-4 text-center text-base text-text-muted">
               {t("modals.task.noBlockerTasks")}
             </Text>
           ) : (
@@ -108,7 +108,7 @@ export function BlockerTaskSelect({
                     onPress={() => select(tk.id)}
                     className="rounded-lg px-3 py-3"
                   >
-                    <Text className="text-base text-text" numberOfLines={2}>
+                    <Text className="font-sans text-base text-text" numberOfLines={2}>
                       {tk.title}
                     </Text>
                   </Pressable>

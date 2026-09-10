@@ -21,7 +21,7 @@ export function HiddenSectionsFooter({
       style={{ borderColor: c.border, borderStyle: "dashed" }}
     >
       <EyeOff size={14} color={c.textMuted} />
-      <Text className="text-sm text-text-muted">{label}</Text>
+      <Text className="font-sans text-sm text-text-muted">{label}</Text>
     </Pressable>
   );
 }

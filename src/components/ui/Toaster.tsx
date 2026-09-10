@@ -51,7 +51,7 @@ export function Toaster() {
                 <Info size={18} color={color} />
               )}
             </View>
-            <Text className="flex-1 text-sm leading-snug text-text">
+            <Text className="font-sans flex-1 text-sm leading-snug text-text">
               {tt.message}
             </Text>
             <Pressable

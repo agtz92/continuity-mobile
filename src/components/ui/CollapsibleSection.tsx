@@ -1,24 +1,22 @@
 import type { ReactNode } from "react";
-import {
-  LayoutAnimation,
-  Platform,
-  Pressable,
-  Text,
-  UIManager,
-  View,
-} from "react-native";
+import { Pressable, Text, View } from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { ChevronRight } from "lucide-react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
 
-// Required for LayoutAnimation on old-architecture Android; no-op elsewhere.
-if (
-  Platform.OS === "android" &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
+/**
+ * El plegado se anima con **Reanimated, no con `LayoutAnimation`**.
+ *
+ * Antes esto llamaba a `LayoutAnimation.configureNext` sobre un subárbol donde
+ * `TaskRow` y `RoutineRow` ya usan animaciones de layout de Reanimated. Son dos
+ * sistemas distintos mutando la misma jerarquía de vistas nativas, y en la
+ * Nueva Arquitectura —que SDK 54 activa por defecto— eso corrompe el árbol: la
+ * pantalla se queda **en blanco con la barra de pestañas encima**, sin lanzar
+ * ninguna excepción, y empeora con cada intento. Un sistema de animación por
+ * árbol, y aquí el que ya estaba puesto era Reanimated.
+ */
 
 export function CollapsibleSection({
   open,
@@ -42,10 +40,7 @@ export function CollapsibleSection({
   const s = THEME_SURFACES[effective];
   const c = useThemeColors();
 
-  const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    onToggle();
-  };
+  const toggle = onToggle;
 
   // Rotate via inline style, not a toggling className: a className that flips
   // between undefined and a value makes NativeWind's css-interop try to "upgrade"
@@ -69,9 +64,11 @@ export function CollapsibleSection({
           <Text className="flex-1 font-sans-semibold text-sm text-text">{title}</Text>
           {rightSlot}
         </Pressable>
-        {open && (
-          <View className="border-t border-border bg-bg p-3">{children}</View>
-        )}
+        <Animated.View layout={LinearTransition.duration(180)}>
+          {open && (
+            <View className="border-t border-border bg-bg p-3">{children}</View>
+          )}
+        </Animated.View>
       </View>
     );
   }
@@ -97,7 +94,9 @@ export function CollapsibleSection({
         </Text>
         {rightSlot}
       </Pressable>
-      {open && children}
+      <Animated.View layout={LinearTransition.duration(180)}>
+        {open && children}
+      </Animated.View>
     </View>
   );
 }

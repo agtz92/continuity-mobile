@@ -111,7 +111,7 @@ export default function QuickNotes() {
         <ScreenTitle>
           {t("views.quickNotes.title")}
         </ScreenTitle>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("views.quickNotes.subtitle")}
         </Text>
         {quickNotes.length > 0 && (
@@ -214,7 +214,7 @@ export default function QuickNotes() {
                       {n.pinned && <Pin size={14} color={c.accent} />}
                     </View>
                     {!!preview && (
-                      <Text className="mt-1 text-sm text-text-muted" numberOfLines={2}>
+                      <Text className="font-sans mt-1 text-sm text-text-muted" numberOfLines={2}>
                         {preview}
                       </Text>
                     )}
@@ -231,17 +231,17 @@ export default function QuickNotes() {
                       )}
                       {proj && (
                         <View className="rounded-md border border-border bg-bg px-2 py-0.5">
-                          <Text className="text-[11px] text-text-muted" numberOfLines={1}>
+                          <Text className="font-sans text-[11px] text-text-muted" numberOfLines={1}>
                             {proj.name}
                           </Text>
                         </View>
                       )}
                       {!cat && !proj && (
-                        <Text className="text-[11px] italic text-text-muted">
+                        <Text className="font-sans text-[11px] italic text-text-muted">
                           {t("views.quickNotes.standalone")}
                         </Text>
                       )}
-                      <Text className="ml-auto text-[11px] text-text-muted">
+                      <Text className="font-sans ml-auto text-[11px] text-text-muted">
                         {t("views.quickNotes.sectionCount", { count: n.sections.length })}
                       </Text>
                     </View>

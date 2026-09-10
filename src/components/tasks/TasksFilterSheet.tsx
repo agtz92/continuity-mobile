@@ -79,7 +79,7 @@ export function TasksFilterSheet({
     >
       <View className="mb-2 flex-row justify-end">
         <Pressable onPress={() => setDraft(EMPTY_TASK_FILTER)} hitSlop={6}>
-          <Text className="px-2 py-1 text-xs text-accent">
+          <Text className="font-sans px-2 py-1 text-xs text-accent">
             {t("views.tasks.filterSheet.clear")}
           </Text>
         </Pressable>
@@ -88,7 +88,7 @@ export function TasksFilterSheet({
       <View className="gap-4">
         {(projects.length > 0 || hasUnassigned) && (
           <View>
-            <Text className="mb-2 text-[11px] uppercase tracking-wider text-text-muted">
+            <Text className="font-sans mb-2 text-[11px] uppercase tracking-wider text-text-muted">
               {t("views.tasks.filterSheet.byProject")}
             </Text>
             <View className="flex-row flex-wrap gap-1.5">
@@ -112,7 +112,7 @@ export function TasksFilterSheet({
         )}
 
         <View className="flex-row items-center justify-between px-1 py-2">
-          <Text className="text-sm text-text">
+          <Text className="font-sans text-sm text-text">
             {t("views.tasks.filterSheet.showCompleted")}
           </Text>
           <Switch
@@ -122,7 +122,7 @@ export function TasksFilterSheet({
           />
         </View>
         <View className="flex-row items-center justify-between px-1 py-2">
-          <Text className="text-sm text-text">
+          <Text className="font-sans text-sm text-text">
             {t("views.tasks.filterSheet.showBlocked")}
           </Text>
           <Switch

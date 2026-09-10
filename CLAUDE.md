@@ -86,7 +86,7 @@ con el editor. Espejo del cambio web. Detalle:
 
 ## Paletas de colores
 
-Para editar las paletas (cambiar hex de una existente o agregar una nueva), consulta `docs/paletas-de-colores.md`. Resumen: aquí **no hay `globals.css`** — `src/palette/config.ts` (`PALETTE_ACCENTS`, del que se derivan las muestras) es la fuente de verdad, leída por `src/theme/ThemeProvider.tsx`. Mantén los hex idénticos a los del repo web (`continuity`) y **verifícalo con `npm run check-tokens`**, que compara los dos juegos y falla si divergen.
+Para editar las paletas (cambiar hex de una existente o agregar una nueva), consulta `docs/paletas-de-colores.md`. Resumen: aquí **no hay `globals.css`** — `src/palette/config.ts` (`PALETTE_ACCENTS`, del que se derivan las muestras) es la fuente de verdad, leída por `src/theme/ThemeProvider.tsx`. Mantén los hex idénticos a los del repo web (`continuity`) y **verifícalo con `npm run check-parity`**, que compara los dos juegos y falla si divergen.
 
 Las paletas del rediseño son cinco (ocre · salvia · óxido · hielo · ciruela). Las once viejas siguen leyéndose vía `LEGACY_PALETTE_MAP`, pero ya no se pueden elegir.
 

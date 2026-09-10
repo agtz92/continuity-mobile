@@ -20,8 +20,9 @@ import { useQuickNotes } from "@/hooks/useQuickNotes";
 import { useQuickNoteMutations } from "@/hooks/useQuickNoteMutations";
 import { Field } from "@/components/ui/Field";
 import { ProjectSelect } from "@/components/ui/ProjectSelect";
+import { CategorySelect } from "@/components/ui/CategorySelect";
 import { NoteSectionCard } from "@/components/notes/NoteSectionCard";
-import { categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { useThemeColors } from "@/theme/useThemeColors";
 import { deleteFeedback, impactFeedback, selectionFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
 
@@ -47,7 +48,7 @@ export default function QuickNoteEditor() {
   if (!note) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-bg" edges={["bottom"]}>
-        <Text className="text-base text-text-muted">…</Text>
+        <Text className="font-sans text-base text-text-muted">…</Text>
       </SafeAreaView>
     );
   }
@@ -121,51 +122,13 @@ export default function QuickNoteEditor() {
         </Pressable>
       </View>
 
-      {/* Category */}
+      {/* Category — campo, no fila de filtros. Ver `ui/CategorySelect`. */}
       <Field label={t("views.quickNotes.category")}>
-        <View className="flex-row flex-wrap gap-1.5">
-          <Pressable
-            onPress={() => saveMeta({ categoryId: null })}
-            className="rounded-lg border px-3 py-1.5"
-            style={{
-              backgroundColor: note.categoryId === null ? c.accent : c.surface,
-              borderColor: note.categoryId === null ? c.accent : c.border,
-            }}
-          >
-            <Text
-              className="text-sm font-sans-medium"
-              style={{ color: note.categoryId === null ? c.bg : c.textMuted }}
-            >
-              {t("views.quickNotes.noCategory")}
-            </Text>
-          </Pressable>
-          {categories.map((cat) => {
-            const active = note.categoryId === cat.id;
-            const chip = categoryChipColors(cat.color, c);
-            return (
-              <Pressable
-                key={cat.id}
-                onPress={() => saveMeta({ categoryId: cat.id })}
-                className="flex-row items-center gap-1.5 rounded-lg border px-3 py-1.5"
-                style={{
-                  backgroundColor: active ? chip.bg : c.surface,
-                  borderColor: active ? chip.border : c.border,
-                }}
-              >
-                <View
-                  className="h-2 w-2 rounded-full"
-                  style={{ backgroundColor: chip.dot }}
-                />
-                <Text
-                  className="text-sm font-sans-medium"
-                  style={{ color: active ? chip.text : c.textMuted }}
-                >
-                  {cat.name}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <CategorySelect
+          categories={categories}
+          value={note.categoryId}
+          onChange={(categoryId: string | null) => saveMeta({ categoryId })}
+        />
       </Field>
 
       {/* Project */}
@@ -186,7 +149,7 @@ export default function QuickNoteEditor() {
       style={{ marginTop: 6 }}
     >
       <Plus size={15} color={c.textMuted} />
-      <Text className="text-sm text-text-muted">
+      <Text className="font-sans text-sm text-text-muted">
         {t("views.quickNotes.addSection")}
       </Text>
     </Pressable>

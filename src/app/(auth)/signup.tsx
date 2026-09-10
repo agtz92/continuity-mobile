@@ -57,12 +57,12 @@ export default function Signup() {
             <Text className="text-3xl font-sans-bold text-text">
               {t("auth.signup.title")}
             </Text>
-            <Text className="text-base text-text-muted">{t("auth.signup.subtitle")}</Text>
+            <Text className="font-sans text-base text-text-muted">{t("auth.signup.subtitle")}</Text>
           </View>
 
           {done ? (
             <View className="gap-4">
-              <Text className="text-base text-text">{t("auth.signup.checkEmail")}</Text>
+              <Text className="font-sans text-base text-text">{t("auth.signup.checkEmail")}</Text>
               <Pressable
                 onPress={() => router.replace("/login")}
                 className="flex-row items-center justify-center rounded-xl bg-accent px-4 py-3"
@@ -119,7 +119,7 @@ export default function Signup() {
                   />
                 </View>
 
-                {error && <Text className="text-signal">{error}</Text>}
+                {error && <Text className="font-sans text-signal">{error}</Text>}
 
                 <Pressable
                   onPress={onSignUp}
@@ -134,7 +134,7 @@ export default function Signup() {
               </View>
 
               <View className="flex-row justify-center gap-1">
-                <Text className="text-base text-text-muted">
+                <Text className="font-sans text-base text-text-muted">
                   {t("auth.signup.haveAccount")}
                 </Text>
                 <Pressable onPress={() => router.replace("/login")}>

@@ -116,7 +116,7 @@ function NotificationCard({
           </Text>
         )}
         {!!body && (
-          <Text className="mt-0.5 text-sm leading-snug text-text-muted">
+          <Text className="font-sans mt-0.5 text-sm leading-snug text-text-muted">
             {body}
           </Text>
         )}

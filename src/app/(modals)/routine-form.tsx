@@ -290,7 +290,7 @@ export default function RoutineForm() {
 
       {recurrenceType === "monthly_day" && (
         <View className="rounded-lg border border-border bg-surface px-3 py-2">
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("modals.routine.monthlyDayHint", {
               day: Number.isFinite(monthlyDay) ? monthlyDay : 1,
             })}
@@ -339,7 +339,7 @@ export default function RoutineForm() {
             borderColor: alpha(c.signal, 0.3),
           }}
         >
-          <Text className="text-sm" style={{ color: c.signal }}>
+          <Text className="font-sans text-sm" style={{ color: c.signal }}>
             {error}
           </Text>
         </View>

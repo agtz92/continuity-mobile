@@ -107,7 +107,7 @@ export function ProjectCardCompact({
             }}
           >
             <Sparkles size={10} color={c.accent} />
-            <Text className="text-xs text-accent">
+            <Text className="font-sans text-xs text-accent">
               {t("projectCard.comebackBadge", { days: comebackGapDays })}
             </Text>
           </View>
@@ -120,7 +120,7 @@ export function ProjectCardCompact({
               borderColor: alpha(c.closed, 0.4),
             }}
           >
-            <Text className="text-xs" style={{ color: c.closed }}>
+            <Text className="font-sans text-xs" style={{ color: c.closed }}>
               {t("projectCard.openCount", { count: openCount })}
             </Text>
           </View>
@@ -133,7 +133,7 @@ export function ProjectCardCompact({
               borderColor: alpha(c.signal, 0.4),
             }}
           >
-            <Text className="text-xs" style={{ color: c.signal }}>
+            <Text className="font-sans text-xs" style={{ color: c.signal }}>
               {t("projectCard.overdueBadge", { count: overdueCount })}
             </Text>
           </View>
@@ -146,7 +146,7 @@ export function ProjectCardCompact({
               borderColor: alpha(c.accent, 0.4),
             }}
           >
-            <Text className="text-xs" style={{ color: c.accent }}>
+            <Text className="font-sans text-xs" style={{ color: c.accent }}>
               {t("projectCard.todayBadge", { count: todayCount })}
             </Text>
           </View>
@@ -160,7 +160,7 @@ export function ProjectCardCompact({
       )}
 
       {!!p.nextStep && (
-        <Text numberOfLines={2} className="mb-3 text-sm text-text-muted">
+        <Text numberOfLines={2} className="font-sans mb-3 text-sm text-text-muted">
           → {p.nextStep}
         </Text>
       )}
@@ -182,7 +182,7 @@ export function ProjectCardCompact({
               }}
             >
               <Clock size={10} color={c.accent} />
-              <Text className="text-xs text-accent">
+              <Text className="font-sans text-xs text-accent">
                 {t("projectCard.todayHoursLabel", { hours: todayEffortHours })}
               </Text>
             </View>
@@ -190,7 +190,7 @@ export function ProjectCardCompact({
           {totalEffortHours != null && totalEffortHours > 0 && (
             <View className="flex-row items-center gap-1">
               <Clock size={10} color={c.textMuted} />
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 {t("projectCard.totalHoursLabel", { hours: totalEffortHours })}
               </Text>
             </View>

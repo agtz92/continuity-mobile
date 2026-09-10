@@ -40,7 +40,7 @@ export function WelcomeBackCard({
           {t("closure.welcomeBack.title", { name: project.name })}
         </Text>
       </View>
-      <Text className="text-sm text-text-muted">
+      <Text className="font-sans text-sm text-text-muted">
         {t("closure.welcomeBack.pausedAgo", { count: days })}
       </Text>
 
@@ -49,7 +49,7 @@ export function WelcomeBackCard({
           <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.whereStopped")}
           </Meta>
-          <Text className="text-sm text-text">{project.pausedContext}</Text>
+          <Text className="font-sans text-sm text-text">{project.pausedContext}</Text>
         </View>
       )}
       {!!project.pausedNextAction && (
@@ -57,7 +57,7 @@ export function WelcomeBackCard({
           <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.nextAction")}
           </Meta>
-          <Text className="text-sm text-text">
+          <Text className="font-sans text-sm text-text">
             {"→ "}
             {project.pausedNextAction}
           </Text>
@@ -68,7 +68,7 @@ export function WelcomeBackCard({
           <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.blocker")}
           </Meta>
-          <Text className="text-sm text-text">{project.pausedBlocker}</Text>
+          <Text className="font-sans text-sm text-text">{project.pausedBlocker}</Text>
         </View>
       )}
 
@@ -91,7 +91,7 @@ export function WelcomeBackCard({
           accessibilityRole="button"
           className="rounded-lg border border-border bg-surface px-4 py-2.5"
         >
-          <Text className="text-sm text-text">
+          <Text className="font-sans text-sm text-text">
             {t("closure.welcomeBack.keepPaused")}
           </Text>
         </Pressable>

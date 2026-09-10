@@ -44,7 +44,7 @@ export function Step1Name({
         <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step1.heading")}
         </Text>
-        <Text className="text-base text-text-muted">
+        <Text className="font-sans text-base text-text-muted">
           {t("onboarding.step1.sub")}
         </Text>
       </View>
@@ -66,9 +66,9 @@ export function Step1Name({
           onSubmitEditing={submit}
         />
         {error ? (
-          <Text className="text-xs text-signal">{error}</Text>
+          <Text className="font-sans text-xs text-signal">{error}</Text>
         ) : prefilled ? (
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("onboarding.step1.helperPrefilled")}
           </Text>
         ) : null}

@@ -59,7 +59,7 @@ export function BugTopicSelect({
         className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
       >
         <Text
-          className={"text-base " + (value ? "text-text" : "text-text-muted")}
+          className={"font-sans " + "text-base " + (value ? "text-text" : "text-text-muted")}
         >
           {value || placeholder}
         </Text>
@@ -88,7 +88,7 @@ export function BugTopicSelect({
                 onPress={() => commit(trimmed)}
                 className="flex-row items-center justify-between rounded-lg px-3 py-3"
               >
-                <Text className="text-base text-accent">
+                <Text className="font-sans text-base text-accent">
                   {freeTextLabel(trimmed)}
                 </Text>
               </Pressable>
@@ -102,7 +102,7 @@ export function BugTopicSelect({
                   className="flex-row items-center justify-between rounded-lg px-3 py-3"
                 >
                   <Text
-                    className={
+                    className={"font-sans " + 
                       "text-base " + (active ? "text-accent" : "text-text")
                     }
                   >

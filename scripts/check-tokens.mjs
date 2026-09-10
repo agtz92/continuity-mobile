@@ -1,5 +1,6 @@
 /**
- * Valida que los tokens de móvil no hayan divergido de los de web.
+ * Valida que móvil no haya divergido de web: ni en tokens, ni en los archivos
+ * que se copian verbatim.
  *
  * `src/theme/tokens.generated.ts` es la copia del archivo que emite
  * `pnpm tokens` en el repo web desde `src/design/tokens.json`. `src/theme/
@@ -16,7 +17,7 @@
  * Se lee con regex a propósito: sin runner de tests ni paso de build, un script
  * de Node sin dependencias es lo único que se puede correr en cualquier sitio.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -123,7 +124,41 @@ if (problems.length) {
   process.exit(1);
 }
 
+// --- Archivos copiados verbatim desde web -----------------------------------
+//
+// El parser de markdown se copia entero en vez de importarse, porque los repos
+// son separados. Su cabecera dice "no lo edites aquí"; esto lo hace comprobable
+// en lugar de un ruego. Si el repo web no está al lado (otra máquina, CI de
+// móvil solo), se omite: no poder comparar no es una divergencia.
+const COPIES = [
+  {
+    mine: "src/components/markdown/parse.ts",
+    theirs: "../frontend/src/components/markdown/parse.ts",
+    // Líneas de cabecera propias de la copia, que no existen en el original.
+    skip: 8,
+  },
+];
+
+let copiesChecked = 0;
+for (const f of COPIES) {
+  const theirs = join(ROOT, f.theirs);
+  if (!existsSync(theirs)) {
+    console.log(`(omitido: no encuentro ${f.theirs} — repo web no disponible)`);
+    continue;
+  }
+  const mine = read(f.mine).split("\n").slice(f.skip).join("\n");
+  if (mine !== readFileSync(theirs, "utf8")) {
+    console.error(
+      `\n${f.mine} ha divergido de ${f.theirs}.\n` +
+        "Ese archivo se edita en web y se vuelve a copiar aquí — nunca al revés."
+    );
+    process.exit(1);
+  }
+  copiesChecked++;
+}
+
 console.log(
   `Tokens OK: ${Object.keys(THEME_VARS).length} temas y` +
-    ` ${Object.keys(PALETTE_ACCENTS).length} paletas coinciden con web.`
+    ` ${Object.keys(PALETTE_ACCENTS).length} paletas coinciden con web.` +
+    (copiesChecked ? ` ${copiesChecked} copia(s) verbatim intacta(s).` : "")
 );

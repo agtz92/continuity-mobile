@@ -49,7 +49,7 @@ export function AvatarPickerSheet({
           accessibilityRole="button"
           className="items-center py-1"
         >
-          <Text className="text-sm text-text-muted">
+          <Text className="font-sans text-sm text-text-muted">
             {t("settings.profile.clearAvatar")}
           </Text>
         </Pressable>
@@ -87,7 +87,7 @@ export function AvatarPickerSheet({
                       />
                       <Text
                         numberOfLines={1}
-                        className="text-[11px] text-text-muted"
+                        className="font-sans text-[11px] text-text-muted"
                       >
                         {t(`avatars.names.${a.nameKey}`)}
                       </Text>

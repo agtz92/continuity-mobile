@@ -98,7 +98,7 @@ export default function Appearance() {
         <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.language")}
         </Text>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("settings.appearance.languageHint")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
@@ -117,7 +117,7 @@ export default function Appearance() {
         <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.theme")}
         </Text>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("settings.appearance.themeHint")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
@@ -136,7 +136,7 @@ export default function Appearance() {
         <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.palette")}
         </Text>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("settings.appearance.paletteHint")}
         </Text>
         <View className="flex-row flex-wrap gap-2">

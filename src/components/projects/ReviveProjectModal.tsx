@@ -54,7 +54,7 @@ export function ReviveProjectModal({
           accessibilityRole="button"
           className="items-center rounded-lg border border-border bg-surface py-3"
         >
-          <Text className="text-base text-text">
+          <Text className="font-sans text-base text-text">
             {t("closure.revive.leaveDead")}
           </Text>
         </Pressable>
@@ -65,15 +65,15 @@ export function ReviveProjectModal({
           <Meta variant="cintillo" tone="muted" className="mb-1">
             {t("closure.revive.wouldRestartLabel")}
           </Meta>
-          <Text className="text-sm text-text">{wouldRestart}</Text>
+          <Text className="font-sans text-sm text-text">{wouldRestart}</Text>
         </View>
       )}
       {showCap && (
-        <Text className="text-xs text-text-muted">
+        <Text className="font-sans text-xs text-text-muted">
           {t("closure.revive.capLine", { used: activeUsed, cap: activeCap })}
         </Text>
       )}
-      <Text className="text-sm text-text-muted">
+      <Text className="font-sans text-sm text-text-muted">
         {t("closure.revive.bringBackAs")}
       </Text>
       <View className="flex-row gap-2">

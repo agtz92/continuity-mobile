@@ -164,7 +164,7 @@ export function SelectedDayAgenda({
           hitSlop={8}
           className="flex-row items-center gap-1 pl-2"
         >
-          <Text className="text-xs" style={{ color: colors.accent }}>
+          <Text className="font-sans text-xs" style={{ color: colors.accent }}>
             {openDayLabel}
           </Text>
           <ArrowRight size={13} color={colors.accent} />
@@ -173,7 +173,7 @@ export function SelectedDayAgenda({
 
       {count === 0 ? (
         <Text
-          className="px-3 pb-3 pt-1 text-xs italic"
+          className="font-sans px-3 pb-3 pt-1 text-xs italic"
           style={{ color: colors.textMuted }}
         >
           {emptyLabel}
@@ -186,7 +186,7 @@ export function SelectedDayAgenda({
           {timed.map((it) => (
             <View key={it.key} className="flex-row items-center gap-2">
               <Text
-                className="text-[10px] tabular-nums"
+                className="font-sans text-[10px] tabular-nums"
                 style={{ color: colors.textMuted, width: 44 }}
               >
                 {it.time}

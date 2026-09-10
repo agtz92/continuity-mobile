@@ -251,7 +251,7 @@ export default function TaskForm() {
                           </View>
                         )}
                         <Text
-                          className="flex-1 text-sm text-text-muted"
+                          className="font-sans flex-1 text-sm text-text-muted"
                           numberOfLines={1}
                         >
                           {found?.title ?? t("modals.task.unknownTask")}
@@ -259,7 +259,7 @@ export default function TaskForm() {
                       </>
                     ) : (
                       <Text
-                        className="flex-1 text-sm text-text-muted"
+                        className="font-sans flex-1 text-sm text-text-muted"
                         numberOfLines={1}
                       >
                         {b.externalDescription}
@@ -303,7 +303,7 @@ export default function TaskForm() {
                   (externalBlocker.trim() ? "" : "opacity-50")
                 }
               >
-                <Text className="text-sm text-text">
+                <Text className="font-sans text-sm text-text">
                   {t("modals.task.addBlocker")}
                 </Text>
               </Pressable>

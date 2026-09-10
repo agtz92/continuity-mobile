@@ -97,7 +97,7 @@ export function PanelCard({
           <Text className="text-sm font-sans-semibold text-text">{title}</Text>
         </View>
         {subtitle ? (
-          <Text className="mt-0.5 text-xs text-text-muted">{subtitle}</Text>
+          <Text className="font-sans mt-0.5 text-xs text-text-muted">{subtitle}</Text>
         ) : null}
       </View>
       {children}
@@ -126,7 +126,7 @@ export function StatTile({
       {icon && (
         <View className="mb-1 flex-row items-center gap-1.5">
           {icon}
-          <Text className="text-[11px] text-text-muted">{label}</Text>
+          <Text className="font-sans text-[11px] text-text-muted">{label}</Text>
         </View>
       )}
       {/* La cifra en display y tabular: una columna de números que baila al
@@ -200,15 +200,15 @@ export function ActivityChart({ series, t }: { series: ActivityPoint[]; t: T }) 
       <View className="mb-3 flex-row gap-4">
         <View className="flex-row items-center gap-1.5">
           <View className="h-2 w-2 rounded-full" style={{ backgroundColor: EMERALD }} />
-          <Text className="text-xs text-text-muted">{t("analytics.activityChart.updates")}</Text>
+          <Text className="font-sans text-xs text-text-muted">{t("analytics.activityChart.updates")}</Text>
         </View>
         <View className="flex-row items-center gap-1.5">
           <View className="h-2 w-2 rounded-full" style={{ backgroundColor: BLUE }} />
-          <Text className="text-xs text-text-muted">{t("analytics.activityChart.tasks")}</Text>
+          <Text className="font-sans text-xs text-text-muted">{t("analytics.activityChart.tasks")}</Text>
         </View>
       </View>
       {n === 0 ? (
-        <Text className="py-4 text-sm text-text-muted">—</Text>
+        <Text className="font-sans py-4 text-sm text-text-muted">—</Text>
       ) : (
         <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={{ height: H }}>
           {width > 0 && (
@@ -312,7 +312,7 @@ export function LoopPanel({ loop, t, c }: { loop: LoopStats; t: T; c: ThemeColor
         subtitle={t("analytics.loop.subtitle")}
         icon={<Sparkles size={16} color={c.accent2} />}
       >
-        <Text className="py-4 text-sm text-text-muted">{t("analytics.loop.empty")}</Text>
+        <Text className="font-sans py-4 text-sm text-text-muted">{t("analytics.loop.empty")}</Text>
       </PanelCard>
     );
   }
@@ -371,14 +371,14 @@ export function LoopPanel({ loop, t, c }: { loop: LoopStats; t: T; c: ThemeColor
           <View className="mb-2 flex-row gap-4">
             <View className="flex-row items-center gap-1.5">
               <View className="h-2 w-2 rounded-full" style={{ backgroundColor: PURPLE }} />
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 {t("analytics.loop.chartMessages")}
               </Text>
             </View>
             {hasDeep && (
               <View className="flex-row items-center gap-1.5">
                 <View className="h-2 w-2 rounded-full" style={{ backgroundColor: BLUE }} />
-                <Text className="text-xs text-text-muted">
+                <Text className="font-sans text-xs text-text-muted">
                   {t("analytics.loop.chartDeep")}
                 </Text>
               </View>
@@ -454,18 +454,18 @@ export function LoopPanel({ loop, t, c }: { loop: LoopStats; t: T; c: ThemeColor
       )}
 
       <View className="mt-4 gap-2.5">
-        <Text className="text-[11px] uppercase tracking-wide text-text-muted">
+        <Text className="font-sans text-[11px] uppercase tracking-wide text-text-muted">
           {t("analytics.loop.topTools")}
         </Text>
         {loop.topTools.length === 0 ? (
-          <Text className="text-sm text-text-muted">{t("analytics.loop.topToolsEmpty")}</Text>
+          <Text className="font-sans text-sm text-text-muted">{t("analytics.loop.topToolsEmpty")}</Text>
         ) : (
           loop.topTools.map((row) => (
             <View
               key={row.tool}
               className="flex-row items-center justify-between gap-3 rounded-lg border border-border bg-bg px-3 py-2"
             >
-              <Text className="min-w-0 flex-1 text-sm capitalize text-text" numberOfLines={1}>
+              <Text className="font-sans min-w-0 flex-1 text-sm capitalize text-text" numberOfLines={1}>
                 {row.tool.replace(/_/g, " ")}
               </Text>
               <Text className="text-base font-sans-semibold text-text">{row.count}</Text>
@@ -475,7 +475,7 @@ export function LoopPanel({ loop, t, c }: { loop: LoopStats; t: T; c: ThemeColor
       </View>
 
       <View className="mt-4 gap-2.5">
-        <Text className="text-[11px] uppercase tracking-wide text-text-muted">
+        <Text className="font-sans text-[11px] uppercase tracking-wide text-text-muted">
           {t("analytics.loop.surfaces")}
         </Text>
         <View className="gap-2.5">
@@ -515,8 +515,8 @@ export function StatusBar({
   return (
     <View>
       <View className="mb-1 flex-row justify-between">
-        <Text className="text-xs text-text-muted">{label}</Text>
-        <Text className="text-xs text-text-muted">{count}</Text>
+        <Text className="font-sans text-xs text-text-muted">{label}</Text>
+        <Text className="font-sans text-xs text-text-muted">{count}</Text>
       </View>
       <View className="h-1.5 overflow-hidden rounded-full bg-border">
         <View style={{ height: "100%", width: `${pct}%`, backgroundColor: color }} />
@@ -569,11 +569,11 @@ export function StatusBreakdownPanel({
     >
       <View className="gap-5">
         <View className="gap-2.5">
-          <Text className="text-[11px] uppercase tracking-wide text-text-muted">
+          <Text className="font-sans text-[11px] uppercase tracking-wide text-text-muted">
             {t("analytics.statusBreakdown.status")}
           </Text>
           {statusCounts.length === 0 ? (
-            <Text className="text-sm text-text-muted">{t("analytics.statusBreakdown.noData")}</Text>
+            <Text className="font-sans text-sm text-text-muted">{t("analytics.statusBreakdown.noData")}</Text>
           ) : (
             STATUS_ORDER.map((s) => {
               const row = statusCounts.find((x) => x.status === s);
@@ -591,11 +591,11 @@ export function StatusBreakdownPanel({
           )}
         </View>
         <View className="gap-2.5">
-          <Text className="text-[11px] uppercase tracking-wide text-text-muted">
+          <Text className="font-sans text-[11px] uppercase tracking-wide text-text-muted">
             {t("analytics.statusBreakdown.category")}
           </Text>
           {categoryBreakdown.length === 0 ? (
-            <Text className="text-sm text-text-muted">{t("analytics.statusBreakdown.noCategories")}</Text>
+            <Text className="font-sans text-sm text-text-muted">{t("analytics.statusBreakdown.noCategories")}</Text>
           ) : (
             categoryBreakdown.map((cat) => (
               <View
@@ -607,11 +607,11 @@ export function StatusBreakdownPanel({
                     className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: categoryChipColors(cat.color, c).dot }}
                   />
-                  <Text className="flex-1 text-sm text-text" numberOfLines={1}>
+                  <Text className="font-sans flex-1 text-sm text-text" numberOfLines={1}>
                     {cat.name}
                   </Text>
                 </View>
-                <Text className="text-xs text-text-muted">
+                <Text className="font-sans text-xs text-text-muted">
                   {t("analytics.statusBreakdown.rowMeta", {
                     projects: cat.projectCount,
                     interactions: cat.interactions,
@@ -690,7 +690,7 @@ export function WeekdayHeatmap({ heatmap, t }: { heatmap: WeekdayBucket[]; t: T 
               >
                 <Text className="text-xs font-sans-semibold text-text">{count}</Text>
               </View>
-              <Text className="text-[10px] text-text-muted">
+              <Text className="font-sans text-[10px] text-text-muted">
                 {t(`analytics.weekday.labels.${key}`)}
               </Text>
             </View>
@@ -708,7 +708,7 @@ export function Delta({ value, c }: { value: number; c: ThemeColors }) {
     return (
       <View className="flex-row items-center gap-0.5">
         <Minus size={12} color={c.textMuted} />
-        <Text className="text-xs text-text-muted">0</Text>
+        <Text className="font-sans text-xs text-text-muted">0</Text>
       </View>
     );
   }
@@ -716,14 +716,14 @@ export function Delta({ value, c }: { value: number; c: ThemeColors }) {
     return (
       <View className="flex-row items-center gap-0.5">
         <ArrowUp size={12} color={c.accent} />
-        <Text className="text-xs text-accent">+{value}</Text>
+        <Text className="font-sans text-xs text-accent">+{value}</Text>
       </View>
     );
   }
   return (
     <View className="flex-row items-center gap-0.5">
       <ArrowDown size={12} color={ROSE} />
-      <Text className="text-xs" style={{ color: ROSE }}>
+      <Text className="font-sans text-xs" style={{ color: ROSE }}>
         {value}
       </Text>
     </View>
@@ -746,7 +746,7 @@ export function TopProjectsPanel({
       subtitle={t("analytics.topProjects.subtitle")}
     >
       {rows.length === 0 ? (
-        <Text className="py-4 text-sm text-text-muted">{t("analytics.topProjects.empty")}</Text>
+        <Text className="font-sans py-4 text-sm text-text-muted">{t("analytics.topProjects.empty")}</Text>
       ) : (
         <View className="gap-2">
           {rows.map((r) => (
@@ -755,10 +755,10 @@ export function TopProjectsPanel({
               className="flex-row items-center justify-between gap-3 rounded-lg border border-border bg-bg px-3 py-2"
             >
               <View className="min-w-0 flex-1">
-                <Text className="text-sm text-text" numberOfLines={1}>
+                <Text className="font-sans text-sm text-text" numberOfLines={1}>
                   {r.name}
                 </Text>
-                <Text className="text-[11px] text-text-muted">{t(`status.${r.status}`)}</Text>
+                <Text className="font-sans text-[11px] text-text-muted">{t(`status.${r.status}`)}</Text>
               </View>
               <View className="flex-row items-center gap-3">
                 <Delta value={r.deltaVsPrev} c={c} />
@@ -797,7 +797,7 @@ export function SleepingStalePanel({
         subtitle={t("analytics.sleeping.subtitle")}
       >
         {sleeping.length === 0 ? (
-          <Text className="py-4 text-sm text-text-muted">{t("analytics.sleeping.empty")}</Text>
+          <Text className="font-sans py-4 text-sm text-text-muted">{t("analytics.sleeping.empty")}</Text>
         ) : (
           <View className="gap-2">
             {sleeping.map((s) => {
@@ -807,7 +807,7 @@ export function SleepingStalePanel({
                   key={s.projectId}
                   className="flex-row items-center justify-between gap-3 rounded-lg border border-border bg-bg px-3 py-2"
                 >
-                  <Text className="min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
+                  <Text className="font-sans min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
                     {s.name}
                   </Text>
                   <View className="flex-row items-center gap-2">
@@ -818,11 +818,11 @@ export function SleepingStalePanel({
                         borderColor: `rgba(${tone.base},0.3)`,
                       }}
                     >
-                      <Text className="text-[10px]" style={{ color: tone.text }}>
+                      <Text className="font-sans text-[10px]" style={{ color: tone.text }}>
                         {s.bucket}d
                       </Text>
                     </View>
-                    <Text className="text-xs text-text-muted">{s.daysIdle}d</Text>
+                    <Text className="font-sans text-xs text-text-muted">{s.daysIdle}d</Text>
                   </View>
                 </View>
               );
@@ -837,7 +837,7 @@ export function SleepingStalePanel({
         subtitle={t("analytics.stale.subtitle")}
       >
         {stale.length === 0 ? (
-          <Text className="py-4 text-sm text-text-muted">{t("analytics.stale.empty")}</Text>
+          <Text className="font-sans py-4 text-sm text-text-muted">{t("analytics.stale.empty")}</Text>
         ) : (
           <View className="gap-2">
             {stale.map((s) => (
@@ -845,10 +845,10 @@ export function SleepingStalePanel({
                 key={s.ideaId}
                 className="flex-row items-center justify-between gap-3 rounded-lg border border-border bg-bg px-3 py-2"
               >
-                <Text className="min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
+                <Text className="font-sans min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
                   {s.title}
                 </Text>
-                <Text className="text-xs text-text-muted">{s.daysOld}d</Text>
+                <Text className="font-sans text-xs text-text-muted">{s.daysOld}d</Text>
               </View>
             ))}
           </View>
@@ -898,18 +898,18 @@ export function EffortPanel({ effort, t }: { effort: EffortStats; t: T }) {
     >
       <View className="mb-4 flex-row items-baseline gap-2">
         <Text className="text-3xl font-sans-semibold text-text">{effort.effortHoursTotal}</Text>
-        <Text className="text-sm text-text-muted">{t("analytics.effort.totalHoursSuffix")}</Text>
+        <Text className="font-sans text-sm text-text-muted">{t("analytics.effort.totalHoursSuffix")}</Text>
       </View>
       {effort.effortHoursByProject.length === 0 ? (
-        <Text className="text-sm text-text-muted">{t("analytics.effort.empty")}</Text>
+        <Text className="font-sans text-sm text-text-muted">{t("analytics.effort.empty")}</Text>
       ) : (
         <View className="gap-1.5">
           {effort.effortHoursByProject.map((row) => (
             <View key={row.projectId} className="flex-row items-center justify-between gap-3">
-              <Text className="min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
+              <Text className="font-sans min-w-0 flex-1 text-sm text-text" numberOfLines={1}>
                 {row.name}
               </Text>
-              <Text className="text-sm text-text-muted">{row.hours} h</Text>
+              <Text className="font-sans text-sm text-text-muted">{row.hours} h</Text>
             </View>
           ))}
         </View>

@@ -46,7 +46,7 @@ export default function IdeaForm() {
       saving={saving}
     >
       {!existing && (
-        <Text className="text-sm text-text-muted">{t("modals.idea.intro")}</Text>
+        <Text className="font-sans text-sm text-text-muted">{t("modals.idea.intro")}</Text>
       )}
       <Field label={t("modals.idea.title")}>
         <FormInput value={title} onChangeText={setTitle} autoFocus />

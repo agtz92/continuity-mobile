@@ -116,10 +116,10 @@ export function TodayFocusSection({
     >
       {todayFocus.items.length === 0 ? (
         <View className="items-center rounded-xl border border-border bg-surface p-8">
-          <Text className="text-base mb-3 text-text-muted">
+          <Text className="font-sans text-base mb-3 text-text-muted">
             {t("views.today.focus.emptyTitle")}
           </Text>
-          <Text className="text-center text-sm text-text-muted">
+          <Text className="font-sans text-center text-sm text-text-muted">
             {projects.length === 0
               ? t("views.today.focus.emptyHintFirst")
               : t("views.today.focus.emptyHintNext")}
@@ -192,13 +192,13 @@ export function TodayFocusSection({
                         </View>
                       )}
                       {item.project && (
-                        <Text className="text-xs text-text-muted">
+                        <Text className="font-sans text-xs text-text-muted">
                           · {item.project.name}
                         </Text>
                       )}
                     </View>
                     <View className="flex-row flex-wrap items-center gap-2">
-                      <Text className="text-base text-text">
+                      <Text className="font-sans text-base text-text">
                         {item.task
                           ? item.task.title
                           : item.type === "stalled" && item.project
@@ -221,7 +221,7 @@ export function TodayFocusSection({
                         >
                           <CalendarCheck size={12} color={c.accent} />
                           <Text
-                            className="text-[11px]"
+                            className="font-sans text-[11px]"
                             style={{ color: c.accent }}
                           >
                             {t("taskRow.moveToToday")}
@@ -240,7 +240,7 @@ export function TodayFocusSection({
                         >
                           <CalendarClock size={12} color={c.textMuted} />
                           <Text
-                            className="text-[11px]"
+                            className="font-sans text-[11px]"
                             style={{ color: c.textMuted }}
                           >
                             {t("taskRow.reschedule")}
@@ -269,7 +269,7 @@ export function TodayFocusSection({
                 className="rounded-full px-1.5 py-0.5"
                 style={{ backgroundColor: alpha(c.accent, 0.3) }}
               >
-                <Text className="text-xs" style={{ color: c.accent }}>
+                <Text className="font-sans text-xs" style={{ color: c.accent }}>
                   {t("views.today.focus.moreCount", {
                     count: todayFocus.total - todayFocus.items.length,
                   })}

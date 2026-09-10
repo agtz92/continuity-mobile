@@ -31,10 +31,10 @@ function ProjectsList({ output }: { output: unknown }) {
           className="flex-row items-center justify-between gap-2 rounded-md border border-border px-2 py-1.5"
           style={{ backgroundColor: alpha(c.surface, 0.6) }}
         >
-          <Text className="flex-1 text-xs text-text" numberOfLines={1}>
+          <Text className="font-sans flex-1 text-xs text-text" numberOfLines={1}>
             {String(p.name || "")}
           </Text>
-          <Text className="text-[10px] uppercase text-text-muted">
+          <Text className="font-sans text-[10px] uppercase text-text-muted">
             {String(p.status || "")}
           </Text>
         </View>
@@ -62,7 +62,7 @@ function TasksList({ output }: { output: unknown }) {
               style={{ backgroundColor: done ? c.textMuted : c.accent }}
             />
             <Text
-              className={
+              className={"font-sans " + 
                 "flex-1 text-xs " +
                 (done ? "text-text-muted line-through" : "text-text")
               }
@@ -112,7 +112,7 @@ export function ToolCallCard({ block }: { block: AssistantToolUseBlock }) {
         <Wrench size={12} color={c.textMuted} />
         <Text className="text-xs font-sans-medium text-text-muted">{name}</Text>
         <Text
-          className="ml-auto text-[10px]"
+          className="font-sans ml-auto text-[10px]"
           style={{ color: isLoading ? c.accent : c.textMuted }}
         >
           {isLoading ? t("assistant.tools.running") : t("assistant.tools.done")}
@@ -126,11 +126,11 @@ export function ToolCallCard({ block }: { block: AssistantToolUseBlock }) {
         >
           {hasInput && (
             <View className="mb-2">
-              <Text className="mb-1 text-[10px] uppercase tracking-wider text-text-muted">
+              <Text className="font-sans mb-1 text-[10px] uppercase tracking-wider text-text-muted">
                 {t("assistant.tools.input")}
               </Text>
               <Text
-                className="text-[11px] text-text-muted"
+                className="font-sans text-[11px] text-text-muted"
                 style={{ fontFamily: MONO }}
               >
                 {JSON.stringify(block.input, null, 2)}
@@ -142,7 +142,7 @@ export function ToolCallCard({ block }: { block: AssistantToolUseBlock }) {
               <RichRenderer output={block.output} />
             ) : (
               <Text
-                className="text-[11px] text-text-muted"
+                className="font-sans text-[11px] text-text-muted"
                 style={{ fontFamily: MONO }}
               >
                 {JSON.stringify(block.output, null, 2)}

@@ -24,10 +24,10 @@ function Note({ label, body }: { label: string; body: string }) {
   if (!body) return null;
   return (
     <View>
-      <Text className="text-[10px] uppercase tracking-wider text-text-muted">
+      <Text className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
         {label}
       </Text>
-      <Text className="text-sm text-text">{body}</Text>
+      <Text className="font-sans text-sm text-text">{body}</Text>
     </View>
   );
 }
@@ -114,7 +114,7 @@ export default function Graveyard() {
               {t("views.graveyard.patternTitle")}
             </Meta>
           </View>
-          <Text className="text-sm leading-snug text-text">{insight!.body}</Text>
+          <Text className="font-sans text-sm leading-snug text-text">{insight!.body}</Text>
           <Pressable
             onPress={askLoop}
             accessibilityRole="button"
@@ -136,7 +136,7 @@ export default function Graveyard() {
               {t("views.graveyard.noPatternTitle")}
             </Text>
           </View>
-          <Text className="text-sm text-text-muted">
+          <Text className="font-sans text-sm text-text-muted">
             {t("views.graveyard.noPatternBody")}
           </Text>
         </View>
@@ -145,13 +145,13 @@ export default function Graveyard() {
       {killed.length === 0 ? (
         <View className="items-center gap-2 rounded-xl border border-border bg-surface p-8">
           <Tombstone size={28} color={c.textMuted} />
-          <Text className="text-center text-sm text-text-muted">
+          <Text className="font-sans text-center text-sm text-text-muted">
             {t("views.graveyard.empty")}
           </Text>
         </View>
       ) : (
         <>
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("views.graveyard.wouldRestartCount", {
               count: wouldRestartCount,
               total: killed.length,
@@ -167,7 +167,7 @@ export default function Graveyard() {
                   <Text className="text-base font-sans-semibold text-text">
                     {p.name}
                   </Text>
-                  <Text className="text-xs text-text-muted">
+                  <Text className="font-sans text-xs text-text-muted">
                     {t("views.graveyard.lived", {
                       count: daysSince(p.created) ?? 0,
                     })}
@@ -182,7 +182,7 @@ export default function Graveyard() {
                     }}
                   >
                     <RefreshCw size={11} color={c.accent} />
-                    <Text className="text-[11px] text-accent">
+                    <Text className="font-sans text-[11px] text-accent">
                       {t("views.graveyard.wouldRestartBadge")}
                     </Text>
                   </View>
@@ -216,7 +216,7 @@ export default function Graveyard() {
                       {t("views.graveyard.ai")}
                     </Meta>
                   </View>
-                  <Text className="text-sm leading-snug text-text">
+                  <Text className="font-sans text-sm leading-snug text-text">
                     {p.killedAiReflection}
                   </Text>
                 </View>

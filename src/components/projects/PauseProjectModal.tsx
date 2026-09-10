@@ -99,7 +99,7 @@ export function PauseProjectModal({
           placeholder={t("closure.pause.blockerPlaceholder")}
         />
       </Field>
-      <Text className="text-xs leading-snug text-text-muted">
+      <Text className="font-sans text-xs leading-snug text-text-muted">
         {t("closure.pause.why")}
       </Text>
     </ClosureModalShell>

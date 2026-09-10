@@ -87,7 +87,7 @@ export function ModalScaffold({
             accessibilityRole="button"
             className="rounded-lg border border-border bg-surface px-5 py-3"
           >
-            <Text className="text-base text-text">{t("common.cancel")}</Text>
+            <Text className="font-sans text-base text-text">{t("common.cancel")}</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>

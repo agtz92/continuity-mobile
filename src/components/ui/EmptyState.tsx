@@ -33,7 +33,7 @@ export function EmptyState({
         {title}
       </Text>
       {body ? (
-        <Text className="mt-3 text-base text-text-3">{body}</Text>
+        <Text className="font-sans mt-3 text-base text-text-3">{body}</Text>
       ) : null}
       {actions ? (
         <View className="mt-5 flex-row flex-wrap items-center gap-3">

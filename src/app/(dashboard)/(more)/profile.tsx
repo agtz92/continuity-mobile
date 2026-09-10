@@ -118,11 +118,11 @@ export default function Profile() {
               accessibilityRole="button"
               className="self-start rounded-lg border border-border bg-bg px-3 py-1.5 active:opacity-80"
             >
-              <Text className="text-sm text-text">
+              <Text className="font-sans text-sm text-text">
                 {t("settings.profile.changeAvatar")}
               </Text>
             </Pressable>
-            <Text className="text-xs text-text-muted">
+            <Text className="font-sans text-xs text-text-muted">
               {t("settings.profile.avatarDescription")}
             </Text>
           </View>
@@ -165,14 +165,14 @@ export default function Profile() {
           <Meta variant="cintillo" tone="muted">
             {t("settings.profile.email")}
           </Meta>
-          <Text className="text-base text-text">{email}</Text>
+          <Text className="font-sans text-base text-text">{email}</Text>
         </View>
         {createdAt !== "" && (
           <View className="gap-1">
             <Meta variant="cintillo" tone="muted">
               {t("settings.profile.memberSince")}
             </Meta>
-            <Text className="text-base text-text">{createdAt}</Text>
+            <Text className="font-sans text-base text-text">{createdAt}</Text>
           </View>
         )}
       </View>
@@ -194,10 +194,10 @@ export default function Profile() {
             {t("settings.deleteAccount.title")}
           </Text>
         </View>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("settings.deleteAccount.body")}
         </Text>
-        <Text className="text-sm text-text-muted">
+        <Text className="font-sans text-sm text-text-muted">
           {t("settings.deleteAccount.subscriptionWarning")}
         </Text>
         <Pressable

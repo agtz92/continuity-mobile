@@ -92,12 +92,12 @@ export function StalledProjectModal({
               >
                 {active && <Check size={13} color={c.accent} />}
               </View>
-              <Text className="flex-1 text-base text-text">{t(opt.key)}</Text>
+              <Text className="font-sans flex-1 text-base text-text">{t(opt.key)}</Text>
             </Pressable>
           );
         })}
       </View>
-      <Text className="text-xs text-text-muted">
+      <Text className="font-sans text-xs text-text-muted">
         {t("closure.stalled.footer")}
       </Text>
     </ClosureModalShell>

@@ -28,7 +28,7 @@ export function Paywall({
       <Text className="text-center text-lg font-sans-semibold text-text">
         {t("paywall.title", { plan: requiredPlan })}
       </Text>
-      <Text className="text-base text-center text-text-muted">{t("paywall.body")}</Text>
+      <Text className="font-sans text-base text-center text-text-muted">{t("paywall.body")}</Text>
       <Pressable
         onPress={onManage}
         accessibilityRole="button"

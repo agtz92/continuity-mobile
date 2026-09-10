@@ -241,7 +241,7 @@ export default function Tasks() {
       className="rounded-full border px-2 py-0.5"
       style={{ backgroundColor: alpha(tone, 0.1), borderColor: alpha(tone, 0.3) }}
     >
-      <Text className="text-xs" style={{ color: tone }}>
+      <Text className="font-sans text-xs" style={{ color: tone }}>
         {n}
       </Text>
     </View>
@@ -297,7 +297,7 @@ export default function Tasks() {
               className="flex-row items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2"
             >
               <ListFilter size={14} color={c.textMuted} />
-              <Text className="text-sm text-text">
+              <Text className="font-sans text-sm text-text">
                 {t("views.tasks.filterCta")}
               </Text>
               {activeFilterCount > 0 && (
@@ -371,7 +371,7 @@ export default function Tasks() {
             }
           >
             {buckets.today.length === 0 ? (
-              <Text className="py-4 text-center text-sm text-text-muted">
+              <Text className="font-sans py-4 text-center text-sm text-text-muted">
                 {t("views.tasks.todayEmpty")}
               </Text>
             ) : (
@@ -428,7 +428,7 @@ export default function Tasks() {
                     borderColor: alpha(c.accent, 0.3),
                   }}
                 >
-                  <Text className="text-xs text-accent">{buckets.done.length}</Text>
+                  <Text className="font-sans text-xs text-accent">{buckets.done.length}</Text>
                 </View>
               }
             >

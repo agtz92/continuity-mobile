@@ -50,7 +50,7 @@ export function BlockerBadge({
           overflow: "hidden",
         }}
       >
-        <Text style={{ color: c.signal, fontSize: 11 }}>✕</Text>
+        <Text className="font-sans" style={{ color: c.signal, fontSize: 11 }}>✕</Text>
         <Meta variant={label ? "cintillo" : "dato"} tone="inherit" style={{ color: c.signal }}>
           {label ? t("blocker.blocked") : ""}
           {label && since > 0 ? " " : ""}
@@ -73,13 +73,13 @@ export function BlockerBadge({
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Text style={{ color: c.signal, fontSize: 13 }}>✕</Text>
+        <Text className="font-sans" style={{ color: c.signal, fontSize: 13 }}>✕</Text>
         <Meta variant="cintillo" tone="inherit" style={{ color: c.signal }}>
           {since > 0 ? t("blocker.blockedDays", { count: since }) : t("blocker.blocked")}
         </Meta>
       </View>
       {reason ? (
-        <Text className="mt-1 text-sm text-text-2">{reason}</Text>
+        <Text className="font-sans mt-1 text-sm text-text-2">{reason}</Text>
       ) : null}
       {blocksCount ? (
         <Meta variant="cintillo" tone="faint" className="mt-1">

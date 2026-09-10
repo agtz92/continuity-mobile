@@ -227,7 +227,7 @@ export default function Routines() {
       className="rounded-full border px-2 py-0.5"
       style={{ backgroundColor: bg, borderColor: border }}
     >
-      <Text className="text-xs" style={{ color }}>
+      <Text className="font-sans text-xs" style={{ color }}>
         {n}
       </Text>
     </View>
@@ -290,7 +290,7 @@ export default function Routines() {
             )}
           >
             {filteredToday.length === 0 ? (
-              <Text className="py-4 text-center text-sm text-text-muted">
+              <Text className="font-sans py-4 text-center text-sm text-text-muted">
                 {t("views.routines.todayEmpty")}
               </Text>
             ) : (

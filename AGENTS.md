@@ -90,7 +90,7 @@ con el peso de la tinta (`text3`/`text5`) o con la rampa de reglas.
 consume la app; es la referencia. Antes de dar por buena cualquier edición de tokens o paletas:
 
 ```bash
-npm run check-tokens
+npm run check-parity
 ```
 
 Sale != 0 en cuanto un hex de `src/theme/tokens.ts` o `src/palette/config.ts` se separa del de web.

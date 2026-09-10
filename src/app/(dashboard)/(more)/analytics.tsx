@@ -104,7 +104,7 @@ export default function Analytics() {
           <BarChart3 size={18} color={c.accent} />
           <ScreenTitle>{t("analytics.title")}</ScreenTitle>
           {loading && !initialLoading ? (
-            <Text className="text-xs text-text-muted">{t("analytics.refreshing")}</Text>
+            <Text className="font-sans text-xs text-text-muted">{t("analytics.refreshing")}</Text>
           ) : null}
         </View>
 
@@ -128,7 +128,7 @@ export default function Analytics() {
 
       {initialLoading || (!analytics && !error) ? (
         <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-text-muted">{t("analytics.calculating")}</Text>
+          <Text className="font-sans text-base text-text-muted">{t("analytics.calculating")}</Text>
         </View>
       ) : (
         <ScrollView
@@ -147,7 +147,7 @@ export default function Analytics() {
                 <Text className="text-sm font-sans-semibold" style={{ color: c.signal }}>
                   {t("analytics.loadError")}
                 </Text>
-                <Text className="mt-1 text-xs text-text-muted">{error.message}</Text>
+                <Text className="font-sans mt-1 text-xs text-text-muted">{error.message}</Text>
                 <Pressable
                   onPress={() => refetch()}
                   className="mt-3 self-start rounded-md bg-accent px-3 py-1.5"

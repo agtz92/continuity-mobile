@@ -2,26 +2,14 @@ import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
-import { HeaderBackButton } from "@/components/ui/HeaderBackButton";
+import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
 
 export default function MoreLayout() {
   const { t } = useTranslation();
   const { effective } = useTheme();
   const s = THEME_SURFACES[effective];
 
-  const headered = {
-    headerShown: true,
-    headerStyle: { backgroundColor: s.surface },
-    headerTintColor: s.text,
-    headerTitleStyle: { color: s.text },
-    headerShadowVisible: false,
-    // Explicit, clearly-visible back arrow — the default native chevron was
-    // too subtle and users couldn't tell the header was tappable.
-    headerBackVisible: false,
-    headerLeft: (props: { canGoBack?: boolean }) => (
-      <HeaderBackButton canGoBack={props.canGoBack} />
-    ),
-  } as const;
+  const headered = headerOptionsFor(s);
 
   return (
     <Stack initialRouteName="more">
@@ -79,3 +67,7 @@ export default function MoreLayout() {
     </Stack>
   );
 }
+
+// `expo-router` monta esto en vez de dejar el hueco en blanco cuando una
+// pantalla de este árbol revienta al renderizar. Ver `ui/RouteError`.
+export { RouteError as ErrorBoundary } from "@/components/ui/RouteError";

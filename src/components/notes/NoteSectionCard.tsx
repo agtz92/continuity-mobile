@@ -152,7 +152,7 @@ export function NoteSectionCard({
             </Pressable>
           ) : (
             <Pressable onPress={() => setEditing(true)}>
-              <Text className="italic" style={{ color: c.textMuted, fontSize: 15 }}>
+              <Text className="font-sans italic" style={{ color: c.textMuted, fontSize: 15 }}>
                 {t("views.quickNotes.sectionBody")}
               </Text>
             </Pressable>

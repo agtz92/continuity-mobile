@@ -116,7 +116,7 @@ export function RoutineRow({
         >
           <View className="flex-row flex-wrap items-center gap-2">
             <Text
-              className={
+              className={"font-sans " + 
                 "text-base " +
                 (isDone ? "text-text-muted line-through" : "text-text")
               }
@@ -167,7 +167,7 @@ export function RoutineRow({
                 </Text>
               </View>
             ) : (
-              <Text className="text-xs" style={{ color: c.textMuted }}>
+              <Text className="font-sans text-xs" style={{ color: c.textMuted }}>
                 {new Date(scheduledDate + "T00:00:00").toLocaleDateString(
                   i18n.language
                 )}
@@ -179,11 +179,11 @@ export function RoutineRow({
                   className="h-2 w-2 rounded-full"
                   style={{ backgroundColor: projectDot ?? c.textMuted }}
                 />
-                <Text className="text-xs text-text-muted">{project.name}</Text>
+                <Text className="font-sans text-xs text-text-muted">{project.name}</Text>
               </View>
             )}
             {!!routine.description && (
-              <Text className="text-xs text-text-muted">
+              <Text className="font-sans text-xs text-text-muted">
                 · {routine.description}
               </Text>
             )}

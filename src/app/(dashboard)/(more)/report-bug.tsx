@@ -50,7 +50,7 @@ export default function ReportBug() {
       contentContainerClassName="gap-5 p-5"
       keyboardShouldPersistTaps="handled"
     >
-      <Text className="text-sm text-text-muted">
+      <Text className="font-sans text-sm text-text-muted">
         {t("reportBug.description")}
       </Text>
 
@@ -74,7 +74,7 @@ export default function ReportBug() {
           multiline
           numberOfLines={6}
         />
-        <Text className="text-right text-xs text-text-muted">
+        <Text className="font-sans text-right text-xs text-text-muted">
           {message.length}/{MAX_MESSAGE_LEN}
         </Text>
       </Field>

@@ -311,7 +311,7 @@ export default function Log() {
                 }
               >
                 <Text
-                  className={
+                  className={"font-sans " + 
                     "text-xs " + (active ? "text-bg" : "text-text-muted")
                   }
                 >
@@ -368,13 +368,13 @@ export default function Log() {
               <View className="mb-2 flex-row gap-3 rounded-lg border border-border bg-surface p-3">
                 <View style={{ marginTop: 2 }}>{iconFor(a.kind, c)}</View>
                 <View className="min-w-0 flex-1">
-                  <Text className="mb-0.5 text-xs text-text-muted">
+                  <Text className="font-sans mb-0.5 text-xs text-text-muted">
                     {formatDate(a.created, locale)}
                   </Text>
                   {proj && (
-                    <Text className="mb-0.5 text-xs text-accent">{proj.name}</Text>
+                    <Text className="font-sans mb-0.5 text-xs text-accent">{proj.name}</Text>
                   )}
-                  <Text className="text-sm text-text">
+                  <Text className="font-sans text-sm text-text">
                     {describe(a, locale, t)}
                   </Text>
                 </View>

@@ -41,7 +41,7 @@ export function QuickActionChips({
           className="rounded-full border border-border px-2.5 py-1 active:bg-surface"
           style={disabled ? { opacity: 0.5 } : undefined}
         >
-          <Text className="text-[11px] text-text-muted">
+          <Text className="font-sans text-[11px] text-text-muted">
             {t(`assistant.quickActions.${k}`)}
           </Text>
         </Pressable>

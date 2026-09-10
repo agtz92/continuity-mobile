@@ -255,7 +255,7 @@ export default function Onboarding() {
 
       {replay && (
         <View className="mx-5 mb-2 rounded-lg border border-border bg-surface px-3 py-2">
-          <Text className="text-xs text-text-muted">
+          <Text className="font-sans text-xs text-text-muted">
             {t("onboarding.replay.banner")}
           </Text>
         </View>

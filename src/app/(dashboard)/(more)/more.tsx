@@ -1,4 +1,5 @@
-import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import { Meta } from "@/components/ui/Meta";
 import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -114,7 +115,7 @@ export default function More() {
             }
           >
             <Icon color={s.text} size={20} />
-            <Text className="text-base flex-1 text-text">{it.label}</Text>
+            <Text className="font-sans text-base flex-1 text-text">{it.label}</Text>
             <ChevronRight color={s.textMuted} size={18} />
           </Pressable>
         );
@@ -143,7 +144,10 @@ export default function More() {
           },
         ])}
 
-        {/* Legal — external web pages (Apple wants an accessible privacy policy) */}
+        {/* Legal. Apple (5.1.1) y Play exigen que la política de privacidad sea
+            accesible; un enlace cumple, así que esto NO era una falta. Pero se
+            abría con `Linking.openURL`, que te expulsa a Safari y te deja fuera
+            de la app. `WebBrowser` la abre dentro, con su botón de cerrar. */}
         <View className="overflow-hidden rounded-xl border border-border bg-surface">
           {[
             {
@@ -163,14 +167,14 @@ export default function More() {
             return (
               <Pressable
                 key={it.key}
-                onPress={() => void Linking.openURL(it.url)}
+                onPress={() => void WebBrowser.openBrowserAsync(it.url)}
                 className={
                   "flex-row items-center gap-3 px-4 py-4 " +
                   (i > 0 ? "border-t border-border" : "")
                 }
               >
                 <Icon color={s.text} size={20} />
-                <Text className="text-base flex-1 text-text">{it.label}</Text>
+                <Text className="font-sans text-base flex-1 text-text">{it.label}</Text>
                 <ChevronRight color={s.textMuted} size={18} />
               </Pressable>
             );

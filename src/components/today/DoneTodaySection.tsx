@@ -75,7 +75,7 @@ export function DoneTodaySection({
                 }}
               >
                 <CheckCircle2 size={11} color={c.accent} />
-                <Text className="text-xs text-accent">
+                <Text className="font-sans text-xs text-accent">
                   {t("views.today.doneToday.tasksLabel", { count: taskCount })}
                 </Text>
               </Pressable>
@@ -96,7 +96,7 @@ export function DoneTodaySection({
                 }}
               >
                 <TrendingUp size={11} color={c.closed} />
-                <Text className="text-xs text-closed">
+                <Text className="font-sans text-xs text-closed">
                   {t("views.today.doneToday.logsLabel", { count: logCount })}
                 </Text>
               </Pressable>
@@ -110,7 +110,7 @@ export function DoneTodaySection({
                 }}
               >
                 <Clock size={11} color={c.closed} />
-                <Text className="text-xs text-closed">
+                <Text className="font-sans text-xs text-closed">
                   {t("views.today.doneToday.hoursWorkedLabel", {
                     hours: doneTodayEffortHours,
                   })}
@@ -123,7 +123,7 @@ export function DoneTodaySection({
         <View className="gap-3 rounded-xl border border-border bg-surface p-3">
           {todayHoursByProject.length > 0 && (
             <View className="flex-row flex-wrap items-center gap-1.5 border-b border-border pb-2">
-              <Text className="mr-1 text-[10px] uppercase tracking-wider text-text-muted">
+              <Text className="font-sans mr-1 text-[10px] uppercase tracking-wider text-text-muted">
                 {t("views.today.doneToday.hoursByProject")}
               </Text>
               {todayHoursByProject.map(({ project, hours }) => (
@@ -137,7 +137,7 @@ export function DoneTodaySection({
                   }}
                 >
                   <Clock size={10} color={c.accent} />
-                  <Text className="text-xs text-accent">
+                  <Text className="font-sans text-xs text-accent">
                     {project.name} · {hours}h
                   </Text>
                 </Pressable>
@@ -162,14 +162,14 @@ export function DoneTodaySection({
                         </Meta>
                         {proj && (
                           <Pressable onPress={() => jumpToProject(proj.id)}>
-                            <Text className="text-xs text-text-muted">
+                            <Text className="font-sans text-xs text-text-muted">
                               · {proj.name}
                             </Text>
                           </Pressable>
                         )}
                       </View>
                       <View className="flex-row flex-wrap items-center gap-2">
-                        <Text className="text-sm text-text-muted line-through">
+                        <Text className="font-sans text-sm text-text-muted line-through">
                           {item.task.title}
                         </Text>
                         {item.task.effortHours != null &&
@@ -201,7 +201,7 @@ export function DoneTodaySection({
                         </Meta>
                       </View>
                       <View className="flex-row flex-wrap items-center gap-2">
-                        <Text className="text-sm text-text-muted">
+                        <Text className="font-sans text-sm text-text-muted">
                           {item.title}
                         </Text>
                         {item.effortHours != null &&
@@ -239,13 +239,13 @@ export function DoneTodaySection({
                       </Meta>
                       {proj && (
                         <Pressable onPress={() => jumpToProject(proj.id)}>
-                          <Text className="text-xs text-text-muted">
+                          <Text className="font-sans text-xs text-text-muted">
                             · {proj.name}
                           </Text>
                         </Pressable>
                       )}
                     </View>
-                    <Text className="text-sm text-text-muted">{item.text}</Text>
+                    <Text className="font-sans text-sm text-text-muted">{item.text}</Text>
                   </View>
                 </View>
               );

@@ -4,12 +4,6 @@ import "@/lib/polyfills";
 import "../global.css";
 import "@/lib/i18n";
 
-// Antes del primer render: fija la grotesca del rediseño como familia por
-// defecto de `Text`/`TextInput`. Ver `src/theme/baseFont.ts`.
-import { applyBaseFont } from "@/theme/baseFont";
-
-applyBaseFont();
-
 import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -121,3 +115,7 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+// `expo-router` monta esto en vez de dejar el hueco en blanco cuando una
+// pantalla de este árbol revienta al renderizar. Ver `ui/RouteError`.
+export { RouteError as ErrorBoundary } from "@/components/ui/RouteError";
