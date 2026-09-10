@@ -4,9 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react-native";
 import { subscribeToasts, toast as toastApi, type Toast } from "@/lib/toast";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { lift } from "@/theme/lift";
 
-const RED = "rgb(248,113,113)";
-const RED_BORDER = "rgba(239,68,68,0.6)";
 
 export function Toaster() {
   const c = useThemeColors();
@@ -17,10 +16,11 @@ export function Toaster() {
 
   if (toasts.length === 0) return null;
 
+  // Tres voces y ninguna más: lo que falla, lo que se cerró, y lo demás, que
+  // es tinta neutra. El "info" era el segundo acento y solo añadía un color.
   const tint = (kind: Toast["kind"]) =>
-    kind === "error" ? RED : kind === "success" ? c.accent : c.accent2;
-  const border = (kind: Toast["kind"]) =>
-    kind === "error" ? RED_BORDER : alpha(tint(kind), 0.6);
+    kind === "error" ? c.signal : kind === "success" ? c.closed : c.text3;
+  const border = (kind: Toast["kind"]) => alpha(tint(kind), 0.6);
 
   return (
     <View
@@ -40,7 +40,7 @@ export function Toaster() {
           <View
             key={tt.id}
             className="flex-row items-start gap-2 rounded-lg border bg-surface px-3 py-2.5"
-            style={{ borderColor: border(tt.kind), elevation: 6 }}
+            style={{ borderColor: border(tt.kind), ...lift("float", c) }}
           >
             <View style={{ marginTop: 1 }}>
               {tt.kind === "error" ? (

@@ -48,7 +48,7 @@ export default function ResetPassword() {
       >
         <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
           <View className="gap-1">
-            <Text className="text-3xl font-bold text-text">
+            <Text className="text-3xl font-sans-bold text-text">
               {t("auth.reset.title")}
             </Text>
             <Text className="text-base text-text-muted">{t("auth.reset.subtitle")}</Text>
@@ -59,7 +59,7 @@ export default function ResetPassword() {
           ) : (
             <View className="gap-3">
               <View className="gap-1">
-                <Text className="text-sm font-medium text-text">
+                <Text className="text-sm font-sans-medium text-text">
                   {t("auth.reset.email")}
                 </Text>
                 <TextInput
@@ -74,7 +74,7 @@ export default function ResetPassword() {
                 />
               </View>
 
-              {error && <Text className="text-red-500">{error}</Text>}
+              {error && <Text className="text-signal">{error}</Text>}
 
               <Pressable
                 onPress={onSend}
@@ -82,7 +82,7 @@ export default function ResetPassword() {
                 className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
               >
                 {busy && <ActivityIndicator size="small" />}
-                <Text className="text-base font-semibold text-bg">
+                <Text className="text-base font-sans-semibold text-bg">
                   {t("auth.reset.send")}
                 </Text>
               </Pressable>
@@ -90,7 +90,7 @@ export default function ResetPassword() {
           )}
 
           <Pressable onPress={() => router.replace("/login")} className="self-center">
-            <Text className="text-base font-semibold text-accent">
+            <Text className="text-base font-sans-semibold text-accent">
               {t("auth.reset.backToLogin")}
             </Text>
           </Pressable>

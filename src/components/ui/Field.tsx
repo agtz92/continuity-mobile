@@ -11,7 +11,7 @@ export function Field({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-xs font-medium uppercase tracking-wider text-text-muted">
+      <Text className="text-xs font-sans-medium uppercase tracking-wider text-text-muted">
         {label}
       </Text>
       {children}

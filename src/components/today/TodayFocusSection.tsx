@@ -14,11 +14,12 @@ import { daysOverdue, daysSince, todayLocalISODate } from "@/lib/date";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { toast } from "@/lib/toast";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { TaskToggle } from "@/components/tasks/TaskToggle";
 import type { useTodayFocus } from "@/hooks/useTodayFocus";
 import { EffortBadge } from "./EffortBadge";
-import { RED, RED_T, ORANGE, ORANGE_T, AMBER, AMBER_T } from "./todayColors";
+import { focusTint } from "./todayColors";
 
 type FocusModel = ReturnType<typeof useTodayFocus>;
 
@@ -62,30 +63,12 @@ export function TodayFocusSection({
     if (ok) toast.success(t("taskRow.movedToast"), 2000);
   };
 
-  const focusTypeColor = (type: string) =>
-    type === "overdue"
-      ? RED_T
-      : type === "today"
-      ? ORANGE_T
-      : type === "stalled"
-      ? AMBER_T
-      : c.accent;
-  const focusBorder = (type: string) =>
-    type === "overdue"
-      ? `rgba(${RED},0.3)`
-      : type === "today"
-      ? `rgba(${ORANGE},0.3)`
-      : type === "stalled"
-      ? `rgba(${AMBER},0.3)`
-      : c.border;
-  // Left urgency spine — homologates the focus card with the TaskRow/RoutineRow
-  // redesign (red overdue, amber today/stalled, accent next-step).
-  const focusSpine = (type: string) =>
-    type === "overdue"
-      ? `rgb(${RED})`
-      : type === "today" || type === "stalled"
-      ? `rgb(${AMBER})`
-      : c.accent;
+  // Los tres tonos salen de `focusTint`, que los resuelve contra el tema. Antes
+  // eran hex fijos de Tailwind y era lo que hacía que el tema claro se viera
+  // ajeno: un rojo #ef4444 sobre papel crema no es de la familia de nada.
+  const focusTypeColor = (type: string) => focusTint(type, c).tint;
+  const focusBorder = (type: string) => focusTint(type, c).border;
+  const focusSpine = (type: string) => focusTint(type, c).spine;
 
   return (
     <CollapsibleSection
@@ -99,18 +82,18 @@ export function TodayFocusSection({
             <View
               className="flex-row items-center gap-1.5 rounded-full border px-2.5 py-1"
               style={{
-                backgroundColor: `rgba(${ORANGE},0.2)`,
-                borderColor: `rgba(${ORANGE},0.4)`,
+                backgroundColor: alpha(c.accent, 0.2),
+                borderColor: alpha(c.accent, 0.4),
               }}
             >
-              <Target size={11} color={ORANGE_T} />
-              <Text className="text-xs font-medium" style={{ color: ORANGE_T }}>
+              <Target size={11} color={c.accent} />
+              <Text className="text-xs font-sans-medium" style={{ color: c.accent }}>
                 {t("views.today.focus.tasksLabel", {
                   count: todayTaskCounts.total,
                 })}
               </Text>
               {todayTaskCounts.overdue > 0 && (
-                <Text className="text-xs font-semibold" style={{ color: RED_T }}>
+                <Text className="text-xs font-sans-semibold" style={{ color: c.signal }}>
                   {t("views.today.focus.overdueExtra", {
                     count: todayTaskCounts.overdue,
                   })}
@@ -118,19 +101,13 @@ export function TodayFocusSection({
               )}
             </View>
             {todayEffortHours > 0 && (
-              <View
-                className="flex-row items-center gap-1 rounded-full border px-2.5 py-1"
-                style={{
-                  backgroundColor: alpha(c.accent2, 0.15),
-                  borderColor: alpha(c.accent2, 0.4),
-                }}
-              >
-                <Clock size={11} color={c.accent2} />
-                <Text className="text-xs font-medium text-accent-2">
+              <View className="flex-row items-center gap-1">
+                <Clock size={11} color={c.text5} />
+                <Meta tone="faint">
                   {t("views.today.focus.totalHoursLabel", {
                     hours: todayEffortHours,
                   })}
-                </Text>
+                </Meta>
               </View>
             )}
           </View>
@@ -185,7 +162,7 @@ export function TodayFocusSection({
                   >
                     <View className="mb-1 flex-row flex-wrap items-center gap-2">
                       <Text
-                        className="text-xs font-medium uppercase tracking-wider"
+                        className="text-xs font-sans-medium uppercase tracking-wider"
                         style={{ color: focusTypeColor(item.type) }}
                       >
                         {t(
@@ -200,15 +177,15 @@ export function TodayFocusSection({
                       </Text>
                       {late !== null && (
                         <View
-                          className="rounded border px-1.5 py-0.5"
+                          className="rounded-md border px-1.5 py-0.5"
                           style={{
-                            backgroundColor: `rgba(${RED},0.25)`,
-                            borderColor: `rgba(${RED},0.5)`,
+                            backgroundColor: alpha(c.signal, 0.25),
+                            borderColor: alpha(c.signal, 0.5),
                           }}
                         >
                           <Text
-                            className="text-[10px] font-semibold"
-                            style={{ color: RED_T }}
+                            className="text-[10px] font-sans-semibold"
+                            style={{ color: c.signal }}
                           >
                             {t("views.today.focus.daysLate", { count: late })}
                           </Text>
@@ -281,24 +258,24 @@ export function TodayFocusSection({
               onPress={() => router.push("/tasks")}
               className="flex-row items-center justify-center gap-2 self-start rounded-lg border px-4 py-2"
               style={{
-                backgroundColor: `rgba(${ORANGE},0.1)`,
-                borderColor: `rgba(${ORANGE},0.3)`,
+                backgroundColor: alpha(c.accent, 0.1),
+                borderColor: alpha(c.accent, 0.3),
               }}
             >
-              <Text className="text-sm font-medium" style={{ color: ORANGE_T }}>
+              <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
                 {t("views.today.focus.viewAll")}
               </Text>
               <View
                 className="rounded-full px-1.5 py-0.5"
-                style={{ backgroundColor: `rgba(${ORANGE},0.3)` }}
+                style={{ backgroundColor: alpha(c.accent, 0.3) }}
               >
-                <Text className="text-xs" style={{ color: ORANGE_T }}>
+                <Text className="text-xs" style={{ color: c.accent }}>
                   {t("views.today.focus.moreCount", {
                     count: todayFocus.total - todayFocus.items.length,
                   })}
                 </Text>
               </View>
-              <ChevronRight size={14} color={ORANGE_T} />
+              <ChevronRight size={14} color={c.accent} />
             </Pressable>
           )}
         </View>

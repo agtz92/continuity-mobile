@@ -34,7 +34,7 @@ export function Step5Customize({
   return (
     <View className="gap-6">
       <View className="gap-3">
-        <Text className="text-3xl font-bold text-text">
+        <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step5.heading")}
         </Text>
         <Text className="text-base leading-relaxed text-text-muted">
@@ -42,7 +42,7 @@ export function Step5Customize({
         </Text>
       </View>
 
-      <View className="flex-row items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-4">
+      <View className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4">
         <Settings2 size={20} color={c.textMuted} />
         <Text className="flex-1 text-sm text-text-muted">
           {t("onboarding.step5.hint")}
@@ -63,7 +63,7 @@ export function Step5Customize({
           className="items-center py-1"
           style={busy ? { opacity: 0.5 } : undefined}
         >
-          <Text className="text-sm font-medium text-accent">
+          <Text className="text-sm font-sans-medium text-accent">
             {t("onboarding.replay.replayTourButton")}
           </Text>
         </Pressable>

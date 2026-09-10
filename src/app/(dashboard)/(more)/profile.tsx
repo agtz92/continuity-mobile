@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Meta } from "@/components/ui/Meta";
 import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client/react";
@@ -91,10 +92,10 @@ export default function Profile() {
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       {/* Avatar */}
-      <View className="gap-3 rounded-2xl border border-border bg-surface p-5">
-        <Text className="text-xs uppercase tracking-wider text-text-muted">
+      <View className="gap-3 rounded-xl border border-border bg-surface p-5">
+        <Meta variant="cintillo" tone="muted">
           {t("settings.profile.avatar")}
-        </Text>
+        </Meta>
         <View className="flex-row items-center gap-4">
           {avatarUrl ? (
             <Image
@@ -106,7 +107,7 @@ export default function Profile() {
               className="h-[72px] w-[72px] items-center justify-center rounded-full"
               style={{ backgroundColor: alpha(c.accent, 0.15) }}
             >
-              <Text className="text-2xl font-semibold text-accent">
+              <Text className="text-2xl font-sans-semibold text-accent">
                 {initial}
               </Text>
             </View>
@@ -129,7 +130,7 @@ export default function Profile() {
       </View>
 
       {/* Name */}
-      <View className="gap-3 rounded-2xl border border-border bg-surface p-5">
+      <View className="gap-3 rounded-xl border border-border bg-surface p-5">
         <Field label={t("settings.profile.name")}>
           <FormInput
             value={current}
@@ -150,7 +151,7 @@ export default function Profile() {
         >
           <Text
             className={
-              "text-base font-semibold " + (canSave ? "text-bg" : "text-text-muted")
+              "text-base font-sans-semibold " + (canSave ? "text-bg" : "text-text-muted")
             }
           >
             {t("common.save")}
@@ -159,18 +160,18 @@ export default function Profile() {
       </View>
 
       {/* Account info (read-only) */}
-      <View className="gap-4 rounded-2xl border border-border bg-surface p-5">
+      <View className="gap-4 rounded-xl border border-border bg-surface p-5">
         <View className="gap-1">
-          <Text className="text-xs uppercase tracking-wider text-text-muted">
+          <Meta variant="cintillo" tone="muted">
             {t("settings.profile.email")}
-          </Text>
+          </Meta>
           <Text className="text-base text-text">{email}</Text>
         </View>
         {createdAt !== "" && (
           <View className="gap-1">
-            <Text className="text-xs uppercase tracking-wider text-text-muted">
+            <Meta variant="cintillo" tone="muted">
               {t("settings.profile.memberSince")}
-            </Text>
+            </Meta>
             <Text className="text-base text-text">{createdAt}</Text>
           </View>
         )}
@@ -178,17 +179,17 @@ export default function Profile() {
 
       {/* Danger zone — account deletion (Apple requirement) */}
       <View
-        className="gap-3 rounded-2xl border p-5"
+        className="gap-3 rounded-xl border p-5"
         style={{
-          borderColor: "rgba(239,68,68,0.4)",
-          backgroundColor: "rgba(239,68,68,0.06)",
+          borderColor: alpha(c.signal, 0.4),
+          backgroundColor: alpha(c.signal, 0.06),
         }}
       >
         <View className="flex-row items-center gap-2">
-          <AlertTriangle size={16} color="rgb(248,113,113)" />
+          <AlertTriangle size={16} color={c.signal} />
           <Text
-            className="text-base font-semibold"
-            style={{ color: "rgb(248,113,113)" }}
+            className="text-base font-sans-semibold"
+            style={{ color: c.signal }}
           >
             {t("settings.deleteAccount.title")}
           </Text>
@@ -205,7 +206,7 @@ export default function Profile() {
           hitSlop={6}
           className="self-start"
         >
-          <Text className="text-sm font-medium text-accent underline">
+          <Text className="text-sm font-sans-medium text-accent underline">
             {t("settings.deleteAccount.manageSubscription")}
           </Text>
         </Pressable>
@@ -214,9 +215,9 @@ export default function Profile() {
           disabled={deleting}
           accessibilityRole="button"
           className="items-center rounded-lg py-3"
-          style={{ backgroundColor: "rgb(220,38,38)", opacity: deleting ? 0.6 : 1 }}
+          style={{ backgroundColor: c.signal, opacity: deleting ? 0.6 : 1 }}
         >
-          <Text className="text-base font-semibold text-white">
+          <Text className="text-base font-sans-semibold text-white">
             {deleting
               ? t("settings.deleteAccount.deleting")
               : t("settings.deleteAccount.button")}

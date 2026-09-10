@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Eye, EyeOff, GripVertical, Lock } from "lucide-react-native";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { lift } from "@/theme/lift";
 
 /**
  * Compact "customization row" for the Today edit mode. The actual draggable
@@ -39,13 +40,7 @@ export function TodaySectionEditRow({
         borderColor: hidden ? alpha(c.border, 0.6) : c.border,
         borderStyle: hidden ? "dashed" : "solid",
         opacity: hidden ? 0.65 : 1,
-        ...(isActive && {
-          shadowColor: c.accent,
-          shadowOpacity: 0.3,
-          shadowOffset: { width: 0, height: 4 },
-          shadowRadius: 12,
-          elevation: 8,
-        }),
+        ...(isActive ? lift("drag", c) : null),
       }}
     >
       <Pressable
@@ -62,12 +57,12 @@ export function TodaySectionEditRow({
       <View>{icon}</View>
 
       <View className="min-w-0 flex-1 flex-row flex-wrap items-center gap-2">
-        <Text className="text-base font-medium text-text" numberOfLines={1}>
+        <Text className="text-base font-sans-medium text-text" numberOfLines={1}>
           {label}
         </Text>
         {badge && (
           <View
-            className="rounded px-1.5 py-0.5"
+            className="rounded-md px-1.5 py-0.5"
             style={{ backgroundColor: c.border }}
           >
             <Text className="text-[10px] uppercase tracking-wider text-text-muted">
@@ -77,15 +72,15 @@ export function TodaySectionEditRow({
         )}
         {hidden && (
           <View
-            className="rounded border px-1.5 py-0.5"
+            className="rounded-md border px-1.5 py-0.5"
             style={{
-              backgroundColor: "rgba(245,158,11,0.15)",
-              borderColor: "rgba(245,158,11,0.3)",
+              backgroundColor: alpha(c.accent, 0.15),
+              borderColor: alpha(c.accent, 0.3),
             }}
           >
             <Text
               className="text-[10px] uppercase tracking-wider"
-              style={{ color: "rgb(251,191,36)" }}
+              style={{ color: c.accent }}
             >
               {labels.hide}
             </Text>

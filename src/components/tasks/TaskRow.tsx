@@ -13,12 +13,9 @@ import type { Project, Task } from "@/lib/types";
 import { daysOverdue, isDueToday, isOverdue } from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { EffortBadge } from "@/components/today/EffortBadge";
 import { TaskToggle } from "./TaskToggle";
 
-const RED = "239,68,68"; // red-500
-const AMBER = "245,158,11"; // amber-500
-const RED_400 = "rgb(248,113,113)";
-const AMBER_400 = "rgb(251,191,36)";
 const GRAY = "107,114,128"; // gray-500
 
 /**
@@ -64,14 +61,14 @@ export function TaskRow({
     : undefined;
 
   const borderColor = overdue
-    ? `rgba(${RED},0.3)`
+    ? alpha(c.signal, 0.3)
     : dueToday
-    ? `rgba(${AMBER},0.3)`
+    ? alpha(c.accent, 0.3)
     : c.border;
   const spineColor = overdue
-    ? `rgb(${RED})`
+    ? c.signal
     : dueToday
-    ? `rgb(${AMBER})`
+    ? c.accent
     : c.border;
 
   const handleToggle = () => {
@@ -123,31 +120,22 @@ export function TaskRow({
               {task.title}
             </Text>
             {task.effortHours != null && (
-              <View
-                className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-                style={{
-                  backgroundColor: alpha(c.accent2, 0.15),
-                  borderColor: alpha(c.accent2, 0.3),
-                }}
-              >
-                <Clock size={10} color={c.accent2} />
-                <Text className="text-xs text-accent-2">{task.effortHours}h</Text>
-              </View>
+              <EffortBadge hours={task.effortHours} />
             )}
           </View>
           <View className="mt-1 flex-row flex-wrap items-center gap-x-2 gap-y-1">
             {overdue && lateDays !== null && (
               <View
-                className="rounded px-1.5 py-0.5"
+                className="rounded-md px-1.5 py-0.5"
                 style={{
-                  backgroundColor: `rgba(${RED},0.2)`,
+                  backgroundColor: alpha(c.signal, 0.2),
                   borderWidth: 1,
-                  borderColor: `rgba(${RED},0.4)`,
+                  borderColor: alpha(c.signal, 0.4),
                 }}
               >
                 <Text
-                  className="text-[10px] font-semibold uppercase tracking-wide"
-                  style={{ color: RED_400 }}
+                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
+                  style={{ color: c.signal }}
                 >
                   {t("taskRow.overdueDays", { count: lateDays })}
                 </Text>
@@ -155,16 +143,16 @@ export function TaskRow({
             )}
             {dueToday && (
               <View
-                className="rounded px-1.5 py-0.5"
+                className="rounded-md px-1.5 py-0.5"
                 style={{
-                  backgroundColor: `rgba(${AMBER},0.2)`,
+                  backgroundColor: alpha(c.accent, 0.2),
                   borderWidth: 1,
-                  borderColor: `rgba(${AMBER},0.4)`,
+                  borderColor: alpha(c.accent, 0.4),
                 }}
               >
                 <Text
-                  className="text-[10px] font-semibold uppercase tracking-wide"
-                  style={{ color: AMBER_400 }}
+                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
+                  style={{ color: c.accent }}
                 >
                   {t("taskRow.todayBadge")}
                 </Text>
@@ -172,7 +160,7 @@ export function TaskRow({
             )}
             {isBlocked && (
               <View
-                className="max-w-[240px] flex-row items-center gap-1 rounded px-1.5 py-0.5"
+                className="max-w-[240px] flex-row items-center gap-1 rounded-md px-1.5 py-0.5"
                 style={{
                   backgroundColor: `rgba(${GRAY},0.1)`,
                   borderWidth: 1,
@@ -182,7 +170,7 @@ export function TaskRow({
                 <Lock size={10} color={`rgb(${GRAY})`} />
                 <Text
                   numberOfLines={1}
-                  className="text-[10px] font-semibold"
+                  className="text-[10px] font-sans-semibold"
                   style={{ color: `rgb(${GRAY})` }}
                 >
                   {t("taskRow.blocked")}
@@ -206,8 +194,8 @@ export function TaskRow({
                 onPress={() => onSchedule(task)}
                 hitSlop={6}
               >
-                <CalendarPlus size={12} color={AMBER_400} />
-                <Text className="text-xs" style={{ color: AMBER_400 }}>
+                <CalendarPlus size={12} color={c.accent} />
+                <Text className="text-xs" style={{ color: c.accent }}>
                   {t("taskRow.addDate")}
                 </Text>
               </Pressable>

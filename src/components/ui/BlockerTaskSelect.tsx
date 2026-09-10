@@ -99,7 +99,7 @@ export function BlockerTaskSelect({
           ) : (
             groups.map((g) => (
               <View key={g.id ?? "__none__"} className="gap-1">
-                <Text className="px-3 pt-1 text-xs font-medium uppercase tracking-wider text-text-muted">
+                <Text className="px-3 pt-1 text-xs font-sans-medium uppercase tracking-wider text-text-muted">
                   {g.name ?? t("modals.task.noProject")}
                 </Text>
                 {g.tasks.map((tk) => (

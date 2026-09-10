@@ -48,6 +48,18 @@
           "color": "#208AEF",
           "defaultChannel": "default"
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./node_modules/@expo-google-fonts/instrument-sans/700Bold/InstrumentSans_700Bold.ttf",
+            "./node_modules/@expo-google-fonts/schibsted-grotesk/400Regular/SchibstedGrotesk_400Regular.ttf",
+            "./node_modules/@expo-google-fonts/schibsted-grotesk/500Medium/SchibstedGrotesk_500Medium.ttf",
+            "./node_modules/@expo-google-fonts/schibsted-grotesk/600SemiBold/SchibstedGrotesk_600SemiBold.ttf",
+            "./node_modules/@expo-google-fonts/schibsted-grotesk/700Bold/SchibstedGrotesk_700Bold.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {

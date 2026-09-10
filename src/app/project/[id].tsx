@@ -1,10 +1,21 @@
 import { useState } from "react";
+import { Spine, spineStrikesTitle } from "@/components/ui/Spine";
+import { CoolingRule } from "@/components/ui/CoolingRule";
+import { BlockerBadge } from "@/components/ui/BlockerBadge";
+import { CategoryTag } from "@/components/ui/CategoryTag";
+import { Meta } from "@/components/ui/Meta";
+import {
+  projectBlockedDays,
+  projectCooling,
+  projectDays,
+  taskIsBlocked,
+} from "@/lib/cooling";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { HeartPulse, Pause, Pencil, Plus, Rocket, Skull, Trash2, Zap } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Task } from "@/lib/types";
-import { priorityStripeClass } from "@/lib/priority";
+import { priorityFill } from "@/lib/priority";
 import { confirmAsync } from "@/lib/confirm";
 import { todayLocalISODate } from "@/lib/date";
 import { toast } from "@/lib/toast";
@@ -29,7 +40,7 @@ import {
 import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
-import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 function Section({
   title,
@@ -43,9 +54,9 @@ function Section({
   return (
     <View className="gap-1.5">
       <View className="flex-row items-center gap-2">
-        <Text className="text-xs uppercase tracking-wider text-text-muted">
+        <Meta variant="cintillo" tone="muted">
           {title}
-        </Text>
+        </Meta>
         {count != null && count > 0 && (
           <View className="rounded-full border border-border bg-surface px-2 py-0.5">
             <Text className="text-[10px] tabular-nums text-text-muted">
@@ -94,6 +105,15 @@ export default function ProjectDetail() {
   const project = projects.find((p) => p.id === id);
   const projectTasks = tasks.filter((tk) => tk.projectId === id);
   const pending = projectTasks.filter((tk) => !tk.done);
+  // "Atorado" no es un estado del modelo: se deriva de tareas abiertas con
+  // blocker. La razón es lo que de verdad desatasca — "bloqueado" no le dice
+  // a nadie qué hacer, "esperando el contrato firmado" sí.
+  const blockedPending = pending.filter((tk) => taskIsBlocked(tk));
+  const blockedOpen = blockedPending.length;
+  const firstBlockerReason =
+    blockedPending[0]?.blockedReason ||
+    blockedPending[0]?.blockers?.[0]?.externalDescription ||
+    undefined;
   const completed = projectTasks
     .filter((tk) => tk.done)
     .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));
@@ -154,7 +174,6 @@ export default function ProjectDetail() {
   }
 
   const cat = project.categoryId ? categoryById[project.categoryId] : undefined;
-  const catColors = cat ? categoryChipColors(cat.color, c) : null;
 
   // Quick action on overdue rows: rewrite the due date to today.
   const moveTaskToToday = async (task: Task) => {
@@ -210,6 +229,8 @@ export default function ProjectDetail() {
   const showWelcomeBack = project.status === "paused" && !welcomeDismissed;
 
   // Status actions available from the detail screen, gated by current status.
+  // Las etiquetas estaban hardcodeadas en inglés (deuda anotada en CLAUDE.md);
+  // el rediseño las pasa a i18n de paso, que era cosa de diez minutos.
   const statusActions: {
     key: string;
     label: string;
@@ -224,10 +245,10 @@ export default function ProjectDetail() {
   ) {
     statusActions.push({
       key: "launch",
-      label: "Launch",
-      icon: <Rocket size={15} color={c.accent2} />,
+      label: t("views.projectDetail.statusAction.launch"),
+      icon: <Rocket size={15} color={c.closed} />,
       onPress: onLaunch,
-      tint: c.accent2,
+      tint: c.closed,
     });
   }
   if (
@@ -238,23 +259,23 @@ export default function ProjectDetail() {
   ) {
     statusActions.push({
       key: "pause",
-      label: "Pause",
+      label: t("views.projectDetail.statusAction.pause"),
       icon: <Pause size={15} color={c.textMuted} />,
       onPress: () => setPauseOpen(true),
       tint: c.textMuted,
     });
     statusActions.push({
       key: "kill",
-      label: "Kill",
-      icon: <Skull size={15} color="rgb(220,38,38)" />,
+      label: t("views.projectDetail.statusAction.kill"),
+      icon: <Skull size={15} color={c.signal} />,
       onPress: () => setKillOpen(true),
-      tint: "rgb(220,38,38)",
+      tint: c.signal,
     });
   }
   if (project.status === "paused" || project.status === "stalled") {
     statusActions.unshift({
       key: "resume",
-      label: "Reactivate",
+      label: t("views.projectDetail.statusAction.resume"),
       icon: <Zap size={15} color={c.accent} />,
       onPress: onResume,
       tint: c.accent,
@@ -263,7 +284,7 @@ export default function ProjectDetail() {
   if (project.status === "killed") {
     statusActions.push({
       key: "revive",
-      label: "Revive",
+      label: t("views.projectDetail.statusAction.revive"),
       icon: <HeartPulse size={15} color={c.accent} />,
       onPress: () => setReviveOpen(true),
       tint: c.accent,
@@ -301,21 +322,56 @@ export default function ProjectDetail() {
         }}
       />
       <ScrollView contentContainerClassName="gap-5 p-5">
-        <View className="flex-row flex-wrap items-center gap-2">
-          <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[project.priority]}`} />
-          <Text className="text-base text-text-muted">{t(`priority.${project.priority}`)}</Text>
-          <StatusBadge status={project.status} />
-          {cat && catColors && (
-            <View
-              className="rounded-full border px-2.5 py-0.5"
-              style={{ backgroundColor: catColors.bg, borderColor: catColors.border }}
+        {/* Cabecera del rediseño: espina + nombre en display, y debajo la fila
+            de metadatos. El nombre estaba SOLO en el header de navegación, que
+            lo trunca; aquí es lo primero que se lee. La regla de enfriamiento
+            va a la derecha porque "97 días" es la respuesta a la pregunta que
+            trae a nadie a esta pantalla dos veces. */}
+        <View className="flex-row items-start gap-3">
+          <Spine
+            status={project.status}
+            priority={project.priority}
+            blocked={blockedOpen > 0}
+            height={56}
+          />
+          <View className="min-w-0 flex-1 gap-2">
+            <Text
+              className="font-display text-text"
+              style={{
+                fontSize: 26,
+                lineHeight: 29,
+                letterSpacing: -0.9,
+                textDecorationLine: spineStrikesTitle(project.status)
+                  ? "line-through"
+                  : "none",
+              }}
             >
-              <Text className="text-xs" style={{ color: catColors.text }}>
-                {cat.name}
-              </Text>
+              {project.name}
+            </Text>
+            <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1.5">
+              <View className="flex-row items-center gap-1.5">
+                <View
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: priorityFill(project.priority, c) }}
+                />
+                <Meta variant="cintillo" tone="muted">
+                  {t(`priority.${project.priority}`)}
+                </Meta>
+              </View>
+              <StatusBadge status={project.status} />
+              <CategoryTag name={cat?.name} color={cat?.color} loose={!cat} />
             </View>
-          )}
+          </View>
+          <CoolingRule days={projectDays(project)} cooling={projectCooling(project)} />
         </View>
+
+        {blockedOpen > 0 && (
+          <BlockerBadge
+            since={projectBlockedDays(project)}
+            reason={firstBlockerReason}
+            blocksCount={blockedOpen}
+          />
+        )}
 
         {showWelcomeBack && (
           <WelcomeBackCard
@@ -337,7 +393,7 @@ export default function ProjectDetail() {
                 className="flex-row items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2"
               >
                 {a.icon}
-                <Text className="text-sm font-medium" style={{ color: a.tint }}>
+                <Text className="text-sm font-sans-medium" style={{ color: a.tint }}>
                   {a.label}
                 </Text>
               </Pressable>
@@ -352,9 +408,9 @@ export default function ProjectDetail() {
             borderColor: alpha(c.accent, 0.2),
           }}
         >
-          <Text className="mb-1 text-xs uppercase tracking-wider text-accent">
+          <Meta variant="cintillo" tone="inherit" className="mb-1" style={{ color: c.accent }}>
             {t("views.projects.card.nextStep")}
-          </Text>
+          </Meta>
           {project.nextStep ? (
             <Text className="text-sm text-text">→ {project.nextStep}</Text>
           ) : (
@@ -465,7 +521,7 @@ export default function ProjectDetail() {
                     <View className="mb-1 flex-row items-start justify-between gap-2">
                       <Text
                         className={
-                          "flex-1 text-sm font-medium " +
+                          "flex-1 text-sm font-sans-medium " +
                           (heading ? "text-text" : "italic text-text-muted")
                         }
                         numberOfLines={1}
@@ -503,10 +559,10 @@ export default function ProjectDetail() {
           <Pressable
             onPress={onDelete}
             className="flex-row items-center gap-1.5 self-start rounded-md px-3 py-2"
-            style={{ backgroundColor: "rgba(239,68,68,0.1)" }}
+            style={{ backgroundColor: alpha(c.signal, 0.1) }}
           >
-            <Trash2 size={14} color="rgb(248,113,113)" />
-            <Text className="text-xs" style={{ color: "rgb(248,113,113)" }}>
+            <Trash2 size={14} color={c.signal} />
+            <Text className="text-xs" style={{ color: c.signal }}>
               {t("common.delete")}
             </Text>
           </Pressable>

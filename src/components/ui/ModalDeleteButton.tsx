@@ -2,10 +2,7 @@ import { Pressable, Text } from "react-native";
 import { Trash2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { confirmAsync } from "@/lib/confirm";
-
-const RED = "rgb(239,68,68)";
-const RED_400 = "rgb(248,113,113)";
-const RED_BORDER = "rgba(239,68,68,0.4)";
+import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 /**
  * Destructive delete button for the bottom of an edit form (task/routine).
@@ -25,6 +22,7 @@ export function ModalDeleteButton({
   onConfirm: () => void | Promise<void>;
 }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   const handle = async () => {
     const ok = await confirmAsync(
       confirmTitle,
@@ -39,10 +37,10 @@ export function ModalDeleteButton({
       onPress={handle}
       accessibilityRole="button"
       className="mt-1 flex-row items-center justify-center gap-2 rounded-lg border py-3"
-      style={{ borderColor: RED_BORDER }}
+      style={{ borderColor: alpha(c.signal, 0.4) }}
     >
-      <Trash2 size={16} color={RED} />
-      <Text className="text-base font-medium" style={{ color: RED_400 }}>
+      <Trash2 size={16} color={c.signal} />
+      <Text className="text-base font-sans-medium" style={{ color: c.signal }}>
         {label}
       </Text>
     </Pressable>

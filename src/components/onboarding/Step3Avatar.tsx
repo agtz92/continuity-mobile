@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Meta } from "@/components/ui/Meta";
 import { Image, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import {
@@ -35,7 +36,7 @@ export function Step3Avatar({
   return (
     <View className="gap-6">
       <View className="gap-2">
-        <Text className="text-3xl font-bold text-text">
+        <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step3.heading", { name })}
         </Text>
         <Text className="text-base text-text-muted">
@@ -49,9 +50,9 @@ export function Step3Avatar({
           if (items.length === 0) return null;
           return (
             <View key={style} className="gap-3">
-              <Text className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              <Meta variant="cintillo" tone="muted">
                 {t(`avatars.styles.${style}`)}
-              </Text>
+              </Meta>
               <View className="flex-row flex-wrap gap-x-4 gap-y-4">
                 {items.map((a) => {
                   const isSel = a.id === selected;

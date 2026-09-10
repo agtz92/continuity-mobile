@@ -62,7 +62,7 @@ export function StalledProjectModal({
         >
           <Text
             className={
-              "text-base font-semibold " +
+              "text-base font-sans-semibold " +
               (canSave ? "text-bg" : "text-text-muted")
             }
           >

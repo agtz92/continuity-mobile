@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { Meta } from "@/components/ui/Meta";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   Pressable,
   RefreshControl,
@@ -28,7 +31,7 @@ import { confirmAsync } from "@/lib/confirm";
 import { ListSkeleton } from "@/components/ui/Skeletons";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useNoteMutations } from "@/hooks/useNoteMutations";
-import { useThemeColors, type ThemeColors } from "@/theme/useThemeColors";
+import { alpha, useThemeColors, type ThemeColors } from "@/theme/useThemeColors";
 
 type Filter = "all" | "achievements" | "notes" | "changes" | "deleted";
 const FILTERS: Filter[] = ["all", "achievements", "notes", "changes", "deleted"];
@@ -52,12 +55,6 @@ const DELETED_KINDS: ActivityKind[] = [
   "quick_note_deleted",
 ];
 
-const EMERALD = "rgb(52,211,153)";
-const AMBER = "rgb(251,191,36)";
-const PURPLE = "rgb(192,132,252)";
-const CYAN = "rgb(34,211,238)";
-const BLUE = "rgb(96,165,250)";
-const RED_70 = "rgba(248,113,113,0.7)";
 
 function matchesFilter(kind: ActivityKind, f: Filter): boolean {
   if (f === "all") return true;
@@ -68,33 +65,41 @@ function matchesFilter(kind: ActivityKind, f: Filter): boolean {
   return true;
 }
 
+/**
+ * El icono del evento. **La forma es la que distingue**, no el color.
+ *
+ * Antes cada tipo tenía su tono de Tailwind —esmeralda, ámbar, morado, cian,
+ * azul— y el log se leía como un arcoíris donde nada pesaba más que nada. El
+ * glifo ya dice si algo se creó, se completó o se borró; el color solo tiene
+ * que decir el **registro**: hecho, tuyo, roto, o mero cambio.
+ */
 function iconFor(kind: ActivityKind, c: ThemeColors) {
   switch (kind) {
     case "note":
       return <FileText size={14} color={c.accent} />;
     case "task_completed":
     case "routine_completed":
-      return <CheckCircle2 size={14} color={EMERALD} />;
+      return <CheckCircle2 size={14} color={c.closed} />;
     case "project_created":
     case "idea_created":
     case "task_created":
     case "routine_created":
-      return <Sparkles size={14} color={AMBER} />;
+      return <Sparkles size={14} color={c.accent} />;
     case "idea_promoted":
-      return <Rocket size={14} color={PURPLE} />;
+      return <Rocket size={14} color={c.accent} />;
     case "quick_note_created":
       return <NotebookPen size={14} color={c.accent} />;
     case "project_status_changed":
-      return <RefreshCw size={14} color={CYAN} />;
+      return <RefreshCw size={14} color={c.text3} />;
     case "project_due_date_changed":
     case "task_due_date_changed":
-      return <Calendar size={14} color={BLUE} />;
+      return <Calendar size={14} color={c.text3} />;
     case "project_deleted":
     case "task_deleted":
     case "idea_deleted":
     case "routine_deleted":
     case "quick_note_deleted":
-      return <Trash2 size={14} color={RED_70} />;
+      return <Trash2 size={14} color={alpha(c.signal, 0.7)} />;
     default:
       return <FileText size={14} color={c.textMuted} />;
   }
@@ -271,9 +276,9 @@ export default function Log() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-3 px-5 pb-3 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <ScreenTitle>
           {t("views.log.title")}
-        </Text>
+        </ScreenTitle>
 
         <View className="flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3">
           <Search size={16} color={c.textMuted} />
@@ -321,18 +326,21 @@ export default function Log() {
       {initialLoading && activities.length === 0 ? (
         <ListSkeleton />
       ) : activities.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.log.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.log.empty")}
+            body={t("views.log.emptyBody")}
+          />
         </View>
       ) : visible.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {q
-              ? t("views.log.noMatch", { query: search.trim() })
-              : t("views.log.noneInFilter")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={
+              q
+                ? t("views.log.noMatch", { query: search.trim() })
+                : t("views.log.noneInFilter")
+            }
+          />
         </View>
       ) : (
         <SectionList
@@ -349,9 +357,9 @@ export default function Log() {
             />
           }
           renderSectionHeader={({ section }) => (
-            <Text className="mb-2 mt-4 px-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+            <Meta variant="cintillo" tone="muted" className="mb-2 mt-4 px-1">
               {section.title} · {section.data.length}
-            </Text>
+            </Meta>
           )}
           renderItem={({ item: a }) => {
             const proj = projects.find((p) => p.id === a.projectId);

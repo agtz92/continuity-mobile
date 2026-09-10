@@ -38,7 +38,7 @@ function Pill({
         (active ? "border-accent bg-accent" : "border-border bg-surface")
       }
     >
-      <Text className={"text-base " + (active ? "font-semibold text-bg" : "text-text")}>
+      <Text className={"text-base " + (active ? "font-sans-semibold text-bg" : "text-text")}>
         {label}
       </Text>
     </Pressable>
@@ -95,7 +95,7 @@ export default function Appearance() {
       contentContainerClassName="gap-6 p-5"
     >
       <View className="gap-2">
-        <Text className="text-base font-semibold text-text">
+        <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.language")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -114,7 +114,7 @@ export default function Appearance() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-base font-semibold text-text">
+        <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.theme")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -133,7 +133,7 @@ export default function Appearance() {
       </View>
 
       <View className="gap-2">
-        <Text className="text-base font-semibold text-text">
+        <Text className="text-base font-sans-semibold text-text">
           {t("settings.appearance.palette")}
         </Text>
         <Text className="text-sm text-text-muted">
@@ -149,19 +149,27 @@ export default function Appearance() {
             />
           ))}
         </View>
-        <View className="mt-2 flex-row gap-2">
-          <View className="h-8 flex-1 rounded-lg bg-accent" />
+        {/* La muestra enseña **el vocabulario entero**, no dos acentos: lo que
+            la paleta cambia (acento y su segundo, que hoy solo vive en las
+            gráficas) y lo que no cambia nunca (lo que duele, lo que se cerró,
+            y la rampa de tinta). Antes eran dos bloques iguales y no se veía
+            que el segundo casi no se usa. */}
+        <View className="mt-2 flex-row items-stretch gap-1">
+          <View className="h-8 flex-[3] rounded-lg bg-accent" />
           <View className="h-8 flex-1 rounded-lg bg-accent-2" />
+          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.signal }} />
+          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.closed }} />
+          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.line[34] }} />
         </View>
       </View>
 
       <Pressable
         onPress={replayTour}
         accessibilityRole="button"
-        className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
+        className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
       >
         <Compass size={16} color={c.text} />
-        <Text className="text-base font-semibold text-text">
+        <Text className="text-base font-sans-semibold text-text">
           {t("onboarding.replay.replayTourButton")}
         </Text>
       </Pressable>

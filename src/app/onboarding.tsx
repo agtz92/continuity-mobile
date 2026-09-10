@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Meta } from "@/components/ui/Meta";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -225,9 +226,9 @@ export default function Onboarding() {
     <SafeAreaView className="flex-1 bg-bg" edges={["top", "bottom"]}>
       {/* Header: progress label + skip (skip hidden in replay) */}
       <View className="flex-row items-center justify-between px-5 pb-3 pt-2">
-        <Text className="text-xs uppercase tracking-wider text-text-muted">
+        <Meta variant="cintillo" tone="muted">
           {t("onboarding.progress", { current: step, total: TOTAL_STEPS })}
-        </Text>
+        </Meta>
         {!replay && (
           <TextButton
             label={t("onboarding.skip")}

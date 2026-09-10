@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   Pressable,
   RefreshControl,
@@ -94,7 +96,7 @@ export default function QuickNotes() {
           <View className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />
         ) : null}
         <Text
-          className="text-xs font-medium"
+          className="text-xs font-sans-medium"
           style={{ color: active ? c.bg : c.textMuted }}
         >
           {label}
@@ -106,9 +108,9 @@ export default function QuickNotes() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-2 px-5 pb-2 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <ScreenTitle>
           {t("views.quickNotes.title")}
-        </Text>
+        </ScreenTitle>
         <Text className="text-sm text-text-muted">
           {t("views.quickNotes.subtitle")}
         </Text>
@@ -147,26 +149,31 @@ export default function QuickNotes() {
       {initialLoading && quickNotes.length === 0 ? (
         <ListSkeleton variant="card" />
       ) : quickNotes.length === 0 ? (
-        <View className="flex-1 items-center justify-center gap-4 px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.quickNotes.empty")}
-          </Text>
-          <Pressable
-            onPress={handleNew}
-            className="rounded-lg bg-accent px-4 py-2.5"
-          >
-            <Text className="text-base font-semibold text-bg">
-              {t("views.quickNotes.addFirst")}
-            </Text>
-          </Pressable>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.quickNotes.empty")}
+            body={t("views.quickNotes.emptyBody")}
+            actions={
+              <Pressable
+                onPress={handleNew}
+                className="rounded-md bg-accent px-4 py-2.5"
+              >
+                <Text className="text-base font-sans-semibold text-bg">
+                  {t("views.quickNotes.addFirst")}
+                </Text>
+              </Pressable>
+            }
+          />
         </View>
       ) : filtered.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {q
-              ? t("views.quickNotes.noMatch", { query: search.trim() })
-              : t("views.quickNotes.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={
+              q
+                ? t("views.quickNotes.noMatch", { query: search.trim() })
+                : t("views.quickNotes.empty")
+            }
+          />
         </View>
       ) : (
         <ScrollView
@@ -201,7 +208,7 @@ export default function QuickNotes() {
                   />
                   <View className="flex-1 p-4">
                     <View className="flex-row items-center gap-2">
-                      <Text className="flex-1 font-semibold text-text" numberOfLines={1}>
+                      <Text className="flex-1 font-sans-semibold text-text" numberOfLines={1}>
                         {n.title.trim() || t("views.quickNotes.untitled")}
                       </Text>
                       {n.pinned && <Pin size={14} color={c.accent} />}
@@ -214,16 +221,16 @@ export default function QuickNotes() {
                     <View className="mt-2 flex-row flex-wrap items-center gap-2">
                       {cat && chip && (
                         <View
-                          className="rounded px-2 py-0.5"
+                          className="rounded-md px-2 py-0.5"
                           style={{ backgroundColor: chip.bg }}
                         >
-                          <Text className="text-[11px] font-medium" style={{ color: chip.text }}>
+                          <Text className="text-[11px] font-sans-medium" style={{ color: chip.text }}>
                             {cat.name}
                           </Text>
                         </View>
                       )}
                       {proj && (
-                        <View className="rounded border border-border bg-bg px-2 py-0.5">
+                        <View className="rounded-md border border-border bg-bg px-2 py-0.5">
                           <Text className="text-[11px] text-text-muted" numberOfLines={1}>
                             {proj.name}
                           </Text>

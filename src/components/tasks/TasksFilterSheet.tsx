@@ -69,7 +69,7 @@ export function TasksFilterSheet({
           className="rounded-lg bg-accent px-4 py-2.5"
           style={{ opacity: count === 0 ? 0.5 : 1 }}
         >
-          <Text className="text-center text-sm font-medium text-bg">
+          <Text className="text-center text-sm font-sans-medium text-bg">
             {count === 0
               ? t("views.tasks.filterSheet.applyEmpty")
               : t("views.tasks.filterSheet.apply", { count })}
@@ -156,7 +156,7 @@ function ProjectChip({
     >
       <Text
         className={
-          "text-sm font-medium " + (active ? "text-bg" : "text-text-muted")
+          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
         }
       >
         {label}

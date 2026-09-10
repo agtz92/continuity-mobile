@@ -77,7 +77,7 @@ export function WeekAgenda({
                 }
               >
                 <Text
-                  className="text-base font-semibold"
+                  className="text-base font-sans-semibold"
                   style={{ color: isToday ? colors.bg : colors.text }}
                 >
                   {d.getDate()}

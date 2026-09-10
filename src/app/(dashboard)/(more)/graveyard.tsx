@@ -18,6 +18,7 @@ import { useProjectClosure } from "@/hooks/useProjectClosure";
 import { countsTowardCap, usePlan } from "@/hooks/usePlan";
 import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
 
 function Note({ label, body }: { label: string; body: string }) {
   if (!body) return null;
@@ -100,36 +101,38 @@ export default function Graveyard() {
       {/* Autopsy block (Layer B insight). */}
       {showAutopsy ? (
         <View
-          className="gap-2 rounded-xl border p-4"
-          style={{
-            backgroundColor: alpha(c.accent2, 0.06),
-            borderColor: alpha(c.accent2, 0.3),
-          }}
+          className="flex-row overflow-hidden rounded-xl border"
+          style={{ backgroundColor: c.surface, borderColor: c.border }}
         >
+          {/* La autopsia lleva espina de acento: es lo que el sistema usa para
+              decir "esto es lectura tuya", no un segundo color de marca. */}
+          <View style={{ width: 3, alignSelf: "stretch", backgroundColor: c.accent }} />
+          <View className="flex-1 gap-2 p-4">
           <View className="flex-row items-center gap-2">
-            <Sparkles size={16} color={c.accent2} />
-            <Text className="text-sm font-semibold text-accent-2">
+            <Sparkles size={16} color={c.accent} />
+            <Meta variant="cintillo" tone="inherit" style={{ color: c.accent }}>
               {t("views.graveyard.patternTitle")}
-            </Text>
+            </Meta>
           </View>
           <Text className="text-sm leading-snug text-text">{insight!.body}</Text>
           <Pressable
             onPress={askLoop}
             accessibilityRole="button"
             className="mt-1 flex-row items-center gap-1.5 self-start rounded-lg border px-3 py-2"
-            style={{ borderColor: alpha(c.accent2, 0.4) }}
+            style={{ borderColor: alpha(c.accent, 0.4) }}
           >
-            <MessageCircle size={14} color={c.accent2} />
-            <Text className="text-sm font-medium text-accent-2">
+            <MessageCircle size={14} color={c.accent} />
+            <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
               {t("views.graveyard.askLoop")}
             </Text>
           </Pressable>
+          </View>
         </View>
       ) : (
         <View className="gap-1.5 rounded-xl border border-border bg-surface p-4">
           <View className="flex-row items-center gap-2">
             <Sparkles size={16} color={c.textMuted} />
-            <Text className="text-sm font-semibold text-text">
+            <Text className="text-sm font-sans-semibold text-text">
               {t("views.graveyard.noPatternTitle")}
             </Text>
           </View>
@@ -161,7 +164,7 @@ export default function Graveyard() {
             >
               <View className="flex-row items-start justify-between gap-2">
                 <View className="flex-1">
-                  <Text className="text-base font-semibold text-text">
+                  <Text className="text-base font-sans-semibold text-text">
                     {p.name}
                   </Text>
                   <Text className="text-xs text-text-muted">
@@ -203,15 +206,15 @@ export default function Graveyard() {
                 <View
                   className="gap-1 rounded-lg border p-3"
                   style={{
-                    backgroundColor: alpha(c.accent2, 0.06),
-                    borderColor: alpha(c.accent2, 0.25),
+                    backgroundColor: c.line[4],
+                    borderColor: c.line[14],
                   }}
                 >
                   <View className="flex-row items-center gap-1.5">
-                    <Sparkles size={13} color={c.accent2} />
-                    <Text className="text-[10px] font-semibold uppercase tracking-wider text-accent-2">
+                    <Sparkles size={13} color={c.text3} />
+                    <Meta variant="cintillo" tone="muted">
                       {t("views.graveyard.ai")}
-                    </Text>
+                    </Meta>
                   </View>
                   <Text className="text-sm leading-snug text-text">
                     {p.killedAiReflection}
@@ -227,7 +230,7 @@ export default function Graveyard() {
                 style={{ borderColor: c.border }}
               >
                 <HeartPulse size={15} color={c.accent} />
-                <Text className="text-sm font-medium text-accent">
+                <Text className="text-sm font-sans-medium text-accent">
                   {t("views.graveyard.revive")}
                 </Text>
               </Pressable>

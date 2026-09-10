@@ -125,8 +125,8 @@ export function DashboardTour() {
         ]}
       >
         {showFinal ? (
-          <View className="m-4 gap-4 rounded-2xl border border-border bg-surface p-6">
-            <Text className="text-2xl font-bold text-text">
+          <View className="m-4 gap-4 rounded-xl border border-border bg-surface p-6">
+            <Text className="text-2xl font-sans-bold text-text">
               {t("onboarding.tour.finalCta.title")}
             </Text>
             <Text className="text-base leading-relaxed text-text-muted">
@@ -147,14 +147,14 @@ export function DashboardTour() {
             </View>
           </View>
         ) : (
-          <View className="m-4 gap-4 rounded-2xl border border-border bg-surface p-6">
+          <View className="m-4 gap-4 rounded-xl border border-border bg-surface p-6">
             <View className="flex-row items-center gap-3">
               <View
                 className="h-10 w-10 items-center justify-center rounded-full bg-accent"
               >
                 <Icon size={20} color={c.bg} />
               </View>
-              <Text className="flex-1 text-xl font-bold text-text">
+              <Text className="flex-1 text-xl font-sans-bold text-text">
                 {t(`onboarding.tour.${current.key}.title`)}
               </Text>
             </View>

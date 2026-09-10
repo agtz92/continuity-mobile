@@ -10,6 +10,7 @@ import {
 import { ChevronRight } from "lucide-react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
+import { useThemeColors } from "@/theme/useThemeColors";
 
 // Required for LayoutAnimation on old-architecture Android; no-op elsewhere.
 if (
@@ -39,6 +40,7 @@ export function CollapsibleSection({
 }) {
   const { effective } = useTheme();
   const s = THEME_SURFACES[effective];
+  const c = useThemeColors();
 
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -64,7 +66,7 @@ export function CollapsibleSection({
         >
           {chevron}
           {icon}
-          <Text className="flex-1 text-sm font-medium text-text">{title}</Text>
+          <Text className="flex-1 font-sans-semibold text-sm text-text">{title}</Text>
           {rightSlot}
         </Pressable>
         {open && (
@@ -74,8 +76,12 @@ export function CollapsibleSection({
     );
   }
 
+  // Cabecera de sección del rediseño: **filete arriba** y titular en display.
+  // El filete es lo que separa una sección de la siguiente en toda la app; sin
+  // él, ocho secciones seguidas se leen como una sola lista larga.
   return (
     <View>
+      <View style={{ height: 1, backgroundColor: c.line[14] }} className="mb-2.5" />
       <Pressable
         onPress={toggle}
         accessibilityState={{ expanded: open }}
@@ -83,7 +89,12 @@ export function CollapsibleSection({
       >
         {chevron}
         {icon}
-        <Text className="text-lg font-semibold text-text">{title}</Text>
+        <Text
+          className="font-display text-text"
+          style={{ fontSize: 19, lineHeight: 22, letterSpacing: -0.4 }}
+        >
+          {title}
+        </Text>
         {rightSlot}
       </Pressable>
       {open && children}

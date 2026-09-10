@@ -17,10 +17,10 @@ function ManageBillingLink() {
     <Pressable
       onPress={() => void Linking.openURL(WEB_BILLING_URL)}
       accessibilityRole="button"
-      className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
+      className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
     >
       <ExternalLink size={16} color={c.text} />
-      <Text className="text-base font-semibold text-text">
+      <Text className="text-base font-sans-semibold text-text">
         {t("onboarding.replay.planChangeCta")}
       </Text>
     </Pressable>
@@ -58,7 +58,7 @@ export function Step4Plan({
     return (
       <View className="gap-6">
         <View className="gap-2">
-          <Text className="text-3xl font-bold text-text">
+          <Text className="text-3xl font-sans-bold text-text">
             {t("onboarding.replay.planHeading")}
           </Text>
           <Text className="text-base text-text-muted">
@@ -81,7 +81,7 @@ export function Step4Plan({
     return (
       <View className="gap-6">
         <View className="gap-3">
-          <Text className="text-3xl font-bold text-text">
+          <Text className="text-3xl font-sans-bold text-text">
             {t("onboarding.step4Beta.heading", { name })}
           </Text>
           <Text className="text-base leading-relaxed text-text-muted">
@@ -90,7 +90,7 @@ export function Step4Plan({
           <Text className="text-base leading-relaxed text-text-muted">
             {t("onboarding.step4Beta.body2")}
           </Text>
-          <Text className="text-base font-medium text-text">
+          <Text className="text-base font-sans-medium text-text">
             — {t("onboarding.step4Beta.signoff")}
           </Text>
         </View>
@@ -108,7 +108,7 @@ export function Step4Plan({
   return (
     <View className="gap-6">
       <View className="gap-2">
-        <Text className="text-3xl font-bold text-text">
+        <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.replay.planHeading")}
         </Text>
         <Text className="text-base text-text-muted">

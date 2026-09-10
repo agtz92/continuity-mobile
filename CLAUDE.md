@@ -35,6 +35,20 @@ pantalla completa cierra; el icono `+` rota 45° (se lee como ×). Haptics: `imp
 light al abrir, `selection` al elegir. La firma del FAB no cambió (`icon/onPress/
 label/bottomOffset`), así que los 6 call sites siguen igual.
 
+## Captura rápida (hoja desde el `+`)
+
+Referencia completa: **`../continuity/docs/captura-rapida.md`**.
+
+- Vive en `src/components/capture/CaptureSheet.tsx` y se abre desde el **speed-dial del FAB**
+  (`ui/FAB.tsx`, junto a "Abrir Loop"), no desde una sexta pestaña: el `+` ya es "crear" aquí.
+- `src/lib/quickParse.ts` y `src/lib/quickDate.ts` son **espejos literales** de los de la web
+  (`continuity/frontend/src/lib/`). Los tests viven allá; cualquier cambio se hace allá y se copia.
+  Si divergen, la misma línea crea cosas distintas en el teléfono y en el escritorio.
+- Sintaxis: `#proyecto` · `@mañana 9:30` · `~30m` · `!qué lo bloquea` · `/tipo`. Un sigilo solo
+  cuenta al principio de palabra; duplicarlo lo escribe literal.
+- El bloqueo viaja **dentro** de `createTask` (`blocker`), no como segunda mutation.
+- i18n en `capture.*` (ICU llave simple).
+
 ## Haptics (`src/lib/feedback.ts`)
 
 Helpers guardados (import dinámico de `expo-haptics`, `default ?? mod` por interop):
@@ -72,7 +86,9 @@ con el editor. Espejo del cambio web. Detalle:
 
 ## Paletas de colores
 
-Para editar las paletas (cambiar hex de una existente o agregar una nueva), consulta `docs/paletas-de-colores.md`. Resumen: aquí **no hay `globals.css`** — `src/palette/config.ts` (`PALETTE_SWATCHES`) es la fuente de verdad, leída por `src/theme/ThemeProvider.tsx`. Mantén los hex idénticos a los del repo web (`continuity`).
+Para editar las paletas (cambiar hex de una existente o agregar una nueva), consulta `docs/paletas-de-colores.md`. Resumen: aquí **no hay `globals.css`** — `src/palette/config.ts` (`PALETTE_ACCENTS`, del que se derivan las muestras) es la fuente de verdad, leída por `src/theme/ThemeProvider.tsx`. Mantén los hex idénticos a los del repo web (`continuity`) y **verifícalo con `npm run check-tokens`**, que compara los dos juegos y falla si divergen.
+
+Las paletas del rediseño son cinco (ocre · salvia · óxido · hielo · ciruela). Las once viejas siguen leyéndose vía `LEGACY_PALETTE_MAP`, pero ya no se pueden elegir.
 
 ## Reportar bug / Feedback (usuario → admin, one-way)
 
@@ -109,14 +125,16 @@ Pantalla `src/app/(dashboard)/(more)/calendar.tsx` (bajo "More"). Los sub-views 
 
 Rediseño de `TaskRow`/`RoutineRow` (`src/components/tasks|routines/`) por nota de diseñador — homologado con la web.
 
-- **`TaskToggle` compartido** (`src/components/tasks/TaskToggle.tsx`) es el control de completar de toda fila de tarea/rutina: círculo de **24px** (vacío = "lléname"), se llena con accent + palomita al completar; **rojo** si vencida, candado si bloqueada, **punteado + ↻** para rutina. Reemplazó al `CheckCircle2` de 18px que se leía como decoración.
-- **Spine de urgencia** de 3px en el borde izquierdo (rojo vencida / ámbar hoy / neutro) + **badges sólidos** "Vencida · Nd" / "Hoy" (i18n `taskRow.overdueDays`/`todayBadge`, **plural ICU**). Filas vencidas exponen acciones rápidas **"Mover a hoy"** / **"Reprogramar"**.
+- **`TaskToggle` compartido** (`src/components/tasks/TaskToggle.tsx`) es el control de completar de toda fila de tarea/rutina: círculo de **24px** (vacío = "lléname"), se llena con accent + palomita al completar; **`signal`** si vencida, candado si bloqueada, **punteado + ↻** para rutina. Reemplazó al `CheckCircle2` de 18px que se leía como decoración.
+- **Spine de urgencia** de 3px en el borde izquierdo (`signal` vencida / `accent` hoy / neutro) + **badges sólidos** "Vencida · Nd" / "Hoy" (i18n `taskRow.overdueDays`/`todayBadge`, **plural ICU**). Filas vencidas exponen acciones rápidas **"Mover a hoy"** / **"Reprogramar"**.
 - **Borrar NO vive en la fila** — se movió al **detalle de edición** para evitar el mis-tap junto al toggle. `ModalDeleteButton` (`src/components/ui/ModalDeleteButton.tsx`) usa **`confirmAsync`** (Alert nativo + haptic warning) al final de `task-form`/`routine-form`. Las filas conservan `onDelete?` **opcional sin usar** (con comentario) para no romper los ~call sites; el tap en la fila abre la edición. (En web el confirm es de dos pasos inline, no Alert.)
 - **Today's Focus** (`src/components/today/TodayFocusSection.tsx`) es un **componente aparte** a propósito: lista cosas **mixtas** en una lista priorizada (tareas vencidas/hoy + **proyectos estancados** + **próximos pasos**), por eso no reusa `TaskRow`. Comparte el **lenguaje visual** (mismo `TaskToggle` + spine + badges), no el componente.
 
 ## Detalle de proyecto — cierre y "Launch"
 
-`src/app/project/[id].tsx` ofrece acciones de status gateadas por el estado actual: **Launch** (Rocket, éxito) para active/idea/stalled → `closure.setStatus(project,"launched")` **sin modal de notas** (espejo del selector de status de la web); **Pause**/**Kill** con sus modales de notas; **Reactivate**/**Revive**. `useProjectClosure.setStatus` acepta `"active" | "idea" | "launched"`. ⚠️ Las etiquetas de estos botones están **hardcodeadas en inglés** (deuda pendiente de i18n, igual que sus vecinas).
+`src/app/project/[id].tsx` ofrece acciones de status gateadas por el estado actual: **Launch** (Rocket, éxito) para active/idea/stalled → `closure.setStatus(project,"launched")` **sin modal de notas** (espejo del selector de status de la web); **Pause**/**Kill** con sus modales de notas; **Reactivate**/**Revive**. `useProjectClosure.setStatus` acepta `"active" | "idea" | "launched"`. Las etiquetas salen de `views.projectDetail.statusAction.*` (estaban hardcodeadas en inglés; el rediseño las pasó a i18n).
+
+La cabecera de la pantalla la abre el **nombre del proyecto en display con espina**, no el chip de prioridad: el nombre solo vivía en el header de navegación, que lo trunca. A la derecha va la `CoolingRule` (días sin tocar, con escala) y debajo, si hay tareas abiertas con blocker, el `BlockerBadge` con **la razón** del primero — "bloqueado" no le dice a nadie qué hacer.
 
 ## Ocultar tareas de proyectos cerrados
 

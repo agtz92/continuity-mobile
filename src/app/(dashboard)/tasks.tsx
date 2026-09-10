@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   Pressable,
   RefreshControl,
@@ -40,13 +42,8 @@ import {
   type TaskFilterDraft,
 } from "@/components/tasks/TasksFilterSheet";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { EffortBadge } from "@/components/today/EffortBadge";
 
-const RED = "239,68,68";
-const ORANGE = "249,115,22";
-const AMBER = "245,158,11";
-const RED_T = "rgb(248,113,113)";
-const ORANGE_T = "rgb(251,146,60)";
-const AMBER_T = "rgb(251,191,36)";
 
 type TaskRange = "today" | "week" | "all";
 
@@ -236,12 +233,15 @@ export default function Tasks() {
     />
   );
 
-  const countPill = (n: number, base: string, text: string) => (
+  // Un solo tono por pastilla: el fondo y el borde se derivan de la misma tinta
+  // del tema. Antes recibía la tupla "r,g,b" por separado del color de texto, y
+  // nada garantizaba que fueran el mismo color.
+  const countPill = (n: number, tone: string) => (
     <View
       className="rounded-full border px-2 py-0.5"
-      style={{ backgroundColor: `rgba(${base},0.1)`, borderColor: `rgba(${base},0.3)` }}
+      style={{ backgroundColor: alpha(tone, 0.1), borderColor: alpha(tone, 0.3) }}
     >
-      <Text className="text-xs" style={{ color: text }}>
+      <Text className="text-xs" style={{ color: tone }}>
         {n}
       </Text>
     </View>
@@ -250,9 +250,9 @@ export default function Tasks() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-3 px-5 pb-3 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <ScreenTitle>
           {t("views.tasks.title")}
-        </Text>
+        </ScreenTitle>
 
         <View className="flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3">
           <Search size={16} color={c.textMuted} />
@@ -282,7 +282,7 @@ export default function Tasks() {
                   >
                     <Text
                       className={
-                        "text-sm font-medium " +
+                        "text-sm font-sans-medium " +
                         (active ? "text-bg" : "text-text-muted")
                       }
                     >
@@ -302,7 +302,7 @@ export default function Tasks() {
               </Text>
               {activeFilterCount > 0 && (
                 <View className="h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1">
-                  <Text className="text-[10px] font-semibold text-bg">
+                  <Text className="text-[10px] font-sans-semibold text-bg">
                     {activeFilterCount}
                   </Text>
                 </View>
@@ -315,18 +315,21 @@ export default function Tasks() {
       {initialLoading && tasks.length === 0 ? (
         <ListSkeleton />
       ) : tasks.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.tasks.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.tasks.empty")}
+            body={t("views.tasks.emptyBody")}
+          />
         </View>
       ) : filteredTasks.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {searching
-              ? t("views.tasks.noMatch", { query: search.trim() })
-              : t("views.tasks.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={
+              searching
+                ? t("views.tasks.noMatch", { query: search.trim() })
+                : t("views.tasks.empty")
+            }
+          />
         </View>
       ) : (
         <ScrollView
@@ -344,9 +347,9 @@ export default function Tasks() {
               variant="card"
               open={overdueOpen}
               onToggle={() => setShowOverdue((s) => !s)}
-              icon={<Target size={14} color={RED_T} />}
+              icon={<Target size={14} color={c.signal} />}
               title={t("views.tasks.overdueBucket")}
-              rightSlot={countPill(buckets.overdue.length, RED, RED_T)}
+              rightSlot={countPill(buckets.overdue.length, c.signal)}
             >
               <View className="gap-2">
                 {buckets.overdue.map((task) => renderRow(task))}
@@ -358,23 +361,12 @@ export default function Tasks() {
             variant="card"
             open={todayOpen}
             onToggle={() => setShowToday((s) => !s)}
-            icon={<Target size={14} color={ORANGE_T} />}
+            icon={<Target size={14} color={c.accent} />}
             title={t("views.tasks.todayOnlyBucket")}
             rightSlot={
               <View className="flex-row items-center gap-1.5">
-                {countPill(buckets.today.length, ORANGE, ORANGE_T)}
-                {todayEffort > 0 && (
-                  <View
-                    className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-                    style={{
-                      backgroundColor: alpha(c.accent2, 0.15),
-                      borderColor: alpha(c.accent2, 0.3),
-                    }}
-                  >
-                    <Clock size={10} color={c.accent2} />
-                    <Text className="text-xs text-accent-2">{todayEffort}h</Text>
-                  </View>
-                )}
+                {countPill(buckets.today.length, c.accent)}
+                {todayEffort > 0 && <EffortBadge hours={todayEffort} />}
               </View>
             }
           >
@@ -394,20 +386,10 @@ export default function Tasks() {
               variant="card"
               open={upcomingOpen}
               onToggle={() => setShowUpcoming((s) => !s)}
-              icon={<Clock size={14} color={c.accent2} />}
+              icon={<Clock size={14} color={c.text3} />}
               title={t("views.tasks.upcoming")}
               rightSlot={
-                <View
-                  className="rounded-full border px-2 py-0.5"
-                  style={{
-                    backgroundColor: alpha(c.accent2, 0.1),
-                    borderColor: alpha(c.accent2, 0.3),
-                  }}
-                >
-                  <Text className="text-xs text-accent-2">
-                    {buckets.upcoming.length}
-                  </Text>
-                </View>
+                countPill(buckets.upcoming.length, c.text3)
               }
             >
               <View className="gap-2">
@@ -421,9 +403,9 @@ export default function Tasks() {
               variant="card"
               open={unscheduledOpen}
               onToggle={() => setShowUnscheduled((s) => !s)}
-              icon={<CalendarPlus size={14} color={AMBER_T} />}
+              icon={<CalendarPlus size={14} color={c.accent} />}
               title={t("views.tasks.pickDay")}
-              rightSlot={countPill(buckets.unscheduled.length, AMBER, AMBER_T)}
+              rightSlot={countPill(buckets.unscheduled.length, c.accent)}
             >
               <View className="gap-2">
                 {buckets.unscheduled.map((task) => renderRow(task, true))}

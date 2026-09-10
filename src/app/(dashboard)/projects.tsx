@@ -34,6 +34,8 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { selectionFeedback } from "@/lib/feedback";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Meta } from "@/components/ui/Meta";
 import { ListSkeleton } from "@/components/ui/Skeletons";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { FAB } from "@/components/ui/FAB";
@@ -227,7 +229,10 @@ export default function Projects() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-3 px-5 pb-3 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <Text
+          className="font-display text-text"
+          style={{ fontSize: 30, lineHeight: 32, letterSpacing: -1 }}
+        >
           {t("views.projects.title")}
         </Text>
 
@@ -268,7 +273,7 @@ export default function Projects() {
                   >
                     <Text
                       className={
-                        "text-xs font-medium " +
+                        "text-xs font-sans-medium " +
                         (active ? "text-bg" : "text-text-muted")
                       }
                     >
@@ -301,31 +306,51 @@ export default function Projects() {
       {initialLoading && visibleProjects.length === 0 ? (
         <ListSkeleton variant="card" />
       ) : visibleProjects.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.projects.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.projects.empty")}
+            body={t("views.projects.emptyBody")}
+            actions={
+              <Pressable
+                onPress={() => router.push("/project-form")}
+                className="rounded-md border px-4 py-2"
+                style={{ borderColor: c.accent }}
+              >
+                <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
+                  {t("modals.project.newTitle")}
+                </Text>
+              </Pressable>
+            }
+          />
         </View>
       ) : filtered.length === 0 ? (
-        <View className="flex-1 items-center justify-center gap-3 px-5">
-          <Text className="text-base text-center text-text-muted">
-            {search.trim()
-              ? t("views.projects.noMatchSearch", { query: search.trim() })
-              : t("views.projects.noMatchFilters")}
-          </Text>
-          {(statusFilter !== "all" || !!search.trim()) && (
-            <Pressable
-              onPress={() => {
-                setStatusFilter("all");
-                setSearch("");
-              }}
-              className="rounded-md border border-border bg-surface px-3 py-1.5"
-            >
-              <Text className="text-xs text-text">
-                {t("views.projects.clearFilters")}
-              </Text>
-            </Pressable>
-          )}
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={
+              search.trim()
+                ? t("views.projects.noMatchSearch", { query: search.trim() })
+                : t("views.projects.noMatchFilters")
+            }
+            rule={t("views.projects.hiddenCount", {
+              count: visibleProjects.length - filtered.length,
+            })}
+            actions={
+              statusFilter !== "all" || search.trim() ? (
+                <Pressable
+                  onPress={() => {
+                    setStatusFilter("all");
+                    setSearch("");
+                  }}
+                  className="rounded-md border px-4 py-2"
+                  style={{ borderColor: c.accent }}
+                >
+                  <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
+                    {t("views.projects.clearFilters")}
+                  </Text>
+                </Pressable>
+              ) : null
+            }
+          />
         </View>
       ) : sortMode === "manual" && manualDragEnabled ? (
         // (D) Drag to reorder — persisted as "Mi orden".
@@ -339,7 +364,7 @@ export default function Projects() {
           <DraggableFlatList
             data={sorted}
             keyExtractor={(p) => p.id}
-            contentContainerStyle={{ gap: 12, padding: 20, paddingTop: 4 }}
+            contentContainerStyle={{ gap: 16, padding: 20, paddingTop: 4 }}
             onDragEnd={({ data }) => onManualDragEnd(data)}
             renderItem={({ item, drag, isActive }: RenderItemParams<Project>) => (
               <ScaleDecorator>
@@ -364,7 +389,7 @@ export default function Projects() {
         <FlatList
           data={listRows}
           keyExtractor={(row) => row.key}
-          contentContainerStyle={{ gap: 12, padding: 20, paddingTop: 4 }}
+          contentContainerStyle={{ gap: 16, padding: 20, paddingTop: 4 }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -406,9 +431,9 @@ export default function Projects() {
           }
           renderItem={({ item }) =>
             item.type === "header" ? (
-              <Text className="px-1 pt-1 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              <Meta variant="cintillo" tone="muted" className="px-1 pt-3">
                 {item.label}
-              </Text>
+              </Meta>
             ) : (
               renderCard(item.project)
             )

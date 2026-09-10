@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { Meta } from "@/components/ui/Meta";
 import { useTranslation } from "react-i18next";
 import { Lightbulb, Zap } from "lucide-react-native";
 import { useThemeColors } from "@/theme/useThemeColors";
@@ -61,9 +62,9 @@ export function ReviveProjectModal({
     >
       {!!wouldRestart && (
         <View className="rounded-lg border border-border bg-bg p-3">
-          <Text className="mb-1 text-xs uppercase tracking-wider text-text-muted">
+          <Meta variant="cintillo" tone="muted" className="mb-1">
             {t("closure.revive.wouldRestartLabel")}
-          </Text>
+          </Meta>
           <Text className="text-sm text-text">{wouldRestart}</Text>
         </View>
       )}
@@ -83,7 +84,7 @@ export function ReviveProjectModal({
           className="flex-1 flex-row items-center justify-center gap-2 rounded-lg bg-accent py-3"
         >
           <Zap size={16} color={c.bg} />
-          <Text className="text-base font-semibold text-bg">
+          <Text className="text-base font-sans-semibold text-bg">
             {t("closure.revive.active")}
           </Text>
         </Pressable>
@@ -94,7 +95,7 @@ export function ReviveProjectModal({
           className="flex-1 flex-row items-center justify-center gap-2 rounded-lg border border-border bg-surface py-3"
         >
           <Lightbulb size={16} color={c.text} />
-          <Text className="text-base font-semibold text-text">
+          <Text className="text-base font-sans-semibold text-text">
             {t("closure.revive.idea")}
           </Text>
         </Pressable>

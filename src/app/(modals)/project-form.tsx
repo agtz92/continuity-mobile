@@ -192,7 +192,7 @@ export default function ProjectForm() {
               >
                 <Text
                   className={
-                    "text-sm font-medium " +
+                    "text-sm font-sans-medium " +
                     (categoryId === null ? "text-bg" : "text-text-muted")
                   }
                 >
@@ -217,7 +217,7 @@ export default function ProjectForm() {
                       style={{ backgroundColor: chip.dot }}
                     />
                     <Text
-                      className="text-sm font-medium"
+                      className="text-sm font-sans-medium"
                       style={{ color: active ? chip.text : c.textMuted }}
                     >
                       {cat.name}
@@ -269,7 +269,7 @@ export default function ProjectForm() {
                 onPress={handleCreateCategory}
                 className="flex-1 items-center rounded-lg bg-accent py-2"
               >
-                <Text className="text-sm font-semibold text-bg">
+                <Text className="text-sm font-sans-semibold text-bg">
                   {t("modals.project.createCategory")}
                 </Text>
               </Pressable>

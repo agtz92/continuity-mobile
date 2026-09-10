@@ -63,7 +63,7 @@ export default function Login() {
       >
         <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
           <View className="gap-1">
-            <Text className="text-3xl font-bold text-text">
+            <Text className="text-3xl font-sans-bold text-text">
               {t("auth.login.title")}
             </Text>
             <Text className="text-base text-text-muted">{t("auth.login.subtitle")}</Text>
@@ -71,7 +71,7 @@ export default function Login() {
 
           <View className="gap-3">
             <View className="gap-1">
-              <Text className="text-sm font-medium text-text">
+              <Text className="text-sm font-sans-medium text-text">
                 {t("auth.login.email")}
               </Text>
               <TextInput
@@ -86,7 +86,7 @@ export default function Login() {
               />
             </View>
             <View className="gap-1">
-              <Text className="text-sm font-medium text-text">
+              <Text className="text-sm font-sans-medium text-text">
                 {t("auth.login.password")}
               </Text>
               <TextInput
@@ -109,7 +109,7 @@ export default function Login() {
               </Text>
             </Pressable>
 
-            {error && <Text className="text-red-500">{error}</Text>}
+            {error && <Text className="text-signal">{error}</Text>}
 
             <Pressable
               onPress={onSignIn}
@@ -117,7 +117,7 @@ export default function Login() {
               className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
             >
               {busy && <ActivityIndicator size="small" />}
-              <Text className="text-base font-semibold text-bg">
+              <Text className="text-base font-sans-semibold text-bg">
                 {t("auth.login.signIn")}
               </Text>
             </Pressable>
@@ -135,7 +135,7 @@ export default function Login() {
             className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-3"
           >
             {googleBusy && <ActivityIndicator size="small" />}
-            <Text className="text-base font-semibold text-text">
+            <Text className="text-base font-sans-semibold text-text">
               {t("auth.login.google")}
             </Text>
           </Pressable>
@@ -143,7 +143,7 @@ export default function Login() {
           <View className="flex-row justify-center gap-1">
             <Text className="text-base text-text-muted">{t("auth.login.noAccount")}</Text>
             <Pressable onPress={() => router.push("/signup")}>
-              <Text className="text-base font-semibold text-accent">
+              <Text className="text-base font-sans-semibold text-accent">
                 {t("auth.login.signUpLink")}
               </Text>
             </Pressable>

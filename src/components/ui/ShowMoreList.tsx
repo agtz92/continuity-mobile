@@ -32,7 +32,7 @@ export function ShowMoreList<T>({
       ))}
       {hidden > 0 && (
         <Pressable onPress={() => setShowAll((s) => !s)} className="mt-1 self-start">
-          <Text className="text-xs font-medium text-accent">
+          <Text className="text-xs font-sans-medium text-accent">
             {showAll
               ? t("common.showLess")
               : t("common.showMore", { count: hidden })}

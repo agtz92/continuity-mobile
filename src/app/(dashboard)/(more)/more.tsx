@@ -1,4 +1,6 @@
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Meta } from "@/components/ui/Meta";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -99,7 +101,7 @@ export default function More() {
   ];
 
   const renderGroup = (items: Item[]) => (
-    <View className="overflow-hidden rounded-2xl border border-border bg-surface">
+    <View className="overflow-hidden rounded-xl border border-border bg-surface">
       {items.map((it, i) => {
         const Icon = it.icon;
         return (
@@ -123,13 +125,13 @@ export default function More() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <ScrollView contentContainerClassName="gap-4 p-5">
-        <Text className="text-2xl font-bold text-text">{t("tabs.more")}</Text>
+        <ScreenTitle>{t("tabs.more")}</ScreenTitle>
 
         {renderGroup(workspace)}
 
-        <Text className="px-1 text-xs font-semibold uppercase tracking-wider text-text-muted">
+        <Meta variant="cintillo" tone="muted" className="px-1 pt-2">
           {t("settings.nav.label")}
-        </Text>
+        </Meta>
         {renderGroup(settings)}
 
         {renderGroup([
@@ -142,7 +144,7 @@ export default function More() {
         ])}
 
         {/* Legal — external web pages (Apple wants an accessible privacy policy) */}
-        <View className="overflow-hidden rounded-2xl border border-border bg-surface">
+        <View className="overflow-hidden rounded-xl border border-border bg-surface">
           {[
             {
               key: "privacy",
@@ -177,10 +179,10 @@ export default function More() {
 
         <Pressable
           onPress={() => supabase.auth.signOut()}
-          className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4"
+          className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4"
         >
           <LogOut color={s.text} size={18} />
-          <Text className="text-base font-semibold text-text">
+          <Text className="text-base font-sans-semibold text-text">
             {t("accountMenu.items.signOut")}
           </Text>
         </Pressable>

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,18 +10,38 @@ import {
 } from "lucide-react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
-import { PALETTE_SWATCHES } from "@/palette/config";
+import { accentsFor } from "@/palette/config";
 import { DashboardTour } from "@/components/onboarding/DashboardTour";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
+import { isDailyViewStatus } from "@/lib/projectStatus";
 
 export default function DashboardLayout() {
   const { t } = useTranslation();
   const { effective, palette } = useTheme();
   const surfaces = THEME_SURFACES[effective];
-  const [accent] = PALETTE_SWATCHES[palette][effective];
+  const [accent] = accentsFor(palette, effective);
 
   // Push registration + tap-to-navigate (Fase 8). Inert under Expo Go.
   usePushNotifications();
+
+  // Globo de atascos sobre "Proyectos". El rediseño lo pide porque un proyecto
+  // atorado es lo único que la app **no** puede resolver sola: si no se ve
+  // desde cualquier pestaña, se queda ahí semanas.
+  //
+  // `tabBarBadge` es de react-navigation v7 y NO choca con `animation:"shift"`
+  // —uno anima la transición, el otro pinta encima del icono—, pero el tinte
+  // sí hay que fijarlo: `tabBarBadgeStyle` no hereda `tabBarActiveTintColor`.
+  const { projects, tasks } = useDashboardData();
+  const blockedCount = useMemo(() => {
+    const withBlocked = new Set(
+      tasks.filter((tk) => !tk.done && taskIsBlocked(tk)).map((tk) => tk.projectId)
+    );
+    return projects.filter(
+      (p) => isDailyViewStatus(p.status) && projectIsBlocked(p, withBlocked.has(p.id) ? 1 : 0)
+    ).length;
+  }, [projects, tasks]);
 
   return (
     <>
@@ -51,6 +72,13 @@ export default function DashboardLayout() {
           tabBarIcon: ({ color, size }) => (
             <FolderKanban color={color} size={size} />
           ),
+          tabBarBadge: blockedCount > 0 ? blockedCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: surfaces.signal,
+            color: surfaces.bg,
+            fontSize: 10,
+            fontFamily: "SchibstedGrotesk_600SemiBold",
+          },
         }}
       />
       <Tabs.Screen

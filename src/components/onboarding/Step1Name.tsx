@@ -41,7 +41,7 @@ export function Step1Name({
   return (
     <View className="gap-6">
       <View className="gap-2">
-        <Text className="text-3xl font-bold text-text">
+        <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step1.heading")}
         </Text>
         <Text className="text-base text-text-muted">
@@ -50,7 +50,7 @@ export function Step1Name({
       </View>
 
       <View className="gap-1.5">
-        <Text className="text-sm font-medium text-text">
+        <Text className="text-sm font-sans-medium text-text">
           {t("onboarding.step1.label")}
         </Text>
         <FormInput
@@ -66,7 +66,7 @@ export function Step1Name({
           onSubmitEditing={submit}
         />
         {error ? (
-          <Text className="text-xs text-red-500">{error}</Text>
+          <Text className="text-xs text-signal">{error}</Text>
         ) : prefilled ? (
           <Text className="text-xs text-text-muted">
             {t("onboarding.step1.helperPrefilled")}

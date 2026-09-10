@@ -1,24 +1,25 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Clock } from "lucide-react-native";
-import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
 
 /**
- * Badge de horas de esfuerzo (Clock + "{hours}h"), compartido por las secciones
- * de la pantalla Hoy. Extraído del helper `effortBadge` de today.tsx
- * (ver AUDITORIA_CODIGO.md).
+ * Horas de esfuerzo: **metadato, no señal**.
+ *
+ * Antes era una pastilla con el segundo color de acento, y competía por
+ * atención con los badges de "vencida" y "hoy" que viven en la misma fila. El
+ * sistema solo tiene tres voces —`signal`, `accent`, `closed`— y "2h" no es
+ * ninguna: es un dato, y los datos van en `<Meta>` con tinta apagada.
+ *
+ * El reloj se queda porque es lo que hace que se lea sin leer: la cifra sola
+ * junto a otra cifra no dice qué mide.
  */
 export function EffortBadge({ hours }: { hours: number }) {
   const c = useThemeColors();
   return (
-    <View
-      className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-      style={{
-        backgroundColor: alpha(c.accent2, 0.15),
-        borderColor: alpha(c.accent2, 0.3),
-      }}
-    >
-      <Clock size={10} color={c.accent2} />
-      <Text className="text-xs text-accent-2">{hours}h</Text>
+    <View className="flex-row items-center gap-1">
+      <Clock size={10} color={c.text5} />
+      <Meta tone="faint">{`${hours}h`}</Meta>
     </View>
   );
 }

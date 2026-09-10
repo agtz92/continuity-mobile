@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   RefreshControl,
   ScrollView,
@@ -33,8 +35,6 @@ const HORIZON_DAYS = 7; // how far ahead we materialize pending occurrences for 
 const BACKLOG_DAYS = 14; // how far back we surface missed pending occurrences
 const LATER_LOOKAHEAD = 365; // one row per routine whose next date is beyond the horizon
 
-const ORANGE = "249,115,22";
-const ORANGE_T = "rgb(251,146,60)";
 
 interface DueItem {
   routine: Routine;
@@ -236,9 +236,9 @@ export default function Routines() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-3 px-5 pb-3 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <ScreenTitle>
           {t("views.routines.title")}
-        </Text>
+        </ScreenTitle>
 
         {routines.length > 0 && (
           <View className="flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3">
@@ -258,10 +258,12 @@ export default function Routines() {
       {initialLoading && routines.length === 0 ? (
         <ListSkeleton />
       ) : routines.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.routines.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.routines.empty")}
+            body={t("views.routines.emptyBody")}
+            rule={t("views.routines.emptyRule")}
+          />
         </View>
       ) : (
         <ScrollView
@@ -278,13 +280,13 @@ export default function Routines() {
             variant="card"
             open={todayOpen}
             onToggle={() => setShowToday((s) => !s)}
-            icon={<Target size={14} color={ORANGE_T} />}
+            icon={<Target size={14} color={c.accent} />}
             title={t("views.routines.todayBucket")}
             rightSlot={pill(
               filteredToday.length,
-              `rgba(${ORANGE},0.1)`,
-              `rgba(${ORANGE},0.3)`,
-              ORANGE_T
+              alpha(c.accent, 0.1),
+              alpha(c.accent, 0.3),
+              c.accent
             )}
           >
             {filteredToday.length === 0 ? (
@@ -325,13 +327,13 @@ export default function Routines() {
               variant="card"
               open={upcomingOpen}
               onToggle={() => setShowUpcoming((s) => !s)}
-              icon={<Clock size={14} color={c.accent2} />}
+              icon={<Clock size={14} color={c.text3} />}
               title={t("views.routines.upcoming")}
               rightSlot={pill(
                 filteredUpcoming.length,
-                alpha(c.accent2, 0.1),
-                alpha(c.accent2, 0.3),
-                c.accent2
+                alpha(c.text3, 0.1),
+                alpha(c.text3, 0.3),
+                c.text3
               )}
             >
               <View className="gap-2">

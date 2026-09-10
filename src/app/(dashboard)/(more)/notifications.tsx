@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Meta } from "@/components/ui/Meta";
 import {
   ActivityIndicator,
   Linking,
@@ -158,7 +159,7 @@ export default function Notifications() {
       <Section title={t("settings.notifications.channels")}>
         <View className="flex-row items-center justify-between">
           <View className="flex-1 pr-3">
-            <Text className="text-base font-medium text-text">
+            <Text className="text-base font-sans-medium text-text">
               {t("settings.notifications.telegram")}
             </Text>
             <Text className="mt-0.5 text-xs text-text-muted">
@@ -194,7 +195,7 @@ export default function Notifications() {
               ) : (
                 <Send size={13} color={c.bg} />
               )}
-              <Text className="text-xs font-medium" style={{ color: c.bg }}>
+              <Text className="text-xs font-sans-medium" style={{ color: c.bg }}>
                 {t("settings.notifications.channel.connect")}
               </Text>
             </Pressable>
@@ -256,7 +257,7 @@ export default function Notifications() {
                   hitSlop={8}
                 >
                   <MapPin size={13} color={c.accent} />
-                  <Text className="text-xs font-medium text-accent">
+                  <Text className="text-xs font-sans-medium text-accent">
                     {t("settings.notifications.useDeviceTimezone")}
                   </Text>
                 </Pressable>
@@ -341,10 +342,10 @@ export default function Notifications() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View className="gap-3 rounded-2xl border border-border bg-surface p-5">
-      <Text className="text-xs font-semibold uppercase tracking-wider text-text-muted">
+    <View className="gap-3 rounded-xl border border-border bg-surface p-5">
+      <Meta variant="cintillo" tone="muted">
         {title}
-      </Text>
+      </Meta>
       {children}
     </View>
   );

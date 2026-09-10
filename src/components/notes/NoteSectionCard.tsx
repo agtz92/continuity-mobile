@@ -12,6 +12,7 @@ import {
 } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import { useThemeColors } from "@/theme/useThemeColors";
+import { lift } from "@/theme/lift";
 import { MarkdownText } from "@/components/notes/MarkdownText";
 import { deleteFeedback, impactFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
@@ -66,15 +67,7 @@ export function NoteSectionCard({
     <View
       className="overflow-hidden rounded-xl border border-border bg-surface"
       style={
-        isActive
-          ? {
-              shadowColor: c.accent,
-              shadowOpacity: 0.3,
-              shadowOffset: { width: 0, height: 4 },
-              shadowRadius: 12,
-              elevation: 8,
-            }
-          : undefined
+        isActive ? lift("drag", c) : undefined
       }
     >
       <View className="flex-row items-center gap-2 px-3 py-2.5">
@@ -89,7 +82,7 @@ export function NoteSectionCard({
           onBlur={() => persist({})}
           placeholder={t("views.quickNotes.sectionHeading")}
           placeholderTextColor={c.textMuted}
-          className="flex-1 py-0 font-semibold"
+          className="flex-1 py-0 font-sans-semibold"
           style={{ color: c.text, fontSize: 15 }}
         />
         {open ? (

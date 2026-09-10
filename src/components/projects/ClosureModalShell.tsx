@@ -68,11 +68,11 @@ export function ClosureModalShell({
           pointerEvents="box-none"
         >
           <View
-            className="overflow-hidden rounded-2xl border border-border bg-surface"
+            className="overflow-hidden rounded-xl border border-border bg-surface"
             style={{ maxHeight: "88%" }}
           >
             <View className="flex-row items-start justify-between gap-3 px-5 pb-2 pt-5">
-              <Text className="flex-1 text-lg font-semibold text-text">
+              <Text className="flex-1 text-lg font-sans-semibold text-text">
                 {title}
               </Text>
               {dismissible && (

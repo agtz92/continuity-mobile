@@ -49,9 +49,51 @@ Dev build y TestFlight comparten bundle id → solo una instalada a la vez.
 
 ## Convenciones de tema/rutas
 
-- `useThemeColors()` → `{bg,surface,border,text,textMuted,accent,accent2}` (hex). `alpha(hex,n)`.
-- `useTheme()` → `{theme,palette,effective,setTheme,setPalette}`. `effective: "continuuit"|"light"|"dark"`.
+- `useThemeColors()` → superficies (`canvas,bg,surface,surface2,surface3,well`), tintas
+  (`text,text2,text3,text4,text5,textOff`), semántica (`signal,closed`), la **rampa de reglas**
+  (`line[4|8|10|14|18|22|34]`) y los alias vivos (`border,textMuted,accent,accent2`). Todo en hex,
+  salvo `line`, que sale de una tupla `"r,g,b"`.
+- `alpha(color, n)` acepta **hex, `"r,g,b"` y `"rgb(r,g,b)"`**.
+- `useTheme()` → `{theme,palette,effective,setTheme,setPalette}`.
+  **`effective: "continuu"|"light"|"carbon"`** (antes `"continuuit"|"light"|"dark"`). Lo guardado de
+  antes se traduce al leer con `normalizeTheme`/`normalizePalette` (`src/theme/config.ts`,
+  `src/palette/config.ts`) — al **escribir** se usa `isTheme`, que no acepta los viejos.
 - **Typed routes** activadas: estáticas como string (`router.push("/today")`), dinámicas como objeto (`router.push({pathname:"/project/[id]", params:{id}})`).
+
+## Rediseño: las tres voces, y nada más
+
+`signal` (lo que duele: vencido, bloqueado, error) · `accent` (lo que pide atención hoy) · `closed`
+(lo hecho, lo lanzado). **No hay un cuarto color.** Todo lo que no es ninguna de las tres se dice
+con el peso de la tinta (`text3`/`text5`) o con la rampa de reglas.
+
+- **No inventes colores.** Nada de hex ni `rgb()` literales fuera de `src/theme/` y
+  `src/palette/`. La única excepción viva es `src/components/analytics/panels.tsx`, que conserva su
+  juego propio porque ahí el color **identifica una serie** (decisión del dueño).
+- **Metadato ≠ señal.** Horas, recurrencia, fechas, contadores: `<Meta>` con tinta apagada, no una
+  pastilla de color. Un "2h" no duele.
+- **La espina** (`components/ui/Spine`) dice estado y prioridad antes de que leas el nombre.
+  Precedencia: `blocked` > `launched/paused/killed/archived/idea` > prioridad. Si añades una fila de
+  proyecto en algún sitio, lleva espina.
+- **Tipografía:** `font-display` (Instrument Sans) para titulares y cifras; el resto sale en
+  Schibsted por defecto vía `src/theme/baseFont.ts`. **Cada peso es una familia**: usa
+  `font-sans-medium/semibold/bold`, NUNCA `font-bold`/`font-semibold` a secas (dejarían negrita
+  sintética sobre el peso 400).
+- **Sombras:** solo `lift("drag"|"float", c)` de `src/theme/lift.ts`. Lo demás se separa con filete.
+- **Radios:** tres — `rounded-md` (6, control), `rounded-lg` (10, fila), `rounded-xl` (14, hoja),
+  más `rounded-full` para lo que sí es circular. `rounded` a secas son 4px de Tailwind: no se usa.
+- Primitivos en `src/components/ui/`: `Meta`, `Figure`, `ScreenTitle`, `Spine`, `Hatch`,
+  `BlockerBadge`, `CategoryTag`, `ProgressTicks`, `CoolingRule`, `EmptyState`.
+
+## Tokens: no diverjas de web
+
+`src/theme/tokens.generated.ts` es la **copia** de lo que emite `pnpm tokens` en el repo web. No lo
+consume la app; es la referencia. Antes de dar por buena cualquier edición de tokens o paletas:
+
+```bash
+npm run check-tokens
+```
+
+Sale != 0 en cuanto un hex de `src/theme/tokens.ts` o `src/palette/config.ts` se separa del de web.
 
 ## Memoria del proyecto
 

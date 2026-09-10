@@ -159,12 +159,12 @@ export default function GoogleTasks() {
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       {/* Connection card */}
-      <View className="flex-row items-center gap-3 rounded-2xl border border-border bg-surface p-4">
+      <View className="flex-row items-center gap-3 rounded-xl border border-border bg-surface p-4">
         <View className="h-10 w-10 items-center justify-center rounded-lg border border-border">
           <ListTodo size={20} color={c.accent} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-medium text-text">
+          <Text className="text-sm font-sans-medium text-text">
             {t("settings.plugins.googleTasks.title")}
           </Text>
           <Text className="mt-0.5 text-xs text-text-muted">
@@ -200,7 +200,7 @@ export default function GoogleTasks() {
             ) : (
               <ExternalLink size={14} color={c.bg} />
             )}
-            <Text className="text-sm font-medium" style={{ color: c.bg }}>
+            <Text className="text-sm font-sans-medium" style={{ color: c.bg }}>
               {t("settings.plugins.googleTasks.connectButton")}
             </Text>
           </Pressable>
@@ -209,7 +209,7 @@ export default function GoogleTasks() {
 
       {/* Import mapping */}
       {connected && (
-        <View className="gap-4 rounded-2xl border border-border bg-surface p-5">
+        <View className="gap-4 rounded-xl border border-border bg-surface p-5">
           {listsQuery.loading && !listsQuery.data ? (
             <Text className="text-sm text-text-muted">
               {t("settings.plugins.googleTasks.loadingLists")}
@@ -248,7 +248,7 @@ export default function GoogleTasks() {
               >
                 <Text
                   className={
-                    "text-base font-semibold " +
+                    "text-base font-sans-semibold " +
                     (canImport && !importing ? "text-bg" : "text-text-muted")
                   }
                 >

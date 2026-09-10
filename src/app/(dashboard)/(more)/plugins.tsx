@@ -24,7 +24,7 @@ export default function Plugins() {
       <Pressable
         onPress={() => router.push("/google-tasks")}
         accessibilityRole="button"
-        className="flex-row items-center gap-3 rounded-2xl border border-border bg-surface p-4 active:opacity-80"
+        className="flex-row items-center gap-3 rounded-xl border border-border bg-surface p-4 active:opacity-80"
       >
         <View
           className="h-10 w-10 items-center justify-center rounded-lg border border-border"
@@ -33,7 +33,7 @@ export default function Plugins() {
           <ListTodo size={20} color={c.accent} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-medium text-text">
+          <Text className="text-sm font-sans-medium text-text">
             {t("settings.plugins.googleTasks.name")}
           </Text>
           <Text className="mt-0.5 text-xs text-text-muted" numberOfLines={1}>

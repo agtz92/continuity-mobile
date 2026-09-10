@@ -55,7 +55,7 @@ export function MonthGrid({
         : undefined;
       const color = cat
         ? categoryChipColors(cat.color, colors).dot
-        : colors.accent2;
+        : colors.line[34];
       if (showTasks || !r.project) r.tasks.forEach(() => bars.push(color));
       else bars.push(color);
     });
@@ -93,9 +93,9 @@ export function MonthGrid({
             // bars below can carry category colors instead.
             const numberColor =
               showLoad && load.level === "over"
-                ? "#ef4444"
+                ? colors.signal
                 : showLoad && load.level === "busy"
-                  ? "#f59e0b"
+                  ? colors.accent
                   : colors.text;
             return (
               <Pressable
@@ -130,7 +130,7 @@ export function MonthGrid({
                   }
                 >
                   <Text
-                    className="text-xs font-medium"
+                    className="text-xs font-sans-medium"
                     style={{ color: isToday ? colors.bg : numberColor }}
                   >
                     {d.getDate()}

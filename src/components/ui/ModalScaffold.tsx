@@ -42,7 +42,7 @@ export function ModalScaffold({
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
       <View className="flex-row items-center justify-between border-b border-border px-4 pb-3 pt-6">
-        <Text className="text-base font-semibold text-text">{title}</Text>
+        <Text className="text-base font-sans-semibold text-text">{title}</Text>
         <Pressable
           onPress={() => router.back()}
           hitSlop={10}
@@ -76,7 +76,7 @@ export function ModalScaffold({
           >
             <Text
               className={
-                "text-base font-semibold " + (enabled ? "text-bg" : "text-text-muted")
+                "text-base font-sans-semibold " + (enabled ? "text-bg" : "text-text-muted")
               }
             >
               {saveLabel ?? t("common.save")}

@@ -14,6 +14,8 @@ import {
   View,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
+import { Meta } from "@/components/ui/Meta";
 import DraggableFlatList, {
   type RenderItemParams,
 } from "react-native-draggable-flatlist";
@@ -98,18 +100,6 @@ import { alpha, useThemeColors } from "@/theme/useThemeColors";
  * lib/dateConstants.ts (ver AUDITORIA_CODIGO.md).
  */
 
-// Tuplas RGB "r,g,b" (sin envolver en rgb()) para poder componer alphas inline
-// vía `rgba(${RED},0.3)`. Los *_T son los hex tintados ya resueltos para texto/
-// iconos. Hardcodeadas porque no dependen del tema (semáforo overdue/today/idle).
-const RED = "239,68,68";
-const ORANGE = "249,115,22";
-const AMBER = "245,158,11";
-const PURPLE = "168,85,247";
-const RED_T = "rgb(248,113,113)";
-const ORANGE_T = "rgb(251,146,60)";
-const AMBER_T = "rgb(251,191,36)";
-const PURPLE_T = "rgb(192,132,252)";
-
 
 function greetingKey(): "morning" | "afternoon" | "evening" {
   const h = new Date().getHours();
@@ -148,7 +138,7 @@ function CreateOption({
       >
         {icon}
       </View>
-      <Text className="text-base font-medium text-text">{label}</Text>
+      <Text className="text-base font-sans-medium text-text">{label}</Text>
     </Pressable>
   );
 }
@@ -334,9 +324,9 @@ export default function Today() {
   const counters: { id: string; label: string; value: number; tint: string }[] =
     [
       { id: "active", label: t("views.today.counters.active"), value: activeProjects.length, tint: c.accent },
-      { id: "launched", label: t("views.today.counters.launched"), value: launchedCount, tint: c.accent2 },
-      { id: "stalled", label: t("views.today.counters.stalled"), value: stalled.length, tint: AMBER_T },
-      { id: "ideas", label: t("views.today.counters.ideas"), value: ideas.length, tint: PURPLE_T },
+      { id: "launched", label: t("views.today.counters.launched"), value: launchedCount, tint: c.closed },
+      { id: "stalled", label: t("views.today.counters.stalled"), value: stalled.length, tint: c.accent },
+      { id: "ideas", label: t("views.today.counters.ideas"), value: ideas.length, tint: c.text3 },
       { id: "tasks", label: t("views.today.counters.tasks"), value: tasks.length, tint: c.text },
     ];
 
@@ -349,16 +339,16 @@ export default function Today() {
 
   // -------- Section icon map for the customize-mode row -------- //
   const SECTION_ICON: Record<TodaySectionId, ReactNode> = {
-    counters: <TrendingUp size={18} color={c.accent2} />,
-    "stalled-alert": <Bell size={18} color={AMBER_T} />,
+    counters: <TrendingUp size={18} color={c.text3} />,
+    "stalled-alert": <Bell size={18} color={c.accent} />,
     "today-focus": <Target size={18} color={c.accent} />,
-    "routines-today": <Repeat size={18} color={c.accent2} />,
+    "routines-today": <Repeat size={18} color={c.text3} />,
     "done-today": <Sparkles size={18} color={c.accent} />,
     closeable: <Flag size={18} color={c.accent} />,
-    sleeping: <Moon size={18} color={AMBER_T} />,
-    "stale-ideas": <Lightbulb size={18} color={PURPLE_T} />,
+    sleeping: <Moon size={18} color={c.accent} />,
+    "stale-ideas": <Lightbulb size={18} color={c.text3} />,
     "active-projects": <Zap size={18} color={c.accent} />,
-    "launched-with-tasks": <Rocket size={18} color={c.accent2} />,
+    "launched-with-tasks": <Rocket size={18} color={c.closed} />,
   };
 
   // -------- Section nodes (rendered only when data exists) -------- //
@@ -579,12 +569,14 @@ export default function Today() {
         {/* Header: date + greeting + assistant trigger + customize */}
         <View className="flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
-            <Text className="text-xs capitalize text-text-muted">
+            {/* La fecha es cintillo, el saludo es el titular: el orden de
+                lectura del canvas es "cuándo" y luego "quién eres hoy". */}
+            <Meta variant="cintillo" tone="muted" className="capitalize">
               {formattedDate}
-            </Text>
-            <Text className="mt-0.5 text-2xl font-semibold text-text">
+            </Meta>
+            <ScreenTitle className="mt-1">
               {t(`views.today.greeting.${greetingKey()}`)}
-            </Text>
+            </ScreenTitle>
           </View>
           <Pressable
             onPress={() => router.push("/assistant")}
@@ -597,7 +589,7 @@ export default function Today() {
             }}
           >
             <Sparkles size={16} color={c.accent} />
-            <Text className="text-xs font-medium text-accent">
+            <Text className="text-xs font-sans-medium text-accent">
               {t("assistant.buttonLabel")}
             </Text>
           </Pressable>
@@ -652,20 +644,20 @@ export default function Today() {
             onPress={() => goCreate("/project-form")}
           />
           <CreateOption
-            icon={<Target size={18} color={c.accent2} />}
-            tint={alpha(c.accent2, 0.15)}
+            icon={<Target size={18} color={c.accent} />}
+            tint={alpha(c.accent, 0.15)}
             label={t("views.today.createMenu.task")}
             onPress={() => goCreate("/task-form")}
           />
           <CreateOption
-            icon={<Repeat size={18} color={PURPLE_T} />}
-            tint={`rgba(${PURPLE},0.15)`}
+            icon={<Repeat size={18} color={c.text3} />}
+            tint={alpha(c.text3, 0.15)}
             label={t("views.today.createMenu.routine")}
             onPress={() => goCreate("/routine-form")}
           />
           <CreateOption
-            icon={<Lightbulb size={18} color={AMBER_T} />}
-            tint={`rgba(${AMBER},0.15)`}
+            icon={<Lightbulb size={18} color={c.accent} />}
+            tint={alpha(c.accent, 0.15)}
             label={t("views.today.createMenu.idea")}
             onPress={() => goCreate("/idea-form")}
           />

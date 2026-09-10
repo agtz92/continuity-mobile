@@ -8,6 +8,7 @@
  * TODO: refactor — extraer ActivityChart y un *Panel.tsx por gráfico + lib/analyticsConfig.ts (RANGES/CHIPS/buckets/STATUS_COLOR) (ver AUDITORIA_CODIGO.md)
  */
 import { type ReactNode, useState } from "react";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   Pressable,
   RefreshControl,
@@ -20,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { AlertCircle, BarChart3 } from "lucide-react-native";
 import type { AnalyticsRange } from "@/lib/types";
 import { useAnalyticsData } from "@/hooks/useAnalyticsData";
-import { useThemeColors } from "@/theme/useThemeColors";
+import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { CHIPS, RANGES, type ChipId } from "@/lib/analyticsConfig";
 
 import {
@@ -101,7 +102,7 @@ export default function Analytics() {
       <View className="gap-3 px-5 pb-3 pt-2">
         <View className="flex-row items-center gap-2">
           <BarChart3 size={18} color={c.accent} />
-          <Text className="text-2xl font-bold text-text">{t("analytics.title")}</Text>
+          <ScreenTitle>{t("analytics.title")}</ScreenTitle>
           {loading && !initialLoading ? (
             <Text className="text-xs text-text-muted">{t("analytics.refreshing")}</Text>
           ) : null}
@@ -116,7 +117,7 @@ export default function Analytics() {
                 onPress={() => setRange(r.value)}
                 className={"flex-1 items-center rounded-md px-2 py-1.5 " + (active ? "bg-border" : "")}
               >
-                <Text className={"text-xs font-medium " + (active ? "text-text" : "text-text-muted")}>
+                <Text className={"text-xs font-sans-medium " + (active ? "text-text" : "text-text-muted")}>
                   {t(`analytics.range.${r.key}`)}
                 </Text>
               </Pressable>
@@ -139,11 +140,11 @@ export default function Analytics() {
           {error && (
             <View
               className="flex-row items-start gap-3 rounded-xl border bg-surface p-4"
-              style={{ borderColor: "rgba(245,158,11,0.3)" }}
+              style={{ borderColor: alpha(c.signal, 0.3) }}
             >
-              <AlertCircle size={18} color={AMBER} style={{ marginTop: 2 }} />
+              <AlertCircle size={18} color={c.signal} style={{ marginTop: 2 }} />
               <View className="flex-1">
-                <Text className="text-sm font-semibold" style={{ color: AMBER }}>
+                <Text className="text-sm font-sans-semibold" style={{ color: c.signal }}>
                   {t("analytics.loadError")}
                 </Text>
                 <Text className="mt-1 text-xs text-text-muted">{error.message}</Text>
@@ -151,7 +152,7 @@ export default function Analytics() {
                   onPress={() => refetch()}
                   className="mt-3 self-start rounded-md bg-accent px-3 py-1.5"
                 >
-                  <Text className="text-xs font-medium text-bg">{t("common.retry")}</Text>
+                  <Text className="text-xs font-sans-medium text-bg">{t("common.retry")}</Text>
                 </Pressable>
               </View>
             </View>
@@ -177,7 +178,7 @@ export default function Analytics() {
                     >
                       <Text
                         className={
-                          "text-sm font-medium " + (active ? "text-bg" : "text-text-muted")
+                          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
                         }
                       >
                         {t(`analytics.chips.${id}`)}

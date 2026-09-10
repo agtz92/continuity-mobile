@@ -82,10 +82,10 @@ export default function ReportBug() {
       <Pressable
         onPress={onSubmit}
         disabled={!canSubmit}
-        className="items-center rounded-2xl bg-accent px-4 py-4"
+        className="items-center rounded-xl bg-accent px-4 py-4"
         style={{ opacity: canSubmit ? 1 : 0.5 }}
       >
-        <Text className="text-base font-semibold text-white">
+        <Text className="text-base font-sans-semibold text-white">
           {submitting ? t("reportBug.sending") : t("reportBug.submit")}
         </Text>
       </Pressable>

@@ -111,7 +111,7 @@ function NotificationCard({
       <Icon size={18} color={palette.accent} style={{ marginTop: 1 }} />
       <View className="min-w-0 flex-1">
         {!!title && (
-          <Text className="text-sm font-semibold" style={{ color: c.text }}>
+          <Text className="text-sm font-sans-semibold" style={{ color: c.text }}>
             {title}
           </Text>
         )}
@@ -123,7 +123,7 @@ function NotificationCard({
         {!!ctaUrl && !!ctaLabel && (
           <Pressable onPress={onCta} hitSlop={6} className="mt-2 self-start">
             <Text
-              className="text-sm font-medium underline"
+              className="text-sm font-sans-medium underline"
               style={{ color: palette.accent }}
             >
               {ctaLabel}
@@ -207,15 +207,17 @@ function severityPalette(
   switch (severity) {
     case "error":
       return {
-        bg: "rgba(239,68,68,0.1)",
-        border: "rgba(239,68,68,0.3)",
-        accent: "rgb(248,113,113)",
+        bg: alpha(c.signal, 0.1),
+        border: alpha(c.signal, 0.3),
+        accent: c.signal,
       };
     case "warn":
+      // Aviso ≠ error. No hay un cuarto color para esto: se dice con el mismo
+      // acento y menos peso, y el icono es el que separa uno de otro.
       return {
-        bg: "rgba(245,158,11,0.1)",
-        border: "rgba(245,158,11,0.3)",
-        accent: "rgb(251,191,36)",
+        bg: alpha(c.accent, 0.1),
+        border: alpha(c.accent, 0.3),
+        accent: c.accent,
       };
     case "info":
     default:

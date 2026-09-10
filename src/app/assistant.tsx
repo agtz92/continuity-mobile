@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Meta } from "@/components/ui/Meta";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -27,8 +29,6 @@ import { QuickActionChips } from "@/components/assistant/QuickActionChips";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const MAX_INPUT_CHARS = 4000;
-const AMBER = "245,158,11";
-const AMBER_T = "rgb(251,191,36)";
 
 export default function AssistantScreen() {
   const { t } = useTranslation();
@@ -92,14 +92,17 @@ export default function AssistantScreen() {
         </View>
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center gap-2">
-            <Text className="text-base font-semibold text-text">
+            <Text
+              className="font-display text-text"
+              style={{ fontSize: 18, lineHeight: 20, letterSpacing: -0.4 }}
+            >
               {t("assistant.title")}
             </Text>
             <PlanBadge plan={plan} />
           </View>
-          <Text className="text-xs text-text-muted" numberOfLines={1}>
+          <Meta tone="faint" numberOfLines={1}>
             {t(canWrite ? "assistant.subtitleReadWrite" : "assistant.subtitle")}
-          </Text>
+          </Meta>
         </View>
         <Pressable
           onPress={newConversation}
@@ -130,23 +133,15 @@ export default function AssistantScreen() {
         <UsageMeter usage={usage} />
 
         {isEmpty ? (
-          <View className="flex-1 items-center justify-center gap-3 px-8">
-            <View
-              className="h-14 w-14 items-center justify-center rounded-full"
-              style={{ backgroundColor: alpha(c.accent, 0.15) }}
-            >
-              <Sparkles size={26} color={c.accent} />
-            </View>
-            <Text className="text-center text-lg font-semibold text-text">
-              {t("assistant.welcome.title")}
-            </Text>
-            <Text className="text-center text-sm text-text-muted">
-              {t(
+          <View className="flex-1 justify-center px-6">
+            <EmptyState
+              title={t("assistant.welcome.title")}
+              body={t(
                 canWrite
                   ? "assistant.welcome.bodyReadWrite"
                   : "assistant.welcome.body",
               )}
-            </Text>
+            />
           </View>
         ) : (
           <MessageList messages={messages} streaming={streaming} />
@@ -156,12 +151,12 @@ export default function AssistantScreen() {
           <View
             className="mx-4 mb-2 flex-row items-center gap-2 rounded-lg border px-3 py-2"
             style={{
-              backgroundColor: `rgba(${AMBER},0.1)`,
-              borderColor: `rgba(${AMBER},0.3)`,
+              backgroundColor: alpha(c.signal, 0.1),
+              borderColor: alpha(c.signal, 0.3),
             }}
           >
-            <AlertCircle size={14} color={AMBER_T} />
-            <Text className="flex-1 text-xs" style={{ color: AMBER_T }}>
+            <AlertCircle size={14} color={c.signal} />
+            <Text className="flex-1 text-xs" style={{ color: c.signal }}>
               {error}
             </Text>
           </View>
@@ -184,7 +179,7 @@ export default function AssistantScreen() {
           >
             <Brain size={13} color={deepMode ? c.accent : c.textMuted} />
             <Text
-              className="text-xs font-medium"
+              className="text-xs font-sans-medium"
               style={{ color: deepMode ? c.accent : c.textMuted }}
             >
               {t("assistant.deepMode")}
@@ -200,7 +195,7 @@ export default function AssistantScreen() {
             placeholder={t("assistant.inputPlaceholder")}
             placeholderTextColor={c.textMuted}
             multiline
-            className="max-h-32 flex-1 rounded-2xl border border-border bg-surface px-4 py-2.5 text-text"
+            className="max-h-32 flex-1 rounded-xl border border-border bg-surface px-4 py-2.5 text-text"
           />
           {streaming ? (
             <Pressable

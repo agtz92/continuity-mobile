@@ -102,7 +102,7 @@ export default function QuickNoteEditor() {
           onBlur={() => saveMeta({})}
           placeholder={t("views.quickNotes.titlePlaceholder")}
           placeholderTextColor={c.textMuted}
-          className="flex-1 font-bold"
+          className="flex-1 font-sans-bold"
           style={{ color: c.text, fontSize: 20 }}
         />
         <Pressable
@@ -133,7 +133,7 @@ export default function QuickNoteEditor() {
             }}
           >
             <Text
-              className="text-sm font-medium"
+              className="text-sm font-sans-medium"
               style={{ color: note.categoryId === null ? c.bg : c.textMuted }}
             >
               {t("views.quickNotes.noCategory")}
@@ -157,7 +157,7 @@ export default function QuickNoteEditor() {
                   style={{ backgroundColor: chip.dot }}
                 />
                 <Text
-                  className="text-sm font-medium"
+                  className="text-sm font-sans-medium"
                   style={{ color: active ? chip.text : c.textMuted }}
                 >
                   {cat.name}

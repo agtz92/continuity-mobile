@@ -14,6 +14,7 @@ import { useRoutineMutations } from "@/hooks/useRoutineMutations";
 import { weekdayShortLabels } from "@/lib/recurrence";
 import { todayLocalISODate } from "@/lib/date";
 import type { IntervalUnit, RecurrenceType } from "@/lib/types";
+import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const RECURRENCE_TYPES: RecurrenceType[] = [
   "once",
@@ -44,7 +45,7 @@ function Chip({
     >
       <Text
         className={
-          "text-sm font-medium " + (active ? "text-bg" : "text-text-muted")
+          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
         }
       >
         {label}
@@ -55,6 +56,7 @@ function Chip({
 
 export default function RoutineForm() {
   const { t } = useTranslation();
+  const c = useThemeColors();
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string; projectId?: string }>();
   const { routines, projects } = useDashboardData();
@@ -257,7 +259,7 @@ export default function RoutineForm() {
               >
                 <Text
                   className={
-                    "text-sm font-medium " +
+                    "text-sm font-sans-medium " +
                     (weekdays.includes(idx) ? "text-bg" : "text-text-muted")
                   }
                 >
@@ -333,11 +335,11 @@ export default function RoutineForm() {
         <View
           className="rounded-lg border px-3 py-2"
           style={{
-            backgroundColor: "rgba(244,63,94,0.1)",
-            borderColor: "rgba(244,63,94,0.3)",
+            backgroundColor: alpha(c.signal, 0.1),
+            borderColor: alpha(c.signal, 0.3),
           }}
         >
-          <Text className="text-sm" style={{ color: "rgb(244,63,94)" }}>
+          <Text className="text-sm" style={{ color: c.signal }}>
             {error}
           </Text>
         </View>

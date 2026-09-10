@@ -30,12 +30,9 @@ const projectColors = (
 ) => {
   const cat = project?.categoryId ? categoryById[project.categoryId] : undefined;
   if (cat) return categoryChipColors(cat.color, c);
-  return {
-    bg: alpha(c.accent2, 0.14),
-    text: c.accent2,
-    border: alpha(c.accent2, 0.32),
-    dot: c.accent2,
-  };
+  // Sin categoría: neutro. Antes era el segundo acento, que lo hacía parecer
+  // una categoría más — la única que nadie eligió.
+  return { bg: c.line[8], text: c.text3, border: c.line[22], dot: c.line[34] };
 };
 
 /** One chip per project for a day (default view), with a task count badge. */
@@ -61,7 +58,7 @@ export function ProjectChip({
     >
       <Text
         numberOfLines={1}
-        className="flex-1 text-xs font-medium"
+        className="flex-1 text-xs font-sans-medium"
         style={{ color: cc.text }}
       >
         {project?.name ?? "—"}
@@ -154,10 +151,10 @@ export function RoutineChip({
 export function LoadBar({ load, colors }: { load: DayLoad; colors: ThemeColors }) {
   const color =
     load.level === "over"
-      ? "#ef4444"
+      ? colors.signal
       : load.level === "busy"
-        ? "#f59e0b"
-        : colors.accent;
+        ? colors.accent
+        : colors.line[34];
   const pct =
     load.hours <= 0
       ? 0

@@ -28,7 +28,7 @@ function ProjectsList({ output }: { output: unknown }) {
       {projects.slice(0, 8).map((p, i) => (
         <View
           key={(p.id as string) || i}
-          className="flex-row items-center justify-between gap-2 rounded border border-border px-2 py-1.5"
+          className="flex-row items-center justify-between gap-2 rounded-md border border-border px-2 py-1.5"
           style={{ backgroundColor: alpha(c.surface, 0.6) }}
         >
           <Text className="flex-1 text-xs text-text" numberOfLines={1}>
@@ -54,7 +54,7 @@ function TasksList({ output }: { output: unknown }) {
         return (
           <View
             key={(tk.id as string) || i}
-            className="flex-row items-center gap-2 rounded border border-border px-2 py-1.5"
+            className="flex-row items-center gap-2 rounded-md border border-border px-2 py-1.5"
             style={{ backgroundColor: alpha(c.surface, 0.6) }}
           >
             <View
@@ -110,7 +110,7 @@ export function ToolCallCard({ block }: { block: AssistantToolUseBlock }) {
           <ChevronRight size={12} color={c.textMuted} />
         )}
         <Wrench size={12} color={c.textMuted} />
-        <Text className="text-xs font-medium text-text-muted">{name}</Text>
+        <Text className="text-xs font-sans-medium text-text-muted">{name}</Text>
         <Text
           className="ml-auto text-[10px]"
           style={{ color: isLoading ? c.accent : c.textMuted }}

@@ -11,17 +11,19 @@ import React, {
 import { AppState, View, useColorScheme } from "react-native";
 import { vars } from "nativewind";
 import * as SplashScreen from "expo-splash-screen";
+
+import { useAppFonts } from "@/theme/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@apollo/client/react";
 import { useAuth } from "@/lib/auth";
 import { NOTIFICATION_SETTINGS_QUERY } from "@/lib/graphql";
 import { isLocale, persistLocale } from "@/lib/locale";
-import { DEFAULT_THEME, isTheme, type Theme } from "./config";
-import { THEME_SURFACES, type EffectiveMode } from "./tokens";
+import { DEFAULT_THEME, normalizeTheme, type Theme } from "./config";
+import { LINE_STEPS, THEME_SURFACES, type EffectiveMode } from "./tokens";
 import {
+  accentsFor,
   DEFAULT_PALETTE,
-  isPalette,
-  PALETTE_SWATCHES,
+  normalizePalette,
   type Palette,
 } from "../palette/config";
 
@@ -50,15 +52,42 @@ export function useTheme(): ThemeContextValue {
 // loses the CSS variables (--bg, --accent, …) that className utilities resolve.
 function buildThemeVars(effective: EffectiveMode, palette: Palette) {
   const s = THEME_SURFACES[effective];
-  const [accent, accent2] = PALETTE_SWATCHES[palette][effective];
+  const [accent, accentHi, accentLo] = accentsFor(palette, effective);
+
+  // La rampa de reglas se emite como variables para que `border-line-14` y
+  // compañía funcionen como clase. En RN no hay `color-mix`, así que se calcula
+  // aquí una vez por tema en vez de en cada componente.
+  const lineVars: Record<string, string> = {};
+  for (const n of LINE_STEPS) {
+    const [r, g, b] = s.lineRgb.split(",").map((x) => Number(x.trim()));
+    lineVars[`--line-${n}`] = `rgba(${r}, ${g}, ${b}, ${n / 100})`;
+  }
+
   return vars({
+    "--canvas": s.canvas,
     "--bg": s.bg,
     "--surface": s.surface,
-    "--border": s.border,
+    "--surface-2": s.surface2,
+    "--surface-3": s.surface3,
+    "--well": s.well,
     "--text": s.text,
-    "--text-muted": s.textMuted,
+    "--text-2": s.text2,
+    "--text-3": s.text3,
+    "--text-4": s.text4,
+    "--text-5": s.text5,
+    "--text-off": s.textOff,
+    "--signal": s.signal,
+    "--closed": s.closed,
+    "--toast-bg": s.toastBg,
+    "--toast-text": s.toastText,
     "--accent": accent,
-    "--accent-2": accent2,
+    "--accent-hi": accentHi,
+    "--accent-lo": accentLo,
+    ...lineVars,
+    // Alias de compatibilidad. Mueren en la PR de limpieza.
+    "--border": s.border,
+    "--text-muted": s.textMuted,
+    "--accent-2": s.accent2,
   });
 }
 
@@ -83,8 +112,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           AsyncStorage.getItem(THEME_KEY),
           AsyncStorage.getItem(PALETTE_KEY),
         ]);
-        if (isTheme(t)) setThemeState(t);
-        if (isPalette(p)) setPaletteState(p);
+        // `normalize*` y no `is*`: lo guardado puede ser de antes del rediseño
+        // (`continuuit`, `dark`, `pink`…) y hay que traducirlo, no descartarlo.
+        const nt = normalizeTheme(t);
+        const np = normalizePalette(p);
+        if (nt) setThemeState(nt);
+        if (np) setPaletteState(np);
       } finally {
         setHydrated(true);
       }
@@ -100,12 +133,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // session isn't clobbered.
   const { session, loading: authLoading } = useAuth();
 
-  // Hide the native splash once the theme is hydrated AND auth has resolved, so
-  // the first visible frame is the correct screen in the correct theme rather
-  // than a blank/default flash. preventAutoHideAsync() is called in _layout.tsx.
+  // Hide the native splash once the theme is hydrated, auth has resolved AND
+  // las fuentes están registradas, so the first visible frame is the correct
+  // screen in the correct theme **and la tipografía correcta** rather than a
+  // blank/default flash. preventAutoHideAsync() is called in _layout.tsx.
+  //
+  // Las fuentes entran aquí y no en `_layout` porque este es el único sitio que
+  // ya decide cuándo se puede pintar; tener dos gates es tener dos flashes.
+  const fontsReady = useAppFonts();
   useEffect(() => {
-    if (hydrated && !authLoading) SplashScreen.hideAsync().catch(() => {});
-  }, [hydrated, authLoading]);
+    if (hydrated && !authLoading && fontsReady) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [hydrated, authLoading, fontsReady]);
 
   const { data: settings, refetch } = useQuery<{
     notificationSettings: {
@@ -124,13 +164,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       palette?: string | null;
       locale?: string | null;
     }) => {
-      if (isTheme(s.theme)) {
-        setThemeState(s.theme);
-        void AsyncStorage.setItem(THEME_KEY, s.theme);
+      // Aquí estaba la divergencia: con `isTheme` (solo canónicos de la lista
+      // VIEJA), un tema cambiado desde la web llegaba como `continuu`, no
+      // validaba, y la app se quedaba con el suyo SIN AVISAR. Dos clientes
+      // mostrando temas distintos y nadie sabiendo por qué.
+      const nt = normalizeTheme(s.theme);
+      if (nt) {
+        setThemeState(nt);
+        void AsyncStorage.setItem(THEME_KEY, nt);
       }
-      if (isPalette(s.palette)) {
-        setPaletteState(s.palette);
-        void AsyncStorage.setItem(PALETTE_KEY, s.palette);
+      const np = normalizePalette(s.palette);
+      if (np) {
+        setPaletteState(np);
+        void AsyncStorage.setItem(PALETTE_KEY, np);
       }
       if (isLocale(s.locale)) void persistLocale(s.locale);
     },
@@ -172,9 +218,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     void AsyncStorage.setItem(PALETTE_KEY, p);
   };
 
-  // "system" resolves to light/dark (never to continuuit), matching web.
+  // "system" resuelve a los dos temas neutros (nunca al de marca), igual que
+  // en web: seguir al sistema es una preferencia de luz, no de identidad.
   const effective: EffectiveMode =
-    theme === "system" ? (system === "dark" ? "dark" : "light") : theme;
+    theme === "system" ? (system === "dark" ? "carbon" : "light") : theme;
 
   const style = useMemo(
     () => buildThemeVars(effective, palette),

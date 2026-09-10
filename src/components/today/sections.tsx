@@ -7,6 +7,7 @@
  */
 
 import { useState } from "react";
+import { Figure } from "@/components/ui/Figure";
 import { View, Text, Pressable, ScrollView } from "react-native";
 import {
   Bell,
@@ -24,22 +25,14 @@ import { useRouter } from "expo-router";
 import type { Category, Project, Routine, Task } from "@/lib/types";
 import { daysSince } from "@/lib/date";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
 import { RoutineRow } from "@/components/routines/RoutineRow";
 import type { useTodayFocus } from "@/hooks/useTodayFocus";
 import type { useProductivityStats } from "@/hooks/useProductivityStats";
 import type { TodayRoutineItem } from "./todayRoutines";
-import {
-  RED_T,
-  ORANGE,
-  ORANGE_T,
-  AMBER,
-  AMBER_T,
-  PURPLE,
-  PURPLE_T,
-  sleepingDot,
-} from "./todayColors";
+import { sleepingDot } from "./todayColors";
 
 type FocusModel = ReturnType<typeof useTodayFocus>;
 type Stats = ReturnType<typeof useProductivityStats>;
@@ -60,16 +53,16 @@ export function CountersSection({
         contentContainerClassName="gap-2 pr-3"
       >
         {counters.map((co) => (
-          <View
-            key={co.id}
-            className="min-w-[120px] rounded-xl border border-border bg-surface px-4 py-3"
-          >
-            <Text className="text-[11px] uppercase tracking-wider text-text-muted">
-              {co.label}
-            </Text>
-            <Text className="mt-0.5 text-2xl font-bold" style={{ color: co.tint }}>
+          // Regla arriba en vez de tarjeta: la cifra es lo que se lee, y una
+          // caja alrededor de cada una convertía la cinta en cinco cajas.
+          <View key={co.id} className="min-w-[104px] gap-1.5 pr-4">
+            <View style={{ height: 3, width: 28, backgroundColor: co.tint }} />
+            <Figure size={30} tone={co.tint}>
               {co.value}
-            </Text>
+            </Figure>
+            <Meta variant="cintillo" tone="muted">
+              {co.label}
+            </Meta>
           </View>
         ))}
       </ScrollView>
@@ -85,24 +78,25 @@ interface StalledAlertSectionProps {
 export function StalledAlertSection({
   stalled, jumpToProject,
 }: StalledAlertSectionProps) {
+  const c = useThemeColors();
   const { t } = useTranslation();
   return (
       <View
         className="rounded-xl border p-4"
         style={{
-          backgroundColor: `rgba(${AMBER},0.1)`,
-          borderColor: `rgba(${AMBER},0.3)`,
+          backgroundColor: alpha(c.accent, 0.1),
+          borderColor: alpha(c.accent, 0.3),
         }}
       >
         <View className="flex-row items-start gap-3">
-          <Bell size={18} color={AMBER_T} />
+          <Bell size={18} color={c.accent} />
           <View className="flex-1">
-            <Text className="mb-1 font-semibold" style={{ color: AMBER_T }}>
+            <Text className="mb-1 font-sans-semibold" style={{ color: c.accent }}>
               {t("views.today.stalledAlert.title", { count: stalled.length })}
             </Text>
-            <Text className="text-sm" style={{ color: `rgba(${AMBER},0.9)` }}>
+            <Text className="text-sm" style={{ color: alpha(c.accent, 0.9) }}>
               {t("views.today.stalledAlert.subtitleLead")}{" "}
-              <Text className="font-bold">
+              <Text className="font-sans-bold">
                 {t("views.today.stalledAlert.subtitleEmphasis")}
               </Text>
             </Text>
@@ -112,9 +106,9 @@ export function StalledAlertSection({
                   key={p.id}
                   onPress={() => jumpToProject(p.id)}
                   className="rounded-md px-3 py-1.5"
-                  style={{ backgroundColor: `rgba(${AMBER},0.2)` }}
+                  style={{ backgroundColor: alpha(c.accent, 0.2) }}
                 >
-                  <Text className="text-xs" style={{ color: AMBER_T }}>
+                  <Text className="text-xs" style={{ color: c.accent }}>
                     {p.name} · {daysSince(p.lastActivity)}d
                   </Text>
                 </Pressable>
@@ -154,7 +148,7 @@ export function RoutinesTodaySection({
       <CollapsibleSection
         open={showRoutinesToday}
         onToggle={() => setShowRoutinesToday((s) => !s)}
-        icon={<Repeat size={18} color={c.accent2} />}
+        icon={<Repeat size={18} color={c.text3} />}
         title={t("views.today.routines.title")}
         rightSlot={
           todayRoutineCounts.total > 0 ? (
@@ -162,18 +156,18 @@ export function RoutinesTodaySection({
               <View
                 className="flex-row items-center gap-1.5 rounded-full border px-2.5 py-1"
                 style={{
-                  backgroundColor: `rgba(${ORANGE},0.2)`,
-                  borderColor: `rgba(${ORANGE},0.4)`,
+                  backgroundColor: alpha(c.accent, 0.2),
+                  borderColor: alpha(c.accent, 0.4),
                 }}
               >
-                <Repeat size={11} color={ORANGE_T} />
-                <Text className="text-xs font-medium" style={{ color: ORANGE_T }}>
+                <Repeat size={11} color={c.accent} />
+                <Text className="text-xs font-sans-medium" style={{ color: c.accent }}>
                   {t("views.today.routines.routinesLabel", {
                     count: todayRoutineCounts.total,
                   })}
                 </Text>
                 {todayRoutineCounts.overdue > 0 && (
-                  <Text className="text-xs font-semibold" style={{ color: RED_T }}>
+                  <Text className="text-xs font-sans-semibold" style={{ color: c.signal }}>
                     {t("views.today.routines.overdueExtra", {
                       count: todayRoutineCounts.overdue,
                     })}
@@ -181,19 +175,13 @@ export function RoutinesTodaySection({
                 )}
               </View>
               {todayRoutineEffortHours > 0 && (
-                <View
-                  className="flex-row items-center gap-1 rounded-full border px-2.5 py-1"
-                  style={{
-                    backgroundColor: alpha(c.accent2, 0.15),
-                    borderColor: alpha(c.accent2, 0.4),
-                  }}
-                >
-                  <Clock size={11} color={c.accent2} />
-                  <Text className="text-xs font-medium text-accent-2">
+                <View className="flex-row items-center gap-1">
+                  <Clock size={11} color={c.text5} />
+                  <Meta tone="faint">
                     {t("views.today.routines.totalHoursLabel", {
                       hours: todayRoutineEffortHours,
                     })}
-                  </Text>
+                  </Meta>
                 </View>
               )}
             </View>
@@ -262,10 +250,10 @@ export function CloseableSection({
                   borderColor: alpha(c.accent, 0.3),
                 }}
               >
-                <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
+                <Text className="mb-2 text-xs font-sans-medium uppercase tracking-wider text-accent">
                   {t("views.today.closeable.almostThereChip", { pct })}
                 </Text>
-                <Text className="text-base mb-2 font-semibold text-text">
+                <Text className="text-base mb-2 font-sans-semibold text-text">
                   {sp.project.name}
                 </Text>
                 <View className="mb-2 h-1.5 overflow-hidden rounded-full bg-border">
@@ -290,10 +278,10 @@ export function CloseableSection({
               onPress={() => jumpToProject(sp.project.id)}
               className="rounded-xl border border-border bg-surface p-4"
             >
-              <Text className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">
+              <Text className="mb-2 text-xs font-sans-medium uppercase tracking-wider text-accent">
                 {t("views.today.closeable.quickWin")}
               </Text>
-              <Text className="text-base mb-2 font-semibold text-text">
+              <Text className="text-base mb-2 font-sans-semibold text-text">
                 {sp.project.name}
               </Text>
               <Text className="text-xs text-text-muted">
@@ -322,17 +310,17 @@ export function SleepingSection({
       <CollapsibleSection
         open={showSleeping}
         onToggle={() => setShowSleeping((s) => !s)}
-        icon={<Moon size={18} color={AMBER_T} />}
+        icon={<Moon size={18} color={c.accent} />}
         title={t("views.today.sleeping.title")}
         rightSlot={
           <View
             className="rounded-full border px-2 py-0.5"
             style={{
-              backgroundColor: `rgba(${AMBER},0.1)`,
-              borderColor: `rgba(${AMBER},0.3)`,
+              backgroundColor: alpha(c.accent, 0.1),
+              borderColor: alpha(c.accent, 0.3),
             }}
           >
-            <Text className="text-xs" style={{ color: AMBER_T }}>
+            <Text className="text-xs" style={{ color: c.accent }}>
               {stalledProjects.length}
             </Text>
           </View>
@@ -346,23 +334,23 @@ export function SleepingSection({
             >
               <View
                 className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: sleepingDot[bucket] }}
+                style={{ backgroundColor: sleepingDot(bucket, c) }}
               />
               <View className="min-w-0 flex-1">
                 <View className="flex-row flex-wrap items-center gap-2">
                   <Pressable onPress={() => jumpToProject(project.id)}>
-                    <Text className="text-base font-semibold text-text">
+                    <Text className="text-base font-sans-semibold text-text">
                       {project.name}
                     </Text>
                   </Pressable>
                   <View
-                    className="rounded border px-2 py-0.5"
+                    className="rounded-md border px-2 py-0.5"
                     style={{
-                      backgroundColor: `rgba(${AMBER},0.15)`,
-                      borderColor: `rgba(${AMBER},0.3)`,
+                      backgroundColor: alpha(c.accent, 0.15),
+                      borderColor: alpha(c.accent, 0.3),
                     }}
                   >
-                    <Text className="text-xs" style={{ color: AMBER_T }}>
+                    <Text className="text-xs" style={{ color: c.accent }}>
                       {t("views.today.sleeping.daysIdle", { count: days })}
                     </Text>
                   </View>
@@ -403,6 +391,7 @@ interface StaleIdeasSectionProps {
 export function StaleIdeasSection({
   staleIdeas,
 }: StaleIdeasSectionProps) {
+  const c = useThemeColors();
   const { t } = useTranslation();
   const router = useRouter();
   return (
@@ -410,21 +399,21 @@ export function StaleIdeasSection({
         onPress={() => router.push("/ideas")}
         className="rounded-xl border p-4"
         style={{
-          backgroundColor: `rgba(${PURPLE},0.05)`,
-          borderColor: `rgba(${PURPLE},0.3)`,
+          backgroundColor: alpha(c.text3, 0.05),
+          borderColor: alpha(c.text3, 0.3),
         }}
       >
         <View className="flex-row items-start gap-3">
-          <Lightbulb size={18} color={PURPLE_T} />
+          <Lightbulb size={18} color={c.text3} />
           <View className="flex-1">
-            <Text className="mb-1 font-semibold" style={{ color: PURPLE_T }}>
+            <Text className="mb-1 font-sans-semibold" style={{ color: c.text3 }}>
               {t("views.today.staleIdeas.title", { count: staleIdeas.length })}
             </Text>
-            <Text className="text-sm" style={{ color: `rgba(${PURPLE},0.8)` }}>
+            <Text className="text-sm" style={{ color: alpha(c.text3, 0.8) }}>
               {t("views.today.staleIdeas.subtitle")}
             </Text>
           </View>
-          <ChevronRight size={18} color={PURPLE_T} />
+          <ChevronRight size={18} color={c.text3} />
         </View>
       </Pressable>
   );
@@ -511,17 +500,17 @@ export function LaunchedWithTasksSection({
       <CollapsibleSection
         open={showLaunched}
         onToggle={() => setShowLaunched((s) => !s)}
-        icon={<Rocket size={18} color={c.accent2} />}
+        icon={<Rocket size={18} color={c.closed} />}
         title={t("views.today.launched.title")}
         rightSlot={
           <View
             className="rounded-full border px-2 py-0.5"
             style={{
-              backgroundColor: alpha(c.accent2, 0.1),
-              borderColor: alpha(c.accent2, 0.3),
+              backgroundColor: alpha(c.closed, 0.1),
+              borderColor: alpha(c.closed, 0.3),
             }}
           >
-            <Text className="text-xs text-accent-2">
+            <Text className="text-xs" style={{ color: c.closed }}>
               {launchedWithOpenTasks.length}
             </Text>
           </View>

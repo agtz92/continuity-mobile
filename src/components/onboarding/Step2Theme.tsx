@@ -2,7 +2,11 @@ import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
 import { SUPPORTED_THEMES, THEME_LABEL_KEY } from "@/theme/config";
-import { SUPPORTED_PALETTES, PALETTE_LABEL_KEY, PALETTE_SWATCHES } from "@/palette/config";
+import {
+  SUPPORTED_PALETTES,
+  PALETTE_LABEL_KEY,
+  accentsFor,
+} from "@/palette/config";
 import { PrimaryButton, Pill } from "./controls";
 
 /**
@@ -25,7 +29,7 @@ export function Step2Theme({
   return (
     <View className="gap-6">
       <View className="gap-2">
-        <Text className="text-3xl font-bold text-text">
+        <Text className="text-3xl font-sans-bold text-text">
           {t("onboarding.step2.heading")}
         </Text>
         <Text className="text-base text-text-muted">
@@ -34,7 +38,7 @@ export function Step2Theme({
       </View>
 
       <View className="gap-2">
-        <Text className="text-sm font-medium text-text">
+        <Text className="text-sm font-sans-medium text-text">
           {t("onboarding.step2.mode")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
@@ -50,12 +54,12 @@ export function Step2Theme({
       </View>
 
       <View className="gap-2">
-        <Text className="text-sm font-medium text-text">
+        <Text className="text-sm font-sans-medium text-text">
           {t("onboarding.step2.palette")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
           {SUPPORTED_PALETTES.map((pl) => {
-            const [a, a2] = PALETTE_SWATCHES[pl][effective];
+            const [a, a2] = accentsFor(pl, effective);
             return (
               <Pill
                 key={pl}

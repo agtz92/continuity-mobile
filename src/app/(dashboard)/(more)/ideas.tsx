@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   Pressable,
   RefreshControl,
@@ -15,10 +17,8 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useIdeaMutations } from "@/hooks/useIdeaMutations";
 import { FAB } from "@/components/ui/FAB";
 import { ListSkeleton } from "@/components/ui/Skeletons";
-import { useThemeColors } from "@/theme/useThemeColors";
+import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
-const PURPLE = "168,85,247";
-const PURPLE_T = "rgb(192,132,252)";
 
 export default function Ideas() {
   const { t } = useTranslation();
@@ -56,9 +56,9 @@ export default function Ideas() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <View className="gap-2 px-5 pb-3 pt-2">
-        <Text className="text-2xl font-bold text-text">
+        <ScreenTitle>
           {t("views.ideas.title")}
-        </Text>
+        </ScreenTitle>
         <Text className="text-sm text-text-muted">
           {t("views.ideas.subtitle")}
         </Text>
@@ -80,16 +80,16 @@ export default function Ideas() {
       {initialLoading && ideas.length === 0 ? (
         <ListSkeleton variant="card" />
       ) : ideas.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.ideas.empty")}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState
+            title={t("views.ideas.empty")}
+            body={t("views.ideas.emptyBody")}
+            rule={t("views.ideas.emptyRule")}
+          />
         </View>
       ) : filtered.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-5">
-          <Text className="text-base text-center text-text-muted">
-            {t("views.ideas.noMatch", { query: search.trim() })}
-          </Text>
+        <View className="flex-1 px-5">
+          <EmptyState title={t("views.ideas.noMatch", { query: search.trim() })} />
         </View>
       ) : (
         <ScrollView
@@ -107,21 +107,21 @@ export default function Ideas() {
               key={i.id}
               className="rounded-xl border p-4"
               style={{
-                backgroundColor: `rgba(${PURPLE},0.05)`,
-                borderColor: `rgba(${PURPLE},0.2)`,
+                backgroundColor: alpha(c.text3, 0.05),
+                borderColor: alpha(c.text3, 0.2),
               }}
             >
               <View className="mb-2 flex-row items-start gap-2">
-                <Lightbulb size={16} color={PURPLE_T} style={{ marginTop: 2 }} />
+                <Lightbulb size={16} color={c.text3} style={{ marginTop: 2 }} />
                 <Text
-                  className="flex-1 font-semibold"
-                  style={{ color: PURPLE_T }}
+                  className="flex-1 font-sans-semibold"
+                  style={{ color: c.text3 }}
                 >
                   {i.title}
                 </Text>
               </View>
               {!!i.why && (
-                <Text className="mb-2 text-sm italic" style={{ color: PURPLE_T }}>
+                <Text className="mb-2 text-sm italic" style={{ color: c.text3 }}>
                   → {i.why}
                 </Text>
               )}
@@ -134,9 +134,9 @@ export default function Ideas() {
                 <Pressable
                   onPress={() => promoteIdea(i.id)}
                   className="rounded-md px-3 py-1.5"
-                  style={{ backgroundColor: `rgba(${PURPLE},0.2)` }}
+                  style={{ backgroundColor: alpha(c.text3, 0.2) }}
                 >
-                  <Text className="text-xs font-medium" style={{ color: PURPLE_T }}>
+                  <Text className="text-xs font-sans-medium" style={{ color: c.text3 }}>
                     {t("views.ideas.promote")}
                   </Text>
                 </Pressable>

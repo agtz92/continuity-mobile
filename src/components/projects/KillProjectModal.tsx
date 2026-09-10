@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useThemeColors } from "@/theme/useThemeColors";
 import { Pressable, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Field } from "@/components/ui/Field";
@@ -30,6 +31,7 @@ export function KillProjectModal({
   onConfirm: (notes: KillNotes) => void;
 }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   const [reason, setReason] = useState("");
   const [learnings, setLearnings] = useState("");
   const [wouldRestart, setWouldRestart] = useState("");
@@ -60,14 +62,14 @@ export function KillProjectModal({
           accessibilityRole="button"
           className="items-center rounded-lg py-3"
           style={{
-            backgroundColor: canSave ? "rgb(220,38,38)" : undefined,
+            backgroundColor: canSave ? c.signal : undefined,
           }}
         >
           <Text
             className={
-              "text-base font-semibold " + (canSave ? "" : "text-text-muted")
+              "text-base font-sans-semibold " + (canSave ? "" : "text-text-muted")
             }
-            style={canSave ? { color: "white" } : undefined}
+            style={canSave ? { color: c.bg } : undefined}
           >
             {t("closure.kill.confirm")}
           </Text>

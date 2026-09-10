@@ -150,7 +150,7 @@ export function DayGrid({
 
   const sectionHeader = (label: string, count: number) => (
     <Text
-      className="px-0.5 text-xs font-medium"
+      className="px-0.5 text-xs font-sans-medium"
       style={{ color: colors.textMuted }}
     >
       {label} · {count}
@@ -252,10 +252,10 @@ export function DayGrid({
                   const cc = cat
                     ? categoryChipColors(cat.color, colors)
                     : {
-                        bg: alpha(colors.accent2, 0.16),
-                        text: colors.accent2,
-                        border: alpha(colors.accent2, 0.4),
-                        dot: colors.accent2,
+                        bg: colors.line[8],
+                        text: colors.text3,
+                        border: colors.line[22],
+                        dot: colors.line[34],
                       };
                   const h = Math.max(
                     MIN_BLOCK,
@@ -282,7 +282,7 @@ export function DayGrid({
                     >
                       <Text
                         numberOfLines={1}
-                        className="text-xs font-medium"
+                        className="text-xs font-sans-medium"
                         style={{ color: cc.text }}
                       >
                         {t.title}

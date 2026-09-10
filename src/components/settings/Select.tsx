@@ -63,7 +63,7 @@ export function Select({
                   active ? { backgroundColor: alpha(c.accent, 0.1) } : undefined
                 }
               >
-                <Text className={"text-base " + (active ? "font-semibold text-text" : "text-text")}>
+                <Text className={"text-base " + (active ? "font-sans-semibold text-text" : "text-text")}>
                   {o.label}
                 </Text>
                 {active && <Check size={18} color={c.accent} />}

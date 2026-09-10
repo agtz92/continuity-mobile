@@ -1,4 +1,5 @@
 import { Image, Pressable, Text, View } from "react-native";
+import { Meta } from "@/components/ui/Meta";
 import { useTranslation } from "react-i18next";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { useUserAvatar } from "@/hooks/useUserAvatar";
@@ -60,9 +61,9 @@ export function AvatarPickerSheet({
           if (items.length === 0) return null;
           return (
             <View key={style} className="gap-3">
-              <Text className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              <Meta variant="cintillo" tone="muted">
                 {t(`avatars.styles.${style}`)}
-              </Text>
+              </Meta>
               <View className="flex-row flex-wrap gap-x-4 gap-y-4">
                 {items.map((a) => {
                   const selected = a.id === avatarId;

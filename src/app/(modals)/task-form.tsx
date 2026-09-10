@@ -60,7 +60,7 @@ function Chip({
     >
       <Text
         className={
-          "text-sm font-medium " + (active ? "text-bg" : "text-text-muted")
+          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
         }
       >
         {label}
@@ -244,8 +244,8 @@ export default function TaskForm() {
                     {b.blockingTaskId ? (
                       <>
                         {proj && (
-                          <View className="rounded border border-border bg-surface px-1.5 py-0.5">
-                            <Text className="text-[10px] font-medium text-text-muted">
+                          <View className="rounded-md border border-border bg-surface px-1.5 py-0.5">
+                            <Text className="text-[10px] font-sans-medium text-text-muted">
                               {proj.name}
                             </Text>
                           </View>

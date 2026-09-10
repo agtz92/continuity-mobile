@@ -43,7 +43,22 @@ export interface Project {
   stalledAt?: string | null;
   /** Manual order ("Mi orden" sort). Dense 0..N once reordered; 0 by default. */
   position?: number;
+
+  // ---- Enfriamiento y atasco, derivados por el servidor (core/services/cooling.py).
+  // Opcionales a propósito: una respuesta cacheada de antes de B1 no los trae.
+  // Los mismos cuatro campos que consume la web; ver `lib/cooling.ts` allá.
+  /** Días desde el último movimiento. */
+  daysSinceTouch?: number | null;
+  /** Tramo de enfriamiento: 0-7 templado · 8-21 enfriándose · 22+ frío. */
+  cooling?: Cooling | null;
+  /** Desde cuándo arrastra al menos una tarea abierta con blocker. */
+  blockedSince?: string | null;
+  /** ¿Tiene al menos una tarea abierta con blocker? */
+  isBlocked?: boolean | null;
 }
+
+/** Tramo de enfriamiento de un proyecto. Espejo del backend y de la web. */
+export type Cooling = "warm" | "cool" | "cold";
 
 export interface GraveyardInsight {
   body: string;
@@ -81,6 +96,10 @@ export interface Task {
   dueTime: string | null; // "HH:MM:SS" or null = all-day
   durationMinutes: number | null;
   blockers: TaskBlocker[];
+  /** Desde cuándo está detenida. Lo deriva el servidor del blocker más viejo. */
+  blockedSince?: string | null;
+  /** Por qué está detenida — lo que de verdad desatasca. */
+  blockedReason?: string | null;
 }
 
 export interface Idea {
@@ -349,19 +368,7 @@ export const CATEGORY_COLORS = [
   "orange",
 ] as const;
 
-// Static map — Tailwind needs the literal class names in source to keep them.
-const CATEGORY_COLOR_MAP: Record<string, { chip: string; dot: string }> = {
-  emerald: { chip: "bg-accent/15 text-accent border-accent/30", dot: "bg-accent" },
-  blue: { chip: "bg-accent-2/15 text-accent-2 border-accent-2/30", dot: "bg-accent-2" },
-  purple: { chip: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30", dot: "bg-purple-400" },
-  amber: { chip: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30", dot: "bg-amber-400" },
-  rose: { chip: "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30", dot: "bg-rose-400" },
-  cyan: { chip: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/30", dot: "bg-cyan-400" },
-  indigo: { chip: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30", dot: "bg-indigo-400" },
-  pink: { chip: "bg-pink-500/15 text-pink-700 dark:text-pink-300 border-pink-500/30", dot: "bg-pink-400" },
-  lime: { chip: "bg-lime-500/15 text-lime-700 dark:text-lime-300 border-lime-500/30", dot: "bg-lime-400" },
-  orange: { chip: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30", dot: "bg-orange-400" },
-};
-
-export const categoryColorClass = (color: string) =>
-  CATEGORY_COLOR_MAP[color] ?? CATEGORY_COLOR_MAP.emerald;
+// El mapa de clases por categoría vivía aquí y no lo usaba nadie: quien
+// resuelve el color de una categoría es `categoryChipColors` (hex, contra el
+// tema). Además llevaba `bg-accent/15`, que es la trampa de opacidad sobre
+// tokens (regla 5 de AGENTS.md) y no habría aplicado nunca.

@@ -2,18 +2,31 @@ import { Pressable, Text, View } from "react-native";
 import { Clock, Rocket, Sparkles } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Category, Project, Task } from "@/lib/types";
-import { priorityStripeClass } from "@/lib/priority";
-import { daysSince, isDueToday, isOverdue } from "@/lib/date";
+import { isDueToday, isOverdue } from "@/lib/date";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { Spine, spineStrikesTitle } from "@/components/ui/Spine";
+import { ProgressTicks } from "@/components/ui/ProgressTicks";
+import { CategoryTag } from "@/components/ui/CategoryTag";
+import { Meta } from "@/components/ui/Meta";
+import { touchInk } from "@/components/today/todayColors";
+import { projectDays, projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
 
-const RED = "239,68,68"; // red-500
-const ORANGE = "249,115,22"; // orange-500
 
 /**
- * Compact, tappable project card. Mirrors the web card used in Today's grids;
- * here it's also the list item on the Projects screen. Variants differ in tint
- * (launched gets an accent-2 wash), header lead (priority dot vs Rocket),
- * footer ("Xd ago" only for active), and a launched-only "X open" badge.
+ * Tarjeta compacta de proyecto. Espejo de la web: es la tarjeta de las rejillas
+ * de Hoy y también el renglón de la pantalla de Proyectos.
+ *
+ * Rediseño:
+ *
+ * - **La espina sustituye al punto de prioridad.** El punto solo decía
+ *   prioridad; la espina dice estado *y* prioridad, con la misma precedencia
+ *   que en toda la app (`components/ui/Spine`), y ocupa el alto entero de la
+ *   tarjeta en vez de 10px sueltos junto al título.
+ * - **El progreso son bloques contables**, no una barra proporcional: cada
+ *   marca es una tarea. Una barra al 62% no dice si faltan tres o treinta.
+ * - **El "hace Xd" ya no es ámbar a los 7 días**: el enfriamiento se dice con
+ *   el peso de la tinta (`touchInk`), que es la misma rampa que usa el punto
+ *   de proyecto dormido en Hoy.
  */
 export function ProjectCardCompact({
   project: p,
@@ -45,44 +58,49 @@ export function ProjectCardCompact({
     (tk) => !tk.done && isOverdue(tk.dueDate)
   ).length;
   const openCount = projectTasks.filter((tk) => !tk.done).length;
-  const days = daysSince(p.lastActivity) ?? 0;
-  const donePct = total === 0 ? 0 : Math.round((done / total) * 100);
+  const blockedCount = projectTasks.filter(
+    (tk) => !tk.done && taskIsBlocked(tk)
+  ).length;
+  const blocked = projectIsBlocked(p, blockedCount);
+  const days = projectDays(p);
 
   const borderColor =
     overdueCount > 0
-      ? `rgba(${RED},0.4)`
+      ? alpha(c.signal, 0.4)
       : todayCount > 0
-      ? `rgba(${ORANGE},0.4)`
+      ? alpha(c.accent, 0.4)
       : variant === "launched"
-      ? alpha(c.accent2, 0.2)
+      ? alpha(c.closed, 0.2)
       : c.border;
   const backgroundColor =
-    variant === "launched" ? alpha(c.accent2, 0.05) : c.surface;
+    variant === "launched" ? alpha(c.closed, 0.05) : c.surface;
 
   const cat = p.categoryId ? categoryById[p.categoryId] : undefined;
-  const catColors = cat ? categoryChipColors(cat.color, c) : null;
-
-  const fillColor =
-    donePct >= 80 ? c.accent : donePct >= 40 ? c.accent2 : c.textMuted;
 
   return (
     <Pressable
       onPress={onPress}
-      className="rounded-xl border p-4 active:opacity-90"
+      className="flex-row overflow-hidden rounded-lg border active:opacity-90"
       style={{ borderColor, backgroundColor }}
     >
+      <Spine status={p.status} priority={p.priority} blocked={blocked} />
+      <View className="flex-1 p-4">
       <View className="mb-1 flex-row flex-wrap items-center gap-2">
-        {variant === "launched" ? (
-          <Rocket size={14} color={c.accent2} />
-        ) : (
-          <View className={`h-2.5 w-2.5 rounded-full ${priorityStripeClass[p.priority]}`} />
-        )}
-        <Text numberOfLines={1} className="text-base flex-1 font-semibold text-text">
+        {variant === "launched" && <Rocket size={14} color={c.closed} />}
+        <Text
+          numberOfLines={1}
+          className="text-base flex-1 font-display text-text"
+          style={
+            spineStrikesTitle(p.status)
+              ? { textDecorationLine: "line-through" }
+              : undefined
+          }
+        >
           {p.name}
         </Text>
         {comebackGapDays != null && comebackGapDays > 0 && (
           <View
-            className="flex-row items-center gap-1 rounded border px-1.5 py-0.5"
+            className="flex-row items-center gap-1 rounded-md border px-1.5 py-0.5"
             style={{
               backgroundColor: alpha(c.accent, 0.2),
               borderColor: alpha(c.accent, 0.4),
@@ -96,50 +114,48 @@ export function ProjectCardCompact({
         )}
         {variant === "launched" && (
           <View
-            className="rounded border px-1.5 py-0.5"
+            className="rounded-md border px-1.5 py-0.5"
             style={{
-              backgroundColor: alpha(c.accent2, 0.2),
-              borderColor: alpha(c.accent2, 0.4),
+              backgroundColor: alpha(c.closed, 0.2),
+              borderColor: alpha(c.closed, 0.4),
             }}
           >
-            <Text className="text-xs text-accent-2">
+            <Text className="text-xs" style={{ color: c.closed }}>
               {t("projectCard.openCount", { count: openCount })}
             </Text>
           </View>
         )}
         {overdueCount > 0 && (
           <View
-            className="rounded border px-1.5 py-0.5"
+            className="rounded-md border px-1.5 py-0.5"
             style={{
-              backgroundColor: `rgba(${RED},0.2)`,
-              borderColor: `rgba(${RED},0.4)`,
+              backgroundColor: alpha(c.signal, 0.2),
+              borderColor: alpha(c.signal, 0.4),
             }}
           >
-            <Text className="text-xs" style={{ color: `rgb(${RED})` }}>
+            <Text className="text-xs" style={{ color: c.signal }}>
               {t("projectCard.overdueBadge", { count: overdueCount })}
             </Text>
           </View>
         )}
         {todayCount > 0 && (
           <View
-            className="rounded border px-1.5 py-0.5"
+            className="rounded-md border px-1.5 py-0.5"
             style={{
-              backgroundColor: `rgba(${ORANGE},0.2)`,
-              borderColor: `rgba(${ORANGE},0.4)`,
+              backgroundColor: alpha(c.accent, 0.2),
+              borderColor: alpha(c.accent, 0.4),
             }}
           >
-            <Text className="text-xs" style={{ color: `rgb(${ORANGE})` }}>
+            <Text className="text-xs" style={{ color: c.accent }}>
               {t("projectCard.todayBadge", { count: todayCount })}
             </Text>
           </View>
         )}
       </View>
 
-      {cat && catColors && (
-        <View className="mb-2 self-start rounded border px-2 py-0.5" style={{ backgroundColor: catColors.bg, borderColor: catColors.border }}>
-          <Text className="text-xs" style={{ color: catColors.text }}>
-            {cat.name}
-          </Text>
+      {cat && (
+        <View className="mb-2 self-start">
+          <CategoryTag name={cat.name} color={cat.color} />
         </View>
       )}
 
@@ -151,20 +167,7 @@ export function ProjectCardCompact({
 
       {total > 0 && (
         <View className="mb-2">
-          <View className="h-1.5 overflow-hidden rounded-full bg-border">
-            <View
-              className="h-full rounded-full"
-              style={{ width: `${donePct}%`, backgroundColor: fillColor }}
-            />
-          </View>
-          <View className="mt-0.5 flex-row justify-between">
-            <Text className="text-[10px] text-text-muted">
-              {t("projectCard.donePct", { pct: donePct })}
-            </Text>
-            <Text className="text-[10px] text-text-muted">
-              {done}/{total}
-            </Text>
-          </View>
+          <ProgressTicks done={done} total={total} blocked={blockedCount} />
         </View>
       )}
 
@@ -172,7 +175,7 @@ export function ProjectCardCompact({
         <View className="flex-row flex-wrap items-center gap-2">
           {todayEffortHours != null && todayEffortHours > 0 && (
             <View
-              className="flex-row items-center gap-1 rounded border px-1.5 py-0.5"
+              className="flex-row items-center gap-1 rounded-md border px-1.5 py-0.5"
               style={{
                 backgroundColor: alpha(c.accent, 0.15),
                 borderColor: alpha(c.accent, 0.3),
@@ -194,13 +197,11 @@ export function ProjectCardCompact({
           )}
         </View>
         {variant === "active" && (
-          <Text
-            className="text-xs"
-            style={days > 6 ? { color: "rgb(251,191,36)" } : { color: c.textMuted }}
-          >
+          <Meta tone="inherit" style={{ color: touchInk(days, c) }}>
             {t("projectCard.daysAgo", { days })}
-          </Text>
+          </Meta>
         )}
+      </View>
       </View>
     </Pressable>
   );

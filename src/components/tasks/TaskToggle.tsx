@@ -2,8 +2,6 @@ import { Pressable, View } from "react-native";
 import { Check, Lock, Repeat } from "lucide-react-native";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
-const RED_BORDER = "rgba(239,68,68,0.8)"; // red-500 @ 80%
-
 /**
  * Circular completion toggle shared by every task/routine row (mirror of the
  * web `tasks/TaskToggle.tsx`). Replaces the old 18px muted CheckCircle2 icon,
@@ -46,7 +44,7 @@ export function TaskToggle({
           borderColor: done
             ? c.accent
             : overdue
-              ? RED_BORDER
+              ? alpha(c.signal, 0.8)
               : alpha(c.textMuted, 0.6),
           backgroundColor: done ? c.accent : "transparent",
           borderStyle: kind === "routine" && !done ? "dashed" : "solid",

@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { Meta } from "@/components/ui/Meta";
 import { useTranslation } from "react-i18next";
 import { Undo2 } from "lucide-react-native";
 import type { Project } from "@/lib/types";
@@ -35,7 +36,7 @@ export function WelcomeBackCard({
     >
       <View className="flex-row items-center gap-2">
         <Undo2 size={18} color={c.accent} />
-        <Text className="flex-1 text-base font-semibold text-text">
+        <Text className="flex-1 text-base font-sans-semibold text-text">
           {t("closure.welcomeBack.title", { name: project.name })}
         </Text>
       </View>
@@ -45,17 +46,17 @@ export function WelcomeBackCard({
 
       {!!project.pausedContext && (
         <View>
-          <Text className="text-xs uppercase tracking-wider text-text-muted">
+          <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.whereStopped")}
-          </Text>
+          </Meta>
           <Text className="text-sm text-text">{project.pausedContext}</Text>
         </View>
       )}
       {!!project.pausedNextAction && (
         <View>
-          <Text className="text-xs uppercase tracking-wider text-text-muted">
+          <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.nextAction")}
-          </Text>
+          </Meta>
           <Text className="text-sm text-text">
             {"→ "}
             {project.pausedNextAction}
@@ -64,14 +65,14 @@ export function WelcomeBackCard({
       )}
       {!!project.pausedBlocker && (
         <View>
-          <Text className="text-xs uppercase tracking-wider text-text-muted">
+          <Meta variant="cintillo" tone="muted">
             {t("closure.welcomeBack.blocker")}
-          </Text>
+          </Meta>
           <Text className="text-sm text-text">{project.pausedBlocker}</Text>
         </View>
       )}
 
-      <Text className="text-sm font-medium text-text">
+      <Text className="text-sm font-sans-medium text-text">
         {t("closure.welcomeBack.ready")}
       </Text>
       <View className="flex-row gap-2">
@@ -81,7 +82,7 @@ export function WelcomeBackCard({
           accessibilityRole="button"
           className="flex-1 items-center rounded-lg bg-accent py-2.5"
         >
-          <Text className="text-sm font-semibold text-bg">
+          <Text className="text-sm font-sans-semibold text-bg">
             {t("closure.welcomeBack.reactivate")}
           </Text>
         </Pressable>

@@ -23,9 +23,9 @@ export function Paywall({
   const s = THEME_SURFACES[effective];
 
   return (
-    <View className="items-center gap-3 rounded-2xl border border-border bg-surface p-6">
+    <View className="items-center gap-3 rounded-xl border border-border bg-surface p-6">
       <Lock color={s.textMuted} size={28} />
-      <Text className="text-center text-lg font-semibold text-text">
+      <Text className="text-center text-lg font-sans-semibold text-text">
         {t("paywall.title", { plan: requiredPlan })}
       </Text>
       <Text className="text-base text-center text-text-muted">{t("paywall.body")}</Text>
@@ -34,7 +34,7 @@ export function Paywall({
         accessibilityRole="button"
         className="mt-1 rounded-xl bg-accent px-5 py-3 active:opacity-90"
       >
-        <Text className="text-base font-semibold text-bg">{t("paywall.manage")}</Text>
+        <Text className="text-base font-sans-semibold text-bg">{t("paywall.manage")}</Text>
       </Pressable>
     </View>
   );

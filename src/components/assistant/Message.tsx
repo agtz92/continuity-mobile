@@ -13,7 +13,7 @@ export function Message({ message }: { message: ChatMessage }) {
     return (
       <View className="items-end">
         <View
-          className="max-w-[85%] rounded-2xl border px-3 py-2"
+          className="max-w-[85%] rounded-xl border px-3 py-2"
           style={{
             backgroundColor: alpha(c.accent, 0.15),
             borderColor: alpha(c.accent, 0.3),

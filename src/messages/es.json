@@ -436,7 +436,7 @@
       "theme": "Tema",
       "themeHint": "Elige tu apariencia preferida. \"Sistema\" sigue la configuración de tu dispositivo.",
       "themeContinuuit": "Continuuit",
-      "themeLight": "Claro",
+      "themeLight": "Papel",
       "themeDark": "Oscuro",
       "themeSystem": "Sistema",
       "palette": "Paleta de colores",
@@ -453,7 +453,14 @@
       "paletteBoho": "Boho",
       "paletteComplimentary": "Complementaria",
       "paletteSunset": "Atardecer",
-      "paletteRetro": "Retro"
+      "paletteRetro": "Retro",
+      "themeContinuu": "Continuu",
+      "themeCarbon": "Carbón",
+      "paletteOcre": "Ocre",
+      "paletteSalvia": "Salvia",
+      "paletteOxido": "Óxido",
+      "paletteHielo": "Hielo",
+      "paletteCiruela": "Ciruela"
     },
     "billing": {
       "title": "Facturación y plan",
@@ -892,7 +899,7 @@
     "tasks": {
       "title": "Todas las tareas",
       "search": "Buscar tareas o proyecto...",
-      "empty": "Aún no hay tareas.",
+      "empty": "No hay nada en la lista",
       "addFirst": "Crear primera tarea",
       "noMatch": "No hay tareas que coincidan con \"{query}\"",
       "todayBucket": "Hoy y vencidas",
@@ -920,12 +927,13 @@
         "noProject": "Sin proyecto",
         "showCompleted": "Mostrar completadas",
         "showBlocked": "Mostrar bloqueadas"
-      }
+      },
+      "emptyBody": "Las tareas viven dentro de un proyecto, o sueltas cuando no hace falta uno. En cualquier caso, lo que importa es sacarlas de tu cabeza."
     },
     "routines": {
       "title": "Rutinas",
       "search": "Buscar rutinas...",
-      "empty": "Aún no hay rutinas. Crea una para registrar actividades recurrentes o sueltas.",
+      "empty": "Aún no hay rutinas",
       "addFirst": "Crear primera rutina",
       "todayBucket": "Hoy y vencidas",
       "todayEmpty": "Sin rutinas para hoy. ✨",
@@ -933,12 +941,14 @@
       "upcoming": "Próximas (7 días)",
       "later": "Más adelante",
       "archived": "Archivadas",
-      "newAria": "Nueva rutina"
+      "newAria": "Nueva rutina",
+      "emptyBody": "Una rutina es el trabajo que no termina nunca: la revisión semanal, la caminata diaria. No va en una lista de tareas, porque tacharla no es el objetivo.",
+      "emptyRule": "Lo que se repite es lo que de verdad cambia las cosas"
     },
     "projects": {
       "title": "Todos los proyectos",
       "search": "Buscar por nombre, descripción, categoría...",
-      "empty": "Aún no hay proyectos.",
+      "empty": "Todavía no has empezado nada",
       "addFirst": "Agrega tu primer proyecto",
       "noMatchSearch": "No hay proyectos que coincidan con \"{query}\"",
       "noMatchFilters": "No hay proyectos que coincidan con estos filtros",
@@ -1017,7 +1027,9 @@
         "noUpdates": "Sin updates registrados",
         "editTaskAria": "Editar tarea",
         "deleteTaskAria": "Eliminar tarea"
-      }
+      },
+      "emptyBody": "Un proyecto es cualquier cosa con más de un paso y una razón para existir. Apunta el primero antes de que se convierta en una nota que no vuelves a encontrar.",
+      "hiddenCount": "{count, plural, one {# proyecto oculto por los filtros} other {# proyectos ocultos por los filtros}}"
     },
     "ideas": {
       "title": "Parking lot de ideas",
@@ -1026,9 +1038,11 @@
       "captureAria": "Capturar nueva idea",
       "addFirst": "Capturar primera idea",
       "subtitle": "Aparca aquí ideas nuevas para no abandonar lo que ya estás haciendo. Promuévelas cuando estés listo.",
-      "empty": "Aún no has capturado ideas.",
+      "empty": "Aún no has capturado nada",
       "noMatch": "No hay ideas que coincidan con \"{query}\"",
-      "promote": "Promover a proyecto"
+      "promote": "Promover a proyecto",
+      "emptyBody": "Una idea es un proyecto al que todavía no te comprometes. Guárdala aquí para que deje de ocuparte la cabeza, y prométela cuando se gane un primer paso.",
+      "emptyRule": "Las ideas no caducan — solo se van callando"
     },
     "quickNotes": {
       "title": "Quick Notes",
@@ -1037,7 +1051,7 @@
       "search": "Buscar en notas y secciones...",
       "newNote": "Nueva nota",
       "addFirst": "Crear primera nota",
-      "empty": "Aún no tienes notas.",
+      "empty": "Aún no hay notas",
       "noMatch": "No hay notas que coincidan con \"{query}\"",
       "loading": "Cargando notas...",
       "untitled": "Nota sin título",
@@ -1066,12 +1080,13 @@
         "all": "Todas",
         "loose": "Sueltas",
         "pinned": "Fijadas"
-      }
+      },
+      "emptyBody": "Un sitio para lo que no cabe en una tarea: la decisión, la referencia, eso que alguien te dijo una vez y vas a necesitar dentro de un mes."
     },
     "log": {
       "title": "Bitácora",
       "search": "Buscar entradas o proyecto...",
-      "empty": "Sin actividad registrada todavía. Registra updates en tus proyectos para llevar momentum.",
+      "empty": "Todavía no hay registro",
       "noMatch": "No hay entradas que coincidan con \"{query}\"",
       "noneInFilter": "Sin entradas en este filtro.",
       "deleteConfirm": "¿Eliminar esta entrada?",
@@ -1111,7 +1126,8 @@
         "routineDeleted": "Eliminaste la rutina {title}",
         "quickNoteCreated": "Creaste la nota {title}",
         "quickNoteDeleted": "Eliminaste la nota {title}"
-      }
+      },
+      "emptyBody": "Aquí cae cada cosa completada, cada cambio de estado y cada nota. Es lo que vas a querer tener el día que te preguntes dónde se fueron los últimos tres meses."
     },
     "graveyard": {
       "title": "Cementerio",
@@ -1129,6 +1145,15 @@
       "revive": "Revivir",
       "askLoop": "Pídele a Loop que profundice",
       "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué cancelo mis proyectos?"
+    },
+    "projectDetail": {
+      "statusAction": {
+        "launch": "Lanzar",
+        "pause": "Pausar",
+        "kill": "Matar",
+        "resume": "Reactivar",
+        "revive": "Revivir"
+      }
     }
   },
   "closure": {
@@ -1239,7 +1264,6 @@
     "openCount": "{count} abiertas",
     "overdueBadge": "{count} vencidas",
     "todayBadge": "{count} hoy",
-    "donePct": "{pct}% hecho",
     "todayHoursTooltip": "Horas invertidas hoy",
     "todayHoursLabel": "+{hours}h hoy",
     "totalHoursTooltip": "Horas totales invertidas en tareas completadas",
@@ -1464,10 +1488,22 @@
         "othersTitle": "Otras herramientas",
         "usTitle": "continuu.it",
         "rows": [
-          { "others": "Capturar más", "us": "Terminar más" },
-          { "others": "Planear más", "us": "Cerrar bucles" },
-          { "others": "Agregar proyectos nuevos", "us": "Confrontar los viejos" },
-          { "others": "Optimizar para empezar", "us": "Optimizar para terminar" }
+          {
+            "others": "Capturar más",
+            "us": "Terminar más"
+          },
+          {
+            "others": "Planear más",
+            "us": "Cerrar bucles"
+          },
+          {
+            "others": "Agregar proyectos nuevos",
+            "us": "Confrontar los viejos"
+          },
+          {
+            "others": "Optimizar para empezar",
+            "us": "Optimizar para terminar"
+          }
         ]
       }
     },
@@ -1533,7 +1569,10 @@
             "Video demo pendiente de grabar"
           ],
           "decisionsLabel": "Decisiones que ya habías tomado:",
-          "decisions": ["Stripe en lugar de Lemon Squeezy", "Tres tiers, descuento anual"]
+          "decisions": [
+            "Stripe en lugar de Lemon Squeezy",
+            "Tres tiers, descuento anual"
+          ]
         },
         "closing": "El costo de regresar baja a cero. Proyectos que dabas por muertos empiezan a terminarse solos."
       },
@@ -1549,7 +1588,10 @@
           "topPriority": "Terminar el hero de la landing page",
           "topPriorityNote": "Activo 5 días, te comprometiste a enviarlo esta semana",
           "secondaryLabel": "Secundario",
-          "secondary": ["Revisar tracking de conversión en GTM", "Responder feedback de beta testers"],
+          "secondary": [
+            "Revisar tracking de conversión en GTM",
+            "Responder feedback de beta testers"
+          ],
           "footer": "Responde STATUS para el reporte completo.",
           "userReply": "STATUS"
         },
@@ -1565,10 +1607,22 @@
           "modalTitle": "Antes de empezar uno nuevo…",
           "modalBody": "Ya tienes 4 proyectos activos. ¿Qué decisión estás tomando?",
           "activeProjects": [
-            { "name": "Rediseño de landing page", "status": "5 días activo" },
-            { "name": "Bot de Telegram v2", "status": "12 días pausado" },
-            { "name": "Migración del newsletter", "status": "23 días activo" },
-            { "name": "App de fantasy football", "status": "47 días a la deriva" }
+            {
+              "name": "Rediseño de landing page",
+              "status": "5 días activo"
+            },
+            {
+              "name": "Bot de Telegram v2",
+              "status": "12 días pausado"
+            },
+            {
+              "name": "Migración del newsletter",
+              "status": "23 días activo"
+            },
+            {
+              "name": "App de fantasy football",
+              "status": "47 días a la deriva"
+            }
           ],
           "continueNew": "Empezar igual",
           "pauseExisting": "Pausar uno primero",
@@ -1779,6 +1833,49 @@
       "empty": "Aún no hay entradas publicadas.",
       "readMore": "Leer la entrada",
       "backToBlog": "Volver al blog"
+    }
+  },
+  "blocker": {
+    "blocked": "Bloqueado",
+    "blockedDays": "Bloqueado · {count, plural, one {# día} other {# días}}",
+    "blocksTasks": "{count, plural, one {bloquea # tarea} other {bloquea # tareas}}"
+  },
+  "category": {
+    "none": "suelta"
+  },
+  "progressTicks": {
+    "label": "{done}/{total} tareas · {pct}%",
+    "aria": "{done} de {total} tareas completadas",
+    "ariaBlocked": "{done} de {total} tareas completadas, {blocked} bloqueadas"
+  },
+  "capture": {
+    "title": "Captura rápida",
+    "save": "Guardar",
+    "today": "Hoy",
+    "blockedNoReason": "Bloqueada",
+    "duration": "{minutes} min",
+    "updateNeedsProject": "Un update necesita proyecto: escribe # y su nombre.",
+    "ambiguous": "Ese # casa con varios: {names}. Escribe un poco más.",
+    "unresolved": "{tokens} no hizo nada: se queda en el texto.",
+    "syntax": "#proyecto · @mañana 9:30 · ~30m · !qué lo bloquea",
+    "failed": "No se pudo guardar. El texto sigue aquí.",
+    "kind": {
+      "task": "Tarea",
+      "idea": "Idea",
+      "note": "Nota",
+      "update": "Update"
+    },
+    "placeholder": {
+      "task": "¿Qué hay que hacer?",
+      "idea": "¿Cuál es la idea?",
+      "note": "Título de la nota",
+      "update": "¿Qué pasó?"
+    },
+    "saved": {
+      "task": "Tarea guardada.",
+      "idea": "Idea guardada.",
+      "note": "Nota guardada.",
+      "update": "Update guardado."
     }
   }
 }

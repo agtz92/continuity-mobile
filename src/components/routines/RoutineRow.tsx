@@ -14,12 +14,10 @@ import { describeRecurrence } from "@/lib/recurrence";
 import { daysOverdue, todayLocalISODate } from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
+import { EffortBadge } from "@/components/today/EffortBadge";
 import { TaskToggle } from "@/components/tasks/TaskToggle";
 
-const RED = "239,68,68"; // red-500
-const AMBER = "245,158,11"; // amber-500
-const RED_400 = "rgb(248,113,113)";
-const AMBER_400 = "rgb(251,191,36)";
 
 /**
  * Row for a single routine occurrence. `scheduledDate` is the day this row
@@ -80,22 +78,17 @@ export function RoutineRow({
   const lateDays = overdue ? daysOverdue(scheduledDate) : null;
 
   const borderColor = overdue
-    ? `rgba(${RED},0.3)`
+    ? alpha(c.signal, 0.3)
     : dueToday
-    ? `rgba(${AMBER},0.3)`
+    ? alpha(c.accent, 0.3)
     : c.border;
   const spineColor = overdue
-    ? `rgb(${RED})`
+    ? c.signal
     : dueToday
-    ? `rgb(${AMBER})`
+    ? c.accent
     : c.border;
 
   const projectDot = project ? categoryChipColors(project.color, c).dot : null;
-
-  const badgeStyle = {
-    backgroundColor: alpha(c.accent2, 0.15),
-    borderColor: alpha(c.accent2, 0.3),
-  };
 
   return (
     <Animated.View
@@ -130,56 +123,45 @@ export function RoutineRow({
             >
               {routine.title}
             </Text>
-            <View
-              className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-              style={badgeStyle}
-            >
-              <Repeat size={10} color={c.accent2} />
-              <Text className="text-xs text-accent-2">
-                {describeRecurrence(routine, recLabel)}
-              </Text>
+            {/* La recurrencia y las horas son metadato, no señal: mismo
+                tratamiento que en `TaskRow`. El ↻ ya lo dice el toggle. */}
+            <View className="flex-row items-center gap-1">
+              <Repeat size={10} color={c.text5} />
+              <Meta tone="faint">{describeRecurrence(routine, recLabel)}</Meta>
             </View>
             {routine.effortHours != null && (
-              <View
-                className="flex-row items-center gap-1 rounded border px-2 py-0.5"
-                style={badgeStyle}
-              >
-                <Clock size={10} color={c.accent2} />
-                <Text className="text-xs text-accent-2">
-                  {routine.effortHours}h
-                </Text>
-              </View>
+              <EffortBadge hours={routine.effortHours} />
             )}
           </View>
           <View className="mt-0.5 flex-row flex-wrap items-center gap-x-2 gap-y-1">
             {overdue && lateDays !== null ? (
               <View
-                className="rounded px-1.5 py-0.5"
+                className="rounded-md px-1.5 py-0.5"
                 style={{
-                  backgroundColor: `rgba(${RED},0.2)`,
+                  backgroundColor: alpha(c.signal, 0.2),
                   borderWidth: 1,
-                  borderColor: `rgba(${RED},0.4)`,
+                  borderColor: alpha(c.signal, 0.4),
                 }}
               >
                 <Text
-                  className="text-[10px] font-semibold uppercase tracking-wide"
-                  style={{ color: RED_400 }}
+                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
+                  style={{ color: c.signal }}
                 >
                   {t("routineRow.overdueDays", { count: lateDays })}
                 </Text>
               </View>
             ) : dueToday ? (
               <View
-                className="rounded px-1.5 py-0.5"
+                className="rounded-md px-1.5 py-0.5"
                 style={{
-                  backgroundColor: `rgba(${AMBER},0.2)`,
+                  backgroundColor: alpha(c.accent, 0.2),
                   borderWidth: 1,
-                  borderColor: `rgba(${AMBER},0.4)`,
+                  borderColor: alpha(c.accent, 0.4),
                 }}
               >
                 <Text
-                  className="text-[10px] font-semibold uppercase tracking-wide"
-                  style={{ color: AMBER_400 }}
+                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
+                  style={{ color: c.accent }}
                 >
                   {t("routineRow.todayBadge")}
                 </Text>

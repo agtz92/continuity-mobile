@@ -154,7 +154,7 @@ export function BottomSheet({
         <View pointerEvents="box-none" className="flex-1 justify-end">
           <Animated.View
             style={[heightStyle, { transform: [{ translateY }] }]}
-            className="rounded-t-2xl border-t border-border bg-surface"
+            className="rounded-t-xl border-t border-border bg-surface"
           >
             <View {...pan.panHandlers} className="items-center pb-1 pt-2">
               <View className="h-1 w-9 rounded-full bg-border" />
@@ -162,7 +162,7 @@ export function BottomSheet({
 
             {title && (
               <View className="flex-row items-center justify-between px-4 pb-3">
-                <Text className="text-lg font-semibold text-text">{title}</Text>
+                <Text className="text-lg font-sans-semibold text-text">{title}</Text>
                 <Pressable
                   onPress={onClose}
                   accessibilityLabel="Close"

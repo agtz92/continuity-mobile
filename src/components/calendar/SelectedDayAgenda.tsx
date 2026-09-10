@@ -153,7 +153,7 @@ export function SelectedDayAgenda({
       <View className="flex-row items-center justify-between px-3 pb-1.5 pt-2.5">
         <Text
           numberOfLines={1}
-          className="flex-1 text-xs font-medium capitalize"
+          className="flex-1 text-xs font-sans-medium capitalize"
           style={{ color: colors.text }}
         >
           {dateLabel} · {activitiesLabel(count)}

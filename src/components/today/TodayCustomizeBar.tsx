@@ -26,7 +26,7 @@ export function TodayCustomizeBar({
       >
         <X size={20} color={c.textMuted} />
       </Pressable>
-      <Text className="flex-1 text-base font-semibold text-text" numberOfLines={1}>
+      <Text className="flex-1 text-base font-sans-semibold text-text" numberOfLines={1}>
         {labels.title}
       </Text>
       <Pressable
@@ -46,7 +46,7 @@ export function TodayCustomizeBar({
         className="rounded-md px-4 py-1.5"
         style={{ backgroundColor: c.accent }}
       >
-        <Text className="text-sm font-medium" style={{ color: c.bg }}>
+        <Text className="text-sm font-sans-medium" style={{ color: c.bg }}>
           {labels.done}
         </Text>
       </Pressable>

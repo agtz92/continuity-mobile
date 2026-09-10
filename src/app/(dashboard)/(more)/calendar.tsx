@@ -161,7 +161,7 @@ export default function Calendar() {
       style={{ backgroundColor: view === mode ? c.accent : "transparent" }}
     >
       <Text
-        className="text-xs font-medium"
+        className="text-xs font-sans-medium"
         style={{ color: view === mode ? c.bg : c.textMuted }}
       >
         {label}
@@ -253,7 +253,7 @@ export default function Calendar() {
             </Text>
           </Pressable>
           <Text
-            className="flex-1 text-sm font-medium capitalize"
+            className="flex-1 text-sm font-sans-medium capitalize"
             style={{ color: c.text }}
             numberOfLines={1}
           >

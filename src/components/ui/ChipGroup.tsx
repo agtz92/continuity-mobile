@@ -44,7 +44,7 @@ export function ChipGroup<V extends string>({
             {opt.prefix}
             <Text
               className={
-                "text-sm font-medium " + (active ? "text-bg" : "text-text-muted")
+                "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
               }
             >
               {opt.label}

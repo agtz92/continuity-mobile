@@ -116,7 +116,7 @@ export function DateField({
                   }}
                   className="flex-1 items-center rounded-lg border border-border bg-surface py-3"
                 >
-                  <Text className="text-base font-medium text-text-muted">
+                  <Text className="text-base font-sans-medium text-text-muted">
                     {t("common.clear")}
                   </Text>
                 </Pressable>
@@ -128,7 +128,7 @@ export function DateField({
                 }}
                 className="flex-1 items-center rounded-lg bg-accent py-3"
               >
-                <Text className="text-base font-medium text-bg">{t("common.done")}</Text>
+                <Text className="text-base font-sans-medium text-bg">{t("common.done")}</Text>
               </Pressable>
             </View>
           }

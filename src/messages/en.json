@@ -436,7 +436,7 @@
       "theme": "Theme",
       "themeHint": "Choose your preferred appearance. \"System\" follows your device setting.",
       "themeContinuuit": "Continuuit",
-      "themeLight": "Light",
+      "themeLight": "Paper",
       "themeDark": "Dark",
       "themeSystem": "System",
       "palette": "Color palette",
@@ -453,7 +453,14 @@
       "paletteBoho": "Boho",
       "paletteComplimentary": "Complimentary",
       "paletteSunset": "Sunset",
-      "paletteRetro": "Retro"
+      "paletteRetro": "Retro",
+      "themeContinuu": "Continuu",
+      "themeCarbon": "Carbon",
+      "paletteOcre": "Ochre",
+      "paletteSalvia": "Sage",
+      "paletteOxido": "Rust",
+      "paletteHielo": "Ice",
+      "paletteCiruela": "Plum"
     },
     "billing": {
       "title": "Billing & plan",
@@ -892,7 +899,7 @@
     "tasks": {
       "title": "All Tasks",
       "search": "Search tasks or project...",
-      "empty": "No tasks yet.",
+      "empty": "Nothing on the list",
       "addFirst": "Create first task",
       "noMatch": "No tasks match \"{query}\"",
       "todayBucket": "Today & overdue",
@@ -920,12 +927,13 @@
         "noProject": "No project",
         "showCompleted": "Show completed",
         "showBlocked": "Show blocked"
-      }
+      },
+      "emptyBody": "Tasks live inside a project, or on their own when they don't need one. Either way, the point is to get them out of your head."
     },
     "routines": {
       "title": "Routines",
       "search": "Search routines...",
-      "empty": "No routines yet. Create one to track recurring or standalone activities.",
+      "empty": "No routines yet",
       "addFirst": "Create first routine",
       "todayBucket": "Today & overdue",
       "todayEmpty": "No routines for today. ✨",
@@ -933,12 +941,14 @@
       "upcoming": "Upcoming (7 days)",
       "later": "Later",
       "archived": "Archived",
-      "newAria": "New routine"
+      "newAria": "New routine",
+      "emptyBody": "A routine is the work that never finishes: the weekly review, the daily walk. It doesn't belong on a task list, because ticking it off is not the point.",
+      "emptyRule": "What repeats is what actually changes things"
     },
     "projects": {
       "title": "All Projects",
       "search": "Search by name, description, category...",
-      "empty": "No projects yet.",
+      "empty": "Nothing started yet",
       "addFirst": "Add your first project",
       "noMatchSearch": "No projects match \"{query}\"",
       "noMatchFilters": "No projects match these filters",
@@ -1017,7 +1027,9 @@
         "noUpdates": "No updates logged",
         "editTaskAria": "Edit task",
         "deleteTaskAria": "Delete task"
-      }
+      },
+      "emptyBody": "A project is anything with more than one step and a reason to exist. Write the first one down before it turns into a note you never find again.",
+      "hiddenCount": "{count, plural, one {# project hidden by the filters} other {# projects hidden by the filters}}"
     },
     "ideas": {
       "title": "Ideas Parking Lot",
@@ -1026,9 +1038,11 @@
       "captureAria": "Capture new idea",
       "addFirst": "Capture first idea",
       "subtitle": "Park new ideas here so you don't abandon current projects. Promote them when you're ready.",
-      "empty": "No ideas captured yet.",
+      "empty": "Nothing captured yet",
       "noMatch": "No ideas match \"{query}\"",
-      "promote": "Promote to project"
+      "promote": "Promote to project",
+      "emptyBody": "An idea is a project you haven't committed to. Park it here so it stops taking up room in your head, and promote it when it earns a first step.",
+      "emptyRule": "Ideas don't expire — they just get quieter"
     },
     "quickNotes": {
       "title": "Quick Notes",
@@ -1037,7 +1051,7 @@
       "search": "Search notes and sections...",
       "newNote": "New note",
       "addFirst": "Create first note",
-      "empty": "No notes yet.",
+      "empty": "No notes yet",
       "noMatch": "No notes match \"{query}\"",
       "loading": "Loading notes...",
       "untitled": "Untitled note",
@@ -1066,12 +1080,13 @@
         "all": "All",
         "loose": "Standalone",
         "pinned": "Pinned"
-      }
+      },
+      "emptyBody": "Somewhere to put what doesn't fit in a task: the decision, the reference, the thing someone told you once and you'll need in a month."
     },
     "log": {
       "title": "Activity Log",
       "search": "Search log entries or project...",
-      "empty": "No activity logged yet. Log updates from your projects to track momentum.",
+      "empty": "Nothing logged yet",
       "noMatch": "No log entries match \"{query}\"",
       "noneInFilter": "No items in this filter.",
       "deleteConfirm": "Delete this log entry?",
@@ -1111,7 +1126,8 @@
         "routineDeleted": "Deleted routine {title}",
         "quickNoteCreated": "Created note {title}",
         "quickNoteDeleted": "Deleted note {title}"
-      }
+      },
+      "emptyBody": "Every completion, status change and note lands here. It's the record you'll want the day you ask yourself where the last three months went."
     },
     "graveyard": {
       "title": "Graveyard",
@@ -1129,6 +1145,15 @@
       "revive": "Revive",
       "askLoop": "Ask Loop to go deeper",
       "askLoopPrompt": "Analyze my graveyard: what pattern is there in why I kill my projects?"
+    },
+    "projectDetail": {
+      "statusAction": {
+        "launch": "Launch",
+        "pause": "Pause",
+        "kill": "Kill",
+        "resume": "Reactivate",
+        "revive": "Revive"
+      }
     }
   },
   "closure": {
@@ -1239,7 +1264,6 @@
     "openCount": "{count} open",
     "overdueBadge": "{count} overdue",
     "todayBadge": "{count} today",
-    "donePct": "{pct}% done",
     "todayHoursTooltip": "Hours invested today",
     "todayHoursLabel": "+{hours}h today",
     "totalHoursTooltip": "Total hours invested across completed tasks",
@@ -1464,10 +1488,22 @@
         "othersTitle": "Other tools",
         "usTitle": "continuu.it",
         "rows": [
-          { "others": "Capture more", "us": "Finish more" },
-          { "others": "Plan more", "us": "Close loops" },
-          { "others": "Add new projects", "us": "Confront old ones" },
-          { "others": "Optimize for start", "us": "Optimize for done" }
+          {
+            "others": "Capture more",
+            "us": "Finish more"
+          },
+          {
+            "others": "Plan more",
+            "us": "Close loops"
+          },
+          {
+            "others": "Add new projects",
+            "us": "Confront old ones"
+          },
+          {
+            "others": "Optimize for start",
+            "us": "Optimize for done"
+          }
         ]
       }
     },
@@ -1533,7 +1569,10 @@
             "Demo video pending recording"
           ],
           "decisionsLabel": "Decisions you'd already made:",
-          "decisions": ["Stripe over Lemon Squeezy", "Three pricing tiers, annual discount"]
+          "decisions": [
+            "Stripe over Lemon Squeezy",
+            "Three pricing tiers, annual discount"
+          ]
         },
         "closing": "The cost of returning drops to zero. Projects you wrote off start finishing themselves."
       },
@@ -1549,7 +1588,10 @@
           "topPriority": "Finish the landing page hero",
           "topPriorityNote": "Active for 5 days, you committed to shipping it this week",
           "secondaryLabel": "Secondary",
-          "secondary": ["Review GTM conversion tracking", "Reply to beta tester feedback"],
+          "secondary": [
+            "Review GTM conversion tracking",
+            "Reply to beta tester feedback"
+          ],
           "footer": "Reply STATUS for full report.",
           "userReply": "STATUS"
         },
@@ -1565,10 +1607,22 @@
           "modalTitle": "Before you start a new one…",
           "modalBody": "You already have 4 active projects. Which decision are you making?",
           "activeProjects": [
-            { "name": "Landing page redesign", "status": "5 days active" },
-            { "name": "Telegram bot v2", "status": "12 days paused" },
-            { "name": "Newsletter migration", "status": "23 days active" },
-            { "name": "Fantasy football tool", "status": "47 days drifting" }
+            {
+              "name": "Landing page redesign",
+              "status": "5 days active"
+            },
+            {
+              "name": "Telegram bot v2",
+              "status": "12 days paused"
+            },
+            {
+              "name": "Newsletter migration",
+              "status": "23 days active"
+            },
+            {
+              "name": "Fantasy football tool",
+              "status": "47 days drifting"
+            }
           ],
           "continueNew": "Start anyway",
           "pauseExisting": "Pause one first",
@@ -1779,6 +1833,49 @@
       "empty": "No posts published yet.",
       "readMore": "Read the post",
       "backToBlog": "Back to blog"
+    }
+  },
+  "blocker": {
+    "blocked": "Blocked",
+    "blockedDays": "Blocked · {count, plural, one {# day} other {# days}}",
+    "blocksTasks": "{count, plural, one {blocks # task} other {blocks # tasks}}"
+  },
+  "category": {
+    "none": "loose"
+  },
+  "progressTicks": {
+    "label": "{done}/{total} tasks · {pct}%",
+    "aria": "{done} of {total} tasks done",
+    "ariaBlocked": "{done} of {total} tasks done, {blocked} blocked"
+  },
+  "capture": {
+    "title": "Quick capture",
+    "save": "Save",
+    "today": "Today",
+    "blockedNoReason": "Blocked",
+    "duration": "{minutes} min",
+    "updateNeedsProject": "An update needs a project: type # and its name.",
+    "ambiguous": "That # matches several: {names}. Type a bit more.",
+    "unresolved": "{tokens} did nothing: it stays in the text.",
+    "syntax": "#project · @tomorrow 9:30 · ~30m · !what blocks it",
+    "failed": "Couldn't save it. Your text is still here.",
+    "kind": {
+      "task": "Task",
+      "idea": "Idea",
+      "note": "Note",
+      "update": "Update"
+    },
+    "placeholder": {
+      "task": "What needs doing?",
+      "idea": "What's the idea?",
+      "note": "Note title",
+      "update": "What happened?"
+    },
+    "saved": {
+      "task": "Task saved.",
+      "idea": "Idea saved.",
+      "note": "Note saved.",
+      "update": "Update saved."
     }
   }
 }

@@ -15,6 +15,10 @@ export const PROJECT_CLOSURE_FIELDS = `
   killedAiReflection
   stalledAt
   position
+  daysSinceTouch
+  cooling
+  blockedSince
+  isBlocked
 `;
 
 // Identidad mínima del usuario; `isAdmin` gatea el acceso a las pantallas/ops admin.

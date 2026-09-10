@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { Meta } from "@/components/ui/Meta";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -8,8 +9,6 @@ import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const WEB_BILLING_URL = "https://continuu.it/settings/billing";
-const AMBER = "245,158,11";
-const AMBER_T = "rgb(251,191,36)";
 
 function daysUntil(iso: string): number {
   const ms = new Date(iso).getTime() - Date.now();
@@ -79,12 +78,12 @@ export default function Billing() {
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       {/* Current plan card */}
-      <View className="gap-3 rounded-2xl border border-border bg-surface p-5">
-        <Text className="text-xs uppercase tracking-wider text-text-muted">
+      <View className="gap-3 rounded-xl border border-border bg-surface p-5">
+        <Meta variant="cintillo" tone="muted">
           {t("settings.billing.currentPlan")}
-        </Text>
+        </Meta>
         <View className="flex-row items-center gap-2">
-          <Text className="text-base font-semibold text-text">{planLabel}</Text>
+          <Text className="text-base font-sans-semibold text-text">{planLabel}</Text>
           <PlanBadge plan={plan} />
           {isExempt && (
             <View
@@ -95,7 +94,7 @@ export default function Billing() {
                 borderColor: alpha(c.accent, 0.4),
               }}
             >
-              <Text className="text-[10px] font-semibold uppercase text-accent">
+              <Text className="text-[10px] font-sans-semibold uppercase text-accent">
                 {t("settings.billing.exemptBadge")}
               </Text>
             </View>
@@ -116,18 +115,18 @@ export default function Billing() {
           <View
             className="gap-0.5 rounded-lg px-3 py-2"
             style={{
-              backgroundColor: `rgba(${AMBER},0.1)`,
+              backgroundColor: alpha(c.accent, 0.1),
               borderWidth: 1,
-              borderColor: `rgba(${AMBER},0.3)`,
+              borderColor: alpha(c.accent, 0.3),
             }}
           >
             <View className="flex-row items-center gap-1.5">
-              <AlertCircle size={13} color={AMBER_T} />
-              <Text className="text-xs font-semibold" style={{ color: AMBER_T }}>
+              <AlertCircle size={13} color={c.accent} />
+              <Text className="text-xs font-sans-semibold" style={{ color: c.accent }}>
                 {t("settings.billing.cancelScheduled")}
               </Text>
             </View>
-            <Text className="text-xs leading-snug" style={{ color: AMBER_T }}>
+            <Text className="text-xs leading-snug" style={{ color: c.accent }}>
               {t("settings.billing.cancelScheduledBlurb", {
                 plan: planLabel,
                 date: fmtDate(renewsAt),
@@ -184,10 +183,10 @@ export default function Billing() {
         <Pressable
           onPress={() => void Linking.openURL(manageUrl)}
           accessibilityRole="button"
-          className="flex-row items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-4 active:opacity-80"
+          className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
         >
           <ExternalLink size={16} color={c.text} />
-          <Text className="text-base font-semibold text-text">
+          <Text className="text-base font-sans-semibold text-text">
             {hasSubscription
               ? t("settings.billing.manageSubscription")
               : t("settings.billing.upgrade")}
@@ -209,7 +208,7 @@ function UsageRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between rounded-lg border border-border bg-bg px-3 py-2.5">
       <Text className="text-xs text-text-muted">{label}</Text>
-      <Text className="text-sm font-medium text-text">{value}</Text>
+      <Text className="text-sm font-sans-medium text-text">{value}</Text>
     </View>
   );
 }

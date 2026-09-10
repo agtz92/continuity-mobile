@@ -10,12 +10,15 @@ import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 type Plan = "free" | "pro" | "studio" | "admin";
 
-const PURPLE = "168,85,247";
-const AMBER = "245,158,11";
 
 /**
- * Small tier chip next to the assistant title. Free/Pro track the theme accent;
- * Studio/Admin use fixed purple/amber so they stay distinct across palettes.
+ * Chip de plan junto al título del asistente.
+ *
+ * Antes Studio y Admin tenían morado y ámbar fijos "para que sigan siendo
+ * distintos entre paletas". No hacía falta: **el icono ya los distingue**
+ * (chispa, estrella, gema, corona), y dos colores ajenos al tema en un chip de
+ * 10px no separan nada — solo desentonan. Ahora la escala es de intensidad, que
+ * es lo que un tier significa: apagado, acento, acento sólido.
  */
 export function PlanBadge({ plan }: { plan: Plan }) {
   const c = useThemeColors();
@@ -40,16 +43,16 @@ export function PlanBadge({ plan }: { plan: Plan }) {
     studio: {
       label: "Studio",
       Icon: Gem,
-      color: "rgb(192,132,252)",
-      bg: `rgba(${PURPLE},0.1)`,
-      border: `rgba(${PURPLE},0.4)`,
+      color: c.accent,
+      bg: alpha(c.accent, 0.18),
+      border: alpha(c.accent, 0.6),
     },
     admin: {
       label: "Admin",
       Icon: Crown,
-      color: "rgb(251,191,36)",
-      bg: `rgba(${AMBER},0.1)`,
-      border: `rgba(${AMBER},0.4)`,
+      color: c.bg,
+      bg: c.accent,
+      border: c.accent,
     },
   };
   const st = styles[plan] ?? styles.free;
@@ -61,7 +64,7 @@ export function PlanBadge({ plan }: { plan: Plan }) {
     >
       <Icon size={10} color={st.color} />
       <Text
-        className="text-[10px] font-semibold uppercase"
+        className="text-[10px] font-sans-semibold uppercase"
         style={{ color: st.color }}
       >
         {st.label}

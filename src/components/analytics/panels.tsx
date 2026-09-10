@@ -9,6 +9,8 @@
  */
 
 import { Fragment, useState, type ReactNode } from "react";
+import { Figure } from "@/components/ui/Figure";
+import { Meta } from "@/components/ui/Meta";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import {
   AlertCircle,
@@ -92,7 +94,7 @@ export function PanelCard({
       <View className="mb-3">
         <View className="flex-row items-center gap-2">
           {icon}
-          <Text className="text-sm font-semibold text-text">{title}</Text>
+          <Text className="text-sm font-sans-semibold text-text">{title}</Text>
         </View>
         {subtitle ? (
           <Text className="mt-0.5 text-xs text-text-muted">{subtitle}</Text>
@@ -127,13 +129,15 @@ export function StatTile({
           <Text className="text-[11px] text-text-muted">{label}</Text>
         </View>
       )}
-      <Text className="text-2xl font-semibold" style={tone ? { color: tone } : undefined}>
-        <Text className="text-2xl font-semibold text-text" style={tone ? { color: tone } : undefined}>
-          {value}
-        </Text>
-        {suffix ? <Text className="text-sm text-text-muted"> {suffix}</Text> : null}
-      </Text>
-      {!icon && <Text className="mt-1 text-xs text-text-muted">{label}</Text>}
+      {/* La cifra en display y tabular: una columna de números que baila al
+          refrescar es lo que hacía que el panel se leyera como una hoja de
+          cálculo mal alineada. El sufijo se queda pequeño y apagado — es la
+          unidad, no el dato. */}
+      <View className="flex-row items-baseline gap-1">
+        <Figure tone={tone}>{value}</Figure>
+        {suffix ? <Meta tone="faint">{suffix}</Meta> : null}
+      </View>
+      {!icon && <Meta variant="cintillo" tone="muted" className="mt-1">{label}</Meta>}
     </View>
   );
 }
@@ -464,7 +468,7 @@ export function LoopPanel({ loop, t, c }: { loop: LoopStats; t: T; c: ThemeColor
               <Text className="min-w-0 flex-1 text-sm capitalize text-text" numberOfLines={1}>
                 {row.tool.replace(/_/g, " ")}
               </Text>
-              <Text className="text-base font-semibold text-text">{row.count}</Text>
+              <Text className="text-base font-sans-semibold text-text">{row.count}</Text>
             </View>
           ))
         )}
@@ -684,7 +688,7 @@ export function WeekdayHeatmap({ heatmap, t }: { heatmap: WeekdayBucket[]; t: T 
                 className="aspect-square w-full items-center justify-center rounded-md"
                 style={{ backgroundColor: `rgba(52, 211, 153, ${opacity})` }}
               >
-                <Text className="text-xs font-semibold text-text">{count}</Text>
+                <Text className="text-xs font-sans-semibold text-text">{count}</Text>
               </View>
               <Text className="text-[10px] text-text-muted">
                 {t(`analytics.weekday.labels.${key}`)}
@@ -758,7 +762,7 @@ export function TopProjectsPanel({
               </View>
               <View className="flex-row items-center gap-3">
                 <Delta value={r.deltaVsPrev} c={c} />
-                <Text className="text-base font-semibold text-text">{r.interactions}</Text>
+                <Text className="text-base font-sans-semibold text-text">{r.interactions}</Text>
               </View>
             </View>
           ))}
@@ -808,7 +812,7 @@ export function SleepingStalePanel({
                   </Text>
                   <View className="flex-row items-center gap-2">
                     <View
-                      className="rounded border px-1.5 py-0.5"
+                      className="rounded-md border px-1.5 py-0.5"
                       style={{
                         backgroundColor: `rgba(${tone.base},0.15)`,
                         borderColor: `rgba(${tone.base},0.3)`,
@@ -864,21 +868,19 @@ export function IdeaFunnelPanel({ funnel, t, c }: { funnel: IdeaFunnel; t: T; c:
     >
       <View className="flex-row gap-3">
         <View className="flex-1 rounded-lg border border-border bg-bg p-3">
-          <Text className="text-2xl font-semibold text-text">{funnel.ideasCreated}</Text>
-          <Text className="mt-1 text-xs text-text-muted">{t("analytics.ideaFunnel.created")}</Text>
+          <Figure>{funnel.ideasCreated}</Figure>
+          <Meta variant="cintillo" tone="muted" className="mt-1">{t("analytics.ideaFunnel.created")}</Meta>
         </View>
         <View className="flex-1 rounded-lg border border-border bg-bg p-3">
-          <Text className="text-2xl font-semibold" style={{ color: c.accent }}>
-            {funnel.ideasPromoted}
-          </Text>
-          <Text className="mt-1 text-xs text-text-muted">{t("analytics.ideaFunnel.promoted")}</Text>
+          <Figure tone={c.accent}>{funnel.ideasPromoted}</Figure>
+          <Meta variant="cintillo" tone="muted" className="mt-1">{t("analytics.ideaFunnel.promoted")}</Meta>
         </View>
         <View className="flex-1 rounded-lg border border-border bg-bg p-3">
-          <Text className="text-2xl font-semibold text-text">
-            {pct}
-            <Text className="text-sm text-text-muted">%</Text>
-          </Text>
-          <Text className="mt-1 text-xs text-text-muted">{t("analytics.ideaFunnel.rate")}</Text>
+          <View className="flex-row items-baseline gap-0.5">
+            <Figure>{pct}</Figure>
+            <Meta tone="faint">%</Meta>
+          </View>
+          <Meta variant="cintillo" tone="muted" className="mt-1">{t("analytics.ideaFunnel.rate")}</Meta>
         </View>
       </View>
     </PanelCard>
@@ -895,7 +897,7 @@ export function EffortPanel({ effort, t }: { effort: EffortStats; t: T }) {
       subtitle={subtitle}
     >
       <View className="mb-4 flex-row items-baseline gap-2">
-        <Text className="text-3xl font-semibold text-text">{effort.effortHoursTotal}</Text>
+        <Text className="text-3xl font-sans-semibold text-text">{effort.effortHoursTotal}</Text>
         <Text className="text-sm text-text-muted">{t("analytics.effort.totalHoursSuffix")}</Text>
       </View>
       {effort.effortHoursByProject.length === 0 ? (

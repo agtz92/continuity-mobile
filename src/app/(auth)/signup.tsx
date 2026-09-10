@@ -54,7 +54,7 @@ export default function Signup() {
       >
         <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
           <View className="gap-1">
-            <Text className="text-3xl font-bold text-text">
+            <Text className="text-3xl font-sans-bold text-text">
               {t("auth.signup.title")}
             </Text>
             <Text className="text-base text-text-muted">{t("auth.signup.subtitle")}</Text>
@@ -67,7 +67,7 @@ export default function Signup() {
                 onPress={() => router.replace("/login")}
                 className="flex-row items-center justify-center rounded-xl bg-accent px-4 py-3"
               >
-                <Text className="text-base font-semibold text-bg">
+                <Text className="text-base font-sans-semibold text-bg">
                   {t("auth.signup.signInLink")}
                 </Text>
               </Pressable>
@@ -76,7 +76,7 @@ export default function Signup() {
             <>
               <View className="gap-3">
                 <View className="gap-1">
-                  <Text className="text-sm font-medium text-text">
+                  <Text className="text-sm font-sans-medium text-text">
                     {t("auth.signup.name")}
                   </Text>
                   <TextInput
@@ -90,7 +90,7 @@ export default function Signup() {
                   />
                 </View>
                 <View className="gap-1">
-                  <Text className="text-sm font-medium text-text">
+                  <Text className="text-sm font-sans-medium text-text">
                     {t("auth.signup.email")}
                   </Text>
                   <TextInput
@@ -105,7 +105,7 @@ export default function Signup() {
                   />
                 </View>
                 <View className="gap-1">
-                  <Text className="text-sm font-medium text-text">
+                  <Text className="text-sm font-sans-medium text-text">
                     {t("auth.signup.password")}
                   </Text>
                   <TextInput
@@ -119,7 +119,7 @@ export default function Signup() {
                   />
                 </View>
 
-                {error && <Text className="text-red-500">{error}</Text>}
+                {error && <Text className="text-signal">{error}</Text>}
 
                 <Pressable
                   onPress={onSignUp}
@@ -127,7 +127,7 @@ export default function Signup() {
                   className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
                 >
                   {busy && <ActivityIndicator size="small" />}
-                  <Text className="text-base font-semibold text-bg">
+                  <Text className="text-base font-sans-semibold text-bg">
                     {t("auth.signup.signUp")}
                   </Text>
                 </Pressable>
@@ -138,7 +138,7 @@ export default function Signup() {
                   {t("auth.signup.haveAccount")}
                 </Text>
                 <Pressable onPress={() => router.replace("/login")}>
-                  <Text className="text-base font-semibold text-accent">
+                  <Text className="text-base font-sans-semibold text-accent">
                     {t("auth.signup.signInLink")}
                   </Text>
                 </Pressable>
