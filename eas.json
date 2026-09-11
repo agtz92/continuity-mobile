@@ -14,7 +14,8 @@
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://mhvmliwlhavjpdgpdzss.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_Jk4LRIUWlw57O84p9OYpfg_s0CzsIlQ",
-        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/"
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY" : "appl_EvFAouOlBhzqVmEqTrpazHENeXF"
       }
     },
     "preview": {
@@ -26,7 +27,8 @@
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://mhvmliwlhavjpdgpdzss.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_Jk4LRIUWlw57O84p9OYpfg_s0CzsIlQ",
-        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/"
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY" : "appl_EvFAouOlBhzqVmEqTrpazHENeXF"
       }
     },
     "production": {
@@ -35,7 +37,8 @@
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://mhvmliwlhavjpdgpdzss.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_Jk4LRIUWlw57O84p9OYpfg_s0CzsIlQ",
-        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/"
+        "EXPO_PUBLIC_GRAPHQL_URL": "https://continuity-backend.onrender.com/graphql/",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY" : "appl_EvFAouOlBhzqVmEqTrpazHENeXF"
       }
     }
   },

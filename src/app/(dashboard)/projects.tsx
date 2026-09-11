@@ -128,6 +128,26 @@ export default function Projects() {
           const r = recentTs(b) - recentTs(a);
           return r !== 0 ? r : byName(a, b);
         }
+        case "cold": {
+          // Frío primero: más días sin tocar arriba. `daysSinceTouch` lo deriva
+          // el servidor; si no viene (forma cacheada vieja), cae a lastActivity.
+          const da = a.daysSinceTouch ?? -recentTs(a);
+          const db = b.daysSinceTouch ?? -recentTs(b);
+          return db - da || byName(a, b);
+        }
+        case "category": {
+          // Alfabético dentro del grupo. Aquí solo hace falta que los de la
+          // misma categoría queden contiguos y de forma determinista.
+          const ca = a.categoryId ?? "";
+          const cb = b.categoryId ?? "";
+          if (ca !== cb) {
+            // Los sueltos al final: son el resto, no un grupo más.
+            if (!ca) return 1;
+            if (!cb) return -1;
+            return ca.localeCompare(cb);
+          }
+          return byName(a, b);
+        }
         case "name":
           return byName(a, b);
         case "status": {

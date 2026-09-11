@@ -990,12 +990,14 @@
       },
       "sortBy": {
         "label": "Orden",
-        "smart": "Inteligente",
+        "smart": "Triaje",
         "manual": "Mi orden",
         "priority": "Por prioridad",
         "recent": "Actividad reciente",
         "name": "Nombre",
-        "status": "Por estado"
+        "status": "Por estado",
+        "cold": "Más frío primero",
+        "category": "Por categoría"
       },
       "sections": {
         "attention": "Necesitan atención",
@@ -1707,7 +1709,7 @@
       "headline": "50 lugares. Acceso Pro gratis de por vida.",
       "body": "Dejamos entrar a los primeros 50 builders para probar continuu.it antes del lanzamiento público. A cambio de tu feedback honesto, recibes:",
       "perks": [
-        "Acceso de por vida al tier Pro ($96/año de valor)",
+        "Acceso de por vida al tier Pro ($89.99/año de valor)",
         "Línea directa con el fundador para pedir features",
         "Influencia sobre lo que construimos a continuación",
         "Insignia de miembro fundador en tu perfil",
@@ -1751,8 +1753,8 @@
         },
         "pro": {
           "name": "Pro",
-          "price": "$9",
-          "priceAnnual": "$7",
+          "price": "$8.99",
+          "priceAnnual": "$7.50",
           "priceCadence": "USD al mes",
           "priceCadenceAnnual": "USD al mes, facturado anual",
           "inheritsFrom": "Todo lo de Free, más:",
@@ -1771,8 +1773,8 @@
         },
         "studio": {
           "name": "Studio",
-          "price": "$24",
-          "priceAnnual": "$19",
+          "price": "$14.99",
+          "priceAnnual": "$12.50",
           "priceCadence": "USD al mes",
           "priceCadenceAnnual": "USD al mes, facturado anual",
           "inheritsFrom": "Todo lo de Pro, más:",

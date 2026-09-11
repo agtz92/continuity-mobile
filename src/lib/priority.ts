@@ -32,14 +32,23 @@ export function priorityFill(p: Priority, c: ThemeColors): string {
 
 export type ProjectSortMode =
   | "smart"
+  /** "Frío primero": lo que lleva más tiempo sin tocarse arriba. Es el inverso
+   *  de `recent` y el orden que el rediseño quiere como opción de primera. */
+  | "cold"
+  /** Agrupado por categoría. Los sueltos van al final: son el resto, no un
+   *  grupo más. */
+  | "category"
   | "manual"
   | "priority"
   | "recent"
   | "name"
   | "status";
 
+/** Mismo orden que en web, para que el selector no se lea distinto. */
 export const PROJECT_SORT_MODES: ProjectSortMode[] = [
   "smart",
+  "cold",
+  "category",
   "manual",
   "priority",
   "recent",
