@@ -139,3 +139,28 @@ La cabecera de la pantalla la abre el **nombre del proyecto en display con espin
 ## Ocultar tareas de proyectos cerrados
 
 Las tareas de un proyecto **paused/stalled/killed/archived** se retiran de las vistas diarias; las **standalone** y las de proyectos vivos se quedan. Filtro por `isDailyViewStatus(project.status)` (`src/lib/projectStatus.ts`) en **tres lugares**: Today (`useTodayFocus`), página de Tasks (`(dashboard)/tasks.tsx`, `visibleTasks`) y Calendario (`calendar.tsx`, `visibleTasks`). Gestiona esas tareas desde el detalle de proyecto / graveyard.
+
+## Loop: tres asistentes, un solo interruptor
+
+**No mires `plan` para decidir qué pintar.** `useAssistant()` expone `mode`, que viene del
+backend en `GET /usage/` como `assistant_mode` (la regla vive en
+`backend/core/assistant/tiers.py`). Espejo exacto de la web — si tocas uno, toca el otro.
+
+- **`none`** (free) — `<AssistantLocked/>`: cartel con lo que Loop haría con sus datos y
+  CTA a `/billing`. Sin compositor. **La entrada al asistente no se quita**: el cartel es
+  el gancho, no un candado.
+- **`canned`** (pro) — `<ActionMenu/>`: catálogo de consultas, **sin campo de texto libre**
+  (salvo el buscador, etiquetado como tal). Cada botón llama a `POST /actions/<id>/`, que
+  responde JSON ya renderizado por el servidor en el locale del usuario. No hay stream,
+  no hay modelo, no hay cupo — por eso `<UsageMeter/>` no se pinta aquí.
+  Las etiquetas y el idioma llegan del backend con el catálogo: **una consulta nueva no
+  necesita release en la store.**
+- **`llm`** (studio/admin) — el chat de siempre: `streamChat`, `QuickActionChips`, medidor
+  de cupo y compositor.
+
+**El toggle de "modo profundo" ya no existe.** Qué modelo contesta lo decide el servidor
+(switch de admin + cupo diario). No mandes `deep_mode` ni lo reintroduzcas: un botón que a
+veces se honra y a veces se ignora en silencio es peor que no tener botón.
+
+**`budget_exhausted` no es un error.** El stream lo emite y **sigue**: lo que llega después
+es el cierre que escribe el modelo sin herramientas, diciendo qué alcanzó a hacer.

@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { BlockerBadge } from "@/components/ui/BlockerBadge";
 import { Clock, Rocket, Sparkles } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Category, Project, Task } from "@/lib/types";
@@ -9,7 +10,12 @@ import { ProgressTicks } from "@/components/ui/ProgressTicks";
 import { CategoryTag } from "@/components/ui/CategoryTag";
 import { Meta } from "@/components/ui/Meta";
 import { touchInk } from "@/components/today/todayColors";
-import { projectDays, projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
+import {
+  projectBlockedDays,
+  projectDays,
+  projectIsBlocked,
+  taskIsBlocked,
+} from "@/lib/cooling";
 
 
 /**
@@ -58,10 +64,15 @@ export function ProjectCardCompact({
     (tk) => !tk.done && isOverdue(tk.dueDate)
   ).length;
   const openCount = projectTasks.filter((tk) => !tk.done).length;
-  const blockedCount = projectTasks.filter(
+  const blockedPending = projectTasks.filter(
     (tk) => !tk.done && taskIsBlocked(tk)
-  ).length;
+  );
+  const blockedCount = blockedPending.length;
   const blocked = projectIsBlocked(p, blockedCount);
+  const blockerReason =
+    blockedPending[0]?.blockedReason ||
+    blockedPending[0]?.blockers?.[0]?.externalDescription ||
+    undefined;
   const days = projectDays(p);
 
   const borderColor =
@@ -98,6 +109,7 @@ export function ProjectCardCompact({
         >
           {p.name}
         </Text>
+        {blocked && <BlockerBadge compact label since={projectBlockedDays(p)} />}
         {comebackGapDays != null && comebackGapDays > 0 && (
           <View
             className="flex-row items-center gap-1 rounded-md border px-1.5 py-0.5"

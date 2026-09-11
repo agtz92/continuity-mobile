@@ -25,8 +25,20 @@ async function authHeaders(): Promise<Record<string, string>> {
   };
 }
 
+/**
+ * Which of the three assistants this account gets. Read this, never derive
+ * it from `plan`: the mapping lives in `core/assistant/tiers.py` and moving
+ * a tier must not mean hunting for `plan === "free"` checks in two apps.
+ *
+ * - `none`   — no assistant. Show the placeholder.
+ * - `canned` — the deterministic action catalogue. No model, no cost.
+ * - `llm`    — the real chat.
+ */
+export type AssistantMode = "none" | "canned" | "llm";
+
 export type UsageSnapshot = {
   plan: "free" | "pro" | "studio" | "admin";
+  assistant_mode: AssistantMode;
   messages_sent_today: number;
   daily_message_cap: number | null;
   tokens_used_month: number;
@@ -115,4 +127,71 @@ export async function cancelConversation(
     headers,
     body: JSON.stringify({ conversation_id: conversationId }),
   });
+}
+
+
+// ------------------------------------------------- catálogo (plan canned)
+
+export type CannedAction = {
+  id: string;
+  label: string;
+  needs_query: boolean;
+  placeholder: string;
+};
+
+export type CannedGroup = {
+  group: string;
+  label: string;
+  actions: CannedAction[];
+};
+
+export type CannedAnswer = {
+  conversation_id: string;
+  message_id: string;
+  action_id: string;
+  label: string;
+  content: { type: "text"; text: string }[];
+};
+
+/**
+ * The catalogue is built server-side, labels and language included, so a new
+ * question ships without an app-store release.
+ */
+export async function getActions(): Promise<CannedGroup[]> {
+  const headers = await authHeaders();
+  const res = await fetch(`${assistantBaseUrl}/api/assistant/actions/`, {
+    headers,
+  });
+  if (!res.ok) {
+    throw new Error(`getActions failed: ${res.status}`);
+  }
+  return (await res.json()).groups;
+}
+
+export async function runAction(
+  actionId: string,
+  opts: { conversationId?: string; query?: string } = {},
+): Promise<CannedAnswer> {
+  const headers = await authHeaders();
+  const res = await fetch(
+    `${assistantBaseUrl}/api/assistant/actions/${actionId}/`,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        conversation_id: opts.conversationId,
+        query: opts.query ?? "",
+      }),
+    },
+  );
+  if (!res.ok) {
+    let body: { error?: string } | null = null;
+    try {
+      body = await res.json();
+    } catch {
+      // ignore
+    }
+    throw new Error(body?.error || `runAction failed: ${res.status}`);
+  }
+  return res.json();
 }

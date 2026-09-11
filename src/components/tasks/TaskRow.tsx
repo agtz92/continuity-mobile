@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { BlockerBadge } from "@/components/ui/BlockerBadge";
+import { BlockedTaskDialog } from "./BlockedTaskDialog";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
 import {
@@ -6,17 +8,17 @@ import {
   CalendarClock,
   CalendarPlus,
   Clock,
-  Lock,
 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Project, Task } from "@/lib/types";
-import { daysOverdue, isDueToday, isOverdue } from "@/lib/date";
+import { daysOverdue, isDueToday, isOverdue,
+  daysSince,
+} from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { EffortBadge } from "@/components/today/EffortBadge";
 import { TaskToggle } from "./TaskToggle";
 
-const GRAY = "107,114,128"; // gray-500
 
 /**
  * Bordered task row (mirror of the web `tasks/TaskRow.tsx`). Row anatomy
@@ -56,9 +58,20 @@ export function TaskRow({
   const dueToday = !done && isDueToday(task.dueDate);
   const isBlocked = !done && task.blockers.length > 0;
   const lateDays = overdue ? daysOverdue(task.dueDate) : null;
+  // `blockedReason` lo deriva el servidor; el cálculo local es el respaldo
+  // para formas cacheadas de antes.
   const blockReason = isBlocked
-    ? task.blockers.find((b) => b.externalDescription)?.externalDescription
+    ? task.blockedReason ||
+      task.blockers.find((b) => b.externalDescription)?.externalDescription
     : undefined;
+
+  const blockedDays = isBlocked
+    ? daysSince(
+        task.blockedSince ?? [...task.blockers].map((b) => b.created).sort()[0]
+      ) ?? 0
+    : 0;
+
+  const [askBlocked, setAskBlocked] = useState(false);
 
   const borderColor = overdue
     ? alpha(c.signal, 0.3)
@@ -72,6 +85,13 @@ export function TaskRow({
     : c.border;
 
   const handleToggle = () => {
+    // Cerrar algo que sigue bloqueado no es una acción, es una pregunta: ¿se
+    // levantó el bloqueo, o la tarea dejó de importar? Ver `BlockedTaskDialog`.
+    // Desmarcar una tarea ya hecha no pregunta nada.
+    if (!done && isBlocked) {
+      setAskBlocked(true);
+      return;
+    }
     if (!done) {
       setOptimisticDone(true);
       confirmCompleted(t("taskRow.completedToast"));
@@ -86,6 +106,18 @@ export function TaskRow({
       exiting={FadeOut.duration(220)}
       layout={LinearTransition.duration(220)}
     >
+      {askBlocked && (
+        <BlockedTaskDialog
+          task={task}
+          visible={askBlocked}
+          onClose={() => setAskBlocked(false)}
+          onResolve={() => {
+            setOptimisticDone(true);
+            confirmCompleted(t("taskRow.completedToast"));
+            onToggle(task);
+          }}
+        />
+      )}
       <View
         className="flex-row items-start gap-3 rounded-lg border bg-surface p-3"
         style={{
@@ -158,25 +190,13 @@ export function TaskRow({
                 </Text>
               </View>
             )}
+            {/* El mismo badge que en web: trama + ✕ + días, NUNCA solo color,
+                para que se lea en una captura en escala de grises. Antes aquí
+                había una pastilla gris propia con un hex de Tailwind — un
+                bloqueo no es un dato apagado, es lo único que la app no puede
+                resolver sola. */}
             {isBlocked && (
-              <View
-                className="max-w-[240px] flex-row items-center gap-1 rounded-md px-1.5 py-0.5"
-                style={{
-                  backgroundColor: `rgba(${GRAY},0.1)`,
-                  borderWidth: 1,
-                  borderColor: `rgba(${GRAY},0.3)`,
-                }}
-              >
-                <Lock size={10} color={`rgb(${GRAY})`} />
-                <Text
-                  numberOfLines={1}
-                  className="text-[10px] font-sans-semibold"
-                  style={{ color: `rgb(${GRAY})` }}
-                >
-                  {t("taskRow.blocked")}
-                  {blockReason ? ` · ${blockReason}` : ""}
-                </Text>
-              </View>
+              <BlockerBadge compact label since={blockedDays} />
             )}
             {project && (
               <Text className="font-sans text-xs text-text-muted">{project.name}</Text>

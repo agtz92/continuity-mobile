@@ -8,6 +8,7 @@ export type AssistantEventKind =
   | "tool_use_start"
   | "tool_result"
   | "usage"
+  | "budget_exhausted"
   | "error"
   | "done";
 
@@ -41,13 +42,20 @@ export type AssistantEvent =
       };
     }
   | { kind: "error"; payload: { message: string } }
+  | {
+      /**
+       * The turn used up its tool budget. What follows is a closing
+       * message the model writes without tools, naming what it managed to
+       * do — not an error, and not the end of the conversation.
+       */
+      kind: "budget_exhausted";
+      payload: { iterations: number; executed: string[] };
+    }
   | { kind: "done"; payload: { ok: boolean; stop_reason?: string } };
 
 export type StreamArgs = {
   conversationId?: string;
   content: string;
-  /** Opt in to the costlier Sonnet model (admin plan only). */
-  deepMode?: boolean;
   signal?: AbortSignal;
   onEvent: (event: AssistantEvent) => void;
 };
@@ -88,7 +96,6 @@ export async function streamChat(args: StreamArgs): Promise<void> {
     body: JSON.stringify({
       conversation_id: args.conversationId,
       content: args.content,
-      deep_mode: args.deepMode ?? false,
     }),
     signal: args.signal,
     reactNative: { textStreaming: true },

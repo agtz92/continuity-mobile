@@ -42,8 +42,9 @@ export function usePushNotifications() {
       if (!token || cancelled) return;
       registeredFor.current = userId;
       if (!PUSH_BACKEND_READY) {
-        // Backend not built yet — token is ready, just nowhere to send it.
-        console.log("[push] token ready (backend pending):", token);
+        // Apagado a mano con EXPO_PUBLIC_PUSH_ENABLED=false. El token está
+        // listo; simplemente no se manda a ningún sitio.
+        console.log("[push] token ready (registro desactivado):", token);
         return;
       }
       try {

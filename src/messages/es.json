@@ -68,21 +68,19 @@
   },
   "assistant": {
     "title": "Loop",
-    "subtitle": "Beta de Claude — solo lectura",
-    "subtitleReadWrite": "Beta de Claude — lee y edita",
     "buttonLabel": "Abrir Loop",
     "openTooltip": "Abre Loop para preguntar sobre tus proyectos",
     "newChat": "Nueva conversación",
     "close": "Cerrar",
     "send": "Enviar",
     "stop": "Detener",
-    "deepMode": "Modo profundo",
-    "deepModeHint": "Usa el modelo Sonnet, más capaz, para esta respuesta. Cuesta más — aplica un límite diario.",
     "inputPlaceholder": "Pregunta sobre tus proyectos, tareas o ideas…",
     "welcome": {
       "title": "¡Hola! Estoy aquí para ayudar.",
-      "body": "Puedo leer tus proyectos y tareas para resumir, sugerir prioridades y buscar cosas. Aún no puedo editar nada — eso llega pronto.",
-      "bodyReadWrite": "Puedo leer y organizar tu trabajo — crear y actualizar tareas, fijar prioridades, redactar rutinas y ordenar proyectos. Dime qué necesitas."
+      "bodyFor": {
+        "canned": "Elige una consulta y te la respondo con tus datos reales, al momento.",
+        "llm": "Puedo leer y organizar tu trabajo — crear y actualizar tareas, fijar prioridades, redactar rutinas y ordenar proyectos. Dime qué necesitas."
+      }
     },
     "message": {
       "thinking": "Pensando…",
@@ -112,11 +110,29 @@
       "rateLimit": "Límite de uso alcanzado.",
       "tooLong": "El mensaje es demasiado largo.",
       "sessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
-      "unknown": "Algo salió mal."
+      "unknown": "Algo salió mal.",
+      "planRequired": "No disponible en tu plan."
     },
     "markdown": {
       "writingTable": "escribiendo tabla…",
       "moreRows": "{count, plural, one {# fila más} other {# filas más}}"
+    },
+    "subtitleFor": {
+      "none": "Disponible en planes superiores",
+      "canned": "Consultas sobre tus datos",
+      "llm": "Beta de Claude · lee y edita"
+    },
+    "locked": {
+      "title": "Loop todavía no está en tu plan",
+      "body": "Loop lee tus proyectos y tareas para decirte por dónde seguir. Esto es lo que respondería con tus datos:",
+      "sampleOverdue": "Qué tienes vencido y desde cuándo",
+      "sampleStalled": "Qué proyectos llevan semanas sin moverse",
+      "sampleSearch": "Dónde escribiste aquello que no encuentras",
+      "cta": "Ver planes",
+      "footnote": "Tu captura rápida, tus notas y tu calendario siguen funcionando igual."
+    },
+    "actions": {
+      "hint": "Elige una consulta"
     }
   },
   "common": {
@@ -1891,5 +1907,11 @@
     "body": "Algo falló al dibujarla. No fue nada que hicieras, y no se perdió nada tuyo. Reintenta, o vuelve atrás y entra otra vez.",
     "retry": "Reintentar",
     "detailLabel": "Qué pasó"
+  },
+  "blockedTaskDialog": {
+    "title": "Esta tarea sigue bloqueada",
+    "hint": "Cerrarla con el bloqueo abierto dejaría descuadrado el contador del proyecto.",
+    "resolve": "El bloqueo se resolvió — completarla",
+    "delete": "Eliminar la tarea"
   }
 }

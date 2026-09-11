@@ -68,21 +68,19 @@
   },
   "assistant": {
     "title": "Loop",
-    "subtitle": "Read-only Claude beta",
-    "subtitleReadWrite": "Claude beta — reads & updates",
     "buttonLabel": "Open Loop",
     "openTooltip": "Open Loop to ask about your projects",
     "newChat": "New conversation",
     "close": "Close",
     "send": "Send",
     "stop": "Stop",
-    "deepMode": "Deep mode",
-    "deepModeHint": "Use the more capable Sonnet model for this reply. Costs more — daily limit applies.",
     "inputPlaceholder": "Ask about your projects, tasks, or ideas…",
     "welcome": {
       "title": "Hi! I'm here to help.",
-      "body": "I can read your projects and tasks to summarize, suggest priorities, and find things. I can't edit anything yet — that's coming soon.",
-      "bodyReadWrite": "I can read and organize your work — create and update tasks, set priorities, draft routines, and tidy up projects. Just tell me what you need."
+      "bodyFor": {
+        "canned": "Pick a question and I'll answer it from your real data, right away.",
+        "llm": "I can read and organise your work — create and update tasks, set priorities, draft routines and tidy projects. Tell me what you need."
+      }
     },
     "message": {
       "thinking": "Thinking…",
@@ -112,11 +110,29 @@
       "rateLimit": "Rate limit reached.",
       "tooLong": "Message too long.",
       "sessionExpired": "Session expired. Sign in again.",
-      "unknown": "Something went wrong."
+      "unknown": "Something went wrong.",
+      "planRequired": "Not available on your plan."
     },
     "markdown": {
       "writingTable": "writing table…",
       "moreRows": "{count, plural, one {# more row} other {# more rows}}"
+    },
+    "subtitleFor": {
+      "none": "Available on higher plans",
+      "canned": "Queries over your data",
+      "llm": "Claude beta · reads and edits"
+    },
+    "locked": {
+      "title": "Loop isn't on your plan yet",
+      "body": "Loop reads your projects and tasks to tell you where to pick up. Here's what it would answer with your data:",
+      "sampleOverdue": "What's overdue, and for how long",
+      "sampleStalled": "Which projects haven't moved in weeks",
+      "sampleSearch": "Where you wrote that thing you can't find",
+      "cta": "See plans",
+      "footnote": "Your quick capture, notes and calendar keep working exactly the same."
+    },
+    "actions": {
+      "hint": "Pick a question"
     }
   },
   "notifications": {
@@ -1891,5 +1907,11 @@
     "body": "Something failed while drawing it. Nothing you did — and nothing of yours was lost. Retry, or go back and come in again.",
     "retry": "Retry",
     "detailLabel": "What happened"
+  },
+  "blockedTaskDialog": {
+    "title": "This task is still blocked",
+    "hint": "Closing it with an open blocker would leave the project count wrong.",
+    "resolve": "The blocker is gone — complete it",
+    "delete": "Delete the task"
   }
 }

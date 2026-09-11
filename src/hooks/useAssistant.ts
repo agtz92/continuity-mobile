@@ -4,7 +4,11 @@ import i18n from "@/lib/i18n";
 import { DASHBOARD_QUERY } from "@/lib/graphql";
 import {
   cancelConversation,
+  getActions,
   getUsage,
+  runAction,
+  type AssistantMode,
+  type CannedGroup,
   type UsageSnapshot,
 } from "@/lib/assistantApi";
 import {
@@ -33,6 +37,13 @@ export type AssistantState = {
   streaming: boolean;
   error: string | null;
   plan: "free" | "pro" | "studio" | "admin";
+  /**
+   * Which assistant this account gets. Comes from the server so the rule
+   * lives in one place; `null` until the first usage fetch resolves.
+   */
+  mode: AssistantMode | null;
+  /** Populated only in `canned` mode. */
+  actions: CannedGroup[];
   usage: UsageSnapshot | null;
 };
 
@@ -42,8 +53,31 @@ const INITIAL: AssistantState = {
   streaming: false,
   error: null,
   plan: "free",
+  mode: null,
+  actions: [],
   usage: null,
 };
+
+/**
+ * El modo del asistente, con respaldo cuando el servidor no lo manda.
+ *
+ * `assistant_mode` es la fuente de verdad (backend `core/assistant/tiers.py`) y
+ * hay que leerla, no deducirla. Pero **ausente no puede significar bloqueado**:
+ * un backend viejo, un despliegue a medias o una respuesta cacheada dejaban a
+ * un usuario de Studio —que paga— mirando un cartel de "disponible en planes
+ * superiores", sin composer y sin forma de entender por qué.
+ *
+ * Así que si el campo no viene, se deduce del plan con el mismo mapa que usa el
+ * servidor. Si el cliente se equivoca de más, el backend responde 403
+ * `plan_required` y el error se ve; equivocarse de menos deja a alguien sin lo
+ * que pagó, en silencio. Es la dirección segura en la que fallar.
+ */
+function resolveMode(snap: UsageSnapshot): AssistantMode {
+  if (snap.assistant_mode) return snap.assistant_mode;
+  if (snap.plan === "studio" || snap.plan === "admin") return "llm";
+  if (snap.plan === "pro") return "canned";
+  return "none";
+}
 
 export function useAssistant() {
   const [state, setState] = useState<AssistantState>(INITIAL);
@@ -54,18 +88,31 @@ export function useAssistant() {
   const refreshUsage = useCallback(async () => {
     try {
       const snap = await getUsage();
-      setState((s) => ({ ...s, usage: snap, plan: snap.plan }));
+      const mode = resolveMode(snap);
+      setState((s) => ({ ...s, usage: snap, plan: snap.plan, mode }));
+      return mode;
     } catch {
-      /* swallow */
+      return null;
     }
   }, []);
 
   useEffect(() => {
-    refreshUsage();
+    // The catalogue only exists for `canned`, and asking for it in any
+    // other mode is a guaranteed 403 — so resolve the mode first.
+    (async () => {
+      const mode = await refreshUsage();
+      if (mode !== "canned") return;
+      try {
+        const groups = await getActions();
+        setState((s) => ({ ...s, actions: groups }));
+      } catch {
+        /* the screen falls back to an empty catalogue */
+      }
+    })();
   }, [refreshUsage]);
 
   const send = useCallback(
-    async (content: string, deepMode = false) => {
+    async (content: string) => {
       if (state.streaming) return;
       const trimmed = content.trim();
       if (!trimmed) return;
@@ -99,7 +146,6 @@ export function useAssistant() {
         await streamChat({
           conversationId: state.conversationId ?? undefined,
           content: trimmed,
-          deepMode,
           signal: ctrl.signal,
           onEvent: (event: AssistantEvent) => {
             if (event.kind === "meta") {
@@ -165,6 +211,15 @@ export function useAssistant() {
               ...s,
               error: body?.error || i18n.t("assistant.errors.tooLong"),
             }));
+          } else if (err.status === 403) {
+            // The plan changed under us (downgrade, expiry). Re-read the
+            // mode so the screen switches to the right assistant instead
+            // of showing a composer that can only fail.
+            setState((s) => ({
+              ...s,
+              error: body?.error || i18n.t("assistant.errors.planRequired"),
+            }));
+            refreshUsage();
           } else if (err.status === 401) {
             setState((s) => ({
               ...s,
@@ -198,6 +253,52 @@ export function useAssistant() {
     [state.streaming, state.conversationId, refreshUsage, apollo],
   );
 
+  /**
+   * Run one catalogue action (the `canned` tier). Not a variant of `send`:
+   * there is no stream, no model and nothing to cancel — a question, a
+   * query, an answer. The user's side of the thread is the action's own
+   * label, so the transcript reads like a conversation.
+   */
+  const runCanned = useCallback(
+    async (actionId: string, label: string, query = "") => {
+      if (state.streaming) return;
+      const localId = `local-${Date.now()}`;
+      setState((s) => ({
+        ...s,
+        streaming: true,
+        error: null,
+        messages: [
+          ...s.messages,
+          { id: localId, role: "user", text: label },
+          { id: `${localId}-pending`, role: "assistant", blocks: [] },
+        ],
+      }));
+
+      try {
+        const answer = await runAction(actionId, {
+          conversationId: state.conversationId ?? undefined,
+          query,
+        });
+        setState((s) => ({
+          ...s,
+          conversationId: answer.conversation_id,
+          messages: replaceLastAssistant(
+            s.messages,
+            answer.content.map((b) => ({ type: "text" as const, text: b.text })),
+          ),
+        }));
+      } catch (err) {
+        setState((s) => ({
+          ...s,
+          error: (err as Error).message || i18n.t("assistant.errors.unknown"),
+        }));
+      } finally {
+        setState((s) => ({ ...s, streaming: false }));
+      }
+    },
+    [state.streaming, state.conversationId],
+  );
+
   const stop = useCallback(async () => {
     const ctrl = abortRef.current;
     if (ctrl) ctrl.abort();
@@ -220,7 +321,7 @@ export function useAssistant() {
     }));
   }, [state.streaming]);
 
-  return { ...state, send, stop, newConversation, refreshUsage };
+  return { ...state, send, runCanned, stop, newConversation, refreshUsage };
 }
 
 function replaceLastAssistant(

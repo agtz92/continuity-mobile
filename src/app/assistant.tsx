@@ -14,7 +14,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   AlertCircle,
-  Brain,
   Plus,
   Send,
   Sparkles,
@@ -26,6 +25,8 @@ import { MessageList } from "@/components/assistant/MessageList";
 import { PlanBadge } from "@/components/assistant/PlanBadge";
 import { UsageMeter } from "@/components/assistant/UsageMeter";
 import { QuickActionChips } from "@/components/assistant/QuickActionChips";
+import { ActionMenu } from "@/components/assistant/ActionMenu";
+import { AssistantLocked } from "@/components/assistant/AssistantLocked";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const MAX_INPUT_CHARS = 4000;
@@ -41,8 +42,11 @@ export default function AssistantScreen() {
     streaming,
     error,
     plan,
+    mode,
+    actions,
     usage,
     send,
+    runCanned,
     stop,
     newConversation,
   } = useAssistant();
@@ -55,23 +59,25 @@ export default function AssistantScreen() {
     const p = Array.isArray(params.prompt) ? params.prompt[0] : params.prompt;
     return (p ?? "").slice(0, MAX_INPUT_CHARS);
   });
-  const [deepMode, setDeepMode] = useState(false);
-
-  const canWrite = plan !== "free";
-  const canDeep = plan === "studio" || plan === "admin";
+  // Which assistant this account gets. The server decides (see
+  // core/assistant/tiers.py) and ships the answer in /usage/, so there is
+  // nothing to keep in sync here. `null` means we haven't heard back yet.
+  const isChat = mode === "llm";
+  const isCanned = mode === "canned";
+  const isLocked = mode === "none";
   const isEmpty = messages.length === 0;
   const trimmed = input.trim();
   const canSend = !streaming && trimmed.length > 0;
 
   const handleSend = () => {
     if (!canSend) return;
-    send(trimmed, deepMode);
+    send(trimmed);
     setInput("");
   };
 
   const handlePick = (prompt: string) => {
     if (streaming) return;
-    send(prompt, deepMode);
+    send(prompt);
   };
 
   return (
@@ -101,7 +107,7 @@ export default function AssistantScreen() {
             <PlanBadge plan={plan} />
           </View>
           <Meta tone="faint" numberOfLines={1}>
-            {t(canWrite ? "assistant.subtitleReadWrite" : "assistant.subtitle")}
+            {t(`assistant.subtitleFor.${mode ?? "none"}`)}
           </Meta>
         </View>
         <Pressable
@@ -130,24 +136,23 @@ export default function AssistantScreen() {
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <UsageMeter usage={usage} />
+        {/* Only the llm tier has a budget to meter. */}
+        {isChat && <UsageMeter usage={usage} />}
 
-        {isEmpty ? (
+        {isLocked ? (
+          <AssistantLocked />
+        ) : isEmpty ? (
           <View className="flex-1 justify-center px-6">
             <EmptyState
               title={t("assistant.welcome.title")}
-              body={t(
-                canWrite
-                  ? "assistant.welcome.bodyReadWrite"
-                  : "assistant.welcome.body",
-              )}
+              body={t(`assistant.welcome.bodyFor.${mode ?? "canned"}`)}
             />
           </View>
         ) : (
           <MessageList messages={messages} streaming={streaming} />
         )}
 
-        {error && (
+        {error && !isLocked && (
           <View
             className="mx-4 mb-2 flex-row items-center gap-2 rounded-lg border px-3 py-2"
             style={{
@@ -162,32 +167,24 @@ export default function AssistantScreen() {
           </View>
         )}
 
-        {isEmpty && (
+        {isChat && isEmpty && (
           <QuickActionChips onPick={handlePick} disabled={streaming} />
         )}
 
-        {canDeep && (
-          <Pressable
-            onPress={() => setDeepMode((d) => !d)}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: deepMode }}
-            className="mx-4 mb-2 flex-row items-center gap-2 self-start rounded-full border px-3 py-1.5"
-            style={{
-              backgroundColor: deepMode ? alpha(c.accent, 0.15) : "transparent",
-              borderColor: deepMode ? alpha(c.accent, 0.4) : c.border,
-            }}
-          >
-            <Brain size={13} color={deepMode ? c.accent : c.textMuted} />
-            <Text
-              className="text-xs font-sans-medium"
-              style={{ color: deepMode ? c.accent : c.textMuted }}
-            >
-              {t("assistant.deepMode")}
-            </Text>
-          </Pressable>
+        {isCanned && (
+          <ActionMenu groups={actions} onRun={runCanned} disabled={streaming} />
         )}
 
-        {/* Input row */}
+        {/*
+          There used to be a "deep mode" toggle here. It is gone on purpose:
+          which model answers now depends on an admin switch and the
+          account's remaining budget, both server-side. A button that is
+          sometimes honoured and sometimes silently ignored — which is what
+          it became once the daily cap ran out — is worse than no button.
+        */}
+
+        {/* Input row — chat tier only; `canned` composes with ActionMenu. */}
+        {isChat && (
         <View className="flex-row items-end gap-2 border-t border-border px-4 py-3">
           <TextInput
             value={input}
@@ -220,6 +217,7 @@ export default function AssistantScreen() {
             </Pressable>
           )}
         </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

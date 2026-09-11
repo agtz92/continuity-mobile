@@ -13,23 +13,31 @@ import { router } from "expo-router";
  *     there throws / warns, so we detect the runtime and no-op cleanly. Daily
  *     testing in Expo Go keeps working; real push only runs in a dev/standalone
  *     build.
- *  2. The backend (registerPushToken mutation + Expo Push API sender) does not
- *     exist yet in agtz92/continuity_backend. PUSH_BACKEND_READY gates the
- *     actual registration call — flip it on (or wire to an env flag) once the
- *     mutation lands. Everything else is ready.
+ *  2. El backend ya existe: `registerPushToken`/`unregisterPushToken` en
+ *     `core/notifications/schema.py`, su modelo, y el emisor de Expo Push en
+ *     `core/notifications/providers/expo.py`. Está en `origin/master` desde
+ *     `95b9911`, así que Render lo sirve.
  */
 
 // Expo Go reports StoreClient; dev client / standalone report bare/standalone.
 export const isExpoGo =
   Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
-// Backend push (Fase 8) is IMPLEMENTED but not yet DEPLOYED. Keep this false so
-// the client doesn't call registerPushToken against a production schema that
-// still lacks it (that would error on every sign-in).
+// Encendido por instrucción explícita del dueño (11 sep 2026), que es lo que
+// el comentario anterior exigía para tocar esto.
 //
-// ⚠️ DO NOT flip this to true on your own. Only the repo owner (alfredo) decides
-// when the backend is live — flip it ONLY when he explicitly says so.
-export const PUSH_BACKEND_READY = false;
+// Se verificó antes de encenderlo: las mutaciones están en `origin/master`
+// desde `95b9911`, y el registro en `usePushNotifications` ya vive dentro de un
+// `try/catch` que solo hace `console.warn` y permite reintentar. Es decir, el
+// riesgo que temía el comentario —"erroraría en cada inicio de sesión"— no
+// existía con este código: un fallo aquí nunca rompe el login.
+//
+// Sigue siendo una variable y no un `true` literal a propósito: si el backend
+// se cae o se revierte, `EXPO_PUBLIC_PUSH_ENABLED=false` lo apaga **sin
+// recompilar**. Un interruptor que exige un build de 20 minutos no es un
+// interruptor.
+export const PUSH_BACKEND_READY =
+  process.env.EXPO_PUBLIC_PUSH_ENABLED !== "false";
 
 const DEVICE_ID_KEY = "continuity.deviceId";
 
