@@ -9,7 +9,7 @@ import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
 import {
   currentOffering,
   purchasePackage,
-  purchasesAvailable,
+  purchasesReady,
   restorePurchases,
 } from "@/lib/purchases";
 import { toast } from "@/lib/toast";
@@ -140,7 +140,7 @@ export default function Plans() {
     }
   };
 
-  if (!purchasesAvailable) {
+  if (!purchasesReady()) {
     // Expo Go, o falta la clave. Se dice: un paywall que no puede cobrar es
     // peor que no tenerlo.
     return (

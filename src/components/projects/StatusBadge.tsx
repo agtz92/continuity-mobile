@@ -1,5 +1,6 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { ChevronDown } from "lucide-react-native";
 import { statusConfig } from "@/lib/status";
 import type { ProjectStatus } from "@/lib/types";
 import { alpha, useThemeColors, type ThemeColors } from "@/theme/useThemeColors";
@@ -43,9 +44,14 @@ function look(status: ProjectStatus, c: ThemeColors): Look {
 export function StatusBadge({
   status,
   size = "sm",
+  onPress,
 }: {
   status: ProjectStatus;
   size?: "sm" | "md";
+  /** Con esto el badge deja de ser etiqueta y pasa a ser control: el estado
+   *  se cambia tocándolo, que es lo que hace que se lea como un estado y no
+   *  como una decoración. */
+  onPress?: () => void;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -56,9 +62,16 @@ export function StatusBadge({
   const { ink, fill, border } = look(status, c);
   const iconSize = size === "md" ? 14 : 12;
 
+  const Wrapper = onPress ? Pressable : View;
+
   return (
-    <View
-      className="flex-row items-center gap-1.5 self-start rounded-full border px-2.5 py-0.5"
+    <Wrapper
+      onPress={onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      className={
+        "flex-row items-center gap-1.5 self-start rounded-full border px-2.5 py-0.5" +
+        (onPress ? " active:opacity-70" : "")
+      }
       style={{ backgroundColor: fill, borderColor: border }}
     >
       {/* Los iconos de RN no heredan `currentColor` de className. */}
@@ -69,6 +82,7 @@ export function StatusBadge({
       >
         {t(`status.${status}`)}
       </Text>
-    </View>
+      {onPress && <ChevronDown size={12} color={ink} />}
+    </Wrapper>
   );
 }

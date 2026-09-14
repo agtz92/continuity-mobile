@@ -1178,6 +1178,19 @@
         "kill": "Kill",
         "resume": "Reactivate",
         "revive": "Revive"
+      },
+      "statusSheet": {
+        "title": "Project status",
+        "asksNotes": "Asks a couple of questions first",
+        "meaning": {
+          "idea": "Not committed yet. Parked where you'll find it.",
+          "active": "You're working on this now.",
+          "launched": "Shipped. Done on purpose, not abandoned.",
+          "paused": "Stopped on purpose. Its tasks leave your daily views.",
+          "killed": "Over for good. Goes to the Graveyard with what it taught you.",
+          "stalled": "Set by the system after 14 days without activity.",
+          "archived": "Filed away, without the strikethrough."
+        }
       }
     }
   },
@@ -1234,7 +1247,9 @@
       "active": "Active",
       "idea": "Idea (re-validate)",
       "leaveDead": "Leave it dead"
-    }
+    },
+    "pausedToast": "Paused. Future you will thank you.",
+    "killedToast": "Killed with intention. Lesson saved."
   },
   "taskRow": {
     "markDone": "Mark as done",

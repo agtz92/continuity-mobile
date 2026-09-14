@@ -52,16 +52,33 @@ const API_KEY =
     ? process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY
     : process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY;
 
-/** Sin SDK nativo o sin clave no hay compras; se dice, no se finge. */
-export const purchasesAvailable = !isExpoGo && !!API_KEY && sdk() != null;
+/**
+ * Sin SDK nativo o sin clave no hay compras; se dice, no se finge.
+ *
+ * Es `let` y no `const` porque la ausencia del módulo **nativo** no se detecta
+ * al importar —el JS está ahí igual— sino al primer uso. `configurePurchases`
+ * lo apaga si eso ocurre.
+ */
+let available = !isExpoGo && !!API_KEY && sdk() != null;
+export function purchasesReady(): boolean {
+  return available;
+}
 
 let configured = false;
 
 export function configurePurchases(): void {
   const P = sdk();
-  if (!purchasesAvailable || configured || !P) return;
+  if (!purchasesReady() || configured || !P) return;
   configured = true;
-  P.configure({ apiKey: API_KEY as string });
+  try {
+    P.configure({ apiKey: API_KEY as string });
+  } catch {
+    // El módulo JS existe aunque falte el nativo, así que `require` no falla:
+    // falla la PRIMERA LLAMADA. Pasó con un binario anterior a instalar el SDK
+    // y salió como "Uncaught (in promise)". Sin esta red, un dev client viejo
+    // vuelve a tumbar el arranque.
+    available = false;
+  }
 }
 
 /**
@@ -71,7 +88,7 @@ export function configurePurchases(): void {
  * guarda su propio estado y un reinstalar deja el id anónimo otra vez.
  */
 export async function identifyForPurchases(userId: string): Promise<void> {
-  if (!purchasesAvailable) return;
+  if (!purchasesReady()) return;
   configurePurchases();
   try {
     await sdk()?.logIn(userId);
@@ -82,7 +99,7 @@ export async function identifyForPurchases(userId: string): Promise<void> {
 }
 
 export async function logOutOfPurchases(): Promise<void> {
-  if (!purchasesAvailable || !configured) return;
+  if (!purchasesReady() || !configured) return;
   try {
     await sdk()?.logOut();
   } catch {
@@ -92,7 +109,7 @@ export async function logOutOfPurchases(): Promise<void> {
 
 /** El offering marcado como actual, o null si no hay ninguno configurado. */
 export async function currentOffering(): Promise<PurchasesOffering | null> {
-  if (!purchasesAvailable) return null;
+  if (!purchasesReady()) return null;
   configurePurchases();
   const P = sdk();
   if (!P) return null;

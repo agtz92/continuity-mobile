@@ -1,4 +1,5 @@
 import { useState } from "react";
+import i18n from "@/lib/i18n";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import type { Project } from "@/lib/types";
 import { toast } from "@/lib/toast";
@@ -41,7 +42,7 @@ export function useProjectClosure() {
     setSaving(true);
     const ok = await saveProject({ ...base(p), status: "paused", ...notes });
     setSaving(false);
-    if (ok) toast.success("Paused. Future you will thank you.");
+    if (ok) toast.success(i18n.t("closure.pausedToast"));
     return ok;
   };
 
@@ -49,7 +50,7 @@ export function useProjectClosure() {
     setSaving(true);
     const ok = await saveProject({ ...base(p), status: "killed", ...notes });
     setSaving(false);
-    if (ok) toast.success("Killed with intention. Lesson saved.");
+    if (ok) toast.success(i18n.t("closure.killedToast"));
     return ok;
   };
 

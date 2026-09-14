@@ -40,6 +40,7 @@ export function BottomSheet({
   footer,
   initialHeight = "auto",
   dismissible = true,
+  onClosed,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -48,6 +49,16 @@ export function BottomSheet({
   footer?: ReactNode;
   initialHeight?: InitialHeight;
   dismissible?: boolean;
+  /**
+   * Se dispara cuando la hoja **terminó** de cerrarse y se desmontó.
+   *
+   * Hace falta para encadenar modales: iOS no presenta un `<Modal>` mientras
+   * otro se está descartando, así que abrir el siguiente en el mismo tick que
+   * cierras este deja la app congelada — sin error, sin nada en pantalla, con
+   * los toques bloqueados. Encadenar aquí es la única forma fiable; un
+   * `setTimeout` a ojo se rompe en cuanto alguien cambia la duración.
+   */
+  onClosed?: () => void;
 }) {
   const { height: screenH } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -96,7 +107,9 @@ export function BottomSheet({
           useNativeDriver: true,
         }),
       ]).start(({ finished }) => {
-        if (finished) setRendered(false);
+        if (!finished) return;
+        setRendered(false);
+        onClosed?.();
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

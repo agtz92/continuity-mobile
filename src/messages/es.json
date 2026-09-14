@@ -1178,6 +1178,19 @@
         "kill": "Matar",
         "resume": "Reactivar",
         "revive": "Revivir"
+      },
+      "statusSheet": {
+        "title": "Estado del proyecto",
+        "asksNotes": "Antes te hace un par de preguntas",
+        "meaning": {
+          "idea": "Aún no es un compromiso. Guardado donde lo vas a encontrar.",
+          "active": "En esto estás trabajando ahora.",
+          "launched": "Lanzado. Cerrado a propósito, no abandonado.",
+          "paused": "Detenido a propósito. Sus tareas salen de tus vistas diarias.",
+          "killed": "Se acabó. Va al cementerio con lo que te enseñó.",
+          "stalled": "Lo pone el sistema tras 14 días sin actividad.",
+          "archived": "Archivado, sin tachar."
+        }
       }
     }
   },
@@ -1234,7 +1247,9 @@
       "active": "Activo",
       "idea": "Idea (revalidar)",
       "leaveDead": "Déjalo muerto"
-    }
+    },
+    "pausedToast": "En pausa. Tu yo futuro te lo agradecerá.",
+    "killedToast": "Matado con intención. La lección queda."
   },
   "taskRow": {
     "markDone": "Marcar como hecha",

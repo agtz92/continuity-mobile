@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ProjectStatusSheet } from "@/components/projects/ProjectStatusSheet";
 import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
 import { Spine, spineStrikesTitle } from "@/components/ui/Spine";
 import { CoolingRule } from "@/components/ui/CoolingRule";
@@ -13,9 +14,9 @@ import {
 } from "@/lib/cooling";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { HeartPulse, Pause, Pencil, Plus, Rocket, Skull, Trash2, Zap } from "lucide-react-native";
+import { Pencil, Plus, Trash2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import type { Task } from "@/lib/types";
+import type { ProjectStatus, Task } from "@/lib/types";
 import { priorityFill } from "@/lib/priority";
 import { confirmAsync } from "@/lib/confirm";
 import { todayLocalISODate } from "@/lib/date";
@@ -223,68 +224,27 @@ export default function ProjectDetail() {
 
   const showWelcomeBack = project.status === "paused" && !welcomeDismissed;
 
-  // Status actions available from the detail screen, gated by current status.
-  // Las etiquetas estaban hardcodeadas en inglés (deuda anotada en CLAUDE.md);
-  // el rediseño las pasa a i18n de paso, que era cosa de diez minutos.
-  const statusActions: {
-    key: string;
-    label: string;
-    icon: React.ReactNode;
-    onPress: () => void;
-    tint: string;
-  }[] = [];
-  if (
-    project.status === "active" ||
-    project.status === "idea" ||
-    project.status === "stalled"
-  ) {
-    statusActions.push({
-      key: "launch",
-      label: t("views.projectDetail.statusAction.launch"),
-      icon: <Rocket size={15} color={c.closed} />,
-      onPress: onLaunch,
-      tint: c.closed,
-    });
-  }
-  if (
-    project.status === "active" ||
-    project.status === "idea" ||
-    project.status === "stalled" ||
-    project.status === "launched"
-  ) {
-    statusActions.push({
-      key: "pause",
-      label: t("views.projectDetail.statusAction.pause"),
-      icon: <Pause size={15} color={c.textMuted} />,
-      onPress: () => setPauseOpen(true),
-      tint: c.textMuted,
-    });
-    statusActions.push({
-      key: "kill",
-      label: t("views.projectDetail.statusAction.kill"),
-      icon: <Skull size={15} color={c.signal} />,
-      onPress: () => setKillOpen(true),
-      tint: c.signal,
-    });
-  }
-  if (project.status === "paused" || project.status === "stalled") {
-    statusActions.unshift({
-      key: "resume",
-      label: t("views.projectDetail.statusAction.resume"),
-      icon: <Zap size={15} color={c.accent} />,
-      onPress: onResume,
-      tint: c.accent,
-    });
-  }
-  if (project.status === "killed") {
-    statusActions.push({
-      key: "revive",
-      label: t("views.projectDetail.statusAction.revive"),
-      icon: <HeartPulse size={15} color={c.accent} />,
-      onPress: () => setReviveOpen(true),
-      tint: c.accent,
-    });
-  }
+  // El cambio de estado ya no son botones sueltos: vive detrás del propio
+  // chip de estado. Ver `components/projects/ProjectStatusSheet`.
+  const [statusSheet, setStatusSheet] = useState(false);
+  // Lo elegido espera a que la hoja TERMINE de cerrarse. iOS no presenta un
+  // `<Modal>` mientras otro se descarta: hacerlo en el mismo tick congelaba la
+  // app —sin error, sin pantalla, con los toques bloqueados— al pasar a pausa
+  // o a muerto, que son los dos que abren modal.
+  const [pendingStatus, setPendingStatus] = useState<ProjectStatus | null>(null);
+
+  const applyStatus = (next: ProjectStatus) => {
+    if (next === "paused") return setPauseOpen(true);
+    if (next === "killed") return setKillOpen(true);
+    // Sacar algo del cementerio no es un cambio de estado más: `ReviveProjectModal`
+    // te enseña lo que escribiste al matarlo ("¿lo reintentarías?") y avisa si
+    // revivirlo te pasa del cupo de proyectos activos. Esa hoja no lo sabe.
+    if (project.status === "killed" && next !== "launched") {
+      return setReviveOpen(true);
+    }
+    // `active`, `idea` y `launched` no piden notas: las guardadas se conservan.
+    void closure.setStatus(project, next as "active" | "idea" | "launched");
+  };
 
   return (
     <View className="flex-1 bg-bg">
@@ -353,7 +313,10 @@ export default function ProjectDetail() {
                   {t(`priority.${project.priority}`)}
                 </Meta>
               </View>
-              <StatusBadge status={project.status} />
+              <StatusBadge
+                status={project.status}
+                onPress={() => setStatusSheet(true)}
+              />
               <CategoryTag name={cat?.name} color={cat?.color} loose={!cat} />
             </View>
           </View>
@@ -377,24 +340,6 @@ export default function ProjectDetail() {
           />
         )}
 
-        {statusActions.length > 0 && (
-          <View className="flex-row flex-wrap gap-2">
-            {statusActions.map((a) => (
-              <Pressable
-                key={a.key}
-                onPress={a.onPress}
-                disabled={closure.saving}
-                accessibilityRole="button"
-                className="flex-row items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2"
-              >
-                {a.icon}
-                <Text className="text-sm font-sans-medium" style={{ color: a.tint }}>
-                  {a.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
 
         <View
           className="rounded-lg border px-3 py-2.5"
@@ -563,6 +508,21 @@ export default function ProjectDetail() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <ProjectStatusSheet
+        visible={statusSheet}
+        current={project.status}
+        onClose={() => setStatusSheet(false)}
+        onPick={(next) => {
+          setPendingStatus(next);
+          setStatusSheet(false);
+        }}
+        onClosed={() => {
+          const next = pendingStatus;
+          setPendingStatus(null);
+          if (next) applyStatus(next);
+        }}
+      />
 
       <PauseProjectModal
         visible={pauseOpen}
