@@ -74,6 +74,23 @@ en su `onPress`.
   `changePalette` aplican local primero (flip instantáneo) y espejean al backend
   (no-fatal). Mismo patrón que `changeLocale`.
 
+## Tour del dashboard — data-driven
+
+Diez pasos que **navegan a cada sección y recortan el velo sobre ella**
+(`src/components/onboarding/tour/`). Reemplazó al `DashboardTour` viejo, que
+eran cinco tarjetas con icono y sin foco.
+
+**Para agregarle un paso no se toca ningún componente**: una entrada en
+`tour/steps.ts` + `onboarding.tour.<key>.title/.body` en los dos `messages`. Las
+filas del menú "Más" ya son señalables por su `key` (`more.<key>`), así que una
+sección nueva nace en el tour sin wiring. Procedimiento y decisiones:
+**`docs/onboarding-tour.md`**.
+
+El recorte son **cuatro vistas de velo** con el token `scrim` (no hay
+`box-shadow: 0 0 0 9999px` en RN) y la medición es `measureInWindow` sobre
+anclas registradas — no layout estático: la TabBar cambia de alto con el
+safe-area.
+
 ## Onboarding (5 pasos) + paso "Personalizar Today"
 
 5 pasos: nombre · tema · avatar · plan · **personalizar Today**. El paso 4 avanza

@@ -368,35 +368,49 @@
     },
     "tour": {
       "next": "Siguiente",
-      "skip": "Saltar tour",
-      "step1": {
-        "title": "Aquí viven tus proyectos.",
-        "body": "Cada uno está activo, paused with intention, o killed. Ninguno se queda en el limbo."
+      "back": "Atrás",
+      "skip": "Saltar el tour",
+      "done": "Cerrar el loop",
+      "skipped": "Queda a medias, no se pierde. Puedes relanzarlo desde Apariencia.",
+      "welcome": {
+        "title": "Este es tu loop.",
+        "body": "Nueve secciones. Cada una existe para que un proyecto no se te vaya en drift. Dos minutos y listo."
       },
-      "step2": {
-        "title": "Las tasks pertenecen a un proyecto.",
-        "body": "Si no hay proyecto, no hay task. Esa es la regla."
+      "projects": {
+        "title": "Proyectos: todos tienen un estado",
+        "body": "Idea, activo, en pausa, lanzado, muerto. Nada se queda en el limbo fingiendo que sigue vivo."
       },
-      "step3": {
-        "title": "Las routines son lo que haces sin pensar.",
-        "body": "Lo que pasa todos los días. Trackéalo aquí. Lo demás es ruido."
+      "tasks": {
+        "title": "Tareas: el siguiente paso, no un montón",
+        "body": "Las tareas viven dentro de un proyecto. Si vuelves después de tres semanas, ves dónde te quedaste."
       },
-      "stepNotes": {
-        "title": "Notes es tu cuaderno.",
-        "body": "Lo que consultas una y otra vez — cuentas, contactos, checklists. Agrúpalo en secciones plegables, ligalo a un proyecto o déjalo suelto. Está en Más."
+      "routines": {
+        "title": "Rutinas: el trabajo que se repite",
+        "body": "Revisión semanal, facturas, seguimientos. Lo recurrente no va en una lista que reescribes cada lunes."
       },
-      "step4": {
-        "title": "¿Atorado? Pregúntale a tu IA.",
-        "body": "Este botón abre el asistente. Lee tus proyectos y tasks, y te responde con tu contexto."
+      "calendar": {
+        "title": "Calendario: la semana que de verdad tienes",
+        "body": "Tareas y rutinas en fechas reales. No la semana que imaginaste el domingo en la noche."
       },
-      "finalCta": {
-        "title": "Ahora construye algo.",
-        "body": "Crea tu primer proyecto. Aunque no sepas qué es todavía.",
-        "more": "Hay más por aquí (ideas, log, analytics, chat) pero no queremos aburrirte. Aquí están los links cuando los necesites. Cualquier duda, pregúntale a tu IA.",
-        "resourcesLink": "Recursos",
-        "resourcesComingSoon": "Pronto",
-        "primary": "Crear primer proyecto",
-        "secondary": "Lo hago después"
+      "ideas": {
+        "title": "Ideas: guárdala sin empezarla",
+        "body": "Toda idea nueva quiere ser proyecto hoy. Déjala aquí. La promueves cuando tengas espacio."
+      },
+      "notes": {
+        "title": "Notas: contexto que no tienes que reconstruir",
+        "body": "Decisiones, enlaces, ideas a medias. Esto es lo que hace barato volver a un proyecto pausado."
+      },
+      "graveyard": {
+        "title": "Cementerio: donde descansan los proyectos que mataste",
+        "body": "Matar es una forma de terminar. Nada de aquí es un fracaso: es una decisión que ya tomaste."
+      },
+      "analytics": {
+        "title": "Analíticas: empezados contra terminados",
+        "body": "Todavía está vacío, y así debe ser. Cuando lleves unas semanas te dirá cuánto empiezas y cuánto cierras, con la bitácora entera detrás."
+      },
+      "close": {
+        "title": "Eso es todo.",
+        "body": "Elige un proyecto. De preferencia del que llevas semanas escapando."
       }
     }
   },

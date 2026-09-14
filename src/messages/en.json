@@ -368,35 +368,49 @@
     },
     "tour": {
       "next": "Next",
-      "skip": "Skip tour",
-      "step1": {
-        "title": "Projects live here.",
-        "body": "Each one is active, paused with intention, or killed. None of them sit in limbo."
+      "back": "Back",
+      "skip": "Skip the tour",
+      "done": "Close the loop",
+      "skipped": "Half-finished isn't lost. Replay it any time from Appearance.",
+      "welcome": {
+        "title": "This is your loop.",
+        "body": "Nine sections. Each one exists to keep a project from drifting. Two minutes and you're out."
       },
-      "step2": {
-        "title": "Tasks belong to a project.",
-        "body": "If there's no project, there's no task. That's the rule."
+      "projects": {
+        "title": "Projects: every one has a state",
+        "body": "Idea, active, paused, launched, killed. Nothing sits in limbo pretending it's alive."
       },
-      "step3": {
-        "title": "Routines are what you do without thinking.",
-        "body": "The stuff that happens every day. Track it here. The rest is noise."
+      "tasks": {
+        "title": "Tasks: the next step, not a pile",
+        "body": "Tasks live inside a project. When you come back after three weeks, you see exactly where you stopped."
       },
-      "stepNotes": {
-        "title": "Notes are your notebook.",
-        "body": "Reference you keep coming back to — accounts, contacts, checklists. Group it into collapsible sections, link it to a project or leave it loose. It's under More."
+      "routines": {
+        "title": "Routines: the work that repeats",
+        "body": "Weekly review, invoices, follow-ups. Recurring work doesn't belong in a list you rewrite every Monday."
       },
-      "step4": {
-        "title": "Stuck? Ask your AI.",
-        "body": "This button opens the assistant. It reads your projects and tasks, and answers in your context."
+      "calendar": {
+        "title": "Calendar: the week you actually have",
+        "body": "Tasks and routines on real dates. Not the week you imagined on Sunday night."
       },
-      "finalCta": {
-        "title": "Now build something.",
-        "body": "Create your first project. Even if you're not sure what it is yet.",
-        "more": "There's more (ideas, log, analytics, chat) but we don't want to bore you. Here are the links when you need them. Anything else, ask your AI.",
-        "resourcesLink": "Resources",
-        "resourcesComingSoon": "Soon",
-        "primary": "Create first project",
-        "secondary": "I'll do it later"
+      "ideas": {
+        "title": "Ideas: capture it without starting it",
+        "body": "Every new idea wants to be a project today. Park it here. Promote it when you have room."
+      },
+      "notes": {
+        "title": "Notes: context you don't rebuild",
+        "body": "Decisions, links, half-thoughts. This is what makes returning to a paused project cheap."
+      },
+      "graveyard": {
+        "title": "Graveyard: where killed projects rest",
+        "body": "Killing is a form of finishing. Nothing here is a failure — it's a decision you already made."
+      },
+      "analytics": {
+        "title": "Analytics: started against finished",
+        "body": "It's empty, and it should be. In a few weeks it will tell you how much you start against how much you close, with the full log behind it."
+      },
+      "close": {
+        "title": "That's the tour.",
+        "body": "Pick one project. Ideally the one you keep escaping from."
       }
     }
   },

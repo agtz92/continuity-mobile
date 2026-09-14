@@ -1,6 +1,8 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { Meta } from "@/components/ui/Meta";
+import { TourAnchor } from "@/components/onboarding/tour/TourAnchor";
+import { useTourScroller } from "@/components/onboarding/tour/anchors";
 import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, type Href } from "expo-router";
@@ -101,23 +103,30 @@ export default function More() {
     },
   ];
 
+  // El tour necesita poder traer una fila a la vista si cae bajo el pliegue.
+  const scroller = useTourScroller();
+
   const renderGroup = (items: Item[]) => (
     <View className="overflow-hidden rounded-xl border border-border bg-surface">
       {items.map((it, i) => {
         const Icon = it.icon;
         return (
-          <Pressable
-            key={it.key}
-            onPress={() => router.push(it.href)}
-            className={
-              "flex-row items-center gap-3 px-4 py-4 " +
-              (i > 0 ? "border-t border-border" : "")
-            }
-          >
-            <Icon color={s.text} size={20} />
-            <Text className="font-sans text-base flex-1 text-text">{it.label}</Text>
-            <ChevronRight color={s.textMuted} size={18} />
-          </Pressable>
+          // Envolver aquí y no en cada item hace que una sección nueva del
+          // menú nazca señalable por el tour sin tocar nada: su `key` ya es
+          // el ancla que `steps.ts` puede nombrar.
+          <TourAnchor id={"more." + it.key} key={it.key}>
+            <Pressable
+              onPress={() => router.push(it.href)}
+              className={
+                "flex-row items-center gap-3 px-4 py-4 " +
+                (i > 0 ? "border-t border-border" : "")
+              }
+            >
+              <Icon color={s.text} size={20} />
+              <Text className="font-sans text-base flex-1 text-text">{it.label}</Text>
+              <ChevronRight color={s.textMuted} size={18} />
+            </Pressable>
+          </TourAnchor>
         );
       })}
     </View>
@@ -125,7 +134,7 @@ export default function More() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
-      <ScrollView contentContainerClassName="gap-4 p-5">
+      <ScrollView {...scroller} contentContainerClassName="gap-4 p-5">
         <ScreenTitle>{t("tabs.more")}</ScreenTitle>
 
         {renderGroup(workspace)}

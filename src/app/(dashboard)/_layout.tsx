@@ -11,7 +11,8 @@ import {
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 import { accentsFor } from "@/palette/config";
-import { DashboardTour } from "@/components/onboarding/DashboardTour";
+import { DashboardTour } from "@/components/onboarding/tour/DashboardTour";
+import { TourAnchor } from "@/components/onboarding/tour/TourAnchor";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { usePurchasesIdentity } from "@/hooks/usePurchasesIdentity";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -68,7 +69,11 @@ export default function DashboardLayout() {
         name="today"
         options={{
           title: t("tabs.today"),
-          tabBarIcon: ({ color, size }) => <Sun color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <TourAnchor id="tab.today">
+              <Sun color={color} size={size} />
+            </TourAnchor>
+          ),
         }}
       />
       <Tabs.Screen
@@ -76,7 +81,9 @@ export default function DashboardLayout() {
         options={{
           title: t("tabs.projects"),
           tabBarIcon: ({ color, size }) => (
-            <FolderKanban color={color} size={size} />
+            <TourAnchor id="tab.projects">
+              <FolderKanban color={color} size={size} />
+            </TourAnchor>
           ),
           tabBarBadge: blockedCount > 0 ? blockedCount : undefined,
           tabBarBadgeStyle: {
@@ -92,7 +99,9 @@ export default function DashboardLayout() {
         options={{
           title: t("tabs.tasks"),
           tabBarIcon: ({ color, size }) => (
-            <ListChecks color={color} size={size} />
+            <TourAnchor id="tab.tasks">
+              <ListChecks color={color} size={size} />
+            </TourAnchor>
           ),
         }}
       />
@@ -100,14 +109,22 @@ export default function DashboardLayout() {
         name="routines"
         options={{
           title: t("tabs.routines"),
-          tabBarIcon: ({ color, size }) => <Repeat color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <TourAnchor id="tab.routines">
+              <Repeat color={color} size={size} />
+            </TourAnchor>
+          ),
         }}
       />
       <Tabs.Screen
         name="(more)"
         options={{
           title: t("tabs.more"),
-          tabBarIcon: ({ color, size }) => <Menu color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <TourAnchor id="tab.more">
+              <Menu color={color} size={size} />
+            </TourAnchor>
+          ),
         }}
       />
     </Tabs>
