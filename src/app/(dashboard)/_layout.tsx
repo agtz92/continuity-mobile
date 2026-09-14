@@ -13,6 +13,7 @@ import { THEME_SURFACES } from "@/theme/tokens";
 import { accentsFor } from "@/palette/config";
 import { DashboardTour } from "@/components/onboarding/DashboardTour";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { usePurchasesIdentity } from "@/hooks/usePurchasesIdentity";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
 import { isDailyViewStatus } from "@/lib/projectStatus";
@@ -25,6 +26,9 @@ export default function DashboardLayout() {
 
   // Push registration + tap-to-navigate (Fase 8). Inert under Expo Go.
   usePushNotifications();
+  // Ata las compras al uuid del usuario. Sin esto el webhook descarta la
+  // compra por id anónimo: se cobra y el plan no se mueve.
+  usePurchasesIdentity();
 
   // Globo de atascos sobre "Proyectos". El rediseño lo pide porque un proyecto
   // atorado es lo único que la app **no** puede resolver sola: si no se ve

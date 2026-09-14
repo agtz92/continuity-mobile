@@ -588,7 +588,8 @@
       "checkoutError": "No se pudo abrir el checkout. Intenta de nuevo en unos segundos.",
       "portalError": "No se pudo abrir el portal. Intenta de nuevo en unos segundos.",
       "loadErrorTitle": "No se pudo leer tu plan",
-      "loadErrorBody": "El servicio de facturación no respondió. En tu cuenta no cambió nada — es esta pantalla la que ahora mismo no puede confirmar en qué plan estás."
+      "loadErrorBody": "El servicio de facturación no respondió. En tu cuenta no cambió nada — es esta pantalla la que ahora mismo no puede confirmar en qué plan estás.",
+      "changePlan": "Cambiar de plan"
     },
     "plugins": {
       "title": "Integraciones",
@@ -1913,5 +1914,29 @@
     "hint": "Cerrarla con el bloqueo abierto dejaría descuadrado el contador del proyecto.",
     "resolve": "El bloqueo se resolvió — completarla",
     "delete": "Eliminar la tarea"
+  },
+  "plans": {
+    "title": "Elige tu plan",
+    "period": {
+      "monthly": "Mensual",
+      "annual": "Anual"
+    },
+    "cadence": {
+      "monthly": "al mes",
+      "annual": "al año"
+    },
+    "current": "Tu plan",
+    "choose": "Contratar {plan}",
+    "restore": "Restaurar compras",
+    "purchased": "Plan actualizado",
+    "restored": "Compras restauradas",
+    "errorTitle": "No cargan los planes",
+    "errorBody": "No pudimos contactar a la tienda. No se cobró nada — inténtalo en un momento.",
+    "errorPurchase": "La compra no se completó. No se te ha cobrado.",
+    "errorIdentity": "Vuelve a iniciar sesión antes de suscribirte — no pudimos ligar esta compra a tu cuenta.",
+    "errorRestore": "No pudimos restaurar tus compras.",
+    "unavailableTitle": "No disponible aquí",
+    "unavailableBody": "Las suscripciones necesitan la app completa. Abre Continuity desde tu pantalla de inicio, o administra tu plan en la web.",
+    "autoRenewDisclosure": "Las suscripciones se renuevan solas salvo que las canceles al menos 24 horas antes de que termine el periodo. El cargo va a tu cuenta de Apple al confirmar. Puedes administrarlas o cancelarlas en los ajustes de tu cuenta de Apple."
   }
 }

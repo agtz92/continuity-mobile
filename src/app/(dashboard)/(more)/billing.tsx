@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/Skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Meta } from "@/components/ui/Meta";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ExternalLink } from "lucide-react-native";
 import { PlanBadge } from "@/components/assistant/PlanBadge";
@@ -33,6 +33,7 @@ export default function Billing() {
   // y si la petición fallaba, se quedaba viendo Free para siempre. Un plan no
   // se pinta hasta que el servidor dice cuál es.
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const router = useRouter();
 
   // Refetch each time the screen gains focus so the plan reflects any change the
   // user just made on the web billing page (which we open externally).
@@ -121,6 +122,21 @@ export default function Billing() {
 
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
+      {/* Los planes se compran DENTRO de la app. Antes esta pantalla solo
+          sabía mandarte a la web, que era la única salida sin IAP. */}
+      {!isExempt && !boughtInStore && (
+        <Pressable
+          onPress={() => router.push("/plans")}
+          accessibilityRole="button"
+          className="items-center rounded-md py-3"
+          style={{ backgroundColor: c.accent }}
+        >
+          <Text className="font-sans-semibold text-sm" style={{ color: c.bg }}>
+            {t(plan === "free" ? "plans.title" : "settings.billing.changePlan")}
+          </Text>
+        </Pressable>
+      )}
+
       {/* Current plan card */}
       <View className="gap-3 rounded-xl border border-border bg-surface p-5">
         <Meta variant="cintillo" tone="muted">

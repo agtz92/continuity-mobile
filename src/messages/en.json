@@ -588,7 +588,8 @@
       "checkoutError": "Couldn't open checkout. Please try again in a moment.",
       "portalError": "Couldn't open the billing portal. Please try again in a moment.",
       "loadErrorTitle": "Couldn't read your plan",
-      "loadErrorBody": "The billing service didn't answer. Nothing changed on your account — this screen just can't confirm what plan you're on right now."
+      "loadErrorBody": "The billing service didn't answer. Nothing changed on your account — this screen just can't confirm what plan you're on right now.",
+      "changePlan": "Change plan"
     },
     "plugins": {
       "title": "Plugins",
@@ -1913,5 +1914,29 @@
     "hint": "Closing it with an open blocker would leave the project count wrong.",
     "resolve": "The blocker is gone — complete it",
     "delete": "Delete the task"
+  },
+  "plans": {
+    "title": "Choose your plan",
+    "period": {
+      "monthly": "Monthly",
+      "annual": "Yearly"
+    },
+    "cadence": {
+      "monthly": "per month",
+      "annual": "per year"
+    },
+    "current": "Your plan",
+    "choose": "Get {plan}",
+    "restore": "Restore purchases",
+    "purchased": "Plan updated",
+    "restored": "Purchases restored",
+    "errorTitle": "Plans aren't loading",
+    "errorBody": "We couldn't reach the store. Nothing was charged — try again in a moment.",
+    "errorPurchase": "The purchase didn't go through. You haven't been charged.",
+    "errorIdentity": "Sign in again before subscribing — we couldn't tie this purchase to your account.",
+    "errorRestore": "We couldn't restore your purchases.",
+    "unavailableTitle": "Not available here",
+    "unavailableBody": "Subscriptions need the full app. Open Continuity from your home screen, or manage your plan on the web.",
+    "autoRenewDisclosure": "Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Your Apple account is charged on confirmation. Manage or cancel in your Apple account settings."
   }
 }

@@ -20,6 +20,10 @@ export default function MoreLayout() {
       />
       <Stack.Screen name="ideas" options={{ ...headered, title: t("tabs.ideas") }} />
       <Stack.Screen
+        name="plans"
+        options={{ ...headered, title: t("plans.title") }}
+      />
+      <Stack.Screen
         name="quick-notes"
         options={{ ...headered, title: t("tabs.notes") }}
       />
