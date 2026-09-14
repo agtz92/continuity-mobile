@@ -1602,9 +1602,9 @@
         "closing": "The cost of returning drops to zero. Projects you wrote off start finishing themselves."
       },
       "notifications": {
-        "label": "Telegram + WhatsApp",
+        "label": "Telegram",
         "headline": "Wake up to your day. Get reminded before you lose it.",
-        "body": "continuu.it meets you where you already are. Every morning, at the time you choose, it sends you a focused summary on Telegram. WhatsApp coming soon. Same workflow, your chosen channel.",
+        "body": "continuu.it meets you where you already are. Every morning, at the time you choose, it sends you a focused summary on Telegram or by email. You decide what reaches you, and when.",
         "demo": {
           "botName": "continuu.it bot",
           "greeting": "Good morning, Alfredo.",
@@ -1760,10 +1760,10 @@
             "3 active projects",
             "50 open tasks",
             "2 active routines",
-            "AI Assistant — 15 messages/day (read-only)",
-            "Email and Telegram notifications",
+            "No Loop — the assistant starts at Pro",
+            "Claude connector (read) — use your own Claude",
+            "Email and Telegram notifications, on your rules",
             "Full Today view, analytics, and activity log",
-            "30-day history",
             "Up to 30 ideas"
           ],
           "cta": "Sign up for free"
@@ -1777,13 +1777,11 @@
           "inheritsFrom": "Everything in Free, plus:",
           "perks": [
             "25 active projects, 200 tasks per project",
-            "20 active routines, 500 ideas",
-            "AI Assistant — 200 messages/day with write + brainstorming",
-            "Deep Mode (Sonnet) — 5 messages/day",
-            "WhatsApp — 100 messages/month included",
+            "20 active routines, 500 ideas, 1,000 notes",
+            "Loop in query mode — ask about your projects and tasks",
+            "Claude connector (read) — use your own Claude",
             "Google Tasks + Calendar sync",
             "Sleeping alerts and daily digest",
-            "CSV/JSON export",
             "Email support within 48h"
           ],
           "cta": "Try Pro free for 14 days"
@@ -1797,12 +1795,9 @@
           "inheritsFrom": "Everything in Pro, plus:",
           "perks": [
             "Unlimited projects, tasks, and routines",
-            "AI Assistant — 600 messages/day",
-            "Deep Mode (Sonnet) — 25 messages/day",
-            "WhatsApp — 500 messages/month + your assistant on WhatsApp (coming soon)",
-            "All-time analytics",
-            "Outbound webhooks and personal API key",
-            "Custom notification rules",
+            "Loop in conversation — it creates and organises your work",
+            "Claude connector with write access",
+            "Quick capture interpreted by AI",
             "1:1 onboarding and early access to new features",
             "Priority support within 24h"
           ],
@@ -1937,6 +1932,8 @@
     "errorRestore": "We couldn't restore your purchases.",
     "unavailableTitle": "Not available here",
     "unavailableBody": "Subscriptions need the full app. Open Continuity from your home screen, or manage your plan on the web.",
-    "autoRenewDisclosure": "Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Your Apple account is charged on confirmation. Manage or cancel in your Apple account settings."
+    "autoRenewDisclosure": "Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Your Apple account is charged on confirmation. Manage or cancel in your Apple account settings.",
+    "emptyTitle": "No plans available yet",
+    "emptyBody": "The store answered, but there's nothing on sale for this account right now. If you just set up your products, they can take a few minutes to appear."
   }
 }

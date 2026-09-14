@@ -64,7 +64,12 @@ export default function Plans() {
   const [period, setPeriod] = useState<Period>("annual");
   const [packages, setPackages] = useState<Record<string, PurchasesPackage>>({});
   const [usage, setUsage] = useState<UsageSnapshot | null>(null);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // `empty` no es `error`: la tienda contestó, simplemente no hay nada que
+  // vender todavía. Decir "no pudimos contactar a la tienda" cuando sí se
+  // contactó manda a depurar en la dirección equivocada.
+  const [status, setStatus] = useState<
+    "loading" | "ready" | "empty" | "error"
+  >("loading");
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -81,7 +86,15 @@ export default function Plans() {
         if (hit) map[hit.tier + ":" + hit.period] = pkg;
       }
       setPackages(map);
-      setStatus("ready");
+      if (__DEV__ && Object.keys(map).length === 0) {
+        console.log(
+          "[plans] offering:",
+          offering?.identifier ?? "(ninguno marcado como current)",
+          "paquetes:",
+          offering?.availablePackages?.map((x) => x.product.identifier) ?? []
+        );
+      }
+      setStatus(Object.keys(map).length === 0 ? "empty" : "ready");
     } catch {
       setStatus("error");
     }
@@ -150,12 +163,12 @@ export default function Plans() {
     );
   }
 
-  if (status === "error" || Object.keys(packages).length === 0) {
+  if (status === "error" || status === "empty") {
     return (
       <View className="flex-1 bg-bg px-5">
         <EmptyState
-          title={t("plans.errorTitle")}
-          body={t("plans.errorBody")}
+          title={t(status === "empty" ? "plans.emptyTitle" : "plans.errorTitle")}
+          body={t(status === "empty" ? "plans.emptyBody" : "plans.errorBody")}
           actions={
             <Pressable
               onPress={() => void load()}

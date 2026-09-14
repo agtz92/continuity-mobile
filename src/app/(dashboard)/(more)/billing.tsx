@@ -233,13 +233,16 @@ export default function Billing() {
       </View>
 
       {/*
-        Manage the subscription wherever it was bought. Until the in-app
-        paywall ships (see backend docs/integracion-pagos-web-y-movil.md,
-        phase 4) this screen still stays read-only: no prices, no plan cards,
-        no "Subscribe" CTA, because selling a digital subscription in-app
-        without StoreKit is exactly what App Review rejects.
+        **Gestionar**, nunca **comprar**.
+
+        Este bloque enviaba a la web a suscribirse. Con el paywall nativo ya
+        dentro, eso dejó de ser la única salida y pasó a ser un motivo de
+        rechazo: Apple (3.1.1) prohíbe dirigir al usuario a un mecanismo de
+        compra externo para bienes digitales. Comprar se hace en `/plans`.
+        Lo que sí se permite —y se necesita— es mandar a **administrar** una
+        suscripción que ya existe, a donde la vendieron.
       */}
-      {!isExempt && (
+      {hasSubscription && !isExempt && (
         <Pressable
           onPress={() => void Linking.openURL(manageUrl)}
           accessibilityRole="button"
@@ -247,19 +250,19 @@ export default function Billing() {
         >
           <ExternalLink size={16} color={c.text} />
           <Text className="text-base font-sans-semibold text-text">
-            {hasSubscription
-              ? t("settings.billing.manageSubscription")
-              : t("settings.billing.upgrade")}
+            {t("settings.billing.manageSubscription")}
           </Text>
         </Pressable>
       )}
-      <Text className="font-sans px-1 text-center text-xs text-text-muted">
-        {boughtInStore
-          ? t("settings.billing.manageInStoreHint", {
-              store: boughtOnGoogle ? "Google Play" : "App Store",
-            })
-          : t("settings.billing.manageOnWebHint")}
-      </Text>
+      {hasSubscription && !isExempt && (
+        <Text className="font-sans px-1 text-center text-xs text-text-muted">
+          {boughtInStore
+            ? t("settings.billing.manageInStoreHint", {
+                store: boughtOnGoogle ? "Google Play" : "App Store",
+              })
+            : t("settings.billing.manageOnWebHint")}
+        </Text>
+      )}
     </ScrollView>
   );
 }
