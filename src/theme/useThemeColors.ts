@@ -18,6 +18,8 @@ export type ThemeColors = {
   surface2: string;
   surface3: string;
   well: string;
+  /** Velo del contenido de fondo. Ver `tokens.ts`. */
+  scrim: string;
 
   text: string;
   text2: string;
@@ -65,6 +67,7 @@ export function useThemeColors(): ThemeColors {
       surface2: s.surface2,
       surface3: s.surface3,
       well: s.well,
+      scrim: s.scrim,
       text: s.text,
       text2: s.text2,
       text3: s.text3,

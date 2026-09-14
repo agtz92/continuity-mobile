@@ -59,6 +59,7 @@ const MAP = {
   "--surface-2": "surface2",
   "--surface-3": "surface3",
   "--well": "well",
+  "--scrim": "scrim",
   "--text": "text",
   "--text-2": "text2",
   "--text-3": "text3",

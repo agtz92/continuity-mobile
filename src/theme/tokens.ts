@@ -29,6 +29,9 @@ export type Surfaces = {
   surface3: string;
   /** Columnas laterales hundidas. */
   well: string;
+  /** Velo sobre el contenido cuando algo se pone delante: modales, hojas,
+   *  y el recorte del tour de onboarding. Mismo valor que en web. */
+  scrim: string;
 
   text: string;
   text2: string;
@@ -65,6 +68,7 @@ export const THEME_SURFACES: Record<EffectiveMode, Surfaces> = {
     surface2: "#141935",
     surface3: "#1A2044",
     well: "#0A0D22",
+    scrim: "rgba(7,9,20,0.78)",
     text: "#F5F1E8",
     text2: "#CFD3E6",
     text3: "#A6ABC8",
@@ -90,6 +94,7 @@ export const THEME_SURFACES: Record<EffectiveMode, Surfaces> = {
     surface2: "#EFEBDF",
     surface3: "#E5E0D0",
     well: "#FBF9F3",
+    scrim: "rgba(20,23,43,0.42)",
     text: "#14172B",
     text2: "#34322A",
     text3: "#4E4B3E",
@@ -119,6 +124,7 @@ export const THEME_SURFACES: Record<EffectiveMode, Surfaces> = {
     surface2: "#201D18",
     surface3: "#2A2620",
     well: "#0F0E0C",
+    scrim: "rgba(11,10,9,0.78)",
     text: "#F1EDE3",
     text2: "#D6D0C2",
     text3: "#A9A192",
