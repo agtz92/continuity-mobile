@@ -496,7 +496,11 @@
       "paletteSalvia": "Salvia",
       "paletteOxido": "Óxido",
       "paletteHielo": "Hielo",
-      "paletteCiruela": "Ciruela"
+      "paletteCiruela": "Ciruela",
+      "replayHeading": "Volver a ver",
+      "replayHint": "Repite cualquiera cuando quieras. No pierdes nada de lo que ya configuraste.",
+      "replayTourHint": "Diez pasos por la app, sección por sección.",
+      "replaySetupHint": "Tema, nombre, avatar y plan — el setup inicial."
     },
     "billing": {
       "title": "Facturación y plan",

@@ -171,27 +171,51 @@ export default function Appearance() {
         </View>
       </View>
 
-      <Pressable
-        onPress={replayTour}
-        accessibilityRole="button"
-        className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
-      >
-        <Compass size={16} color={c.text} />
+      {/* Los dos estaban sueltos al final de la pantalla, sin título y con
+          seis secciones tituladas por encima: el del tour se leía como el pie
+          de la paleta y no como una acción. Ahora son una sección con la misma
+          forma que las demás — título, explicación, controles — y se ven como
+          lo que son: dos cosas que puedes repetir. */}
+      <View className="gap-2">
         <Text className="text-base font-sans-semibold text-text">
-          {t("onboarding.replay.replayTourButton")}
+          {t("settings.appearance.replayHeading")}
         </Text>
-      </Pressable>
+        <Text className="font-sans text-sm text-text-muted">
+          {t("settings.appearance.replayHint")}
+        </Text>
 
-      <Pressable
-        onPress={replaySetup}
-        accessibilityRole="button"
-        className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
-      >
-        <RotateCcw size={16} color={c.text} />
-        <Text className="text-base font-sans-semibold text-text">
-          {t("onboarding.replay.replaySetupButton")}
-        </Text>
-      </Pressable>
+        <Pressable
+          onPress={replayTour}
+          accessibilityRole="button"
+          className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
+        >
+          <Compass size={18} color={c.text} />
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-sans-semibold text-text">
+              {t("onboarding.replay.replayTourButton")}
+            </Text>
+            <Text className="mt-0.5 font-sans text-xs text-text-3">
+              {t("settings.appearance.replayTourHint")}
+            </Text>
+          </View>
+        </Pressable>
+
+        <Pressable
+          onPress={replaySetup}
+          accessibilityRole="button"
+          className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
+        >
+          <RotateCcw size={18} color={c.text} />
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-sans-semibold text-text">
+              {t("onboarding.replay.replaySetupButton")}
+            </Text>
+            <Text className="mt-0.5 font-sans text-xs text-text-3">
+              {t("settings.appearance.replaySetupHint")}
+            </Text>
+          </View>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }

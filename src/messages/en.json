@@ -496,7 +496,11 @@
       "paletteSalvia": "Sage",
       "paletteOxido": "Rust",
       "paletteHielo": "Ice",
-      "paletteCiruela": "Plum"
+      "paletteCiruela": "Plum",
+      "replayHeading": "Watch again",
+      "replayHint": "Replay either one whenever. Nothing you already set up is lost.",
+      "replayTourHint": "Ten steps over the app, section by section.",
+      "replaySetupHint": "Theme, name, avatar and plan — the initial setup."
     },
     "billing": {
       "title": "Billing & plan",
