@@ -398,7 +398,8 @@
         "free": "Empieza aquí. Sube de plan cuando lo necesites.",
         "pro": "Más espacio. La IA puede escribir.",
         "studio": "Sin límites, todo incluido."
-      }
+      },
+      "manageHint": "¿Quieres otro plan? Está en Más → Facturación y plan, dentro de la app."
     },
     "planBeta": {
       "heading": "Gracias por estar aquí, {name}.",

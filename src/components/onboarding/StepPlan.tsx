@@ -1,42 +1,59 @@
-import { Linking, Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { ExternalLink } from "lucide-react-native";
-import { useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
 import { PrimaryButton } from "./controls";
 
-// Apple rules: no prices, no "Subscribe" CTA in-app. The web's first-time
-// branch shows plan cards + Stripe checkout — forbidden here. Mobile Step4 is
-// info-only: it states the current plan and links out to the web billing page.
-const WEB_BILLING_URL = "https://continuu.it/settings/billing";
+/**
+ * Paso 4 — el plan. **Informativo, y sin ninguna salida de la app.**
+ *
+ * Aquí había un botón que abría `continuu.it/settings/billing` en el navegador.
+ * Tenía sentido cuando no existía el paywall nativo: no se podía comprar dentro,
+ * así que mandar fuera era la única salida. Con StoreKit ya dentro, eso pasó de
+ * ser un apaño a ser un motivo de rechazo — Apple (3.1.1) prohíbe dirigir al
+ * usuario a un mecanismo de compra externo para bienes digitales, y esto era
+ * literalmente un enlace a la página de suscripción durante el alta.
+ *
+ * Lo que **no** se hace en su lugar es enlazar al paywall nativo desde aquí. El
+ * onboarding vive en una ruta raíz y `/plans` cuelga del stack del dashboard:
+ *
+ * - En alta de verdad, `useProtectedRoute` ve `status` en `pending`/`in_progress`
+ *   y devuelve al usuario a /onboarding en cuanto pisa el dashboard. El botón
+ *   rebotaría.
+ * - En replay sí navegaría, pero el "atrás" de `/plans` vuelve al stack de "Más",
+ *   no al setup: te deja fuera del flujo a medias.
+ *
+ * Así que el paso dice en qué plan estás y dónde cambiarlo — dentro de la app.
+ * El alta dura noventa segundos; el paywall vive en Facturación, que es donde
+ * alguien va cuando de verdad quiere cambiar de plan.
+ */
 
-/** Outbound row to the web billing page (only shown to non-exempt users). */
-function ManageBillingLink() {
+/** En qué plan estás y dónde se cambia. Sin enlaces y sin precios. */
+function PlanInfo({
+  planLabel,
+  showHint,
+}: {
+  planLabel: string;
+  /** A los exentos no se les manda a cambiar un plan que no pagan. */
+  showHint: boolean;
+}) {
   const { t } = useTranslation();
-  const c = useThemeColors();
   return (
-    <Pressable
-      onPress={() => void Linking.openURL(WEB_BILLING_URL)}
-      accessibilityRole="button"
-      className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
-    >
-      <ExternalLink size={16} color={c.text} />
-      <Text className="text-base font-sans-semibold text-text">
-        {t("onboarding.replay.planChangeCta")}
+    <View className="gap-2">
+      <Text className="text-3xl font-sans-bold text-text">
+        {t("onboarding.replay.planHeading")}
       </Text>
-    </Pressable>
+      <Text className="font-sans text-base text-text-muted">
+        {t("onboarding.replay.planInfo", { plan: planLabel })}
+      </Text>
+      {showHint && (
+        <Meta tone="muted" className="mt-1">
+          {t("onboarding.plan.manageHint")}
+        </Meta>
+      )}
+    </View>
   );
 }
 
-/**
- * Step 4 — plan info (Apple-compliant). Three states:
- *  - replay: plan info + (non-exempt) manage-in-billing.
- *  - first-time exempt: the beta thank-you note.
- *  - first-time non-exempt: plan info + manage-in-billing.
- * Never shows prices, plan cards, or an in-app subscribe/checkout CTA.
- *
- * The primary button advances to step 5 (Personalize Today) via `onContinue`;
- * onboarding completion and the "watch tour again" CTA now live on step 5.
- */
 export function StepPlan({
   name,
   planLabel,
@@ -54,70 +71,29 @@ export function StepPlan({
 }) {
   const { t } = useTranslation();
 
-  if (replay) {
-    return (
-      <View className="gap-6">
-        <View className="gap-2">
-          <Text className="text-3xl font-sans-bold text-text">
-            {t("onboarding.replay.planHeading")}
-          </Text>
-          <Text className="font-sans text-base text-text-muted">
-            {t("onboarding.replay.planInfo", { plan: planLabel })}
-          </Text>
-        </View>
+  // A los exentos (beta) no se les habla de planes: se les da las gracias.
+  const body = isExempt && !replay ? (
+    <View className="gap-3">
+      <Text className="text-3xl font-sans-bold text-text">
+        {t("onboarding.planBeta.heading", { name })}
+      </Text>
+      <Text className="font-sans text-base leading-relaxed text-text-muted">
+        {t("onboarding.planBeta.body", { plan: planLabel })}
+      </Text>
+      <Text className="font-sans text-base leading-relaxed text-text-muted">
+        {t("onboarding.planBeta.body2")}
+      </Text>
+      <Text className="text-base font-sans-medium text-text">
+        — {t("onboarding.planBeta.signoff")}
+      </Text>
+    </View>
+  ) : (
+    <PlanInfo planLabel={planLabel} showHint={!isExempt} />
+  );
 
-        {!isExempt && <ManageBillingLink />}
-
-        <PrimaryButton
-          label={t("onboarding.continue")}
-          onPress={onContinue}
-          busy={busy}
-        />
-      </View>
-    );
-  }
-
-  if (isExempt) {
-    return (
-      <View className="gap-6">
-        <View className="gap-3">
-          <Text className="text-3xl font-sans-bold text-text">
-            {t("onboarding.planBeta.heading", { name })}
-          </Text>
-          <Text className="font-sans text-base leading-relaxed text-text-muted">
-            {t("onboarding.planBeta.body", { plan: planLabel })}
-          </Text>
-          <Text className="font-sans text-base leading-relaxed text-text-muted">
-            {t("onboarding.planBeta.body2")}
-          </Text>
-          <Text className="text-base font-sans-medium text-text">
-            — {t("onboarding.planBeta.signoff")}
-          </Text>
-        </View>
-
-        <PrimaryButton
-          label={t("onboarding.continue")}
-          onPress={onContinue}
-          busy={busy}
-        />
-      </View>
-    );
-  }
-
-  // First-time, non-exempt: info only, no prices/checkout.
   return (
     <View className="gap-6">
-      <View className="gap-2">
-        <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.replay.planHeading")}
-        </Text>
-        <Text className="font-sans text-base text-text-muted">
-          {t("onboarding.replay.planInfo", { plan: planLabel })}
-        </Text>
-      </View>
-
-      <ManageBillingLink />
-
+      {body}
       <PrimaryButton
         label={t("onboarding.continue")}
         onPress={onContinue}

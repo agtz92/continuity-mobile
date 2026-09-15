@@ -398,7 +398,8 @@
         "free": "Start here. Upgrade whenever.",
         "pro": "More room. AI can write.",
         "studio": "No limits, all features."
-      }
+      },
+      "manageHint": "Want a different plan? It's under More → Billing & plan, inside the app."
     },
     "planBeta": {
       "heading": "Thanks for being here, {name}.",

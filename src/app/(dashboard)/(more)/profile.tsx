@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Meta } from "@/components/ui/Meta";
-import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { AlertTriangle } from "lucide-react-native";
@@ -17,10 +18,9 @@ import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 type ProfileData = { profile: { avatar: string | null; firstName: string | null } };
 
-const BILLING_URL = "https://continuu.it/settings/billing";
-
 export default function Profile() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const c = useThemeColors();
   const { session } = useAuth();
   const { avatarUrl } = useUserAvatar();
@@ -200,8 +200,15 @@ export default function Profile() {
         <Text className="font-sans text-sm text-text-muted">
           {t("settings.deleteAccount.subscriptionWarning")}
         </Text>
+        {/*
+          Mandaba a `continuu.it/settings/billing` en el navegador, sin mirar
+          dónde se compró la suscripción: si fue por App Store, esa página no
+          puede cancelarla. Ahora va a la pantalla de Facturación de la app, que
+          ya resuelve el destino correcto (gestor nativo si la compra fue de
+          tienda, web si no) — y de paso deja de sacar al usuario de la app.
+        */}
         <Pressable
-          onPress={() => void Linking.openURL(BILLING_URL)}
+          onPress={() => router.push("/billing")}
           accessibilityRole="button"
           hitSlop={6}
           className="self-start"
