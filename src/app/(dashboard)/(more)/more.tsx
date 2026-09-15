@@ -5,6 +5,7 @@ import { TourAnchor } from "@/components/onboarding/tour/TourAnchor";
 import { useTourScroller } from "@/components/onboarding/tour/anchors";
 import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { useRouter, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -135,6 +136,7 @@ export default function More() {
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <ScrollView {...scroller} contentContainerClassName="gap-4 p-5">
+        <NotificationStack />
         <ScreenTitle>{t("tabs.more")}</ScreenTitle>
 
         {renderGroup(workspace)}

@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -235,6 +236,9 @@ export default function Routines() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
+      {/* Admin announcements + derived alerts: en web viven sobre todas las
+          vistas del dashboard, así que aquí también sobre cada pestaña. */}
+      <NotificationStack className="gap-2 px-5 pt-2" />
       <View className="gap-3 px-5 pb-3 pt-2">
         <ScreenTitle>
           {t("views.routines.title")}
