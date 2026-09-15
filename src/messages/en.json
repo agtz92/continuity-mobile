@@ -317,7 +317,8 @@
       "planInfo": "You're on the {plan} plan.",
       "planChangeCta": "Manage in Billing",
       "finishButton": "Done",
-      "replayTourButton": "Watch the dashboard tour again"
+      "replayTourButton": "Watch the dashboard tour again",
+      "replaySetupButton": "Redo setup"
     },
     "tour": {
       "next": "Next",

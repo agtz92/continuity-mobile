@@ -62,7 +62,11 @@ function useProtectedRoute() {
     // don't flash the dashboard for a brand-new user who needs onboarding.
     if (onbLoading && !onb) return;
     const status = onb?.onboardingState?.status;
-    const needsOnboarding = status === "not_started" || status === "in_progress";
+    // "pending", no "not_started": es el valor que emite el backend
+    // (`OnboardingStatus.PENDING`). Con el nombre inventado, esta condición era
+    // falsa siempre y un usuario nuevo aterrizaba en Today sin pasar por el
+    // onboarding. La cadena "not_started" no existe en ninguno de los tres repos.
+    const needsOnboarding = status === "pending" || status === "in_progress";
 
     if (needsOnboarding) {
       // Route into onboarding, but don't fight a user who is already there

@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client/react";
-import { Compass } from "lucide-react-native";
+import { Compass, RotateCcw } from "lucide-react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { SUPPORTED_THEMES, THEME_LABEL_KEY } from "@/theme/config";
@@ -59,6 +59,14 @@ export default function Appearance() {
   const replayTour = () => {
     requestTour();
     router.push("/today");
+  };
+
+  // Rehacer el setup inicial. `_layout.tsx` deja /onboarding alcanzable "para
+  // que funcione la entrada de replay" — pero esa entrada no existía en móvil,
+  // solo en el menú de cuenta de web. Sin ella no había forma de volver a ver
+  // el onboarding desde el teléfono.
+  const replaySetup = () => {
+    router.push({ pathname: "/onboarding", params: { replay: "true" } });
   };
 
   // Theme/palette are owned per-user on the backend (ThemeProvider hydrates from
@@ -171,6 +179,17 @@ export default function Appearance() {
         <Compass size={16} color={c.text} />
         <Text className="text-base font-sans-semibold text-text">
           {t("onboarding.replay.replayTourButton")}
+        </Text>
+      </Pressable>
+
+      <Pressable
+        onPress={replaySetup}
+        accessibilityRole="button"
+        className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
+      >
+        <RotateCcw size={16} color={c.text} />
+        <Text className="text-base font-sans-semibold text-text">
+          {t("onboarding.replay.replaySetupButton")}
         </Text>
       </Pressable>
     </ScrollView>

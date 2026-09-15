@@ -317,7 +317,8 @@
       "planInfo": "Estás en el plan {plan}.",
       "planChangeCta": "Cambiar en Facturación",
       "finishButton": "Listo",
-      "replayTourButton": "Ver el tour del dashboard otra vez"
+      "replayTourButton": "Ver el tour del dashboard otra vez",
+      "replaySetupButton": "Rehacer el setup"
     },
     "tour": {
       "next": "Siguiente",
