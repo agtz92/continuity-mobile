@@ -7,9 +7,9 @@ import { PrimaryButton } from "./controls";
 /**
  * Step 1 — first name. Pre-filled from the Google OAuth metadata when present
  * (see onboarding.tsx). Validates trimmed non-empty + ≤50 chars, mirroring the
- * web Step1Name, then hands the trimmed value back to the flow.
+ * web StepName, then hands the trimmed value back to the flow.
  */
-export function Step1Name({
+export function StepName({
   initialName,
   prefilled,
   busy,
@@ -27,11 +27,11 @@ export function Step1Name({
   const submit = () => {
     const trimmed = value.trim();
     if (!trimmed) {
-      setError(t("onboarding.step1.errorEmpty"));
+      setError(t("onboarding.name.errorEmpty"));
       return;
     }
     if (trimmed.length > 50) {
-      setError(t("onboarding.step1.errorTooLong"));
+      setError(t("onboarding.name.errorTooLong"));
       return;
     }
     setError(null);
@@ -42,16 +42,16 @@ export function Step1Name({
     <View className="gap-6">
       <View className="gap-2">
         <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.step1.heading")}
+          {t("onboarding.name.heading")}
         </Text>
         <Text className="font-sans text-base text-text-muted">
-          {t("onboarding.step1.sub")}
+          {t("onboarding.name.sub")}
         </Text>
       </View>
 
       <View className="gap-1.5">
         <Text className="text-sm font-sans-medium text-text">
-          {t("onboarding.step1.label")}
+          {t("onboarding.name.label")}
         </Text>
         <FormInput
           value={value}
@@ -59,7 +59,7 @@ export function Step1Name({
             setValue(txt);
             if (error) setError(null);
           }}
-          placeholder={t("onboarding.step1.placeholder")}
+          placeholder={t("onboarding.name.placeholder")}
           autoFocus
           maxLength={80}
           returnKeyType="next"
@@ -69,7 +69,7 @@ export function Step1Name({
           <Text className="font-sans text-xs text-signal">{error}</Text>
         ) : prefilled ? (
           <Text className="font-sans text-xs text-text-muted">
-            {t("onboarding.step1.helperPrefilled")}
+            {t("onboarding.name.helperPrefilled")}
           </Text>
         ) : null}
       </View>

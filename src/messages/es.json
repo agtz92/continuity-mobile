@@ -311,53 +311,6 @@
     "back": "Atrás",
     "continue": "Continuar",
     "saving": "Guardando",
-    "step1": {
-      "heading": "Bienvenido, builder.",
-      "sub": "Esto toma 90 segundos. ¿Cómo te llamo?",
-      "label": "Nombre",
-      "placeholder": "Solo tu nombre",
-      "helperPrefilled": "Lo tomamos de tu cuenta de Google. Edítalo si quieres.",
-      "errorEmpty": "Escribe tu nombre.",
-      "errorTooLong": "Máximo 50 caracteres."
-    },
-    "step2": {
-      "heading": "¿Cómo se ve mejor?",
-      "sub": "Puedes cambiarlo después en Settings.",
-      "mode": "Modo",
-      "palette": "Paleta"
-    },
-    "step3": {
-      "heading": "Elige un avatar, {name}.",
-      "sub": "El que se sienta tú."
-    },
-    "step4Beta": {
-      "heading": "Gracias por estar aquí, {name}.",
-      "body": "Estás en el plan {plan}, sin cargo. Eres de los primeros builders probando esto.",
-      "body2": "Si algo se rompe o se siente raro, dímelo. Responde cualquier email que te mande. Los leo todos.",
-      "signoff": "Alfredo",
-      "primary": "Ir al dashboard"
-    },
-    "step4Plan": {
-      "heading": "Elige un plan, o no.",
-      "sub": "Free le funciona a la mayoría que está empezando. Puedes cambiarlo cuando quieras.",
-      "decideLater": "Decidir después",
-      "primary": "Continuar",
-      "currentBadge": "Actual",
-      "selectButton": "Elegir",
-      "selectedButton": "Elegido",
-      "cards": {
-        "free": "Empieza aquí. Sube de plan cuando lo necesites.",
-        "pro": "Más espacio. La IA puede escribir.",
-        "studio": "Sin límites, todo incluido."
-      }
-    },
-    "step5": {
-      "heading": "Haz tuyo el Today.",
-      "sub": "Contadores, foco, rutinas, proyectos dormidos — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
-      "hint": "Es el engrane arriba del Today. Cambia de opinión cuando quieras.",
-      "primary": "Personalizar Today",
-      "later": "Quizás después"
-    },
     "replay": {
       "banner": "Estás editando tu setup. Lo que guardes aplica a tu cuenta.",
       "planHeading": "Tu plan.",
@@ -412,6 +365,53 @@
         "title": "Eso es todo.",
         "body": "Elige un proyecto. De preferencia del que llevas semanas escapando."
       }
+    },
+    "theme": {
+      "heading": "Bienvenido, builder.",
+      "sub": "Esto toma 90 segundos. Empecemos por cómo se ve.",
+      "mode": "Modo",
+      "palette": "Paleta"
+    },
+    "name": {
+      "heading": "¿Cómo te llamo?",
+      "sub": "Solo el nombre. Es como te va a saludar el Today.",
+      "label": "Nombre",
+      "placeholder": "Solo tu nombre",
+      "helperPrefilled": "Lo tomamos de tu cuenta de Google. Edítalo si quieres.",
+      "errorEmpty": "Escribe tu nombre.",
+      "errorTooLong": "Máximo 50 caracteres."
+    },
+    "avatar": {
+      "heading": "Elige un avatar, {name}.",
+      "sub": "El que se sienta tú."
+    },
+    "plan": {
+      "heading": "Elige un plan, o no.",
+      "sub": "Free le funciona a la mayoría que está empezando. Puedes cambiarlo cuando quieras.",
+      "decideLater": "Decidir después",
+      "primary": "Continuar",
+      "currentBadge": "Actual",
+      "selectButton": "Elegir",
+      "selectedButton": "Elegido",
+      "cards": {
+        "free": "Empieza aquí. Sube de plan cuando lo necesites.",
+        "pro": "Más espacio. La IA puede escribir.",
+        "studio": "Sin límites, todo incluido."
+      }
+    },
+    "planBeta": {
+      "heading": "Gracias por estar aquí, {name}.",
+      "body": "Estás en el plan {plan}, sin cargo. Eres de los primeros builders probando esto.",
+      "body2": "Si algo se rompe o se siente raro, dímelo. Responde cualquier email que te mande. Los leo todos.",
+      "signoff": "Alfredo",
+      "primary": "Ir al dashboard"
+    },
+    "customize": {
+      "heading": "Haz tuyo el Today.",
+      "sub": "Contadores, foco, rutinas, proyectos dormidos — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
+      "hint": "Es el engrane arriba del Today. Cambia de opinión cuando quieras.",
+      "primary": "Personalizar Today",
+      "later": "Quizás después"
     }
   },
   "settings": {

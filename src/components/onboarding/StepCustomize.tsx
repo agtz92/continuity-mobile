@@ -15,7 +15,7 @@ import { PrimaryButton } from "./controls";
  *  - replay only: "Watch the dashboard tour again" → `onWatchTour` (moved here
  *    from the plan step so the tour CTA lives on the final screen).
  */
-export function Step5Customize({
+export function StepCustomize({
   replay,
   busy,
   onCustomize,
@@ -35,22 +35,22 @@ export function Step5Customize({
     <View className="gap-6">
       <View className="gap-3">
         <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.step5.heading")}
+          {t("onboarding.customize.heading")}
         </Text>
         <Text className="font-sans text-base leading-relaxed text-text-muted">
-          {t("onboarding.step5.sub")}
+          {t("onboarding.customize.sub")}
         </Text>
       </View>
 
       <View className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4">
         <Settings2 size={20} color={c.textMuted} />
         <Text className="font-sans flex-1 text-sm text-text-muted">
-          {t("onboarding.step5.hint")}
+          {t("onboarding.customize.hint")}
         </Text>
       </View>
 
       <PrimaryButton
-        label={t("onboarding.step5.primary")}
+        label={t("onboarding.customize.primary")}
         onPress={onCustomize}
         busy={busy}
       />
@@ -79,7 +79,7 @@ export function Step5Customize({
         <Text className="font-sans text-sm text-text-muted">
           {replay
             ? t("onboarding.replay.finishButton")
-            : t("onboarding.step5.later")}
+            : t("onboarding.customize.later")}
         </Text>
       </Pressable>
     </View>

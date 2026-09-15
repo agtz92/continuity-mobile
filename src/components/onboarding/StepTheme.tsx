@@ -14,9 +14,9 @@ import { PrimaryButton, Pill } from "./controls";
  * whole app previews the choice instantly (setTheme/setPalette persist locally
  * to AsyncStorage). The flow's onNext mirrors the final pick to the backend via
  * updateNotificationSettings. Swatches preview the accent pair for the active
- * effective theme, matching the web Step2Theme.
+ * effective theme, matching the web StepTheme.
  */
-export function Step2Theme({
+export function StepTheme({
   busy,
   onNext,
 }: {
@@ -30,16 +30,16 @@ export function Step2Theme({
     <View className="gap-6">
       <View className="gap-2">
         <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.step2.heading")}
+          {t("onboarding.theme.heading")}
         </Text>
         <Text className="font-sans text-base text-text-muted">
-          {t("onboarding.step2.sub")}
+          {t("onboarding.theme.sub")}
         </Text>
       </View>
 
       <View className="gap-2">
         <Text className="text-sm font-sans-medium text-text">
-          {t("onboarding.step2.mode")}
+          {t("onboarding.theme.mode")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
           {SUPPORTED_THEMES.map((th) => (
@@ -55,7 +55,7 @@ export function Step2Theme({
 
       <View className="gap-2">
         <Text className="text-sm font-sans-medium text-text">
-          {t("onboarding.step2.palette")}
+          {t("onboarding.theme.palette")}
         </Text>
         <View className="flex-row flex-wrap gap-2">
           {SUPPORTED_PALETTES.map((pl) => {

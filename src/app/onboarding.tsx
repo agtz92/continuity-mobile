@@ -17,11 +17,11 @@ import { supabase } from "@/lib/supabase";
 import { requestCustomize, requestTour } from "@/lib/tour";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { TextButton } from "@/components/onboarding/controls";
-import { Step1Name } from "@/components/onboarding/Step1Name";
-import { Step2Theme } from "@/components/onboarding/Step2Theme";
-import { Step3Avatar } from "@/components/onboarding/Step3Avatar";
-import { Step4Plan } from "@/components/onboarding/Step4Plan";
-import { Step5Customize } from "@/components/onboarding/Step5Customize";
+import { StepTheme } from "@/components/onboarding/StepTheme";
+import { StepName } from "@/components/onboarding/StepName";
+import { StepAvatar } from "@/components/onboarding/StepAvatar";
+import { StepPlan } from "@/components/onboarding/StepPlan";
+import { StepCustomize } from "@/components/onboarding/StepCustomize";
 
 const TOTAL_STEPS = 5;
 
@@ -148,7 +148,7 @@ export default function Onboarding() {
     router.replace("/today");
   };
 
-  // Step 5 primary: complete onboarding, then open the Today layout editor.
+  // Acción principal del paso 5: completar y abrir el editor del Today.
   // First-time runs also skip the tour so the editor doesn't share the screen
   // with the spotlight; replay leaves tour state untouched.
   const finishWithCustomize = async () => {
@@ -165,7 +165,7 @@ export default function Onboarding() {
     }
   };
 
-  // Step 1 → save name, advance.
+  // Paso 2 → guardar nombre, avanzar.
   const handleName = async (value: string) => {
     setBusy(true);
     setName(value);
@@ -175,10 +175,10 @@ export default function Onboarding() {
       /* non-fatal */
     }
     setBusy(false);
-    void goToStep(2);
+    void goToStep(3);
   };
 
-  // Step 2 → persist theme/palette (already applied live), advance.
+  // Paso 1 → persistir tema/paleta (ya aplicados en vivo), avanzar.
   const handleTheme = async (v: { theme: string; palette: string }) => {
     setBusy(true);
     try {
@@ -189,10 +189,10 @@ export default function Onboarding() {
       /* non-fatal */
     }
     setBusy(false);
-    void goToStep(3);
+    void goToStep(2);
   };
 
-  // Step 3 → save avatar (if picked), advance.
+  // Paso 3 → guardar avatar (si eligió), avanzar.
   const handleAvatar = async (avatarId: string | null) => {
     setBusy(true);
     if (avatarId) {
@@ -267,18 +267,18 @@ export default function Onboarding() {
         keyboardShouldPersistTaps="handled"
       >
         {step === 1 && (
-          <Step1Name
+          <StepTheme busy={busy} onNext={(v) => void handleTheme(v)} />
+        )}
+        {step === 2 && (
+          <StepName
             initialName={name || oauthName}
             prefilled={!name && !!oauthName}
             busy={busy}
             onNext={(v) => void handleName(v)}
           />
         )}
-        {step === 2 && (
-          <Step2Theme busy={busy} onNext={(v) => void handleTheme(v)} />
-        )}
         {step === 3 && (
-          <Step3Avatar
+          <StepAvatar
             name={name}
             initialAvatar={state.avatar ?? null}
             busy={busy}
@@ -286,7 +286,7 @@ export default function Onboarding() {
           />
         )}
         {step === 4 && (
-          <Step4Plan
+          <StepPlan
             name={name}
             planLabel={planLabel}
             isExempt={state.isBillingExempt}
@@ -296,7 +296,7 @@ export default function Onboarding() {
           />
         )}
         {step === 5 && (
-          <Step5Customize
+          <StepCustomize
             replay={replay}
             busy={busy}
             onCustomize={() => void finishWithCustomize()}

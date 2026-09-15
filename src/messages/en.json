@@ -311,53 +311,6 @@
     "back": "Back",
     "continue": "Continue",
     "saving": "Saving",
-    "step1": {
-      "heading": "Welcome, builder.",
-      "sub": "This takes 90 seconds. What should I call you?",
-      "label": "First name",
-      "placeholder": "Just your first name",
-      "helperPrefilled": "From your Google account. Edit it if you want.",
-      "errorEmpty": "Type your first name.",
-      "errorTooLong": "50 characters max."
-    },
-    "step2": {
-      "heading": "How should this look?",
-      "sub": "You can change this anytime in Settings.",
-      "mode": "Mode",
-      "palette": "Palette"
-    },
-    "step3": {
-      "heading": "Pick an avatar, {name}.",
-      "sub": "Whichever feels like you."
-    },
-    "step4Beta": {
-      "heading": "Thanks for being here, {name}.",
-      "body": "You're on the {plan} plan, no charge. You're part of the first builders testing this.",
-      "body2": "If something breaks or feels off, tell me. Reply to any email I send. I read all of them.",
-      "signoff": "Alfredo",
-      "primary": "Go to dashboard"
-    },
-    "step4Plan": {
-      "heading": "Pick a plan, or don't.",
-      "sub": "Free works fine for most builders starting out. You can change this whenever.",
-      "decideLater": "Decide later",
-      "primary": "Continue",
-      "currentBadge": "Current",
-      "selectButton": "Select",
-      "selectedButton": "Selected",
-      "cards": {
-        "free": "Start here. Upgrade whenever.",
-        "pro": "More room. AI can write.",
-        "studio": "No limits, all features."
-      }
-    },
-    "step5": {
-      "heading": "Make Today yours.",
-      "sub": "Counters, focus, routines, sleeping projects — Today holds a lot. Keep what matters, hide the rest, drag to reorder.",
-      "hint": "It's the gear at the top of Today. Change your mind whenever.",
-      "primary": "Personalize Today",
-      "later": "Maybe later"
-    },
     "replay": {
       "banner": "Editing your setup. Saving applies to your account.",
       "planHeading": "Your plan.",
@@ -412,6 +365,53 @@
         "title": "That's the tour.",
         "body": "Pick one project. Ideally the one you keep escaping from."
       }
+    },
+    "theme": {
+      "heading": "Welcome, builder.",
+      "sub": "This takes 90 seconds. Let's start with how it looks.",
+      "mode": "Mode",
+      "palette": "Palette"
+    },
+    "name": {
+      "heading": "What should I call you?",
+      "sub": "Just your first name. It's how Today greets you.",
+      "label": "First name",
+      "placeholder": "Just your first name",
+      "helperPrefilled": "From your Google account. Edit it if you want.",
+      "errorEmpty": "Type your first name.",
+      "errorTooLong": "50 characters max."
+    },
+    "avatar": {
+      "heading": "Pick an avatar, {name}.",
+      "sub": "Whichever feels like you."
+    },
+    "plan": {
+      "heading": "Pick a plan, or don't.",
+      "sub": "Free works fine for most builders starting out. You can change this whenever.",
+      "decideLater": "Decide later",
+      "primary": "Continue",
+      "currentBadge": "Current",
+      "selectButton": "Select",
+      "selectedButton": "Selected",
+      "cards": {
+        "free": "Start here. Upgrade whenever.",
+        "pro": "More room. AI can write.",
+        "studio": "No limits, all features."
+      }
+    },
+    "planBeta": {
+      "heading": "Thanks for being here, {name}.",
+      "body": "You're on the {plan} plan, no charge. You're part of the first builders testing this.",
+      "body2": "If something breaks or feels off, tell me. Reply to any email I send. I read all of them.",
+      "signoff": "Alfredo",
+      "primary": "Go to dashboard"
+    },
+    "customize": {
+      "heading": "Make Today yours.",
+      "sub": "Counters, focus, routines, sleeping projects — Today holds a lot. Keep what matters, hide the rest, drag to reorder.",
+      "hint": "It's the gear at the top of Today. Change your mind whenever.",
+      "primary": "Personalize Today",
+      "later": "Maybe later"
     }
   },
   "settings": {

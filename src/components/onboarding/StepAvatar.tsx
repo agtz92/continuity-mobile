@@ -15,9 +15,9 @@ import { PrimaryButton } from "./controls";
  * Step 3 — avatar picker. Same grouped grid as the settings AvatarPickerSheet,
  * but selection is local and only committed on Next (the flow persists it via
  * updateProfile). Avatar is optional — Next proceeds with whatever is selected
- * (or null if untouched), matching the web Step3Avatar.
+ * (or null if untouched), matching the web StepAvatar.
  */
-export function Step3Avatar({
+export function StepAvatar({
   name,
   initialAvatar,
   busy,
@@ -37,10 +37,10 @@ export function Step3Avatar({
     <View className="gap-6">
       <View className="gap-2">
         <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.step3.heading", { name })}
+          {t("onboarding.avatar.heading", { name })}
         </Text>
         <Text className="font-sans text-base text-text-muted">
-          {t("onboarding.step3.sub")}
+          {t("onboarding.avatar.sub")}
         </Text>
       </View>
 

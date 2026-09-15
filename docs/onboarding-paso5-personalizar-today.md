@@ -1,5 +1,11 @@
 # Onboarding · Paso 5 — Personalizar el Today view (móvil)
 
+> **Actualización 2026-09-14.** El orden del flujo cambió (el tema es ahora el
+> paso 1 y el nombre el 2) y los componentes y claves i18n perdieron el número:
+> `Step1Name` → `StepName`, `onboarding.step5` → `onboarding.customize`, etc.
+> Los nombres que cita este documento son los de entonces. Ver
+> `backend/docs/ONBOARDING.md`.
+
 > **Pagos, precios y suscripciones — fuente de verdad:** [Integración de pagos web y móvil](../../backend/docs/integracion-pagos-web-y-movil.md).
 > Lo que este documento diga sobre Stripe, cobros, planes de pago o tiendas es
 > contexto; ante cualquier diferencia, manda ese.

@@ -37,7 +37,7 @@ function ManageBillingLink() {
  * The primary button advances to step 5 (Personalize Today) via `onContinue`;
  * onboarding completion and the "watch tour again" CTA now live on step 5.
  */
-export function Step4Plan({
+export function StepPlan({
   name,
   planLabel,
   isExempt,
@@ -82,16 +82,16 @@ export function Step4Plan({
       <View className="gap-6">
         <View className="gap-3">
           <Text className="text-3xl font-sans-bold text-text">
-            {t("onboarding.step4Beta.heading", { name })}
+            {t("onboarding.planBeta.heading", { name })}
           </Text>
           <Text className="font-sans text-base leading-relaxed text-text-muted">
-            {t("onboarding.step4Beta.body", { plan: planLabel })}
+            {t("onboarding.planBeta.body", { plan: planLabel })}
           </Text>
           <Text className="font-sans text-base leading-relaxed text-text-muted">
-            {t("onboarding.step4Beta.body2")}
+            {t("onboarding.planBeta.body2")}
           </Text>
           <Text className="text-base font-sans-medium text-text">
-            — {t("onboarding.step4Beta.signoff")}
+            — {t("onboarding.planBeta.signoff")}
           </Text>
         </View>
 

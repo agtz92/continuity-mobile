@@ -93,8 +93,12 @@ safe-area.
 
 ## Onboarding (5 pasos) + paso "Personalizar Today"
 
-5 pasos: nombre · tema · avatar · plan · **personalizar Today**. El paso 4 avanza
-al 5 (`onContinue`); el paso 5 (`components/onboarding/Step5Customize.tsx`)
+5 pasos: **tema+paleta · nombre** · avatar · plan · **personalizar Today**. El
+tema va primero desde 2026-09-14 y lleva la bienvenida en su encabezado: se
+elige cómo se ve antes de dar ningún dato. Los componentes y las claves i18n
+**ya no llevan número** (`StepTheme`, `onboarding.theme.*`), justamente para que
+reordenar no obligue a renombrar nada. El paso 4 avanza
+al 5 (`onContinue`); el paso 5 (`components/onboarding/StepCustomize.tsx`)
 completa y abre el editor del Today vía el pub/sub `requestCustomize` de
 `src/lib/tour.ts` (lo consume `(dashboard)/today.tsx` al montar). La ruta de
 personalizar hace `markTour(seen:false)` para que el `DashboardTour` no choque
