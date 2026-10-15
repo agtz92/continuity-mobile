@@ -84,7 +84,8 @@
     },
     "message": {
       "thinking": "Thinking…",
-      "working": "Loop is working…"
+      "working": "Loop is working…",
+      "writing": "Writing {tool}…"
     },
     "tools": {
       "running": "Running",
@@ -111,7 +112,8 @@
       "tooLong": "Message too long.",
       "sessionExpired": "Session expired. Sign in again.",
       "unknown": "Something went wrong.",
-      "planRequired": "Not available on your plan."
+      "planRequired": "Not available on your plan.",
+      "connectionCut": "The connection dropped. Here's what Loop managed to do."
     },
     "markdown": {
       "writingTable": "writing table…",

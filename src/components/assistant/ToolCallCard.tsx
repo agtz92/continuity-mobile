@@ -7,6 +7,11 @@ import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const MONO = Platform.OS === "ios" ? "Courier" : "monospace";
 
+/** Human name of a tool, for the card and the "writing…" line. */
+export function toolLabel(name: string): string {
+  return READABLE_NAME[name] || name;
+}
+
 const READABLE_NAME: Record<string, string> = {
   get_dashboard_summary: "Dashboard summary",
   list_projects: "List projects",

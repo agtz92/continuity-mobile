@@ -5,6 +5,7 @@ import { assistantBaseUrl } from "./assistantApi";
 export type AssistantEventKind =
   | "meta"
   | "text_delta"
+  | "tool_use_pending"
   | "tool_use_start"
   | "tool_result"
   | "usage"
@@ -24,6 +25,15 @@ export type AssistantEvent =
       };
     }
   | { kind: "text_delta"; payload: { text: string } }
+  | {
+      /**
+       * The model started writing a tool call. Its input (a long note, a
+       * detailed prompt) can take a minute to arrive; `tool_use_start`
+       * follows once it is complete and about to run.
+       */
+      kind: "tool_use_pending";
+      payload: { name: string };
+    }
   | {
       kind: "tool_use_start";
       payload: { id: string; name: string; input: Record<string, unknown> };
@@ -67,6 +77,21 @@ export class StreamHttpError extends Error {
     super(`HTTP ${status}`);
     this.status = status;
     this.body = body;
+  }
+}
+
+/**
+ * The stream closed before the server sent `done`: a proxy idle-timeout, a
+ * worker restart, a dropped mobile connection. The turn may have run part
+ * of its tools — the server persists every message as it happens, so the
+ * caller should reload the conversation instead of trusting the bubble.
+ */
+export class StreamCutError extends Error {
+  conversationId: string | null;
+  constructor(conversationId: string | null) {
+    super("Stream ended before `done`");
+    this.name = "StreamCutError";
+    this.conversationId = conversationId;
   }
 }
 
@@ -118,6 +143,13 @@ export async function streamChat(args: StreamArgs): Promise<void> {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let sawDone = false;
+  let conversationId: string | null = args.conversationId ?? null;
+  const onEvent = (event: AssistantEvent) => {
+    if (event.kind === "done") sawDone = true;
+    if (event.kind === "meta") conversationId = event.payload.conversation_id;
+    args.onEvent(event);
+  };
 
   while (true) {
     const { value, done } = await reader.read();
@@ -129,10 +161,12 @@ export async function streamChat(args: StreamArgs): Promise<void> {
     while (frameEnd !== -1) {
       const frame = buffer.slice(0, frameEnd);
       buffer = buffer.slice(frameEnd + 2);
-      dispatch(frame, args.onEvent);
+      dispatch(frame, onEvent);
       frameEnd = buffer.indexOf("\n\n");
     }
   }
+
+  if (!sawDone) throw new StreamCutError(conversationId);
 }
 
 function dispatch(
@@ -148,6 +182,8 @@ function dispatch(
       dataStr += line.slice("data: ".length);
     }
   }
+  // Frames without `event:` — including the `: ping` keepalive comments the
+  // server sends while the model writes a long tool input — carry nothing.
   if (!kind) return;
   try {
     const payload = dataStr ? JSON.parse(dataStr) : {};

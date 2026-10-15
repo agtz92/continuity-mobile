@@ -5,14 +5,17 @@ import { DASHBOARD_QUERY } from "@/lib/graphql";
 import {
   cancelConversation,
   getActions,
+  getMessages,
   getUsage,
   runAction,
   type AssistantMode,
   type CannedGroup,
+  type StoredMessage,
   type UsageSnapshot,
 } from "@/lib/assistantApi";
 import {
   streamChat,
+  StreamCutError,
   StreamHttpError,
   type AssistantEvent,
 } from "@/lib/assistantStream";
@@ -36,6 +39,16 @@ export type AssistantState = {
   conversationId: string | null;
   streaming: boolean;
   error: string | null;
+  /**
+   * The last turn's stream closed before `done`. The thread has been
+   * reloaded from the server, so what is shown is what actually ran.
+   */
+  connectionCut: boolean;
+  /**
+   * Tool the model is writing right now (`tool_use_pending`). Its input can
+   * take a minute to arrive; the UI says "writing…" instead of freezing.
+   */
+  pendingTool: string | null;
   plan: "free" | "pro" | "studio" | "admin";
   /**
    * Which assistant this account gets. Comes from the server so the rule
@@ -52,6 +65,8 @@ const INITIAL: AssistantState = {
   conversationId: null,
   streaming: false,
   error: null,
+  connectionCut: false,
+  pendingTool: null,
   plan: "free",
   mode: null,
   actions: [],
@@ -123,6 +138,7 @@ export function useAssistant() {
         ...s,
         streaming: true,
         error: null,
+        connectionCut: false,
         messages: [
           ...s.messages,
           { id: userId, role: "user", text: trimmed },
@@ -148,6 +164,16 @@ export function useAssistant() {
           content: trimmed,
           signal: ctrl.signal,
           onEvent: (event: AssistantEvent) => {
+            if (event.kind === "tool_use_pending") {
+              const name = event.payload.name;
+              setState((s) => ({ ...s, pendingTool: name }));
+              return;
+            }
+            if (event.kind === "text_delta" || event.kind === "tool_use_start") {
+              setState((s) =>
+                s.pendingTool === null ? s : { ...s, pendingTool: null },
+              );
+            }
             if (event.kind === "meta") {
               setState((s) => ({
                 ...s,
@@ -196,6 +222,29 @@ export function useAssistant() {
       } catch (err) {
         if (ctrl.signal.aborted) {
           setState((s) => ({ ...s, error: i18n.t("assistant.errors.stopped") }));
+        } else if (err instanceof StreamCutError) {
+          // The proxy or the network dropped the turn. The server persists
+          // every message as it happens, so reload the thread instead of
+          // trusting the half-painted bubble — and assume tools ran.
+          usedToolRef.current = true;
+          setState((s) => ({
+            ...s,
+            connectionCut: true,
+            error: i18n.t("assistant.errors.connectionCut"),
+          }));
+          const convId = err.conversationId ?? state.conversationId;
+          if (convId) {
+            try {
+              const stored = await getMessages(convId);
+              setState((s) => ({
+                ...s,
+                conversationId: convId,
+                messages: storedToChat(stored.messages),
+              }));
+            } catch {
+              /* keep what was painted; the error already says it was cut */
+            }
+          }
         } else if (err instanceof StreamHttpError) {
           const body = err.body as { error?: string; kind?: string } | null;
           if (err.status === 429) {
@@ -236,7 +285,7 @@ export function useAssistant() {
         }
       } finally {
         abortRef.current = null;
-        setState((s) => ({ ...s, streaming: false }));
+        setState((s) => ({ ...s, streaming: false, pendingTool: null }));
         refreshUsage();
         // The assistant runs tools server-side that can create/update/delete
         // projects, tasks, ideas, routines, etc. — none of which go through
@@ -318,6 +367,7 @@ export function useAssistant() {
       messages: [],
       conversationId: null,
       error: null,
+      connectionCut: false,
     }));
   }, [state.streaming]);
 
@@ -336,4 +386,65 @@ function replaceLastAssistant(
     }
   }
   return out;
+}
+
+/**
+ * Rebuild the chat from the server's stored rows. One bubble per turn, as
+ * the live stream paints it: every assistant row up to the next user row
+ * folds into a single assistant message, and `tool` rows (tool_result
+ * blocks) fill in the `output` of the tool_use they answer.
+ */
+export function storedToChat(rows: StoredMessage[]): ChatMessage[] {
+  const out: ChatMessage[] = [];
+  let current: { id: string; role: "assistant"; blocks: AssistantBlock[] } | null =
+    null;
+  const blocksOf = (content: unknown): Record<string, unknown>[] =>
+    Array.isArray(content)
+      ? (content as Record<string, unknown>[])
+      : typeof content === "string"
+        ? [{ type: "text", text: content }]
+        : [];
+
+  for (const row of rows) {
+    if (row.role === "user") {
+      current = null;
+      const text = blocksOf(row.content)
+        .filter((b) => b.type === "text")
+        .map((b) => String(b.text ?? ""))
+        .join("");
+      out.push({ id: row.id, role: "user", text });
+      continue;
+    }
+    if (!current) {
+      current = { id: row.id, role: "assistant", blocks: [] };
+      out.push(current);
+    }
+    for (const b of blocksOf(row.content)) {
+      if (row.role === "assistant" && b.type === "text") {
+        current.blocks.push({ type: "text", text: String(b.text ?? "") });
+      } else if (row.role === "assistant" && b.type === "tool_use") {
+        current.blocks.push({
+          type: "tool_use",
+          id: String(b.id),
+          name: String(b.name),
+          input: (b.input as Record<string, unknown>) ?? {},
+        });
+      } else if (row.role === "tool" && b.type === "tool_result") {
+        const target = current.blocks.find(
+          (x) => x.type === "tool_use" && x.id === b.tool_use_id,
+        ) as AssistantToolUseBlock | undefined;
+        if (target) target.output = parseToolOutput(b.content);
+      }
+    }
+  }
+  return out;
+}
+
+function parseToolOutput(content: unknown): unknown {
+  if (typeof content !== "string") return content ?? null;
+  try {
+    return JSON.parse(content);
+  } catch {
+    return content;
+  }
 }

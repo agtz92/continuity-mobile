@@ -12,9 +12,12 @@ export function Message({
    *  final en "incompleto" mientras llegan filas, y aplicarlo a un mensaje ya
    *  cerrado escondería su última tabla. */
   streaming = false,
+  pendingLabel = null,
 }: {
   message: ChatMessage;
   streaming?: boolean;
+  /** "Escribiendo …" mientras llega el input de una tool, en vez de "Pensando…". */
+  pendingLabel?: string | null;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -50,7 +53,7 @@ export function Message({
       <View className="min-w-0 flex-1">
         {isEmpty ? (
           <Text className="font-sans text-xs italic text-text-muted">
-            {t("assistant.message.thinking")}
+            {pendingLabel ?? t("assistant.message.thinking")}
           </Text>
         ) : (
           message.blocks.map((block, i) => {

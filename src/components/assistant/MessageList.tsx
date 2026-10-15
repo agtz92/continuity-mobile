@@ -4,13 +4,17 @@ import { useTranslation } from "react-i18next";
 import type { ChatMessage } from "@/hooks/useAssistant";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { Message } from "./Message";
+import { toolLabel } from "./ToolCallCard";
 
 export function MessageList({
   messages,
   streaming,
+  pendingTool = null,
 }: {
   messages: ChatMessage[];
   streaming: boolean;
+  /** Tool the model is writing (`tool_use_pending`), if any. */
+  pendingTool?: string | null;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -26,6 +30,12 @@ export function MessageList({
   // fills every OTHER silent gap (between tool rounds) so the user always has a
   // sign Claude is still busy.
   const showWorking = streaming && lastBlocks.length > 0 && !toolRunning;
+  // A long tool input (note bodies, prompts) can take a minute to write.
+  // Naming it beats a generic "working" that looks frozen.
+  const pendingLabel =
+    streaming && pendingTool
+      ? t("assistant.message.writing", { tool: toolLabel(pendingTool) })
+      : null;
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
@@ -47,6 +57,7 @@ export function MessageList({
           key={m.id}
           message={m}
           streaming={streaming && m.id === last?.id}
+          pendingLabel={m.id === last?.id ? pendingLabel : null}
         />
       ))}
       {showWorking && (
@@ -66,7 +77,7 @@ export function MessageList({
             />
           </View>
           <Text className="font-sans text-xs text-text-muted">
-            {t("assistant.message.working")}
+            {pendingLabel ?? t("assistant.message.working")}
           </Text>
         </View>
       )}

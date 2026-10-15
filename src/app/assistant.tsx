@@ -41,6 +41,7 @@ export default function AssistantScreen() {
     messages,
     streaming,
     error,
+    pendingTool,
     plan,
     mode,
     actions,
@@ -149,7 +150,11 @@ export default function AssistantScreen() {
             />
           </View>
         ) : (
-          <MessageList messages={messages} streaming={streaming} />
+          <MessageList
+            messages={messages}
+            streaming={streaming}
+            pendingTool={pendingTool}
+          />
         )}
 
         {error && !isLocked && (
