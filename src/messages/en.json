@@ -1073,7 +1073,13 @@
         "logUpdate": "Log update",
         "noUpdates": "No updates logged",
         "editTaskAria": "Edit task",
-        "deleteTaskAria": "Delete task"
+        "deleteTaskAria": "Delete task",
+        "dragTask": "Long-press to reorder",
+        "dateAutoSet": "Due date set: {date}",
+        "moveDateTitle": "Change the due date of “{title}”?",
+        "moveDateBody": "It moved to a new spot in the list. It would go from {from} to {to}.",
+        "moveDateConfirm": "Change date",
+        "moveDateKeep": "Keep date"
       },
       "emptyBody": "A project is anything with more than one step and a reason to exist. Write the first one down before it turns into a note you never find again.",
       "hiddenCount": "{count, plural, one {# project hidden by the filters} other {# projects hidden by the filters}}"

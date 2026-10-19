@@ -100,6 +100,8 @@ export interface Task {
   blockedSince?: string | null;
   /** Por qué está detenida — lo que de verdad desatasca. */
   blockedReason?: string | null;
+  /** Orden manual dentro del proyecto (drag & drop del detalle). */
+  position?: number;
 }
 
 export interface Idea {

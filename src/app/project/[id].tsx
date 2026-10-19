@@ -12,15 +12,24 @@ import {
   projectDays,
   taskIsBlocked,
 } from "@/lib/cooling";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+  ScaleDecorator,
+  type RenderItemParams,
+} from "react-native-draggable-flatlist";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Pencil, Plus, Trash2 } from "lucide-react-native";
+import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { ProjectStatus, Task } from "@/lib/types";
 import { priorityFill } from "@/lib/priority";
-import { confirmAsync } from "@/lib/confirm";
+import { askAsync, confirmAsync } from "@/lib/confirm";
 import { todayLocalISODate } from "@/lib/date";
 import { toast } from "@/lib/toast";
+import { selectionFeedback } from "@/lib/feedback";
+import { byManualOrder, suggestDueDateAfterMove } from "@/lib/taskOrder";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
@@ -91,7 +100,7 @@ export default function ProjectDetail() {
 
   const { projects, tasks, activities, notesByProject, categoryById, initialLoading } =
     useDashboardData();
-  const { toggleTask, deleteTask, saveTask } = useTaskMutations();
+  const { toggleTask, deleteTask, saveTask, reorderProjectTasks } = useTaskMutations();
   const { deleteProject } = useProjectMutations();
   const { remove: removeNote } = useProjectNoteMutations();
   const closure = useProjectClosure();
@@ -106,7 +115,8 @@ export default function ProjectDetail() {
 
   const project = projects.find((p) => p.id === id);
   const projectTasks = tasks.filter((tk) => tk.projectId === id);
-  const pending = projectTasks.filter((tk) => !tk.done);
+  // Pendientes en orden manual (arrastrables); hechas debajo por fecha de cierre.
+  const pending = projectTasks.filter((tk) => !tk.done).sort(byManualOrder);
   // "Atorado" no es un estado del modelo: se deriva de tareas abiertas con
   // blocker. La razón es lo que de verdad desatasca — "bloqueado" no le dice
   // a nadie qué hacer, "esperando el contrato firmado" sí.
@@ -182,6 +192,47 @@ export default function ProjectDetail() {
       effortHours: task.effortHours,
     });
     if (ok) toast.success(t("taskRow.movedToast"), 2000);
+  };
+
+  // Mover cuenta como replanear: la tarea toma la fecha de la vecina que
+  // rebasó. Sin fecha propia se aplica sola; con fecha, se pregunta (y solo si
+  // quedó fuera de orden). Misma regla que la web (`suggestDueDateAfterMove`).
+  const fmtDay = (iso: string) =>
+    new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short" });
+  const rescheduleAfterMove = async (
+    task: Task,
+    ordered: Task[],
+    direction: "up" | "down"
+  ) => {
+    const dueDate = suggestDueDateAfterMove(ordered, task.id, direction);
+    if (!dueDate) return;
+    const apply = () =>
+      saveTask({
+        id: task.id,
+        title: task.title,
+        projectId: task.projectId,
+        dueDate,
+        done: task.done,
+        effortHours: task.effortHours,
+        dueTime: task.dueTime,
+        durationMinutes: task.durationMinutes,
+      });
+    if (!task.dueDate) {
+      if (await apply()) {
+        toast.success(t("views.projects.card.dateAutoSet", { date: fmtDay(dueDate) }), 2000);
+      }
+      return;
+    }
+    const ok = await askAsync(
+      t("views.projects.card.moveDateTitle", { title: task.title }),
+      t("views.projects.card.moveDateBody", {
+        from: fmtDay(task.dueDate),
+        to: fmtDay(dueDate),
+      }),
+      t("views.projects.card.moveDateConfirm"),
+      t("views.projects.card.moveDateKeep")
+    );
+    if (ok) await apply();
   };
 
   const renderTask = (task: Task) => (
@@ -284,7 +335,10 @@ export default function ProjectDetail() {
           ),
         }}
       />
-      <ScrollView contentContainerClassName="gap-5 p-5">
+      <GestureHandlerRootView className="flex-1 bg-bg">
+      {/* NestableScrollContainer en vez de ScrollView: deja que la lista de
+          pendientes se arrastre (long-press en ⠿) sin pelearse con el scroll. */}
+      <NestableScrollContainer contentContainerStyle={{ gap: 20, padding: 20 }}>
         {/* Cabecera del rediseño: espina + nombre en display, y debajo la fila
             de metadatos. El nombre estaba SOLO en el header de navegación, que
             lo trunca; aquí es lo primero que se lee. La regla de enfriamiento
@@ -395,15 +449,46 @@ export default function ProjectDetail() {
             </Text>
           ) : (
             <View className="gap-2">
-              {pending.map((task) => (
-                <View key={task.id}>{renderTask(task)}</View>
-              ))}
-              <ShowMoreList
-                items={completed}
-                initialCount={5}
-                itemKey={(task) => task.id}
-                renderItem={(task) => renderTask(task)}
+              <NestableDraggableFlatList
+                data={pending}
+                keyExtractor={(tk) => tk.id}
+                contentContainerStyle={{ gap: 8 }}
+                onDragEnd={({ data, from, to }) => {
+                  if (from === to) return;
+                  selectionFeedback();
+                  void reorderProjectTasks(
+                    project.id,
+                    data.map((tk) => tk.id)
+                  );
+                  void rescheduleAfterMove(pending[from], data, to < from ? "up" : "down");
+                }}
+                renderItem={({ item, drag, isActive }: RenderItemParams<Task>) => (
+                  <ScaleDecorator>
+                    <View className="flex-row items-center gap-1.5">
+                      <Pressable
+                        onLongPress={drag}
+                        delayLongPress={150}
+                        disabled={isActive}
+                        hitSlop={8}
+                        accessibilityLabel={t("views.projects.card.dragTask")}
+                        className="py-2"
+                      >
+                        <GripVertical size={16} color={c.textMuted} />
+                      </Pressable>
+                      <View className="flex-1">{renderTask(item)}</View>
+                    </View>
+                  </ScaleDecorator>
+                )}
               />
+              {/* Sangría = ancho del handle ⠿, para alinear con las pendientes. */}
+              <View className="gap-2" style={{ paddingLeft: 22 }}>
+                <ShowMoreList
+                  items={completed}
+                  initialCount={5}
+                  itemKey={(task) => task.id}
+                  renderItem={(task) => renderTask(task)}
+                />
+              </View>
             </View>
           )}
           <Pressable
@@ -515,7 +600,8 @@ export default function ProjectDetail() {
             </Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </NestableScrollContainer>
+      </GestureHandlerRootView>
 
       <ProjectStatusSheet
         visible={statusSheet}

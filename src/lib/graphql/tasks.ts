@@ -12,6 +12,7 @@ export const CREATE_TASK = gql`
       completedAt
       created
       effortHours
+      position
       blockers {
         ${TASK_BLOCKER_FIELDS}
       }
@@ -31,6 +32,7 @@ export const UPDATE_TASK = gql`
       completedAt
       created
       effortHours
+      position
       blockers {
         ${TASK_BLOCKER_FIELDS}
       }
@@ -81,3 +83,14 @@ export const DELETE_TASK = gql`
 `;
 
 // ===== Ideas =====
+
+
+/** Orden manual de las tareas de un proyecto (drag & drop del detalle). */
+export const REORDER_PROJECT_TASKS = gql`
+  mutation ReorderProjectTasks($projectId: ID!, $orderedIds: [ID!]!) {
+    reorderProjectTasks(projectId: $projectId, orderedIds: $orderedIds) {
+      id
+      position
+    }
+  }
+`;

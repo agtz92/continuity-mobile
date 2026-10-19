@@ -64,3 +64,26 @@ export function choiceAsync(
     );
   });
 }
+
+/**
+ * Pregunta neutral de sí/no (sin estilo destructivo ni háptica de borrado), p.
+ * ej. "¿cambiar la fecha?" al reordenar tareas. Cerrar el alert cuenta como no.
+ */
+export function askAsync(
+  title: string,
+  message: string | undefined,
+  confirmLabel: string,
+  cancelLabel: string,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: cancelLabel, style: "cancel", onPress: () => resolve(false) },
+        { text: confirmLabel, onPress: () => resolve(true) },
+      ],
+      { cancelable: true, onDismiss: () => resolve(false) },
+    );
+  });
+}

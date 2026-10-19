@@ -45,6 +45,7 @@ export const DASHBOARD_QUERY = gql`
         durationMinutes
         blockedSince
         blockedReason
+        position
         blockers {
           id
           blockedTaskId
