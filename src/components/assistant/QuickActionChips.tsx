@@ -16,7 +16,7 @@ const PROMPTS: Record<ActionKey, string> = {
   priorities:
     "Suggest priorities for this week based on my projects and overdue tasks.",
   sleeping:
-    "Summarize my sleeping projects and suggest one small next step for each.",
+    "Summarize my stalled projects and suggest one small next step for each.",
   lastWeek: "What did I work on in the last 7 days?",
   staleIdeas:
     "Show me stale ideas (older than 30 days) and tell me which look most promising.",

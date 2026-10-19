@@ -3,7 +3,7 @@
     "title": "Reportar un bug",
     "description": "¿Algo no funciona? Cuéntanos qué pasó — llega directo a nuestro equipo. Este buzón es de un solo sentido, así que no recibirás respuesta aquí.",
     "topicLabel": "Tema",
-    "topicPlaceholder": "Elige un tema o escribe el tuyo",
+    "topicPlaceholder": "Elige un tema o escribe el tuyo…",
     "searchPlaceholder": "Busca o escribe un tema…",
     "useTyped": "Usar «{query}»",
     "messageLabel": "¿Qué pasó?",
@@ -94,7 +94,7 @@
     },
     "quickActions": {
       "priorities": "Prioridades de esta semana",
-      "sleeping": "Resumen de proyectos dormidos",
+      "sleeping": "Resumen de proyectos estancados",
       "lastWeek": "¿En qué trabajé la semana pasada?",
       "staleIdeas": "Mostrar ideas estancadas"
     },
@@ -412,7 +412,7 @@
     },
     "customize": {
       "heading": "Haz tuyo el Today.",
-      "sub": "Contadores, foco, rutinas, proyectos dormidos — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
+      "sub": "Contadores, foco, rutinas, proyectos estancados — el Today muestra mucho. Deja lo que importa, oculta el resto, arrastra para reordenar.",
       "hint": "Es el engrane arriba del Today. Cambia de opinión cuando quieras.",
       "primary": "Personalizar Today",
       "later": "Quizás después"
@@ -662,7 +662,7 @@
       "dailyDigestToggle": "Enviarme los pendientes de hoy",
       "dailyDigestHint": "Llega cada día a la hora que elijas con tus tareas vencidas y las que vencen hoy.",
       "otherNotifications": "Otras notificaciones",
-      "sleepingAlertsToggle": "Alertas de proyectos durmientes (≥7, 14, 30 días)",
+      "sleepingAlertsToggle": "Alertas de proyectos estancados (≥7, 14, 30 días)",
       "dueRemindersToggle": "Aviso de pendientes a fin de día",
       "dueReminderHour": "Hora del aviso (local)",
       "dueRemindersHint": "A la hora elegida, si aún quedan tareas o rutinas abiertas hoy, te llega un recordatorio. Si todo está cerrado, no se envía nada.",
@@ -691,7 +691,7 @@
       "backlog": "Backlog",
       "weekday": "Días",
       "topProjects": "Top",
-      "sleeping": "Durmiendo",
+      "sleeping": "Estancados",
       "funnel": "Embudo",
       "effort": "Esfuerzo"
     },
@@ -758,9 +758,9 @@
       "almostThereHint": "≥80% completado"
     },
     "sleeping": {
-      "title": "Durmiendo",
+      "title": "Estancados",
       "subtitle": "Proyectos sin actividad reciente (≥7 días)",
-      "empty": "Nada durmiendo. Buen ritmo."
+      "empty": "Nada estancado. Buen ritmo."
     },
     "stale": {
       "title": "Ideas estancadas",
@@ -1195,7 +1195,7 @@
       "patternTitle": "Patrón en tu cementerio",
       "noPatternTitle": "Aún no hay patrón",
       "noPatternBody": "Cuando tengas 3 proyectos cancelados, Loop busca patrones en lo que no funcionó.",
-      "empty": "Aún no hay nada aquí. Los proyectos cancelados llegan al cementerio como una biblioteca de lo que no funcionó.",
+      "empty": "Aquí no hay nada enterrado todavía. Los proyectos que matas con intención llegan al cementerio, con notas y todo.",
       "wouldRestartCount": "reiniciarías {count} de {total}",
       "lived": "vivió {count, plural, one {# día} other {# días}}",
       "wouldRestartBadge": "reiniciarías",
@@ -1205,7 +1205,7 @@
       "ai": "IA",
       "revive": "Revivir",
       "askLoop": "Pídele a Loop que profundice",
-      "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué cancelo mis proyectos?"
+      "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué mato mis proyectos?"
     },
     "projectDetail": {
       "statusAction": {
@@ -1526,286 +1526,7 @@
     }
   },
   "landing": {
-    "meta": {
-      "title": "continuu.it — Termina lo que empiezas",
-      "description": "El gestor de proyectos para quienes empiezan más de lo que terminan. Pensado para founders, freelancers y constructores de side projects que abandonan justo lo que más importa."
-    },
-    "nav": {
-      "features": "Cómo funciona",
-      "pricing": "Precios",
-      "blog": "Blog",
-      "beta": "Beta",
-      "signIn": "Iniciar sesión",
-      "dashboard": "Ir al dashboard",
-      "ctaShort": "Unirme a la beta"
-    },
-    "hero": {
-      "eyebrow": "En beta privada. Quedan 50 lugares.",
-      "headline": "Termina lo que empiezas.",
-      "subheadline": "El gestor de proyectos para quienes empiezan más de lo que terminan. Para founders, freelancers y constructores de side projects que siguen abandonando lo que más importa.",
-      "ctaPrimary": "Acceder a la beta — gratis",
-      "ctaSecondary": "Sin tarjeta. Gratis de por vida para los primeros 50.",
-      "scrollHint": "Mira cómo funciona"
-    },
-    "recognition": {
-      "headline": "Tienes un cementerio de proyectos a medias. No estás solo. No eres flojo.",
-      "p1": "Abre tu Notion. Cuenta los documentos a medio escribir.",
-      "p2": "Abre tu GitHub. Cuenta los repos privados.",
-      "p3": "Abre tus marcadores. Cuenta las herramientas que compraste y nunca abriste.",
-      "p4": "No te falta motivación. No te falta inteligencia. No te falta disciplina.",
-      "p5": "Has estado usando herramientas de productividad diseñadas para el problema equivocado.",
-      "callout": "Cinco meses en un ERP que nunca desplegué. Una agencia mientras mis propios sitios se quedaban viejos. Una app de fantasy football mientras mi equipo me esperaba. Tres semanas codeando alrededor de un bug de 30 minutos.",
-      "calloutAuthor": "Alfredo, fundador de continuu.it",
-      "readManifesto": "Lee el manifiesto completo del fundador"
-    },
-    "diagnosis": {
-      "headline": "Cada herramienta de productividad se diseñó para ayudarte a empezar. Ninguna se diseñó para ayudarte a terminar.",
-      "p1": "Todoist hace que agregar una tarea sea sin fricción. Notion hace que abrir un doc se sienta elegante. Things hace que planear un proyecto sea satisfactorio.",
-      "p2": "Todas premian el dopaminazo de empezar.",
-      "p3": "Por eso tienes 47 proyectos, 12 sistemas y 3 apps de productividad abiertas ahora mismo, y sigues sintiendo que vas atrasado en todo.",
-      "p4": "El problema no es capturar. Es cerrar.",
-      "compare": {
-        "othersTitle": "Otras herramientas",
-        "usTitle": "continuu.it",
-        "rows": [
-          {
-            "others": "Capturar más",
-            "us": "Terminar más"
-          },
-          {
-            "others": "Planear más",
-            "us": "Cerrar bucles"
-          },
-          {
-            "others": "Agregar proyectos nuevos",
-            "us": "Confrontar los viejos"
-          },
-          {
-            "others": "Optimizar para empezar",
-            "us": "Optimizar para terminar"
-          }
-        ]
-      }
-    },
-    "promise": {
-      "eyebrow": "Te presentamos continuu.it",
-      "headline": "El gestor de proyectos que cierra el bucle.",
-      "p1": "continuu.it es la primera herramienta diseñada en torno a un solo principio: cada proyecto que empiezas tiene que llegar a una decisión.",
-      "p2": "Terminado. Cancelado. Pausado a propósito.",
-      "p3": "Nunca abandonado. Nunca a la deriva. Nunca perdido en el cementerio del 'algún día le entro'.",
-      "p4": "Porque el costo del trabajo a medias no es tiempo. Es posición competitiva. Es confianza. Es la erosión lenta de tu relación con tus propias ideas.",
-      "p5": "Construimos continuu.it para devolverte eso.",
-      "cta": "Acceder a la beta"
-    },
-    "features": {
-      "intro": {
-        "eyebrow": "Así lo vas a usar",
-        "headline": "Seis rituales que convierten la deriva en trabajo enviado."
-      },
-      "forcedClosure": {
-        "label": "Cierre forzado",
-        "headline": "Ningún proyecto a la deriva. Nunca.",
-        "body": "Cada proyecto vive en uno de cuatro estados: Activo, Pausado, Cancelado o Terminado. Después de 14 días en silencio, continuu.it te pregunta cuál es. La deriva es lo que mata a quien construye. Nosotros no la dejamos pasar.",
-        "demo": {
-          "projectTitle": "Rediseño de landing page",
-          "daysSilent": "14 días sin tocarlo",
-          "prompt": "Llevas 14 días sin tocar esto. ¿Listo para enviarlo? ¿Necesitas ayuda? ¿O este proyecto ya terminó?",
-          "ship": "Enviarlo",
-          "help": "Necesito ayuda",
-          "kill": "Cancelar"
-        }
-      },
-      "aiChat": {
-        "label": "Chat con IA",
-        "headline": "Cuéntale a la IA qué estás construyendo. Lo divide en tareas que sí te mueven.",
-        "body": "No plantillas genéricas tipo 'Planear, Construir, Probar, Lanzar'. Pasos reales, específicos y accionables para tu proyecto, tu stack, tu alcance. Solo tienes que ser honesto con lo que quieres construir.",
-        "demo": {
-          "projectTitle": "Proyecto: Landing page de SaaS",
-          "userMessage": "Quiero hacer una landing page para mi SaaS en Next.js, pero siempre me trabo en por dónde empezar.",
-          "aiResponse": "Listo. Tres preguntas rápidas:",
-          "questions": [
-            "¿Ya tienes el copy escrito o empiezas desde el mensaje?",
-            "¿Usas un design system o partes de cero?",
-            "¿Cuál es tu fecha objetivo?"
-          ],
-          "footer": "Con esto te lo divido en 8–12 tareas ordenadas por qué desbloquea qué.",
-          "tag": "Asistente IA"
-        },
-        "closing": "La mayoría de los proyectos no mueren por falta de esfuerzo. Mueren por falta de estructura. Eso lo arreglamos el día uno."
-      },
-      "resumeContext": {
-        "label": "Retomar con contexto",
-        "headline": "Vuelve a tus proyectos sin perder dónde te quedaste.",
-        "body": "Pausaste un proyecto hace tres semanas. Estás listo para retomarlo. Pero ya no recuerdas dónde estabas, qué decidiste y qué te bloqueaba. Por eso no lo retomas. continuu.it resuelve eso.",
-        "demo": {
-          "title": "Bienvenido de vuelta a Rediseño de landing",
-          "lastWorked": "Última vez que trabajaste aquí: hace 23 días.",
-          "nextActionLabel": "Tu siguiente acción era:",
-          "nextAction": "Escribir el copy del hero para la sección de precios",
-          "blockersLabel": "Bloqueos abiertos:",
-          "blockers": [
-            "Estrategia de precios sin definir",
-            "Design tokens sin migrar a v2",
-            "Video demo pendiente de grabar"
-          ],
-          "decisionsLabel": "Decisiones que ya habías tomado:",
-          "decisions": [
-            "Stripe en lugar de Lemon Squeezy",
-            "Tres tiers, descuento anual"
-          ]
-        },
-        "closing": "El costo de regresar baja a cero. Proyectos que dabas por muertos empiezan a terminarse solos."
-      },
-      "notifications": {
-        "label": "Telegram",
-        "headline": "Despierta a tu día. Recibe el recordatorio antes de perderlo.",
-        "body": "continuu.it te alcanza donde ya estás. Cada mañana, a la hora que elijas, te llega un resumen enfocado en Telegram o por correo. Tú decides qué te avisa y cuándo.",
-        "demo": {
-          "botName": "Bot de continuu.it",
-          "greeting": "Buenos días, Alfredo.",
-          "todayLabel": "Pendientes de hoy:",
-          "topPriorityLabel": "Prioridad alta",
-          "topPriority": "Terminar el hero de la landing page",
-          "topPriorityNote": "Activo 5 días, te comprometiste a enviarlo esta semana",
-          "secondaryLabel": "Secundario",
-          "secondary": [
-            "Revisar tracking de conversión en GTM",
-            "Responder feedback de beta testers"
-          ],
-          "footer": "Responde STATUS para el reporte completo.",
-          "userReply": "STATUS"
-        },
-        "closing": "Las notificaciones funcionan cuando viven donde ya está tu atención."
-      },
-      "friction": {
-        "label": "Fricción donde importa",
-        "headline": "Las ideas nuevas tienen fricción. Los compromisos viejos no.",
-        "body": "Cada vez que agregas un proyecto nuevo en continuu.it, ves todos los proyectos activos que ya tienes. No para abandonarlos. Solo para reconocerlos. Para tomar una decisión.",
-        "demo": {
-          "newProjectLabel": "Nuevo proyecto",
-          "newProjectPlaceholder": "Herramienta de automatización para indie hackers…",
-          "modalTitle": "Antes de empezar uno nuevo…",
-          "modalBody": "Ya tienes 4 proyectos activos. ¿Qué decisión estás tomando?",
-          "activeProjects": [
-            {
-              "name": "Rediseño de landing page",
-              "status": "5 días activo"
-            },
-            {
-              "name": "Bot de Telegram v2",
-              "status": "12 días pausado"
-            },
-            {
-              "name": "Migración del newsletter",
-              "status": "23 días activo"
-            },
-            {
-              "name": "App de fantasy football",
-              "status": "47 días a la deriva"
-            }
-          ],
-          "continueNew": "Empezar igual",
-          "pauseExisting": "Pausar uno primero",
-          "reconsider": "Reconsiderar"
-        },
-        "closing": "Muchas veces, la decisión es enviar uno de ellos primero."
-      },
-      "sundayReview": {
-        "label": "Revisión del domingo",
-        "headline": "La hora más importante de tu semana.",
-        "body": "Cada domingo a la hora que elijas, continuu.it te hace cinco preguntas. Diez minutos. Un ritual. El mecanismo que evita que el próximo viernes sea copia del anterior.",
-        "demo": {
-          "title": "Revisión del domingo",
-          "subtitle": "Cinco preguntas. Diez minutos.",
-          "questions": [
-            "¿Qué enviaste esta semana?",
-            "¿Qué evitaste?",
-            "¿Qué bloqueo se te repite?",
-            "¿Con qué te comprometes la próxima semana?",
-            "¿Qué vas a soltar?"
-          ],
-          "placeholder": "Escribe tu respuesta…",
-          "cta": "Siguiente pregunta"
-        },
-        "closing": "No inventamos la revisión semanal. Solo la hicimos imposible de saltarse."
-      }
-    },
-    "loopSociety": {
-      "eyebrow": "Las matemáticas del trabajo a medias",
-      "headline": "Cada builder carga un cementerio.",
-      "subheadline": "El patrón se repite. Los números no mienten.",
-      "body": "Este es el contorno del problema — la gravedad contra la que diseñamos continuu.it.",
-      "stats": {
-        "one": {
-          "value": "47",
-          "label": "Proyectos abiertos",
-          "body": "El número de proyectos a medias que el builder promedio carga en la cabeza. La mayoría nunca llega a una decisión."
-        },
-        "two": {
-          "value": "3 semanas",
-          "label": "Media vida",
-          "body": "El punto donde un side project pasa de \"sigo en eso\" a \"ya le entro después\" — y nunca regresa."
-        },
-        "three": {
-          "value": "4 herramientas",
-          "label": "Abiertas ahora mismo",
-          "body": "Apps de productividad peleando por tu atención. Ninguna está diseñada para cerrar un bucle. Todas premian empezar."
-        },
-        "four": {
-          "value": "0 apps",
-          "label": "Hasta ahora",
-          "body": "Construidas alrededor del cierre forzado. Todas las demás herramientas hacen más fácil empezar. Nosotros hacemos que terminar sea la única salida."
-        }
-      }
-    },
-    "howItWorks": {
-      "headline": "Cómo funciona continuu.it",
-      "steps": [
-        {
-          "title": "Trae lo que ya estás construyendo.",
-          "body": "Agrega tus proyectos a medias. El repo. El doc de Notion. El side hustle. Después platica con la IA para dividir cada uno en tareas que tengan sentido."
-        },
-        {
-          "title": "Deja que el sistema te alcance donde estás.",
-          "body": "Recibe tu briefing matutino en Telegram. Define horarios de recordatorio. Retoma proyectos pausados con contexto de IA. Cerramos el bucle del follow-up para que tú te quedes en el flujo de construir."
-        },
-        {
-          "title": "Aparécete los domingos. Toma decisiones.",
-          "body": "continuu.it empuja, resume, recuerda y ritualiza. Tú solo tienes que responder cinco preguntas cada domingo y elegir qué sigue."
-        }
-      ],
-      "cta": "Empieza tu beta — gratis de por vida"
-    },
-    "beta": {
-      "eyebrow": "En beta privada",
-      "headline": "50 lugares. Acceso Pro gratis de por vida.",
-      "body": "Dejamos entrar a los primeros 50 builders para probar continuu.it antes del lanzamiento público. A cambio de tu feedback honesto, recibes:",
-      "perks": [
-        "Acceso de por vida al tier Pro ($89.99/año de valor)",
-        "Línea directa con el fundador para pedir features",
-        "Influencia sobre lo que construimos a continuación",
-        "Insignia de miembro fundador en tu perfil",
-        "Acceso temprano a los avatares Premium de la Loop Society"
-      ],
-      "footer": "Los lugares se llenan por orden de llegada. Buscamos builders capaces de decirnos qué les gusta y qué no. Sin paja. Solo builders dispuestos a ayudarnos a construir.",
-      "cta": "Apartar mi lugar",
-      "counter": {
-        "claimed": "{taken} / {total} lugares apartados",
-        "almostFull": "Casi lleno",
-        "live": "En vivo"
-      }
-    },
     "pricing": {
-      "headline": "Elige el plan que termina contigo.",
-      "subheadline": "Empieza gratis. Sube cuando lo necesites.",
-      "monthly": "/mes",
-      "yearly": "/año",
-      "popular": "Más popular",
-      "billingToggle": {
-        "monthly": "Mensual",
-        "annual": "Anual",
-        "annualHint": "Ahorra ~22% pagando anual"
-      },
       "tiers": {
         "free": {
           "name": "Free",
@@ -1858,56 +1579,7 @@
           ],
           "cta": "Probar Studio 14 días gratis"
         }
-      },
-      "betaBanner": "Los usuarios beta se quedan con Studio gratis, de por vida. Sin truco. Solo feedback.",
-      "betaCta": "Solicitar acceso a la beta"
-    },
-    "finalCall": {
-      "headlineLine1": "El cementerio de proyectos a medias en tu cabeza no es tu fracaso.",
-      "headlineLine2": "Es un problema estructural de cómo se diseñó la productividad.",
-      "p1": "Te dieron herramientas para empezar. No te dieron herramientas para cerrar el bucle.",
-      "p2": "Claro que tienes un cementerio. El sistema que te entregaron construye cementerios.",
-      "p3": "¿Y si dejaras de aceptarlo?",
-      "p4": "¿Y si decidieras, hoy, hacer algo con las diecisiete cosas que empezaste y nunca terminaste?",
-      "p5": "Aunque sea una. Elige una. Ábrela. Decide si vive o muere. Toma la decisión.",
-      "p6": "Ese es todo el juego. El resto de tu vida es consecuencia de ese hábito.",
-      "cta": "Unirme a la beta",
-      "subCta": "Gratis de por vida. Sin tarjeta. 50 lugares.",
-      "tagline": "Termina lo que empiezas."
-    },
-    "footer": {
-      "tagline": "Termina lo que empiezas.",
-      "product": "Producto",
-      "productLinks": {
-        "features": "Cómo funciona",
-        "pricing": "Precios",
-        "manifesto": "Manifiesto del fundador"
-      },
-      "community": "Comunidad",
-      "communityLinks": {
-        "reddit": "r/Continuuit",
-        "twitter": "Twitter / X",
-        "newsletter": "Newsletter"
-      },
-      "company": "Compañía",
-      "companyLinks": {
-        "about": "Sobre nosotros",
-        "contact": "hello@continuu.it"
-      },
-      "copyright": "© {year} continuu.it"
-    },
-    "langSwitcher": {
-      "ariaLabel": "Cambiar idioma",
-      "en": "English",
-      "es": "Español"
-    },
-    "blog": {
-      "eyebrow": "Notas del fundador",
-      "title": "Blog",
-      "subtitle": "Cómo dejar de huir del trabajo que importa. Reflexiones honestas sobre construir, abandonar y terminar.",
-      "empty": "Aún no hay entradas publicadas.",
-      "readMore": "Leer la entrada",
-      "backToBlog": "Volver al blog"
+      }
     }
   },
   "blocker": {
@@ -1916,7 +1588,7 @@
     "blocksTasks": "{count, plural, one {bloquea # tarea} other {bloquea # tareas}}"
   },
   "category": {
-    "none": "suelta"
+    "none": "sin categoría"
   },
   "progressTicks": {
     "label": "{done}/{total} tareas · {pct}%",

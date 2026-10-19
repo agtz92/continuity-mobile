@@ -95,6 +95,18 @@ npm run check-parity
 
 Sale != 0 en cuanto un hex de `src/theme/tokens.ts` o `src/palette/config.ts` se separa del de web.
 
+## Textos (i18n): no diverjas de web
+
+Mapa completo de dónde vive cada texto: [`../docs/i18n.md`](../docs/i18n.md). Si cambias un texto
+que también existe en `frontend/messages/`, alinéalo y corre:
+
+```bash
+npm run check-i18n
+```
+
+Sale != 0 si la misma clave dice otra cosa en web. Las diferencias intencionales van en
+`scripts/i18n-parity-allow.json` con su motivo.
+
 ## Memoria del proyecto
 
 Gotchas + decisiones acumuladas (para Claude Code): `C:\Users\alfre\.claude\projects\C--GitHub-continuity\memory\project_mobile_app.md`.

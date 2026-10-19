@@ -70,7 +70,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "check-parity": "node scripts/check-tokens.mjs"
+    "check-parity": "node scripts/check-tokens.mjs",
+    "check-i18n": "node scripts/check-i18n.mjs"
   },
   "private": true
 }

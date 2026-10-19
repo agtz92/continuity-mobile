@@ -1,0 +1,23 @@
+{
+  "views.today.customize.dragToReorder": "gesto táctil: en móvil es mantener presionado",
+  "views.projects.manualHint": "gesto táctil: en móvil es mantener presionado",
+  "views.projects.manualFilteredHint": "gesto táctil: no hay handle de arrastre en móvil",
+  "views.projects.card.dragTask": "gesto táctil: en móvil es mantener presionado",
+  "views.today.customize.hiddenFooter": "más corto por el ancho del teléfono",
+  "views.graveyard.title": "más corto por el header nativo",
+  "views.graveyard.lived": "móvil pasa {count} con plural; web pasa {days}",
+  "views.graveyard.wouldRestart": "en móvil es etiqueta; el conteo va en views.graveyard.wouldRestartCount",
+  "assistant.markdown.writingTable": "más corto por el ancho del chat",
+  "assistant.markdown.moreRows": "más corto por el ancho del chat",
+  "reportBug.description": "móvil aclara que el buzón es de un solo sentido",
+  "settings.billing.freeBlurb": "regla 10: sin venta in-app hasta que exista el paywall",
+  "settings.billing.exemptBlurb": "móvil menciona Stripe explícitamente",
+  "settings.billing.storeManagedBlurb": "en móvil la suscripción se administra desde la tienda",
+  "settings.billing.checkoutSuccess": "móvil menciona Stripe explícitamente",
+  "views.tasks.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "views.routines.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "views.projects.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "views.ideas.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "views.quickNotes.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "views.log.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)"
+}
