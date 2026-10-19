@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { useTranslation } from "react-i18next";
 import {
   CREATE_PROJECT,
   DASHBOARD_QUERY,
@@ -6,12 +7,13 @@ import {
   REORDER_PROJECTS,
   UPDATE_PROJECT,
 } from "@/lib/graphql";
-import { confirmAsync } from "@/lib/confirm";
+import { choiceAsync, confirmAsync } from "@/lib/confirm";
 import type { Priority } from "@/lib/types";
 
 const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
 
 export function useProjectMutations() {
+  const { t } = useTranslation();
   const [createProject] = useMutation(CREATE_PROJECT, refetchAfter);
   const [updateProject] = useMutation(UPDATE_PROJECT, refetchAfter);
   const [deleteProject] = useMutation(DELETE_PROJECT, refetchAfter);
@@ -70,13 +72,38 @@ export function useProjectMutations() {
     }
   };
 
-  /** Delete with confirm prompt. Returns true if user confirmed and call succeeded. */
-  const deleteProjectWithConfirm = async (id: string): Promise<boolean> => {
-    const ok = await confirmAsync(
-      "Delete project?",
-      "This deletes the project and all its tasks."
-    );
-    if (!ok) return false;
+  /**
+   * Delete with confirm prompt. With `onKill`, the prompt also offers "Kill"
+   * (the closure ritual, which feeds the graveyard stats) as the suggested
+   * alternative; picking it calls `onKill` and deletes nothing.
+   * Returns true only if the project was actually deleted.
+   */
+  const deleteProjectWithConfirm = async (
+    id: string,
+    opts?: { onKill?: () => void }
+  ): Promise<boolean> => {
+    const title = t("modals.project.deleteConfirm");
+    const body = t("modals.project.deleteConfirmBody");
+    if (opts?.onKill) {
+      const answer = await choiceAsync(
+        title,
+        `${body}
+
+${t("modals.project.killInsteadNote")}`,
+        t("common.delete"),
+        t("modals.project.killInstead"),
+        t("common.cancel")
+      );
+      if (answer === "alt") {
+        opts.onKill();
+        return false;
+      }
+      if (answer !== "confirm") return false;
+    } else if (
+      !(await confirmAsync(title, body, t("common.delete"), t("common.cancel")))
+    ) {
+      return false;
+    }
     try {
       await deleteProject({ variables: { id } });
       return true;

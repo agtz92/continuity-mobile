@@ -30,3 +30,37 @@ export function confirmAsync(
     ]);
   });
 }
+
+/**
+ * Three-way variant of `confirmAsync` (mirrors the web's `choiceDialog`): the
+ * destructive action plus a suggested alternative. Resolves "confirm", "alt"
+ * or null on cancel. Native alerts can't be tinted, so the alternative sits as
+ * the plain (non-destructive) button and `message` carries the nudge.
+ */
+export function choiceAsync(
+  title: string,
+  message: string,
+  confirmLabel: string,
+  altLabel: string,
+  cancelLabel = "Cancel",
+): Promise<"confirm" | "alt" | null> {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: cancelLabel, style: "cancel", onPress: () => resolve(null) },
+        {
+          text: confirmLabel,
+          style: "destructive",
+          onPress: () => {
+            deleteFeedback();
+            resolve("confirm");
+          },
+        },
+        { text: altLabel, onPress: () => resolve("alt") },
+      ],
+      { cancelable: true, onDismiss: () => resolve(null) },
+    );
+  });
+}

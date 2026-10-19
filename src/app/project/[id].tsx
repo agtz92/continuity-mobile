@@ -198,7 +198,15 @@ export default function ProjectDetail() {
   );
 
   const onDelete = async () => {
-    const ok = await deleteProject(project.id);
+    // "Matar" en vez de eliminar abre el mismo ritual que el chip de estado.
+    // Ya muerto, no hay alternativa que ofrecer: confirm simple. El modal
+    // espera a que la alerta termine de cerrarse (iOS no presenta un `<Modal>`
+    // encima de una alerta saliente; ver `pendingStatus` más abajo).
+    const onKill =
+      project.status === "killed"
+        ? undefined
+        : () => setTimeout(() => setKillOpen(true), 350);
+    const ok = await deleteProject(project.id, { onKill });
     if (ok) router.back();
   };
 

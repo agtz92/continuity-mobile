@@ -23,7 +23,7 @@ import { ProjectSelect } from "@/components/ui/ProjectSelect";
 import { CategorySelect } from "@/components/ui/CategorySelect";
 import { NoteSectionCard } from "@/components/notes/NoteSectionCard";
 import { useThemeColors } from "@/theme/useThemeColors";
-import { deleteFeedback, impactFeedback, selectionFeedback } from "@/lib/feedback";
+import { impactFeedback, selectionFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
 
 export default function QuickNoteEditor() {
@@ -76,9 +76,7 @@ export default function QuickNoteEditor() {
   };
 
   const handleDelete = async () => {
-    deleteFeedback();
-    await m.deleteNote(note.id);
-    router.back();
+    if (await m.deleteNote({ ...note, title })) router.back();
   };
 
   const renderSection = ({ item, drag, isActive }: RenderItemParams<NoteSection>) => (
@@ -86,7 +84,7 @@ export default function QuickNoteEditor() {
       <NoteSectionCard
         section={item}
         onSave={(data) => m.updateSection(item.id, data)}
-        onDelete={() => m.deleteSection(item.id)}
+        onDelete={(draft) => m.deleteSection(item.id, draft)}
         onDrag={drag}
         isActive={isActive}
       />

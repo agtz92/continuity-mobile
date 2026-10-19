@@ -14,7 +14,7 @@ import * as Clipboard from "expo-clipboard";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { lift } from "@/theme/lift";
 import { MarkdownText } from "@/components/notes/MarkdownText";
-import { deleteFeedback, impactFeedback } from "@/lib/feedback";
+import { impactFeedback } from "@/lib/feedback";
 import type { NoteSection } from "@/lib/types";
 
 /**
@@ -34,7 +34,8 @@ export function NoteSectionCard({
 }: {
   section: NoteSection;
   onSave: (data: { heading: string; body: string; collapsed: boolean }) => void;
-  onDelete: () => void;
+  /** Gets the on-screen draft so the parent can skip confirming an empty section. */
+  onDelete: (draft: { heading: string; body: string }) => void;
   onDrag: () => void;
   isActive: boolean;
 }) {
@@ -122,10 +123,7 @@ export function NoteSectionCard({
           <GripVertical size={16} color={c.textMuted} />
         </Pressable>
         <Pressable
-          onPress={() => {
-            deleteFeedback();
-            onDelete();
-          }}
+          onPress={() => onDelete({ heading, body })}
           hitSlop={6}
           accessibilityLabel={t("views.quickNotes.deleteSection")}
         >

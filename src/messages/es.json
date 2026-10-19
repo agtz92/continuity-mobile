@@ -1114,6 +1114,14 @@
       "sectionHeading": "Título de la sección",
       "sectionBody": "Escribe aquí... (admite Markdown)",
       "deleteSection": "Eliminar sección",
+      "deleteNoteConfirm": "¿Eliminar «{title}»?",
+      "deleteNoteConfirmUntitled": "¿Eliminar esta nota sin título?",
+      "deleteNoteConfirmBody": "{sections, plural, =0 {La nota se borra por completo.} one {Se borra junto con su única sección.} other {Se borra junto con sus # secciones.}} Esta acción no se puede deshacer.",
+      "deleteNoteConfirmCta": "Eliminar nota",
+      "deleteSectionConfirm": "¿Eliminar «{heading}»?",
+      "deleteSectionConfirmUntitled": "¿Eliminar esta sección?",
+      "deleteSectionConfirmBody": "Su contenido se pierde. Esta acción no se puede deshacer.",
+      "deleteSectionConfirmCta": "Eliminar sección",
       "copy": "Copiar",
       "copied": "Copiado",
       "moveUp": "Subir",
@@ -1361,7 +1369,11 @@
       "category": "Categoría",
       "noCategory": "Sin categoría",
       "newCategoryName": "Nombre de categoría",
-      "createCategory": "Crear"
+      "createCategory": "Crear",
+      "deleteConfirm": "¿Eliminar este proyecto?",
+      "deleteConfirmBody": "Se borran también sus tareas y notas. Esta acción no se puede deshacer.",
+      "killInstead": "Matar",
+      "killInsteadNote": "¿Y si mejor lo matas? Matar un proyecto (en vez de eliminarlo) ayuda a generar estadísticas de por qué matas tus proyectos."
     },
     "task": {
       "newTitle": "Nueva tarea",

@@ -1114,6 +1114,14 @@
       "sectionHeading": "Section title",
       "sectionBody": "Write here... (Markdown supported)",
       "deleteSection": "Delete section",
+      "deleteNoteConfirm": "Delete “{title}”?",
+      "deleteNoteConfirmUntitled": "Delete this untitled note?",
+      "deleteNoteConfirmBody": "{sections, plural, =0 {The whole note goes away.} one {Its only section goes with it.} other {All # of its sections go with it.}} This can't be undone.",
+      "deleteNoteConfirmCta": "Delete note",
+      "deleteSectionConfirm": "Delete “{heading}”?",
+      "deleteSectionConfirmUntitled": "Delete this section?",
+      "deleteSectionConfirmBody": "Its content will be lost. This can't be undone.",
+      "deleteSectionConfirmCta": "Delete section",
       "copy": "Copy",
       "copied": "Copied",
       "moveUp": "Move up",
@@ -1361,7 +1369,11 @@
       "category": "Category",
       "noCategory": "No category",
       "newCategoryName": "Category name",
-      "createCategory": "Create"
+      "createCategory": "Create",
+      "deleteConfirm": "Delete this project?",
+      "deleteConfirmBody": "Its tasks and notes go with it. This can't be undone.",
+      "killInstead": "Kill",
+      "killInsteadNote": "Why not kill it instead? Killing a project (instead of deleting it) helps build stats on why you kill your projects."
     },
     "task": {
       "newTitle": "New Task",

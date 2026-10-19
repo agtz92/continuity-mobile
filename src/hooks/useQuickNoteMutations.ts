@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { useTranslation } from "react-i18next";
 import {
   ADD_NOTE_SECTION,
   CREATE_QUICK_NOTE,
@@ -10,6 +11,8 @@ import {
   UPDATE_NOTE_SECTION,
   UPDATE_QUICK_NOTE,
 } from "@/lib/graphql";
+import { confirmAsync } from "@/lib/confirm";
+import { deleteFeedback } from "@/lib/feedback";
 import type { NoteSection, QuickNote } from "@/lib/types";
 
 const refetchAfter = { refetchQueries: [{ query: QUICK_NOTES_QUERY }] };
@@ -22,6 +25,7 @@ type NotePatch = {
 };
 
 export function useQuickNoteMutations() {
+  const { t } = useTranslation();
   const [createM] = useMutation(CREATE_QUICK_NOTE, refetchAfter);
   const [updateM] = useMutation(UPDATE_QUICK_NOTE, refetchAfter);
   const [pinM] = useMutation(SET_QUICK_NOTE_PINNED, refetchAfter);
@@ -69,11 +73,27 @@ export function useQuickNoteMutations() {
     }
   };
 
-  const deleteNote = async (id: string): Promise<void> => {
+  /**
+   * Asks first — naming the note and how many sections go with it — then
+   * deletes. Resolves true only when the user confirmed and the delete landed,
+   * so the caller knows whether to leave the editor.
+   */
+  const deleteNote = async (note: QuickNote): Promise<boolean> => {
+    const title = note.title.trim();
+    const ok = await confirmAsync(
+      title
+        ? t("views.quickNotes.deleteNoteConfirm", { title })
+        : t("views.quickNotes.deleteNoteConfirmUntitled"),
+      t("views.quickNotes.deleteNoteConfirmBody", { sections: note.sections.length }),
+      t("views.quickNotes.deleteNoteConfirmCta"),
+      t("common.cancel"),
+    );
+    if (!ok) return false;
     try {
-      await deleteM({ variables: { id } });
+      await deleteM({ variables: { id: note.id } });
+      return true;
     } catch {
-      /* surface errors at the screen layer */
+      return false;
     }
   };
 
@@ -111,11 +131,33 @@ export function useQuickNoteMutations() {
     }
   };
 
-  const deleteSection = async (id: string): Promise<void> => {
+  /**
+   * `draft` is what the card shows right now (it may hold unsaved edits). An
+   * empty section goes without asking; one with content asks first.
+   */
+  const deleteSection = async (
+    id: string,
+    draft: { heading: string; body: string }
+  ): Promise<boolean> => {
+    const heading = draft.heading.trim();
+    if (heading || draft.body.trim()) {
+      const ok = await confirmAsync(
+        heading
+          ? t("views.quickNotes.deleteSectionConfirm", { heading })
+          : t("views.quickNotes.deleteSectionConfirmUntitled"),
+        t("views.quickNotes.deleteSectionConfirmBody"),
+        t("views.quickNotes.deleteSectionConfirmCta"),
+        t("common.cancel"),
+      );
+      if (!ok) return false;
+    } else {
+      deleteFeedback();
+    }
     try {
       await deleteSectionM({ variables: { id } });
+      return true;
     } catch {
-      /* surface errors at the screen layer */
+      return false;
     }
   };
 
