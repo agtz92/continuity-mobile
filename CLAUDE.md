@@ -60,6 +60,37 @@ todos los deletes con confirmación (tareas/rutinas/ideas/proyectos) lo heredan 
 solo punto; los borrados directos sin confirm (nota/sección en el editor) lo llaman
 en su `onPress`.
 
+## Datos en vivo (sin cerrar la app)
+
+Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
+`src/hooks/useLiveSync.ts`, montado una vez en `RootNavigator` (`src/app/_layout.tsx`).
+
+- **Señales en vivo:** un trigger en Postgres (`notify_user_change`, backend
+  `core/migrations/0036_live_change_signals.py` + `notifications/migrations/0015_live_settings_signal.py`)
+  manda un broadcast al canal privado `user:<uuid>` cada vez que cambia una fila del usuario,
+  venga de donde venga (web, Claude por MCP, syncs, jobs o esta app). El hook escucha y hace
+  `refetchQueries({ include: "active" })` con debounce de 400 ms. El aviso solo trae
+  `{table, op}`: los datos siguen saliendo por GraphQL.
+- **Al volver a primer plano:** iOS suspende el socket en segundo plano, así que al regresar se
+  relanzan las queries activas (mínimo 15 s entre llamadas).
+- **Tema, paleta e idioma:** `ThemeProvider` **no** aplica desde el caché reactivo (para no pisar
+  un cambio local a medias). Se suscribe con `onLiveChange` y, si el aviso es de
+  `notifications_notificationsettings`, hace su propio refetch + `applyServerSettings`, igual que
+  al volver a primer plano.
+- **Apagar:** `EXPO_PUBLIC_LIVE_UPDATES=off` quita el socket (queda el refetch al volver), pero
+  necesita build u OTA nuevos. El apagado inmediato es en el servidor:
+  `alter table … disable trigger …_live;` (ver `backend/CLAUDE.md`).
+
+### OTA (`eas update`): solo si el binario tiene los mismos módulos nativos
+
+`runtimeVersion` usa la política `appVersion`: un `eas update` llega a **todo** build de
+producción con la misma versión (hoy 1.0.0), aunque sea de hace meses. Si desde ese build se
+agregó un módulo nativo (p. ej. `expo-clipboard`, `react-native-purchases` o `expo-font` después del
+build de junio de 2026), el JS nuevo lo pide, el binario no lo tiene y **la app se cierra al abrir**.
+Antes de publicar: `git diff <commit del último build de producción> HEAD -- package.json app.json`
+(el commit sale en `eas build:list --build-profile production`). Si hay dependencias nativas nuevas,
+toca `eas build --profile production --auto-submit`, no OTA.
+
 ## Arranque sin flash + tema persistente
 
 - **Splash hold:** `_layout.tsx` llama `SplashScreen.preventAutoHideAsync()` al cargar
