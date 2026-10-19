@@ -18,6 +18,7 @@ import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { Toaster } from "@/components/ui/Toaster";
+import { useLiveSync } from "@/hooks/useLiveSync";
 
 // Keep the native splash up until the theme has hydrated from AsyncStorage and
 // auth has resolved (see ThemeProvider). Prevents the "blank, then everything
@@ -85,6 +86,8 @@ function useProtectedRoute() {
 
 function RootNavigator() {
   useProtectedRoute();
+  // Datos frescos sin cerrar la app: señales en vivo + refetch al volver.
+  useLiveSync();
   return (
     <>
       <ThemedStatusBar />

@@ -18,6 +18,7 @@ import { useQuery } from "@apollo/client/react";
 import { useAuth } from "@/lib/auth";
 import { NOTIFICATION_SETTINGS_QUERY } from "@/lib/graphql";
 import { isLocale, persistLocale } from "@/lib/locale";
+import { onLiveChange } from "@/hooks/useLiveSync";
 import { DEFAULT_THEME, normalizeTheme, type Theme } from "./config";
 import { LINE_STEPS, THEME_SURFACES, type EffectiveMode } from "./tokens";
 import {
@@ -194,19 +195,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyServerSettings(s);
   }, [settings, session, applyServerSettings]);
 
-  // Re-sync on foreground (changed theme on web, then picked up the phone).
+  // Re-sync on foreground (changed theme on web, then picked up the phone) and
+  // on a live signal for the settings table (changed on web while the app is
+  // open — `useLiveSync`). Both go through a fresh network refetch, never the
+  // reactive cache, for the reason above.
   useEffect(() => {
     if (!session) return;
-    const sub = AppState.addEventListener("change", (state) => {
-      if (state !== "active") return;
+    const resync = () => {
       refetch()
         .then((res) => {
           const s = res.data?.notificationSettings;
           if (s) applyServerSettings(s);
         })
         .catch(() => {});
+    };
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") resync();
     });
-    return () => sub.remove();
+    const offLive = onLiveChange((tables) => {
+      if (tables.has("notifications_notificationsettings")) resync();
+    });
+    return () => {
+      sub.remove();
+      offLive();
+    };
   }, [session, refetch, applyServerSettings]);
 
   const setTheme = (t: Theme) => {
