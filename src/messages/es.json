@@ -1667,5 +1667,24 @@
     "autoRenewDisclosure": "Las suscripciones se renuevan solas salvo que las canceles al menos 24 horas antes de que termine el periodo. El cargo va a tu cuenta de Apple al confirmar. Puedes administrarlas o cancelarlas en los ajustes de tu cuenta de Apple.",
     "emptyTitle": "Todavía no hay planes",
     "emptyBody": "La tienda contestó, pero ahora mismo no hay nada a la venta para esta cuenta. Si acabas de configurar tus productos, pueden tardar unos minutos en aparecer."
+  },
+  "push": {
+    "actions": {
+      "complete": "Marcar hecha",
+      "postpone": "Pasar a mañana",
+      "postponeAll": "Pasar todas a mañana"
+    },
+    "channels": {
+      "daily": "Pendientes del día",
+      "reminders": "Aviso de cierre del día",
+      "weekly": "Resumen semanal",
+      "announcements": "Novedades"
+    },
+    "result": {
+      "completed": "Tarea marcada como hecha",
+      "postponed": "{count, plural, one {Pasó a mañana} other {# tareas pasaron a mañana}}",
+      "nothing": "Ya estaba al día"
+    },
+    "actionFailed": "No se pudo aplicar. Inténtalo desde la app."
   }
 }

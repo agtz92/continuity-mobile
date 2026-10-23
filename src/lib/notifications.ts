@@ -4,6 +4,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import i18n from "./i18n";
 
 /**
  * Push notifications client helpers (Fase 8).
@@ -52,6 +53,66 @@ if (!isExpoGo) {
       shouldSetBadge: false,
     }),
   });
+}
+
+// Action sets the backend attaches as `categoryId` (backend
+// core/notifications/builders.py, CATEGORY_*). Keep the ids in sync.
+export const PUSH_CATEGORY = {
+  taskFocus: "task_focus", // one task: Marcar hecha · Pasar a mañana
+  tasksBulk: "tasks_bulk", // several: Pasar todas a mañana
+} as const;
+
+export type PushActionId = "complete" | "postpone";
+
+// One Android channel per kind, so the user can mute the weekly summary and
+// keep the end-of-day heads-up. The backend only targets them once
+// EXPO_PUSH_ANDROID_CHANNELS is on (Android drops a push aimed at a channel the
+// device hasn't created).
+const ANDROID_CHANNELS = [
+  { id: "daily", importance: Notifications.AndroidImportance.DEFAULT },
+  { id: "reminders", importance: Notifications.AndroidImportance.HIGH },
+  { id: "weekly", importance: Notifications.AndroidImportance.LOW },
+  { id: "announcements", importance: Notifications.AndroidImportance.DEFAULT },
+] as const;
+
+/**
+ * Registers the action buttons and Android channels, labelled in the current
+ * language. Re-run on language change: the OS keeps the labels it was given.
+ *
+ * Buttons open the app (`opensAppToForeground`): the action then runs through
+ * the normal authenticated Apollo client and confirms with a toast. Running it
+ * without opening the app needs a background task (expo-task-manager), which
+ * on iOS still can't wake a terminated app — so it isn't worth a native build.
+ */
+async function configurePushPresentation() {
+  const t = i18n.t.bind(i18n);
+  try {
+    if (Platform.OS === "android") {
+      await Promise.all(
+        ANDROID_CHANNELS.map((c) =>
+          Notifications.setNotificationChannelAsync(c.id, {
+            name: t(`push.channels.${c.id}`),
+            importance: c.importance,
+          }),
+        ),
+      );
+    }
+    const opens = { opensAppToForeground: true };
+    await Notifications.setNotificationCategoryAsync(PUSH_CATEGORY.taskFocus, [
+      { identifier: "complete", buttonTitle: t("push.actions.complete"), options: opens },
+      { identifier: "postpone", buttonTitle: t("push.actions.postpone"), options: opens },
+    ]);
+    await Notifications.setNotificationCategoryAsync(PUSH_CATEGORY.tasksBulk, [
+      { identifier: "postpone", buttonTitle: t("push.actions.postponeAll"), options: opens },
+    ]);
+  } catch (err) {
+    console.warn("[push] failed to configure categories/channels:", err);
+  }
+}
+
+if (!isExpoGo) {
+  void configurePushPresentation();
+  i18n.on("languageChanged", () => void configurePushPresentation());
 }
 
 /** Stable per-install id for registerPushToken(deviceId). Persisted once. */
@@ -130,6 +191,43 @@ type NotificationData = {
   path?: string;
   [key: string]: unknown;
 };
+
+/** The action button the user pressed, with the tasks it applies to — or null
+ * for a plain tap (or a push without task ids). */
+export function actionFromResponse(
+  resp: Notifications.NotificationResponse,
+): { action: PushActionId; taskIds: string[] } | null {
+  const id = resp.actionIdentifier;
+  if (id !== "complete" && id !== "postpone") return null;
+  const data = resp.notification.request.content.data as NotificationData | null;
+  const raw = data?.taskIds;
+  const taskIds = Array.isArray(raw) ? raw.map(String).filter(Boolean) : [];
+  return taskIds.length ? { action: id, taskIds } : null;
+}
+
+const LAST_RESPONSE_KEY = "continuity.lastPushResponse";
+let lastHandled: string | null = null;
+
+/**
+ * True the first time a given response (notification × button) is seen.
+ * The same response can arrive twice — the live listener and the cold-start
+ * `getLastNotificationResponseAsync` — and the latter can replay a stale one on
+ * a later launch. Persisted so a replay never re-runs an action or re-navigates.
+ */
+export async function claimResponse(
+  resp: Notifications.NotificationResponse,
+): Promise<boolean> {
+  const key = `${resp.notification.request.identifier}:${resp.actionIdentifier}`;
+  if (lastHandled === key) return false;
+  lastHandled = key;
+  try {
+    if ((await AsyncStorage.getItem(LAST_RESPONSE_KEY)) === key) return false;
+    await AsyncStorage.setItem(LAST_RESPONSE_KEY, key);
+  } catch {
+    // Storage hiccup: the in-memory guard still covers the double delivery.
+  }
+  return true;
+}
 
 /**
  * Navigates based on a tapped notification's payload. No-op for unknown shapes,

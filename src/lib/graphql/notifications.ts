@@ -166,6 +166,17 @@ export const UNREGISTER_PUSH_TOKEN = gql`
   }
 `;
 
+// Botones de la push ("Marcar hecha" / "Pasar a mañana"). Idempotente en el
+// backend: devuelve cuántas tareas cambiaron (0 si ya estaban resueltas).
+export const RUN_NOTIFICATION_ACTION = gql`
+  mutation RunNotificationAction(
+    $action: NotificationAction!
+    $taskIds: [ID!]!
+  ) {
+    runNotificationAction(action: $action, taskIds: $taskIds)
+  }
+`;
+
 // ===== Cuenta y feedback =====
 
 // Permanently deletes the user's account + all data (Apple requirement). After
