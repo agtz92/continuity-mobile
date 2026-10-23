@@ -269,7 +269,7 @@
     "stalled": "Estancado",
     "paused": "Pausado",
     "launched": "Lanzado",
-    "killed": "Cancelado",
+    "killed": "Muerto",
     "archived": "Archivado",
     "all": "Todos",
     "allStatuses": "Todos los estados"
@@ -1199,12 +1199,12 @@
       "title": "Cementerio",
       "patternTitle": "Patrón en tu cementerio",
       "noPatternTitle": "Aún no hay patrón",
-      "noPatternBody": "Cuando tengas 3 proyectos cancelados, Loop busca patrones en lo que no funcionó.",
+      "noPatternBody": "Cuando tengas 3 proyectos muertos, Loop busca patrones en lo que no funcionó.",
       "empty": "Aquí no hay nada enterrado todavía. Los proyectos que matas con intención llegan al cementerio, con notas y todo.",
       "wouldRestartCount": "reiniciarías {count} de {total}",
       "lived": "vivió {count, plural, one {# día} other {# días}}",
       "wouldRestartBadge": "reiniciarías",
-      "whyKilled": "Por qué lo cancelaste",
+      "whyKilled": "Por qué lo mataste",
       "learnings": "Aprendizajes",
       "wouldRestart": "Lo reiniciarías",
       "ai": "IA",
@@ -1249,23 +1249,23 @@
       "confirm": "Pausar proyecto"
     },
     "kill": {
-      "title": "Cancelando \"{name}\"",
-      "subtitle": "Cancelar es una forma de terminar. Merece un ritual de cierre.",
-      "reasonLabel": "¿Por qué lo estás cancelando?",
+      "title": "Matando \"{name}\"",
+      "subtitle": "Matar es una forma de terminar. Merece un ritual de cierre.",
+      "reasonLabel": "¿Por qué lo matas?",
       "reasonPlaceholder": "ej., \"El alcance no paraba de crecer y nunca validé la suposición central.\"",
       "learningsLabel": "¿Qué aprendiste de esto?",
       "learningsPlaceholder": "ej., \"Debí lanzar un MVP de 1 semana antes de construir 5 meses de infraestructura.\"",
       "wouldRestartLabel": "¿Lo empezarías de nuevo con lo que sabes ahora? (opcional)",
       "wouldRestartPlaceholder": "ej., \"Sí, pero con un alcance mucho menor y 2 entrevistas con usuarios primero.\"",
       "why": "Lo guardamos en tu Cementerio de Proyectos. No es una lápida, es una biblioteca de lo que no funcionó para que no lo repitas.",
-      "confirm": "Cancelar con intención"
+      "confirm": "Matar con intención"
     },
     "stalled": {
       "title": "No tocas \"{name}\" desde hace {count, plural, one {# día} other {# días}}.",
       "subtitle": "¿Qué quieres hacer con esto?",
       "optionActive": "Sigo trabajando en esto (mantener Activo)",
       "optionPause": "Necesito pausarlo",
-      "optionKill": "Está muerto. Cancélalo.",
+      "optionKill": "Es un proyecto muerto. Mátalo.",
       "confirm": "Toma la decisión",
       "footer": "Nada de irse a la deriva. Toma la decisión."
     },
@@ -1281,7 +1281,7 @@
     },
     "revive": {
       "title": "¿Revivir \"{name}\"?",
-      "subtitle": "Lo cancelaste una vez, a propósito. Traerlo de vuelta está bien. Solo entra con lo que aprendiste.",
+      "subtitle": "Lo mataste una vez, a propósito. Traerlo de vuelta está bien. Solo entra con lo que aprendiste.",
       "wouldRestartLabel": "Dijiste que lo reiniciarías así:",
       "capLine": "Vuelve a contar para tu plan — {used} / {cap} activos",
       "bringBackAs": "Tráelo de vuelta como:",
@@ -1290,7 +1290,7 @@
       "leaveDead": "Déjalo muerto"
     },
     "pausedToast": "En pausa. Tu yo futuro te lo agradecerá.",
-    "killedToast": "Matado con intención. La lección queda."
+    "killedToast": "Lo mataste con intención. Lección guardada."
   },
   "taskRow": {
     "markDone": "Marcar como hecha",
