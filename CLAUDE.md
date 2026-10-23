@@ -207,6 +207,10 @@ backend en `GET /usage/` como `assistant_mode` (la regla vive en
   no hay modelo, no hay cupo — por eso `<UsageMeter/>` no se pinta aquí.
   Las etiquetas y el idioma llegan del backend con el catálogo: **una consulta nueva no
   necesita release en la store.**
+  **Aviso de Studio:** espejo de la web (`<StudioHint/>` + `actions.studioLine`), con una
+  diferencia por la regla 10: el enlace dice "Ver mi plan" y abre `/billing` (solo lectura),
+  y la línea fija del menú no lleva enlace. `assistant.hint.cta` está en la lista de
+  divergencias permitidas de `check-i18n`.
 - **`llm`** (studio/admin) — el chat de siempre: `streamChat`, `QuickActionChips`, medidor
   de cupo y compositor.
 

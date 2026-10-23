@@ -11,6 +11,7 @@ import {
   type AssistantMode,
   type CannedGroup,
   type StoredMessage,
+  type StudioHint,
   type UsageSnapshot,
 } from "@/lib/assistantApi";
 import {
@@ -32,7 +33,13 @@ export type AssistantBlock = AssistantTextBlock | AssistantToolUseBlock;
 
 export type ChatMessage =
   | { id: string; role: "user"; text: string }
-  | { id: string; role: "assistant"; blocks: AssistantBlock[] };
+  | {
+      id: string;
+      role: "assistant";
+      blocks: AssistantBlock[];
+      /** `canned` only: what Studio would do with this answer. Not stored. */
+      hint?: StudioHint;
+    };
 
 export type AssistantState = {
   messages: ChatMessage[];
@@ -57,6 +64,14 @@ export type AssistantState = {
   mode: AssistantMode | null;
   /** Populated only in `canned` mode. */
   actions: CannedGroup[];
+  /**
+   * Studio hints already shown in this conversation, by action id. One per
+   * action per conversation: the second "what's overdue" doesn't need the
+   * same pitch twice.
+   */
+  hintedActions: string[];
+  /** The user hid the hints; none come back until a new conversation. */
+  hintsDismissed: boolean;
   usage: UsageSnapshot | null;
 };
 
@@ -70,6 +85,8 @@ const INITIAL: AssistantState = {
   plan: "free",
   mode: null,
   actions: [],
+  hintedActions: [],
+  hintsDismissed: false,
   usage: null,
 };
 
@@ -328,14 +345,26 @@ export function useAssistant() {
           conversationId: state.conversationId ?? undefined,
           query,
         });
-        setState((s) => ({
-          ...s,
-          conversationId: answer.conversation_id,
-          messages: replaceLastAssistant(
+        setState((s) => {
+          const messages = replaceLastAssistant(
             s.messages,
             answer.content.map((b) => ({ type: "text" as const, text: b.text })),
-          ),
-        }));
+          );
+          const hint =
+            answer.studio_hint &&
+            !s.hintsDismissed &&
+            !s.hintedActions.includes(actionId)
+              ? answer.studio_hint
+              : null;
+          return {
+            ...s,
+            conversationId: answer.conversation_id,
+            messages: hint ? attachHint(messages, hint) : messages,
+            hintedActions: hint
+              ? [...s.hintedActions, actionId]
+              : s.hintedActions,
+          };
+        });
       } catch (err) {
         setState((s) => ({
           ...s,
@@ -368,10 +397,43 @@ export function useAssistant() {
       conversationId: null,
       error: null,
       connectionCut: false,
+      hintedActions: [],
+      hintsDismissed: false,
     }));
   }, [state.streaming]);
 
-  return { ...state, send, runCanned, stop, newConversation, refreshUsage };
+  /** Hide every Studio hint in this conversation, and stop adding new ones. */
+  const dismissHints = useCallback(() => {
+    setState((s) => ({
+      ...s,
+      hintsDismissed: true,
+      messages: s.messages.map((m) =>
+        m.role === "assistant" && m.hint ? { ...m, hint: undefined } : m,
+      ),
+    }));
+  }, []);
+
+  return {
+    ...state,
+    send,
+    runCanned,
+    dismissHints,
+    stop,
+    newConversation,
+    refreshUsage,
+  };
+}
+
+function attachHint(messages: ChatMessage[], hint: StudioHint): ChatMessage[] {
+  const out = [...messages];
+  for (let i = out.length - 1; i >= 0; i--) {
+    const m = out[i];
+    if (m.role === "assistant") {
+      out[i] = { ...m, hint };
+      break;
+    }
+  }
+  return out;
 }
 
 function replaceLastAssistant(

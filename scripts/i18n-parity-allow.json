@@ -19,5 +19,6 @@
   "views.projects.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
   "views.ideas.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
   "views.quickNotes.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
-  "views.log.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)"
+  "views.log.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
+  "assistant.hint.cta": "regla 10 (Apple): en móvil no se invita a comprar fuera de la app; el enlace abre la pantalla de plan, que es de solo lectura"
 }

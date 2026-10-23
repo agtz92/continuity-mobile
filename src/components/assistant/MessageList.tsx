@@ -1,20 +1,24 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { ChatMessage } from "@/hooks/useAssistant";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { Message } from "./Message";
+import { StudioHint } from "./StudioHint";
 import { toolLabel } from "./ToolCallCard";
 
 export function MessageList({
   messages,
   streaming,
   pendingTool = null,
+  onDismissHints,
 }: {
   messages: ChatMessage[];
   streaming: boolean;
   /** Tool the model is writing (`tool_use_pending`), if any. */
   pendingTool?: string | null;
+  /** `canned` only: hides the Studio hints for this conversation. */
+  onDismissHints?: () => void;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -53,12 +57,16 @@ export function MessageList({
       }
     >
       {messages.map((m) => (
-        <Message
-          key={m.id}
-          message={m}
-          streaming={streaming && m.id === last?.id}
-          pendingLabel={m.id === last?.id ? pendingLabel : null}
-        />
+        <Fragment key={m.id}>
+          <Message
+            message={m}
+            streaming={streaming && m.id === last?.id}
+            pendingLabel={m.id === last?.id ? pendingLabel : null}
+          />
+          {m.role === "assistant" && m.hint && onDismissHints && (
+            <StudioHint hint={m.hint} onDismiss={onDismissHints} />
+          )}
+        </Fragment>
       ))}
       {showWorking && (
         <View className="flex-row items-center gap-2 pl-9">

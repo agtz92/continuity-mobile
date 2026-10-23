@@ -134,7 +134,12 @@
       "footnote": "Tu captura rápida, tus notas y tu calendario siguen funcionando igual."
     },
     "actions": {
-      "hint": "Elige una consulta"
+      "hint": "Elige una consulta",
+      "studioLine": "En Studio le escribes lo que necesitas y Loop lo hace."
+    },
+    "hint": {
+      "cta": "Ver mi plan",
+      "dismiss": "Ocultar"
     }
   },
   "common": {

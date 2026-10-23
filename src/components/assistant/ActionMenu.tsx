@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Search } from "lucide-react-native";
+import { MessageSquare, Search } from "lucide-react-native";
 import type { CannedGroup } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -73,6 +73,18 @@ export function ActionMenu({
               </View>
             </View>
           ))}
+
+        {/*
+          Why there's no free-text box, said once and quietly. No link here:
+          the per-answer StudioHint carries the one to the plan screen, and
+          rule 10 keeps this screen from selling.
+        */}
+        <View className="flex-row items-start gap-1.5">
+          <MessageSquare size={11} color={c.textMuted} style={{ marginTop: 3 }} />
+          <Text className="font-sans flex-1 text-xs leading-4 text-text-muted">
+            {t("assistant.actions.studioLine")}
+          </Text>
+        </View>
       </ScrollView>
 
       {searchAction && (

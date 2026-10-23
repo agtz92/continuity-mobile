@@ -48,6 +48,7 @@ export default function AssistantScreen() {
     usage,
     send,
     runCanned,
+    dismissHints,
     stop,
     newConversation,
   } = useAssistant();
@@ -154,6 +155,7 @@ export default function AssistantScreen() {
             messages={messages}
             streaming={streaming}
             pendingTool={pendingTool}
+            onDismissHints={isCanned ? dismissHints : undefined}
           />
         )}
 
