@@ -94,6 +94,18 @@ export async function listConversations(): Promise<ConversationListItem[]> {
   return body.conversations || [];
 }
 
+/** Borra una conversación y sus mensajes para siempre. */
+export async function deleteConversation(conversationId: string): Promise<void> {
+  const headers = await authHeaders();
+  const res = await fetch(
+    `${assistantBaseUrl}/api/assistant/conversations/${conversationId}/`,
+    { method: "DELETE", headers },
+  );
+  if (!res.ok && res.status !== 404) {
+    throw new Error(`deleteConversation failed: ${res.status}`);
+  }
+}
+
 export type StoredMessage = {
   id: string;
   role: "user" | "assistant" | "tool";

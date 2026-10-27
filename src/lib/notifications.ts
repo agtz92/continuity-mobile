@@ -40,7 +40,7 @@ export const isExpoGo =
 export const PUSH_BACKEND_READY =
   process.env.EXPO_PUBLIC_PUSH_ENABLED !== "false";
 
-const DEVICE_ID_KEY = "continuity.deviceId";
+export const DEVICE_ID_KEY = "continuity.deviceId";
 
 // How a notification is presented while the app is foregrounded. Safe to set in
 // a build; skipped under Expo Go to avoid the unsupported-API warning banner.
@@ -205,7 +205,7 @@ export function actionFromResponse(
   return taskIds.length ? { action: id, taskIds } : null;
 }
 
-const LAST_RESPONSE_KEY = "continuity.lastPushResponse";
+export const LAST_RESPONSE_KEY = "continuity.lastPushResponse";
 let lastHandled: string | null = null;
 
 /**

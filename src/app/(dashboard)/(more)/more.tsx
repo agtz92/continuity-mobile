@@ -28,7 +28,7 @@ import {
   type LucideIcon,
 } from "lucide-react-native";
 import { Tombstone } from "@/components/icons/Tombstone";
-import { supabase } from "@/lib/supabase";
+import { signOut } from "@/lib/signOut";
 import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 
@@ -193,7 +193,7 @@ export default function More() {
         </View>
 
         <Pressable
-          onPress={() => supabase.auth.signOut()}
+          onPress={() => void signOut()}
           className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-4"
         >
           <LogOut color={s.text} size={18} />

@@ -9,10 +9,11 @@ import { useAuth } from "@/lib/auth";
 import { DELETE_ACCOUNT, PROFILE_QUERY, UPDATE_PROFILE } from "@/lib/graphql";
 import { useUserAvatar } from "@/hooks/useUserAvatar";
 import { AvatarPickerSheet } from "@/components/settings/AvatarPickerSheet";
+import { YourDataSection } from "@/components/settings/YourDataSection";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { confirmAsync } from "@/lib/confirm";
-import { supabase } from "@/lib/supabase";
+import { signOut } from "@/lib/signOut";
 import { toast } from "@/lib/toast";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -82,8 +83,9 @@ export default function Profile() {
     if (!second) return;
     try {
       await deleteAccountMutation();
-      // Account + data are gone; sign out so the auth gate sends us to /login.
-      await supabase.auth.signOut();
+      // Account + data are gone (push tokens too); sign out so the auth gate
+      // sends us to /login. SIGNED_OUT then clears this device's account data.
+      await signOut({ skipUnregister: true });
     } catch {
       toast.error(t("settings.deleteAccount.error"));
     }
@@ -136,7 +138,7 @@ export default function Profile() {
             value={current}
             onChangeText={setName}
             placeholder={t("settings.profile.namePlaceholder")}
-            maxLength={60}
+            maxLength={50}
             returnKeyType="done"
             onSubmitEditing={() => void handleSaveName()}
           />
@@ -176,6 +178,8 @@ export default function Profile() {
           </View>
         )}
       </View>
+
+      <YourDataSection />
 
       {/* Danger zone — account deletion (Apple requirement) */}
       <View

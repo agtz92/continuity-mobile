@@ -432,9 +432,24 @@
       "billing": "Facturación y plan",
       "plugins": "Integraciones"
     },
+    "yourData": {
+      "title": "Tus datos",
+      "exportBody": "Descarga en un archivo JSON todo lo que guardamos de ti: proyectos, tareas, rutinas, ideas, notas, Quick Notes, categorías, bloqueos, conversaciones con Loop y ajustes.",
+      "export": "Descargar mis datos",
+      "exporting": "Preparando…",
+      "exportError": "No se pudo generar el archivo. Inténtalo de nuevo.",
+      "conversationsTitle": "Conversaciones con Loop",
+      "noConversations": "No hay conversaciones guardadas.",
+      "untitled": "Sin título",
+      "delete": "Borrar conversación",
+      "confirmDelete": "Borrar",
+      "cancel": "Cancelar",
+      "conversationDeleted": "Conversación borrada",
+      "deleteError": "No se pudo borrar la conversación."
+    },
     "deleteAccount": {
       "title": "Eliminar cuenta",
-      "body": "Elimina permanentemente tu cuenta y todo lo que contiene — proyectos, tareas, ideas, rutinas y notas. No se puede deshacer.",
+      "body": "Elimina permanentemente tu cuenta y todo lo que contiene — proyectos, tareas, ideas, rutinas, notas y conversaciones con Loop. No se puede deshacer.",
       "subscriptionWarning": "Eliminar tu cuenta NO cancela tu suscripción. Si tienes un plan activo, cancélalo primero en la web.",
       "manageSubscription": "Administrar suscripción",
       "button": "Eliminar mi cuenta",

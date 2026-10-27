@@ -432,9 +432,24 @@
       "billing": "Billing & plan",
       "plugins": "Plugins"
     },
+    "yourData": {
+      "title": "Your data",
+      "exportBody": "Download everything we hold about you as a JSON file: projects, tasks, routines, ideas, notes, Quick Notes, categories, blockers, conversations with Loop and settings.",
+      "export": "Download my data",
+      "exporting": "Preparing…",
+      "exportError": "Couldn't build the file. Try again.",
+      "conversationsTitle": "Conversations with Loop",
+      "noConversations": "No saved conversations.",
+      "untitled": "Untitled",
+      "delete": "Delete conversation",
+      "confirmDelete": "Delete",
+      "cancel": "Cancel",
+      "conversationDeleted": "Conversation deleted",
+      "deleteError": "Couldn't delete the conversation."
+    },
     "deleteAccount": {
       "title": "Delete account",
-      "body": "Permanently delete your account and everything in it — projects, tasks, ideas, routines and notes. This cannot be undone.",
+      "body": "Permanently deletes your account and everything in it — projects, tasks, ideas, routines, notes and conversations with Loop. This can't be undone.",
       "subscriptionWarning": "Deleting your account does NOT cancel your subscription. If you have an active plan, cancel it on the web first.",
       "manageSubscription": "Manage subscription",
       "button": "Delete my account",
@@ -445,7 +460,7 @@
       "confirm2Title": "Are you absolutely sure?",
       "confirm2Body": "Last chance — this is permanent.",
       "confirm2Cta": "Delete forever",
-      "error": "We could not delete your account. Please try again."
+      "error": "Couldn't delete your account. Please try again."
     },
     "legal": {
       "privacy": "Privacy Policy",

@@ -31,9 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
       setSession(next);
       setLoading(false);
+      // Import tardío: signOut.ts trae Apollo, que no debe cargar antes que la sesión.
+      if (event === "SIGNED_OUT") {
+        void import("./signOut").then((m) => m.clearUserData());
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);
