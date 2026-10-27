@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
 import { Meta } from "@/components/ui/Meta";
 import {
   ActivityIndicator,
-  Linking,
   Pressable,
   ScrollView,
   Switch,
@@ -12,21 +10,15 @@ import {
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@apollo/client/react";
 import { getCalendars } from "expo-localization";
-import { CheckCircle2, MapPin, Send } from "lucide-react-native";
+import { MapPin, Smartphone } from "lucide-react-native";
 import {
-  DISCONNECT_CHANNEL,
   NOTIFICATION_SETTINGS_QUERY,
-  REQUEST_CHANNEL_LINK,
   UPDATE_NOTIFICATION_SETTINGS,
 } from "@/lib/graphql";
 import { toast } from "@/lib/toast";
-import { confirmAsync } from "@/lib/confirm";
 import { Field } from "@/components/ui/Field";
 import { Select, type SelectOption } from "@/components/settings/Select";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
-
-type Channel = "telegram" | "whatsapp";
-type ChannelLink = { channel: Channel; connected: boolean; verifiedAt: string | null };
 
 type Settings = {
   locale: string;
@@ -41,7 +33,6 @@ type Settings = {
   dueReminderHour: number;
   manualEnabled: boolean;
   isAdmin: boolean;
-  links: ChannelLink[];
 };
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -56,7 +47,7 @@ export default function Notifications() {
   const { t } = useTranslation();
   const c = useThemeColors();
 
-  const { data, loading, refetch } = useQuery<{ notificationSettings: Settings }>(
+  const { data, loading } = useQuery<{ notificationSettings: Settings }>(
     NOTIFICATION_SETTINGS_QUERY,
     { fetchPolicy: "cache-and-network" },
   );
@@ -77,32 +68,7 @@ export default function Notifications() {
       },
     },
   );
-  const [requestLink, { loading: linking }] = useMutation(REQUEST_CHANNEL_LINK);
-  const [disconnect] = useMutation(DISCONNECT_CHANNEL);
-
   const settings = data?.notificationSettings;
-  const telegramLink = useMemo(
-    () => settings?.links.find((l) => l.channel === "telegram"),
-    [settings],
-  );
-
-  const [pollingForLink, setPollingForLink] = useState(false);
-
-  useEffect(() => {
-    if (!pollingForLink) return;
-    const id = setInterval(() => {
-      void refetch().catch(() => {});
-    }, 3000);
-    const timeout = setTimeout(() => setPollingForLink(false), 5 * 60 * 1000);
-    return () => {
-      clearInterval(id);
-      clearTimeout(timeout);
-    };
-  }, [pollingForLink, refetch]);
-
-  useEffect(() => {
-    if (telegramLink?.connected) setPollingForLink(false);
-  }, [telegramLink?.connected]);
 
   if (loading && !settings) {
     return (
@@ -122,88 +88,18 @@ export default function Notifications() {
     }
   };
 
-  const onConnectTelegram = async () => {
-    try {
-      const res = await requestLink({ variables: { channel: "TELEGRAM" } });
-      const deepLink = (
-        res.data as { requestChannelLink?: { deepLink?: string } } | null
-      )?.requestChannelLink?.deepLink;
-      if (deepLink) {
-        await Linking.openURL(deepLink);
-        setPollingForLink(true);
-      }
-    } catch {
-      /* error link surfaces a toast */
-    }
-  };
-
-  const onDisconnectTelegram = async () => {
-    const ok = await confirmAsync(
-      t("settings.notifications.channel.disconnectConfirm"),
-      undefined,
-      t("settings.notifications.channel.disconnect"),
-      t("common.cancel"),
-    );
-    if (!ok) return;
-    await disconnect({ variables: { channel: "TELEGRAM" } });
-    await refetch();
-    toast.success(t("settings.notifications.channel.disconnected"));
-  };
-
-  const connected = !!telegramLink?.connected;
   const deviceTz = getCalendars()[0]?.timeZone ?? null;
 
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       {/* Channels */}
       <Section title={t("settings.notifications.channels")}>
-        <View className="flex-row items-center justify-between">
-          <View className="flex-1 pr-3">
-            <Text className="text-base font-sans-medium text-text">
-              {t("settings.notifications.telegram")}
-            </Text>
-            <Text className="font-sans mt-0.5 text-xs text-text-muted">
-              {connected
-                ? t("settings.notifications.channel.connected")
-                : pollingForLink
-                  ? t("settings.notifications.channel.waiting")
-                  : t("settings.notifications.channel.notConnected")}
-            </Text>
-          </View>
-          {connected ? (
-            <Pressable
-              onPress={() => void onDisconnectTelegram()}
-              accessibilityRole="button"
-              className="rounded-lg border border-border px-3 py-1.5 active:opacity-80"
-            >
-              <Text className="font-sans text-xs text-text-muted">
-                {t("settings.notifications.channel.disconnect")}
-              </Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={() => void onConnectTelegram()}
-              disabled={linking}
-              accessibilityRole="button"
-              className="flex-row items-center gap-1.5 rounded-lg px-3 py-1.5 active:opacity-90"
-              style={{ backgroundColor: c.accent, opacity: linking ? 0.6 : 1 }}
-            >
-              {linking ? (
-                <ActivityIndicator size="small" color={c.bg} />
-              ) : pollingForLink ? (
-                <CheckCircle2 size={13} color={c.bg} />
-              ) : (
-                <Send size={13} color={c.bg} />
-              )}
-              <Text className="text-xs font-sans-medium" style={{ color: c.bg }}>
-                {t("settings.notifications.channel.connect")}
-              </Text>
-            </Pressable>
-          )}
+        <View className="flex-row items-start gap-2">
+          <Smartphone size={16} color={c.textMuted} style={{ marginTop: 1 }} />
+          <Text className="font-sans flex-1 text-sm text-text">
+            {t("settings.notifications.pushOnly")}
+          </Text>
         </View>
-        <Text className="font-sans mt-3 text-xs text-text-muted">
-          {t("settings.notifications.whatsappSoon")}
-        </Text>
       </Section>
 
       {/* Weekly digest */}

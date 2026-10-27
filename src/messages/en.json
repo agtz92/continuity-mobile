@@ -651,10 +651,9 @@
     },
     "notifications": {
       "title": "Notifications",
-      "description": "Get nudges on Telegram so a project doesn't quietly die.",
+      "description": "Get nudges on your phone so a project doesn't quietly die.",
       "channels": "Channels",
-      "telegram": "Telegram",
-      "whatsappSoon": "WhatsApp coming soon.",
+      "pushOnly": "Digests and reminders arrive as push notifications in the continuu.it mobile app. Install it and sign in to receive them.",
       "useDeviceTimezone": "Use device timezone",
       "weeklyDigest": "Weekly digest",
       "weeklyDigestToggle": "Send a weekly summary of my analytics",
@@ -671,16 +670,7 @@
       "dueRemindersToggle": "End-of-day pending warning",
       "dueReminderHour": "Warning hour (local)",
       "dueRemindersHint": "At the chosen hour, if there are still open tasks or routines for today, we'll ping you. If everything's closed, nothing is sent.",
-      "manualToggle": "Receive admin / manual announcements",
-      "channel": {
-        "connected": "Connected",
-        "waiting": "Waiting for you to press Start in Telegram…",
-        "notConnected": "Not connected",
-        "connect": "Connect",
-        "disconnect": "Disconnect",
-        "disconnectConfirm": "Disconnect Telegram? You can reconnect later.",
-        "disconnected": "Disconnected"
-      }
+      "manualToggle": "Receive admin / manual announcements"
     }
   },
   "analytics": {
@@ -1543,7 +1533,7 @@
             "2 active routines",
             "No Loop — the assistant starts at Pro",
             "Claude connector (read) — use your own Claude",
-            "Email and Telegram notifications, on your rules",
+            "Push notifications on your phone, on your rules",
             "Full Today view, analytics, and activity log",
             "Up to 30 ideas"
           ],

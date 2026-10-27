@@ -651,10 +651,9 @@
     },
     "notifications": {
       "title": "Notificaciones",
-      "description": "Recibe avisos en Telegram para que un proyecto no muera en silencio.",
+      "description": "Recibe avisos en tu teléfono para que un proyecto no muera en silencio.",
       "channels": "Canales",
-      "telegram": "Telegram",
-      "whatsappSoon": "WhatsApp llegará pronto.",
+      "pushOnly": "Los resúmenes y recordatorios llegan como notificaciones push en la app móvil de continuu.it. Instálala e inicia sesión para recibirlos.",
       "useDeviceTimezone": "Usar zona horaria del dispositivo",
       "weeklyDigest": "Resumen semanal",
       "weeklyDigestToggle": "Enviarme el resumen semanal de mis analíticas",
@@ -671,16 +670,7 @@
       "dueRemindersToggle": "Aviso de pendientes a fin de día",
       "dueReminderHour": "Hora del aviso (local)",
       "dueRemindersHint": "A la hora elegida, si aún quedan tareas o rutinas abiertas hoy, te llega un recordatorio. Si todo está cerrado, no se envía nada.",
-      "manualToggle": "Recibir avisos manuales / del admin",
-      "channel": {
-        "connected": "Conectado",
-        "waiting": "Esperando a que presiones Start en Telegram…",
-        "notConnected": "No conectado",
-        "connect": "Conectar",
-        "disconnect": "Desconectar",
-        "disconnectConfirm": "¿Desconectar Telegram? Puedes reconectar después.",
-        "disconnected": "Desconectado"
-      }
+      "manualToggle": "Recibir avisos manuales / del admin"
     }
   },
   "analytics": {
@@ -1543,7 +1533,7 @@
             "2 rutinas activas",
             "Sin Loop — el asistente empieza en Pro",
             "Conector de Claude (lectura) — usa tu propio Claude",
-            "Notificaciones por Email y Telegram, con tus reglas",
+            "Notificaciones push en tu teléfono, con tus reglas",
             "Today view, analíticas y bitácora completos",
             "Hasta 30 ideas"
           ],

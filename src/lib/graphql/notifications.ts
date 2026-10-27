@@ -92,11 +92,6 @@ export const NOTIFICATION_SETTINGS_QUERY = gql`
       dueReminderHour
       manualEnabled
       isAdmin
-      links {
-        channel
-        connected
-        verifiedAt
-      }
     }
   }
 `;
@@ -119,32 +114,7 @@ export const UPDATE_NOTIFICATION_SETTINGS = gql`
       dueReminderHour
       manualEnabled
       isAdmin
-      links {
-        channel
-        connected
-        verifiedAt
-      }
     }
-  }
-`;
-
-// Inicia el enlace de un canal externo (p. ej. Telegram): devuelve token + deep link
-// que el usuario abre para confirmar la vinculación.
-
-export const REQUEST_CHANNEL_LINK = gql`
-  mutation RequestChannelLink($channel: NotificationChannel!) {
-    requestChannelLink(channel: $channel) {
-      token
-      deepLink
-      expiresAt
-    }
-  }
-`;
-
-
-export const DISCONNECT_CHANNEL = gql`
-  mutation DisconnectChannel($channel: NotificationChannel!) {
-    disconnectChannel(channel: $channel)
   }
 `;
 
