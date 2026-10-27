@@ -49,8 +49,8 @@ export const ADMIN_USER_QUERY = gql`
       isAdmin
       isBillingExempt
       planRenewsAt
-      stripeCustomerId
-      stripeSubscriptionId
+      billingCustomerId
+      billingTransactionId
       createdAt
       lastSignInAt
       emailConfirmedAt
@@ -123,9 +123,9 @@ export const ADMIN_SET_USER_IS_BILLING_EXEMPT = gql`
   }
 `;
 
-// ===== Billing / suscripción (Stripe) =====
-// Checkout/portal abren URLs externas (regla 10: sin IAP en móvil, billing es
-// read-only y se delega a Stripe vía Linking).
+// ===== Billing / suscripción =====
+// Billing es read-only en móvil (regla 10): "Administrar" abre el gestor de la
+// tienda o la página de facturación web.
 
 
 export const ADMIN_SYSTEM_STATS_QUERY = gql`
@@ -236,8 +236,8 @@ export const ADMIN_SUBSCRIBERS_QUERY = gql`
         planRenewsAt
         cancelAtPeriodEnd
         isBillingExempt
-        stripeCustomerId
-        stripeSubscriptionId
+        billingCustomerId
+        billingTransactionId
       }
       page
       perPage

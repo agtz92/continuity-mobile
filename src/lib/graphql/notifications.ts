@@ -150,4 +150,4 @@ export const RUN_NOTIFICATION_ACTION = gql`
 // ===== Cuenta y feedback =====
 
 // Permanently deletes the user's account + all data (Apple requirement). After
-// success the client must sign out. Does NOT cancel Stripe — warn the user.
+// success the client must sign out. Does NOT cancel the subscription — warn the user.
