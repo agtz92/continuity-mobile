@@ -14,13 +14,19 @@ import { submit } from "./queue";
  */
 
 export {
+  discardFailed,
+  failedCount,
+  failedOps,
   flushOutbox,
   pendingCount,
   purgeOutbox,
   refreshAll,
+  retryFailed,
   startOutbox,
   subscribePending,
+  type FailedOp,
 } from "./queue";
+export { quotaMessage } from "./quota";
 
 export interface TaskData {
   title: string;

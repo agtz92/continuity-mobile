@@ -1,12 +1,13 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { CloudOff } from "lucide-react-native";
+import { AlertCircle, CloudOff } from "lucide-react-native";
 import { useOnline } from "@/lib/network";
 import { getSyncedAt, subscribeSyncedAt } from "@/lib/cachePersist";
-import { pendingCount, subscribePending } from "@/lib/outbox";
+import { failedCount, pendingCount, subscribePending } from "@/lib/outbox";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { lift } from "@/theme/lift";
 
@@ -14,6 +15,10 @@ import { lift } from "@/theme/lift";
  * Pastilla "Sin conexión · actualizado hace X" mientras no hay red. Lo que se
  * ve es la caché persistida (`lib/cachePersist.ts`), así que decir de cuándo
  * es importa más que decir que falta la red. No captura toques.
+ *
+ * Si algo hecho sin red no entró (`failedOps` de la cola), la pastilla pasa a
+ * decirlo —con prioridad sobre lo demás— y se puede tocar para ir a
+ * "No se pudo guardar".
  */
 export function OfflineBanner() {
   const { t } = useTranslation();
@@ -22,6 +27,8 @@ export function OfflineBanner() {
   const online = useOnline();
   const syncedAt = useSyncExternalStore(subscribeSyncedAt, getSyncedAt);
   const pending = useSyncExternalStore(subscribePending, pendingCount);
+  const failed = useSyncExternalStore(subscribePending, failedCount);
+  const router = useRouter();
 
   // Re-render cada minuto para que el "hace X" avance.
   const [, setTick] = useState(0);
@@ -33,9 +40,11 @@ export function OfflineBanner() {
 
   // Con red y cola vacía no hay nada que decir. Con red y cola llena, se está
   // mandando lo hecho offline (dura un instante, salvo que el servidor falle).
-  if (online && pending === 0) return null;
+  if (online && pending === 0 && failed === 0) return null;
 
-  const label = online
+  const label = failed > 0
+    ? t("offline.failed.banner", { count: failed })
+    : online
     ? t("offline.syncing", { count: pending })
     : [
         syncedAt
@@ -45,6 +54,34 @@ export function OfflineBanner() {
       ]
         .filter(Boolean)
         .join(" · ");
+
+  if (failed > 0) {
+    return (
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: "absolute",
+          top: insets.top + 4,
+          left: 0,
+          right: 0,
+          alignItems: "center",
+          zIndex: 55,
+        }}
+      >
+        <Pressable
+          onPress={() => router.push("/unsaved")}
+          accessibilityRole="button"
+          className="flex-row items-center gap-1.5 rounded-full border bg-surface px-3 py-1"
+          style={{ borderColor: c.signal, ...lift("float", c) }}
+        >
+          <AlertCircle size={13} color={c.signal} />
+          <Text className="font-sans-medium text-xs" style={{ color: c.signal }}>
+            {label}
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View

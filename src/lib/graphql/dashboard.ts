@@ -114,6 +114,14 @@ export const DASHBOARD_QUERY = gql`
         created
       }
       lastBackup
+      quota {
+        plan
+        blockingKinds
+        caps {
+          kind
+          cap
+        }
+      }
     }
   }
 `;

@@ -8,6 +8,7 @@ import { supabase } from "./supabase";
 import { toast } from "./toast";
 import { isOnline } from "./network";
 import { markSynced } from "./cachePersist";
+import { quotaMessage } from "./outbox/quota";
 import i18n from "./i18n";
 
 const graphqlUrl = process.env.EXPO_PUBLIC_GRAPHQL_URL;
@@ -46,13 +47,32 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   // de cada intento sería ruido. Los errores del servidor sí se muestran.
   const fromOutbox = Boolean(operation.getContext().outbox);
   if (CombinedGraphQLErrors.is(error)) {
+    // La cola avisa ella misma de lo que el servidor rechaza (y lo guarda);
+    // aquí solo queda cerrar sesión si el token ya no sirve.
+    if (fromOutbox) {
+      if (error.errors.some((e) => e.extensions?.code === "UNAUTHENTICATED")) {
+        toast.error(i18n.t("errors.unauthenticated"));
+        void supabase.auth.signOut();
+      }
+      return;
+    }
     let unauthenticated = false;
     for (const gqlError of error.errors) {
       const code = gqlError.extensions?.code;
       if (code === "UNAUTHENTICATED") {
         unauthenticated = true;
       } else if (code === "DB_UNAVAILABLE") {
-        if (!fromOutbox) toast.error(i18n.t("errors.connectionLost"));
+        toast.error(i18n.t("errors.connectionLost"));
+      } else if (code === "QUOTA_EXCEEDED") {
+        const ext = gqlError.extensions as Record<string, unknown>;
+        toast.error(
+          quotaMessage({
+            kind: String(ext.kind),
+            current: Number(ext.current),
+            cap: Number(ext.cap),
+            plan: String(ext.plan),
+          })
+        );
       } else if (gqlError.message) {
         // App-level errors carry a human message from the backend.
         toast.error(gqlError.message);

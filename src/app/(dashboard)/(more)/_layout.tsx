@@ -68,6 +68,10 @@ export default function MoreLayout() {
         name="report-bug"
         options={{ ...headered, title: t("reportBug.title") }}
       />
+      <Stack.Screen
+        name="unsaved"
+        options={{ ...headered, title: t("offline.failed.title") }}
+      />
     </Stack>
   );
 }

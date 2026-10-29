@@ -208,7 +208,9 @@
       "routines": "You hit your active routines limit on the {plan} plan ({current}/{cap}). Archive one or upgrade.",
       "ideas": "You hit your ideas limit on the {plan} plan ({current}/{cap}). Promote one to a project or delete it.",
       "categories": "You hit your categories limit on the {plan} plan ({current}/{cap}).",
-      "notes_per_project": "You hit the per-project notes limit on the {plan} plan ({current}/{cap})."
+      "notes_per_project": "You hit the per-project notes limit on the {plan} plan ({current}/{cap}).",
+      "quick_notes": "You hit your notes limit on the {plan} plan ({current}/{cap}). Delete one or upgrade.",
+      "sections_per_note": "You hit the per-note sections limit on the {plan} plan ({current}/{cap})."
     },
     "retentionAlreadyUsed": "You've already used a retention offer. We'll take you straight to confirm cancellation.",
     "noActiveSubscription": "This account has no active subscription.",
@@ -224,7 +226,32 @@
     "bannerSince": "Offline · updated {ago}",
     "needsConnection": "Needs a connection",
     "pending": "{count, plural, one {# change pending} other {# changes pending}}",
-    "syncing": "{count, plural, one {Saving # change…} other {Saving # changes…}}"
+    "syncing": "{count, plural, one {Saving # change…} other {Saving # changes…}}",
+    "failed": {
+      "banner": "{count, plural, one {# change couldn't be saved} other {# changes couldn't be saved}}",
+      "toast": "A change you made offline couldn't be saved. Tap the notice at the top to see it.",
+      "title": "Couldn't save",
+      "intro": "You made these offline and the server didn't accept them when you reconnected. Nothing was deleted: you can retry, copy the text or discard them.",
+      "emptyTitle": "Everything is saved",
+      "emptyBody": "There are no changes left to review.",
+      "retry": "Retry",
+      "retried": "Saved",
+      "copy": "Copy",
+      "copied": "Text copied",
+      "discard": "Discard",
+      "discardConfirm": "Discard this change?",
+      "discardConfirmBody": "It's removed from this phone and can't be recovered.",
+      "noText": "(no text)",
+      "kinds": {
+        "task": "Task",
+        "idea": "Idea",
+        "projectNote": "Project update",
+        "routine": "Routine",
+        "quickNote": "Note",
+        "section": "Note section",
+        "other": "Change"
+      }
+    }
   },
   "common": {
     "loading": "Loading…",

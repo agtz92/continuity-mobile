@@ -2,8 +2,11 @@ import { AppState, type NativeEventSubscription } from "react-native";
 import { File, Paths } from "expo-file-system";
 import { CombinedGraphQLErrors, ServerError } from "@apollo/client/errors";
 import { apolloCache, apolloClient } from "@/lib/apollo";
+import i18n from "@/lib/i18n";
 import { isOnline, onReconnect } from "@/lib/network";
+import { toast } from "@/lib/toast";
 import { OPS, newId, type OpKind } from "./ops";
+import { quotaHit, quotaMessage } from "./quota";
 
 /**
  * La cola de cambios ("outbox"): lo que el usuario hace sin red se pinta ya y
@@ -15,9 +18,13 @@ import { OPS, newId, type OpKind } from "./ops";
  *   es idempotente, así que reenviar algo que ya entró no hace daño.
  * - **Errores:** red/5xx/`DB_UNAVAILABLE` → la operación se queda y se
  *   reintenta (al volver la red, al volver a primer plano o con backoff). Un
- *   error del servidor (validación, cupo, no existe) la descarta: reintentarla
- *   daría lo mismo. El `errorLink` ya muestra el mensaje y el refetch del
- *   final quita de la caché lo que no entró.
+ *   error del servidor (validación, cupo, no existe) la saca de la cola:
+ *   reintentarla sola daría lo mismo. Si alguien la estaba esperando (un
+ *   formulario, con red) se le avisa y el formulario sigue abierto; si se hizo
+ *   sin red, **no se tira**: pasa a "No se pudo guardar" (`failedOps`) con lo
+ *   que el usuario escribió, para reintentar, copiar o descartar a mano.
+ * - **Tope del plan sin red:** antes de encolar un create se revisa el tope
+ *   con la misma regla del servidor (`quota.ts`); si no cabe, no se crea.
  * - **Online se siente igual que antes:** `submit` espera a que el servidor
  *   conteste antes de resolver, así un formulario que falla se queda abierto.
  *   Sin red resuelve `true` en cuanto la operación quedó guardada.
@@ -44,6 +51,27 @@ let inFlight: string | null = null;
 let retryTimer: ReturnType<typeof setTimeout> | undefined;
 let cleanup: Array<() => void> = [];
 
+/** Lo que el servidor rechazó sin que nadie lo esperara (ver arriba). */
+export interface FailedOp extends OutboxOp {
+  error: string;
+  failedAt: number;
+}
+let failed: FailedOp[] = [];
+
+/** Solo vale la pena guardar lo que lleva texto del usuario. */
+const KEEP_ON_FAILURE = new Set<OpKind>([
+  "task.create",
+  "task.update",
+  "idea.create",
+  "projectNote.add",
+  "routine.create",
+  "routine.update",
+  "quickNote.create",
+  "quickNote.update",
+  "section.add",
+  "section.update",
+]);
+
 const waiters = new Map<string, (ok: boolean) => void>();
 const listeners = new Set<() => void>();
 
@@ -56,7 +84,7 @@ function persist(): void {
   try {
     const file = fileFor(userId);
     if (!file.exists) file.create();
-    file.write(JSON.stringify(queue));
+    file.write(JSON.stringify({ queue, failed }));
   } catch {
     /* sin disco: la cola sigue en memoria */
   }
@@ -75,6 +103,10 @@ export function pendingCount(): number {
   return queue.length;
 }
 
+export function failedCount(): number {
+  return failed.length;
+}
+
 export function subscribePending(fn: () => void): () => void {
   listeners.add(fn);
   return () => {
@@ -90,9 +122,13 @@ export async function startOutbox(uid: string): Promise<void> {
   userId = uid;
   try {
     const file = fileFor(uid);
-    queue = file.exists ? (JSON.parse(await file.text()) as OutboxOp[]) : [];
+    const saved = file.exists ? JSON.parse(await file.text()) : null;
+    // Antes el archivo era solo la lista de la cola.
+    queue = Array.isArray(saved) ? saved : saved?.queue ?? [];
+    failed = Array.isArray(saved) ? [] : saved?.failed ?? [];
   } catch {
     queue = [];
+    failed = [];
   }
   notify();
 
@@ -113,6 +149,7 @@ function stopOutbox(): void {
   waiters.clear();
   userId = null;
   queue = [];
+  failed = [];
 }
 
 /** Cerrar sesión: tira la cola de este usuario y la de cualquiera anterior. */
@@ -136,6 +173,17 @@ export function purgeOutbox(): void {
  */
 export function submit(kind: OpKind, variables: Record<string, unknown>): Promise<boolean> {
   const spec = OPS[kind];
+
+  // Sin red nadie más puede decir "no cabe": se revisa aquí. Con red decide el
+  // servidor (y el formulario espera su respuesta).
+  if (!isOnline()) {
+    const hit = quotaHit(apolloCache, kind, variables);
+    if (hit) {
+      toast.error(quotaMessage(hit));
+      return Promise.resolve(false);
+    }
+  }
+
   try {
     spec.apply(apolloCache, variables);
   } catch {
@@ -214,6 +262,24 @@ function isPermanent(err: unknown): boolean {
   return false;
 }
 
+/** Por qué lo rechazó el servidor, en el idioma del usuario. */
+function errorMessage(err: unknown): string {
+  if (CombinedGraphQLErrors.is(err)) {
+    const first = err.errors[0];
+    const ext = (first?.extensions ?? {}) as Record<string, any>;
+    if (ext.code === "QUOTA_EXCEEDED") {
+      return quotaMessage({
+        kind: String(ext.kind),
+        current: Number(ext.current),
+        cap: Number(ext.cap),
+        plan: String(ext.plan),
+      });
+    }
+    if (first?.message) return first.message;
+  }
+  return i18n.t("errors.generic");
+}
+
 function scheduleRetry(attempts: number): void {
   clearTimeout(retryTimer);
   const delay = Math.min(RETRY_BASE_MS * 2 ** Math.max(0, attempts - 1), RETRY_MAX_MS);
@@ -244,7 +310,15 @@ export async function flushOutbox(): Promise<void> {
       } catch (err) {
         if (isPermanent(err)) {
           queue = queue.filter((q) => q.opId !== op.opId);
-          settle(op.opId, false);
+          const message = errorMessage(err);
+          if (waiters.has(op.opId)) {
+            // Un formulario con red espera: él conserva lo escrito.
+            toast.error(message);
+            settle(op.opId, false);
+          } else if (KEEP_ON_FAILURE.has(op.kind)) {
+            failed = [...failed, { ...op, error: message, failedAt: Date.now() }];
+            toast.error(i18n.t("offline.failed.toast"));
+          }
           sent = true;
         } else {
           op.attempts += 1;
@@ -281,4 +355,25 @@ export function refreshAll(): void {
     return;
   }
   void apolloClient.refetchQueries({ include: "active" });
+}
+
+// ---- "No se pudo guardar" ----------------------------------------------------
+
+export function failedOps(): FailedOp[] {
+  return failed;
+}
+
+/** Vuelve a intentar uno rechazado. Si tampoco entra, se queda en la lista. */
+export async function retryFailed(opId: string): Promise<boolean> {
+  const item = failed.find((f) => f.opId === opId);
+  if (!item) return false;
+  const ok = await submit(item.kind, item.variables);
+  if (ok) discardFailed(opId);
+  return ok;
+}
+
+export function discardFailed(opId: string): void {
+  failed = failed.filter((f) => f.opId !== opId);
+  persist();
+  notify();
 }

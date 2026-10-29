@@ -22,7 +22,7 @@ import type { InMemoryCache, NormalizedCacheObject } from "@apollo/client";
  *
  * Plan completo: `continuity/docs/plan-offline-movil.md` (fase 1).
  */
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const SAVE_THROTTLE_MS = 1000;
 const PREFIX = "apollo-cache-";
 

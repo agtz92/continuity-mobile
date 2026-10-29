@@ -147,7 +147,32 @@
     "bannerSince": "Sin conexión · actualizado {ago}",
     "needsConnection": "Necesita conexión",
     "pending": "{count, plural, one {# cambio pendiente} other {# cambios pendientes}}",
-    "syncing": "{count, plural, one {Guardando # cambio…} other {Guardando # cambios…}}"
+    "syncing": "{count, plural, one {Guardando # cambio…} other {Guardando # cambios…}}",
+    "failed": {
+      "banner": "{count, plural, one {# cambio no se pudo guardar} other {# cambios no se pudieron guardar}}",
+      "toast": "Un cambio que hiciste sin conexión no se pudo guardar. Toca el aviso de arriba para verlo.",
+      "title": "No se pudo guardar",
+      "intro": "Esto lo hiciste sin conexión y el servidor no lo aceptó al reconectar. Nada se borró: puedes reintentarlo, copiar el texto o descartarlo.",
+      "emptyTitle": "Todo está guardado",
+      "emptyBody": "No hay cambios pendientes de revisar.",
+      "retry": "Reintentar",
+      "retried": "Guardado",
+      "copy": "Copiar",
+      "copied": "Texto copiado",
+      "discard": "Descartar",
+      "discardConfirm": "¿Descartar este cambio?",
+      "discardConfirmBody": "Se borra del teléfono y no se puede recuperar.",
+      "noText": "(sin texto)",
+      "kinds": {
+        "task": "Tarea",
+        "idea": "Idea",
+        "projectNote": "Update de proyecto",
+        "routine": "Rutina",
+        "quickNote": "Nota",
+        "section": "Sección de nota",
+        "other": "Cambio"
+      }
+    }
   },
   "common": {
     "loading": "Cargando…",
@@ -239,7 +264,9 @@
       "routines": "Llegaste al límite de rutinas activas en el plan {plan} ({current}/{cap}). Archiva alguna o sube de plan.",
       "ideas": "Llegaste al límite de ideas en el plan {plan} ({current}/{cap}). Convierte alguna en proyecto o elimínala.",
       "categories": "Llegaste al límite de categorías en el plan {plan} ({current}/{cap}).",
-      "notes_per_project": "Llegaste al límite de notas para este proyecto en el plan {plan} ({current}/{cap})."
+      "notes_per_project": "Llegaste al límite de notas para este proyecto en el plan {plan} ({current}/{cap}).",
+      "quick_notes": "Llegaste al límite de notas en el plan {plan} ({current}/{cap}). Borra alguna o sube de plan.",
+      "sections_per_note": "Llegaste al límite de secciones para esta nota en el plan {plan} ({current}/{cap})."
     },
     "retentionAlreadyUsed": "Ya usaste una oferta de retención antes. Si quieres cancelar, te llevamos a la confirmación.",
     "noActiveSubscription": "Esta cuenta no tiene una suscripción activa.",
