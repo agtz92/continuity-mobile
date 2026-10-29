@@ -15,6 +15,7 @@ import { FormInput } from "@/components/ui/FormInput";
 import { confirmAsync } from "@/lib/confirm";
 import { signOut } from "@/lib/signOut";
 import { toast } from "@/lib/toast";
+import { useOnline } from "@/lib/network";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 type ProfileData = { profile: { avatar: string | null; firstName: string | null } };
@@ -33,6 +34,7 @@ export default function Profile() {
   });
   const [deleteAccountMutation, { loading: deleting }] =
     useMutation(DELETE_ACCOUNT);
+  const online = useOnline();
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [name, setName] = useState<string | null>(null);
@@ -223,15 +225,17 @@ export default function Profile() {
         </Pressable>
         <Pressable
           onPress={() => void handleDeleteAccount()}
-          disabled={deleting}
+          disabled={deleting || !online}
           accessibilityRole="button"
           className="items-center rounded-lg py-3"
-          style={{ backgroundColor: c.signal, opacity: deleting ? 0.6 : 1 }}
+          style={{ backgroundColor: c.signal, opacity: deleting || !online ? 0.6 : 1 }}
         >
           <Text className="text-base font-sans-semibold text-white">
             {deleting
               ? t("settings.deleteAccount.deleting")
-              : t("settings.deleteAccount.button")}
+              : online
+                ? t("settings.deleteAccount.button")
+                : t("offline.needsConnection")}
           </Text>
         </Pressable>
       </View>

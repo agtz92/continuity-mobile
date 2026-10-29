@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   AlertCircle,
+  CloudOff,
   Plus,
   Send,
   Sparkles,
@@ -28,6 +29,7 @@ import { QuickActionChips } from "@/components/assistant/QuickActionChips";
 import { ActionMenu } from "@/components/assistant/ActionMenu";
 import { AssistantLocked } from "@/components/assistant/AssistantLocked";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { useOnline } from "@/lib/network";
 
 const MAX_INPUT_CHARS = 4000;
 
@@ -69,7 +71,9 @@ export default function AssistantScreen() {
   const isLocked = mode === "none";
   const isEmpty = messages.length === 0;
   const trimmed = input.trim();
-  const canSend = !streaming && trimmed.length > 0;
+  // Loop siempre necesita red: sin ella se ve el historial, pero no se envía.
+  const online = useOnline();
+  const canSend = !streaming && online && trimmed.length > 0;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -174,12 +178,21 @@ export default function AssistantScreen() {
           </View>
         )}
 
+        {!online && !isLocked && (
+          <View className="mx-4 mb-2 flex-row items-center gap-2 rounded-lg border border-border px-3 py-2">
+            <CloudOff size={14} color={c.text3} />
+            <Text className="font-sans flex-1 text-xs text-text-muted">
+              {t("offline.needsConnection")}
+            </Text>
+          </View>
+        )}
+
         {isChat && isEmpty && (
-          <QuickActionChips onPick={handlePick} disabled={streaming} />
+          <QuickActionChips onPick={handlePick} disabled={streaming || !online} />
         )}
 
         {isCanned && (
-          <ActionMenu groups={actions} onRun={runCanned} disabled={streaming} />
+          <ActionMenu groups={actions} onRun={runCanned} disabled={streaming || !online} />
         )}
 
         {/*

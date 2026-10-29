@@ -14,6 +14,7 @@ import {
 } from "@/lib/assistantApi";
 import { confirmAsync } from "@/lib/confirm";
 import { toast } from "@/lib/toast";
+import { useOnline } from "@/lib/network";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 /**
@@ -26,6 +27,7 @@ export function YourDataSection() {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const [exporting, setExporting] = useState(false);
+  const online = useOnline();
   const [conversations, setConversations] = useState<ConversationListItem[] | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
@@ -93,10 +95,10 @@ export function YourDataSection() {
         </Text>
         <Pressable
           onPress={() => void handleExport()}
-          disabled={exporting}
+          disabled={exporting || !online}
           accessibilityRole="button"
           className="flex-row items-center justify-center gap-2 rounded-lg border border-border bg-bg py-3 active:opacity-80"
-          style={{ opacity: exporting ? 0.6 : 1 }}
+          style={{ opacity: exporting || !online ? 0.6 : 1 }}
         >
           <Download size={16} color={c.text} />
           <Text className="font-sans-medium text-sm text-text">

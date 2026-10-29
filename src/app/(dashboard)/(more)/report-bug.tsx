@@ -8,6 +8,7 @@ import { BugTopicSelect } from "@/components/ui/BugTopicSelect";
 import { useReportMutations } from "@/hooks/useReportMutations";
 import { BUG_TOPIC_VALUES } from "@/lib/bugTopics";
 import { toast } from "@/lib/toast";
+import { useOnline } from "@/lib/network";
 
 const MAX_MESSAGE_LEN = 4000;
 
@@ -25,8 +26,9 @@ export default function ReportBug() {
     [t]
   );
 
+  const online = useOnline();
   const canSubmit =
-    topic.trim().length > 0 && message.trim().length > 0 && !submitting;
+    online && topic.trim().length > 0 && message.trim().length > 0 && !submitting;
 
   const onSubmit = async () => {
     if (!canSubmit) return;
@@ -86,7 +88,11 @@ export default function ReportBug() {
         style={{ opacity: canSubmit ? 1 : 0.5 }}
       >
         <Text className="text-base font-sans-semibold text-white">
-          {submitting ? t("reportBug.sending") : t("reportBug.submit")}
+          {submitting
+            ? t("reportBug.sending")
+            : online
+              ? t("reportBug.submit")
+              : t("offline.needsConnection")}
         </Text>
       </Pressable>
     </ScrollView>

@@ -142,6 +142,11 @@
       "dismiss": "Ocultar"
     }
   },
+  "offline": {
+    "banner": "Sin conexión",
+    "bannerSince": "Sin conexión · actualizado {ago}",
+    "needsConnection": "Necesita conexión"
+  },
   "common": {
     "loading": "Cargando…",
     "save": "Guardar",
@@ -240,6 +245,7 @@
     "unauthenticated": "Tu sesión expiró. Inicia sesión de nuevo.",
     "badInput": "La información que enviaste no es válida. Revisa e inténtalo otra vez.",
     "connectionLost": "No pudimos conectar con el servidor. Inténtalo de nuevo en un momento.",
+    "offlineNotSaved": "Sin conexión: este cambio no se guardó. Inténtalo cuando vuelva la red.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
   },
   "dashboard": {

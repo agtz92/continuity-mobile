@@ -216,7 +216,13 @@
     "unauthenticated": "Your session expired. Please sign in again.",
     "badInput": "The information you submitted is invalid. Check and try again.",
     "connectionLost": "We couldn't reach the server. Please try again in a moment.",
+    "offlineNotSaved": "You're offline: this change wasn't saved. Try again once you're back online.",
     "generic": "Something went wrong. Please try again."
+  },
+  "offline": {
+    "banner": "You're offline",
+    "bannerSince": "Offline · updated {ago}",
+    "needsConnection": "Needs a connection"
   },
   "common": {
     "loading": "Loading…",

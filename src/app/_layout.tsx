@@ -4,7 +4,7 @@ import "@/lib/polyfills";
 import "../global.css";
 import "@/lib/i18n";
 
-import { useEffect } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -13,12 +13,14 @@ import {
 } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
-import { apolloClient } from "@/lib/apollo";
+import { apolloCache, apolloClient } from "@/lib/apollo";
+import { startCachePersistence } from "@/lib/cachePersist";
 import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { Toaster } from "@/components/ui/Toaster";
 import { useLiveSync } from "@/hooks/useLiveSync";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
 
 // Keep the native splash up until the theme has hydrated from AsyncStorage and
 // auth has resolved (see ThemeProvider). Prevents the "blank, then everything
@@ -84,6 +86,31 @@ function useProtectedRoute() {
   }, [session, loading, segments, router, onb, onbLoading]);
 }
 
+// Restaura la caché persistida del usuario ANTES de montar nada que haga
+// queries: así lo primero que leen es lo guardado (offline o arranque en frío)
+// y no un caché vacío. Mientras tanto el splash sigue arriba (lo baja
+// ThemeProvider, que aún no se monta). Ver `lib/cachePersist.ts`.
+function CachePersistGate({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuth();
+  const userId = session?.user?.id ?? null;
+  const [readyFor, setReadyFor] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    void startCachePersistence(apolloCache, userId).finally(() => {
+      if (!cancelled) setReadyFor(userId);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  if (loading) return null;
+  if (userId && readyFor !== userId) return null;
+  return <>{children}</>;
+}
+
 function RootNavigator() {
   useProtectedRoute();
   // Datos frescos sin cerrar la app: señales en vivo + refetch al volver.
@@ -99,6 +126,7 @@ function RootNavigator() {
           options={{ presentation: "fullScreenModal" }}
         />
       </Stack>
+      <OfflineBanner />
       <Toaster />
     </>
   );
@@ -114,9 +142,11 @@ export default function RootLayout() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ApolloProvider client={apolloClient}>
         <AuthProvider>
-          <ThemeProvider>
-            <RootNavigator />
-          </ThemeProvider>
+          <CachePersistGate>
+            <ThemeProvider>
+              <RootNavigator />
+            </ThemeProvider>
+          </CachePersistGate>
         </AuthProvider>
       </ApolloProvider>
     </SafeAreaProvider>

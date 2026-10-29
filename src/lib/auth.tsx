@@ -5,8 +5,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Session } from "@supabase/supabase-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { isAuthRetryableFetchError, type Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import { onReconnect } from "./network";
 
 type AuthContextValue = {
   session: Session | null;
@@ -27,11 +29,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    // `true` mientras la sesión en uso es la guardada en disco porque el
+    // refresh del token falló por red (ver `resolveSession`).
+    let usingStored = false;
+    let cancelled = false;
+
+    const resolveSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (!data.session && error && isAuthRetryableFetchError(error)) {
+        // Sin red y con el access token vencido, Supabase responde "sin
+        // sesión" aunque la tenga guardada (y no la borra: el error es
+        // reintentable). Tratarlo como cierre de sesión mandaría a login a
+        // quien solo está offline. Se usa la guardada — basta para elegir la
+        // caché persistida del usuario — y al volver la red se refresca.
+        const stored = await readStoredSession();
+        if (cancelled) return;
+        usingStored = !!stored;
+        setSession(stored);
+      } else {
+        usingStored = false;
+        setSession(data.session);
+      }
       setLoading(false);
-    });
+    };
+
+    void resolveSession();
     const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
+      // La sesión inicial la decide `resolveSession` (que sabe distinguir
+      // "offline" de "no hay sesión"); INITIAL_SESSION llegaría con null.
+      if (event === "INITIAL_SESSION") return;
+      usingStored = false;
       setSession(next);
       setLoading(false);
       // Import tardío: signOut.ts trae Apollo, que no debe cargar antes que la sesión.
@@ -39,7 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void import("./signOut").then((m) => m.clearUserData());
       }
     });
-    return () => sub.subscription.unsubscribe();
+    const offReconnect = onReconnect(() => {
+      if (usingStored) void resolveSession();
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+      offReconnect();
+    };
   }, []);
 
   return (
@@ -47,4 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
+}
+
+/** La sesión tal como Supabase la dejó en AsyncStorage, sin validar. */
+async function readStoredSession(): Promise<Session | null> {
+  try {
+    const key = (supabase.auth as unknown as { storageKey: string }).storageKey;
+    const raw = await AsyncStorage.getItem(key);
+    const parsed = raw ? (JSON.parse(raw) as Session) : null;
+    return parsed?.user?.id ? parsed : null;
+  } catch {
+    return null;
+  }
 }
