@@ -1,16 +1,13 @@
 import { useMutation } from "@apollo/client/react";
 import { useTranslation } from "react-i18next";
 import {
-  ADD_NOTE_SECTION,
-  CREATE_QUICK_NOTE,
   DELETE_NOTE_SECTION,
   DELETE_QUICK_NOTE,
   QUICK_NOTES_QUERY,
   REORDER_NOTE_SECTIONS,
   SET_QUICK_NOTE_PINNED,
-  UPDATE_NOTE_SECTION,
-  UPDATE_QUICK_NOTE,
 } from "@/lib/graphql";
+import * as outbox from "@/lib/outbox";
 import { confirmAsync } from "@/lib/confirm";
 import { deleteFeedback } from "@/lib/feedback";
 import type { NoteSection, QuickNote } from "@/lib/types";
@@ -26,44 +23,23 @@ type NotePatch = {
 
 export function useQuickNoteMutations() {
   const { t } = useTranslation();
-  const [createM] = useMutation(CREATE_QUICK_NOTE, refetchAfter);
-  const [updateM] = useMutation(UPDATE_QUICK_NOTE, refetchAfter);
+  // Crear/editar notas y secciones funciona sin red: va por la cola
+  // (`lib/outbox`). Fijar, borrar y reordenar siguen necesitando conexión.
   const [pinM] = useMutation(SET_QUICK_NOTE_PINNED, refetchAfter);
   const [deleteM] = useMutation(DELETE_QUICK_NOTE, refetchAfter);
-  const [addSectionM] = useMutation(ADD_NOTE_SECTION, refetchAfter);
-  const [updateSectionM] = useMutation(UPDATE_NOTE_SECTION, refetchAfter);
   const [deleteSectionM] = useMutation(DELETE_NOTE_SECTION, refetchAfter);
   const [reorderM] = useMutation(REORDER_NOTE_SECTIONS, refetchAfter);
 
-  const createNote = async (patch: NotePatch = {}): Promise<QuickNote | null> => {
-    try {
-      const res = await createM({
-        variables: {
-          data: {
-            title: patch.title ?? "",
-            categoryId: patch.categoryId ?? null,
-            projectId: patch.projectId ?? null,
-            pinned: patch.pinned ?? false,
-          },
-        },
-      });
-      return ((res.data as { createQuickNote?: QuickNote } | null)?.createQuickNote) ?? null;
-    } catch {
-      return null;
-    }
-  };
+  const createNote = (patch: NotePatch = {}): Promise<QuickNote | null> =>
+    outbox.createQuickNote<QuickNote>({
+      title: patch.title ?? "",
+      categoryId: patch.categoryId ?? null,
+      projectId: patch.projectId ?? null,
+      pinned: patch.pinned ?? false,
+    });
 
-  const updateNote = async (
-    id: string,
-    data: Required<NotePatch>
-  ): Promise<boolean> => {
-    try {
-      await updateM({ variables: { id, data } });
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  const updateNote = (id: string, data: Required<NotePatch>): Promise<boolean> =>
+    outbox.updateQuickNote(id, data);
 
   const setPinned = async (id: string, pinned: boolean): Promise<void> => {
     try {
@@ -100,36 +76,17 @@ export function useQuickNoteMutations() {
   const addSection = async (
     noteId: string,
     patch: { heading?: string; body?: string; collapsed?: boolean } = {}
-  ): Promise<NoteSection | null> => {
-    try {
-      const res = await addSectionM({
-        variables: {
-          noteId,
-          data: {
-            heading: patch.heading ?? "",
-            body: patch.body ?? "",
-            collapsed: patch.collapsed ?? false,
-            position: null,
-          },
-        },
-      });
-      return ((res.data as { addNoteSection?: NoteSection } | null)?.addNoteSection) ?? null;
-    } catch {
-      return null;
-    }
-  };
+  ): Promise<NoteSection | null> =>
+    outbox.addNoteSection<NoteSection>(noteId, {
+      heading: patch.heading ?? "",
+      body: patch.body ?? "",
+      collapsed: patch.collapsed ?? false,
+    });
 
-  const updateSection = async (
+  const updateSection = (
     id: string,
     data: { heading: string; body: string; collapsed: boolean }
-  ): Promise<boolean> => {
-    try {
-      await updateSectionM({ variables: { id, data } });
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  ): Promise<boolean> => outbox.updateNoteSection(id, data);
 
   /**
    * `draft` is what the card shows right now (it may hold unsaved edits). An

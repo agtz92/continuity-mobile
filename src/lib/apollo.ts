@@ -42,6 +42,9 @@ const authLink = new SetContextLink(async (prevContext) => {
 // for days ("server closed the connection unexpectedly") — show a localized
 // retry message and, critically, do NOT sign the user out.
 const errorLink = new ErrorLink(({ error, operation }) => {
+  // La cola offline (`lib/outbox`) reintenta sola los fallos de red: avisar
+  // de cada intento sería ruido. Los errores del servidor sí se muestran.
+  const fromOutbox = Boolean(operation.getContext().outbox);
   if (CombinedGraphQLErrors.is(error)) {
     let unauthenticated = false;
     for (const gqlError of error.errors) {
@@ -49,7 +52,7 @@ const errorLink = new ErrorLink(({ error, operation }) => {
       if (code === "UNAUTHENTICATED") {
         unauthenticated = true;
       } else if (code === "DB_UNAVAILABLE") {
-        toast.error(i18n.t("errors.connectionLost"));
+        if (!fromOutbox) toast.error(i18n.t("errors.connectionLost"));
       } else if (gqlError.message) {
         // App-level errors carry a human message from the backend.
         toast.error(gqlError.message);
@@ -69,6 +72,8 @@ const errorLink = new ErrorLink(({ error, operation }) => {
     void supabase.auth.signOut();
     return;
   }
+
+  if (error && fromOutbox) return;
 
   if (error) {
     // 5xx, or a reachability failure (offline / DNS / connection reset) — all

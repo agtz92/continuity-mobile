@@ -1,22 +1,18 @@
 import { useMutation } from "@apollo/client/react";
 import {
   ADD_TASK_BLOCKER,
-  CREATE_TASK,
   DASHBOARD_QUERY,
   DELETE_TASK,
   REMOVE_TASK_BLOCKER,
   REORDER_PROJECT_TASKS,
-  TOGGLE_TASK,
-  UPDATE_TASK,
 } from "@/lib/graphql";
+import * as outbox from "@/lib/outbox";
 import type { Task } from "@/lib/types";
 
 const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
 
 export function useTaskMutations() {
-  const [createTask] = useMutation(CREATE_TASK, refetchAfter);
-  const [updateTask] = useMutation(UPDATE_TASK, refetchAfter);
-  const [toggleTaskM] = useMutation(TOGGLE_TASK, refetchAfter);
+  // Crear, editar y marcar funcionan sin red: van por la cola (`lib/outbox`).
   const [deleteTaskM] = useMutation(DELETE_TASK, refetchAfter);
   const [addBlockerM] = useMutation(ADD_TASK_BLOCKER, refetchAfter);
   const [removeBlockerM] = useMutation(REMOVE_TASK_BLOCKER, refetchAfter);
@@ -43,24 +39,12 @@ export function useTaskMutations() {
       ...(t.dueTime !== undefined ? { dueTime: t.dueTime } : {}),
       ...(t.durationMinutes !== undefined ? { durationMinutes: t.durationMinutes } : {}),
     };
-    try {
-      if (t.id) {
-        await updateTask({ variables: { id: t.id, data } });
-      } else {
-        await createTask({ variables: { data } });
-      }
-      return true;
-    } catch {
-      return false;
-    }
+    return t.id ? outbox.updateTask(t.id, data) : outbox.createTask(data);
   };
 
+  // Estado explícito, no toggle: la operación puede salir tarde o repetirse.
   const toggleTask = async (t: Task): Promise<void> => {
-    try {
-      await toggleTaskM({ variables: { id: t.id } });
-    } catch {
-      /* swallow — surface errors at the screen layer */
-    }
+    await outbox.setTaskDone(t.id, !t.done);
   };
 
   /** Persiste el orden manual de las tareas pendientes de un proyecto. La
@@ -130,6 +114,6 @@ export function useTaskMutations() {
     addTaskBlocker,
     removeTaskBlocker,
     reorderProjectTasks,
-    raw: { createTask, deleteTask: deleteTaskM },
+    raw: { deleteTask: deleteTaskM },
   };
 }

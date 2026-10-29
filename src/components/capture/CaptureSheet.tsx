@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client/react";
-import type { ApolloCache } from "@apollo/client";
 
 import type { Project } from "@/lib/types";
 import { BottomSheet } from "@/components/ui/BottomSheet";
@@ -16,36 +14,12 @@ import {
   quickParse,
   type CaptureKind,
 } from "@/lib/quickParse";
-import { CREATE_TASK, DASHBOARD_QUERY, CREATE_IDEA, ADD_NOTE } from "@/lib/graphql";
-import { insertIntoDashboard, type DashboardList } from "@/lib/captureCache";
+// Tarea, idea y update van por la cola offline (`lib/outbox`), que además las
+// pinta en la caché al instante (lo que antes hacía `captureCache` al volver
+// la respuesta).
+import * as outbox from "@/lib/outbox";
 import { useQuickNoteMutations } from "@/hooks/useQuickNoteMutations";
 import { useDashboardData } from "@/hooks/useDashboardData";
-
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
-
-/**
- * Escribe lo creado en la caché del dashboard **ya**, y además refetchea para
- * reconciliar lo que deriva el servidor. Sin esto, lo capturado tardaba en
- * aparecer lo que tarda `DASHBOARD_QUERY` entera, que trae toda la cuenta.
- */
-function captureMutationOptions(list: DashboardList, field: string) {
-  return {
-    ...refetchAfter,
-    // Apollo 4: `ApolloCache` ya no es genérico y `update` recibe el
-    // `FetchResult` crudo, así que el tipado del payload se hace aquí.
-    update(cache: ApolloCache, result: { data?: unknown }) {
-      const payload = (result.data ?? null) as Record<string, unknown> | null;
-      const created = payload?.[field] as { id: string } | undefined;
-      cache.updateQuery({ query: DASHBOARD_QUERY }, (previous: unknown) =>
-        insertIntoDashboard(
-          previous as { dashboard?: Record<string, unknown> } | null,
-          list,
-          created
-        )
-      );
-    },
-  };
-}
 
 /** Fecha local a ISO: medianoche **local**, no UTC (si no, la tarea cae un día antes). */
 function localDateToIso(date: string): string {
@@ -85,18 +59,6 @@ export function CaptureSheet({
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [createTask] = useMutation(
-    CREATE_TASK,
-    captureMutationOptions("tasks", "createTask")
-  );
-  const [createIdea] = useMutation(
-    CREATE_IDEA,
-    captureMutationOptions("ideas", "createIdea")
-  );
-  const [addNote] = useMutation(
-    ADD_NOTE,
-    captureMutationOptions("activities", "addNote")
-  );
   const { createNote } = useQuickNoteMutations();
 
   const parsed = useMemo(() => quickParse(text, projects), [text, projects]);
@@ -135,26 +97,26 @@ export function CaptureSheet({
           parsed.dueDate ??
           (parsed.dueTime ? new Date().toISOString().slice(0, 10) : null);
         const timed = Boolean(date && parsed.dueTime);
-        await createTask({
-          variables: {
-            data: {
-              title: parsed.title,
-              projectId: parsed.projectId,
-              dueDate: date ? localDateToIso(date) : null,
-              done: false,
-              effortHours: null,
-              dueTime: timed ? parsed.dueTime : null,
-              durationMinutes: timed ? parsed.durationMinutes : null,
-              // Tarea y bloqueo en la misma transacción del servidor: antes
-              // eran dos mutations y podían quedar a medias.
-              blocker: parsed.blocked ? parsed.blockerReason : "",
-            },
-          },
+        const ok = await outbox.createTask({
+          title: parsed.title,
+          projectId: parsed.projectId,
+          dueDate: date ? localDateToIso(date) : null,
+          done: false,
+          effortHours: null,
+          dueTime: timed ? parsed.dueTime : null,
+          durationMinutes: timed ? parsed.durationMinutes : null,
+          // Tarea y bloqueo en la misma transacción del servidor: antes
+          // eran dos mutations y podían quedar a medias.
+          blocker: parsed.blocked ? parsed.blockerReason : "",
         });
+        if (!ok) throw new Error("createTask failed");
       } else if (effectiveKind === "idea") {
-        await createIdea({
-          variables: { data: { title: parsed.title, description: "", why: "" } },
+        const ok = await outbox.createIdea({
+          title: parsed.title,
+          description: "",
+          why: "",
         });
+        if (!ok) throw new Error("createIdea failed");
       } else if (effectiveKind === "note") {
         const note = await createNote({
           title: parsed.title,
@@ -162,9 +124,8 @@ export function CaptureSheet({
         });
         if (!note) throw new Error("createQuickNote failed");
       } else {
-        await addNote({
-          variables: { projectId: parsed.projectId, note: parsed.title },
-        });
+        const ok = await outbox.addProjectNote(parsed.projectId!, parsed.title);
+        if (!ok) throw new Error("addNote failed");
       }
       toast.success(t(`capture.saved.${effectiveKind}`));
       close();

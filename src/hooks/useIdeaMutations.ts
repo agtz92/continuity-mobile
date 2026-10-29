@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
+import * as outbox from "@/lib/outbox";
 import {
-  CREATE_IDEA,
   DASHBOARD_QUERY,
   DELETE_IDEA,
   PROMOTE_IDEA,
@@ -10,7 +10,6 @@ import {
 const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
 
 export function useIdeaMutations() {
-  const [createIdea] = useMutation(CREATE_IDEA, refetchAfter);
   const [updateIdeaM] = useMutation(UPDATE_IDEA, refetchAfter);
   const [deleteIdeaM] = useMutation(DELETE_IDEA, refetchAfter);
   const [promoteIdeaM] = useMutation(PROMOTE_IDEA, refetchAfter);
@@ -26,12 +25,10 @@ export function useIdeaMutations() {
       description: i.description,
       why: i.why,
     };
+    // Crear funciona sin red (cola); editar sigue necesitando conexión.
+    if (!i.id) return outbox.createIdea(data);
     try {
-      if (i.id) {
-        await updateIdeaM({ variables: { id: i.id, data } });
-      } else {
-        await createIdea({ variables: { data } });
-      }
+      await updateIdeaM({ variables: { id: i.id, data } });
       return true;
     } catch {
       return false;
@@ -58,6 +55,6 @@ export function useIdeaMutations() {
     saveIdea,
     deleteIdea,
     promoteIdea,
-    raw: { createIdea, deleteIdea: deleteIdeaM },
+    raw: { deleteIdea: deleteIdeaM },
   };
 }

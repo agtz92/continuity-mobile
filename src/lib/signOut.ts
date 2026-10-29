@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apolloClient } from "./apollo";
 import { purgePersistedCache } from "./cachePersist";
+import { purgeOutbox } from "./outbox";
 import { UNREGISTER_PUSH_TOKEN } from "./graphql";
 import { DEVICE_ID_KEY, LAST_RESPONSE_KEY, PUSH_BACKEND_READY, isExpoGo } from "./notifications";
 import { supabase } from "./supabase";
@@ -44,6 +45,8 @@ export async function clearUserData(): Promise<void> {
   // Primero la caché en disco: si no, el guardado pendiente reescribiría el
   // archivo con lo que aún queda en memoria.
   purgePersistedCache();
+  // Cambios offline sin mandar: son de esta cuenta y no deben salir con otra.
+  purgeOutbox();
   await AsyncStorage.multiRemove(USER_KEYS).catch(() => undefined);
   await apolloClient.clearStore().catch(() => undefined);
 }

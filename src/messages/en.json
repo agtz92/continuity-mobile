@@ -222,7 +222,9 @@
   "offline": {
     "banner": "You're offline",
     "bannerSince": "Offline · updated {ago}",
-    "needsConnection": "Needs a connection"
+    "needsConnection": "Needs a connection",
+    "pending": "{count, plural, one {# change pending} other {# changes pending}}",
+    "syncing": "{count, plural, one {Saving # change…} other {Saving # changes…}}"
   },
   "common": {
     "loading": "Loading…",

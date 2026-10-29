@@ -60,6 +60,19 @@ export const TOGGLE_TASK = gql`
 `;
 
 
+// Estado explícito (idempotente): lo usa la cola offline, donde un toggle
+// reenviado dejaría la tarea al revés.
+export const SET_TASK_DONE = gql`
+  mutation SetTaskDone($id: ID!, $done: Boolean!) {
+    setTaskDone(id: $id, done: $done) {
+      id
+      done
+      completedAt
+    }
+  }
+`;
+
+
 export const ADD_TASK_BLOCKER = gql`
   mutation AddTaskBlocker($data: TaskBlockerInput!) {
     addTaskBlocker(data: $data) {

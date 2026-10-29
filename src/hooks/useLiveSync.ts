@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { AppState } from "react-native";
-import { useApolloClient } from "@apollo/client/react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+import { refreshAll } from "@/lib/outbox";
 
 /**
  * Datos frescos sin cerrar la app. Espejo de `useLiveInvalidation` +
@@ -39,13 +39,9 @@ export function onLiveChange(fn: Listener): () => void {
 }
 
 export function useLiveSync() {
-  const apollo = useApolloClient();
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
   const enabled = process.env.EXPO_PUBLIC_LIVE_UPDATES !== "off";
-
-  const apolloRef = useRef(apollo);
-  apolloRef.current = apollo;
 
   // Señales en vivo.
   useEffect(() => {
@@ -59,7 +55,8 @@ export function useLiveSync() {
     const flush = () => {
       const tables = pending;
       pending = new Set();
-      void apolloRef.current.refetchQueries({ include: "active" });
+      // Con cambios offline pendientes, primero se mandan (ver `refreshAll`).
+      refreshAll();
       listeners.forEach((fn) => fn(tables));
     };
     const bump = (table?: string) => {
@@ -111,7 +108,7 @@ export function useLiveSync() {
       if (state !== "active") return;
       if (Date.now() - last < FOREGROUND_MIN_GAP_MS) return;
       last = Date.now();
-      void apolloRef.current.refetchQueries({ include: "active" });
+      refreshAll();
     });
     return () => sub.remove();
   }, [userId]);

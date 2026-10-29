@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client/react";
+import * as outbox from "@/lib/outbox";
 import {
-  ADD_NOTE,
   DASHBOARD_QUERY,
   DELETE_NOTE,
   UPDATE_NOTE,
@@ -9,18 +9,12 @@ import {
 const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
 
 export function useNoteMutations() {
-  const [addNoteM] = useMutation(ADD_NOTE, refetchAfter);
   const [updateNoteM] = useMutation(UPDATE_NOTE, refetchAfter);
   const [deleteNoteM] = useMutation(DELETE_NOTE, refetchAfter);
 
-  const addNote = async (projectId: string, note: string): Promise<boolean> => {
-    try {
-      await addNoteM({ variables: { projectId, note } });
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  // Agregar funciona sin red (cola); editar y borrar necesitan conexión.
+  const addNote = (projectId: string, note: string): Promise<boolean> =>
+    outbox.addProjectNote(projectId, note);
 
   const editNote = async (id: string, note: string): Promise<boolean> => {
     try {
@@ -43,6 +37,5 @@ export function useNoteMutations() {
     addNote,
     editNote,
     deleteNote,
-    raw: { addNote: addNoteM },
   };
 }

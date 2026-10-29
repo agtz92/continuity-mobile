@@ -1,13 +1,12 @@
 import { useMutation } from "@apollo/client/react";
 import {
   ARCHIVE_ROUTINE,
-  COMPLETE_ROUTINE_OCCURRENCE,
   CREATE_ROUTINE,
   DASHBOARD_QUERY,
   DELETE_ROUTINE,
-  UNCOMPLETE_ROUTINE_OCCURRENCE,
   UPDATE_ROUTINE,
 } from "@/lib/graphql";
+import * as outbox from "@/lib/outbox";
 import type { IntervalUnit, RecurrenceType } from "@/lib/types";
 
 const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
@@ -32,14 +31,6 @@ export function useRoutineMutations() {
   const [updateRoutine] = useMutation(UPDATE_ROUTINE, refetchAfter);
   const [archiveRoutineM] = useMutation(ARCHIVE_ROUTINE, refetchAfter);
   const [deleteRoutineM] = useMutation(DELETE_ROUTINE, refetchAfter);
-  const [completeOccurrenceM] = useMutation(
-    COMPLETE_ROUTINE_OCCURRENCE,
-    refetchAfter
-  );
-  const [uncompleteOccurrenceM] = useMutation(
-    UNCOMPLETE_ROUTINE_OCCURRENCE,
-    refetchAfter
-  );
 
   const saveRoutine = async (r: RoutineFormInput): Promise<boolean> => {
     const data = {
@@ -83,25 +74,16 @@ export function useRoutineMutations() {
     }
   };
 
+  // Palomear y despalomear funcionan sin red: van por la cola (`lib/outbox`).
   const completeOccurrence = async (
     routineId: string,
     scheduledDate: string
   ): Promise<void> => {
-    try {
-      await completeOccurrenceM({
-        variables: { routineId, scheduledDate, note: "" },
-      });
-    } catch {
-      /* swallow — surface errors at the screen layer */
-    }
+    await outbox.completeOccurrence(routineId, scheduledDate);
   };
 
   const uncompleteOccurrence = async (id: string): Promise<void> => {
-    try {
-      await uncompleteOccurrenceM({ variables: { id } });
-    } catch {
-      /* swallow — surface errors at the screen layer */
-    }
+    await outbox.uncompleteOccurrence(id);
   };
 
   return {

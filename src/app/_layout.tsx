@@ -15,6 +15,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { apolloCache, apolloClient } from "@/lib/apollo";
 import { startCachePersistence } from "@/lib/cachePersist";
+import { startOutbox } from "@/lib/outbox";
 import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
@@ -98,9 +99,13 @@ function CachePersistGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    void startCachePersistence(apolloCache, userId).finally(() => {
-      if (!cancelled) setReadyFor(userId);
-    });
+    // La cola de cambios offline arranca después de la caché: lo que mande
+    // al servidor tiene que caer sobre la caché ya restaurada.
+    void startCachePersistence(apolloCache, userId)
+      .then(() => startOutbox(userId))
+      .finally(() => {
+        if (!cancelled) setReadyFor(userId);
+      });
     return () => {
       cancelled = true;
     };

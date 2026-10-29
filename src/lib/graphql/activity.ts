@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 import { ACTIVITY_FIELDS } from "./fragments";
 
 export const ADD_NOTE = gql`
-  mutation AddNote($projectId: ID!, $note: String!) {
-    addNote(projectId: $projectId, note: $note) {
+  mutation AddNote($projectId: ID!, $note: String!, $id: ID) {
+    addNote(projectId: $projectId, note: $note, id: $id) {
       ${ACTIVITY_FIELDS}
     }
   }

@@ -40,11 +40,13 @@ export const COMPLETE_ROUTINE_OCCURRENCE = gql`
     $routineId: ID!
     $scheduledDate: Date!
     $note: String
+    $id: ID
   ) {
     completeRoutineOccurrence(
       routineId: $routineId
       scheduledDate: $scheduledDate
       note: $note
+      id: $id
     ) {
       ${ROUTINE_OCCURRENCE_FIELDS}
     }

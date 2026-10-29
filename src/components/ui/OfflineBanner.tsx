@@ -6,6 +6,7 @@ import type { TFunction } from "i18next";
 import { CloudOff } from "lucide-react-native";
 import { useOnline } from "@/lib/network";
 import { getSyncedAt, subscribeSyncedAt } from "@/lib/cachePersist";
+import { pendingCount, subscribePending } from "@/lib/outbox";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { lift } from "@/theme/lift";
 
@@ -20,6 +21,7 @@ export function OfflineBanner() {
   const insets = useSafeAreaInsets();
   const online = useOnline();
   const syncedAt = useSyncExternalStore(subscribeSyncedAt, getSyncedAt);
+  const pending = useSyncExternalStore(subscribePending, pendingCount);
 
   // Re-render cada minuto para que el "hace X" avance.
   const [, setTick] = useState(0);
@@ -29,7 +31,20 @@ export function OfflineBanner() {
     return () => clearInterval(id);
   }, [online]);
 
-  if (online) return null;
+  // Con red y cola vacía no hay nada que decir. Con red y cola llena, se está
+  // mandando lo hecho offline (dura un instante, salvo que el servidor falle).
+  if (online && pending === 0) return null;
+
+  const label = online
+    ? t("offline.syncing", { count: pending })
+    : [
+        syncedAt
+          ? t("offline.bannerSince", { ago: formatAgo(t, syncedAt) })
+          : t("offline.banner"),
+        pending > 0 ? t("offline.pending", { count: pending }) : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
 
   return (
     <View
@@ -49,11 +64,7 @@ export function OfflineBanner() {
         accessibilityRole="alert"
       >
         <CloudOff size={13} color={c.text3} />
-        <Text className="font-sans-medium text-xs text-text-2">
-          {syncedAt
-            ? t("offline.bannerSince", { ago: formatAgo(t, syncedAt) })
-            : t("offline.banner")}
-        </Text>
+        <Text className="font-sans-medium text-xs text-text-2">{label}</Text>
       </View>
     </View>
   );
