@@ -1,11 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import {
-  ARCHIVE_ROUTINE,
-  CREATE_ROUTINE,
-  DASHBOARD_QUERY,
-  DELETE_ROUTINE,
-  UPDATE_ROUTINE,
-} from "@/lib/graphql";
+import { ARCHIVE_ROUTINE, DASHBOARD_QUERY, DELETE_ROUTINE } from "@/lib/graphql";
 import * as outbox from "@/lib/outbox";
 import type { IntervalUnit, RecurrenceType } from "@/lib/types";
 
@@ -27,8 +21,6 @@ export interface RoutineFormInput {
 }
 
 export function useRoutineMutations() {
-  const [createRoutine] = useMutation(CREATE_ROUTINE, refetchAfter);
-  const [updateRoutine] = useMutation(UPDATE_ROUTINE, refetchAfter);
   const [archiveRoutineM] = useMutation(ARCHIVE_ROUTINE, refetchAfter);
   const [deleteRoutineM] = useMutation(DELETE_ROUTINE, refetchAfter);
 
@@ -46,16 +38,8 @@ export function useRoutineMutations() {
       effortHours: r.effortHours,
       projectId: r.projectId || null,
     };
-    try {
-      if (r.id) {
-        await updateRoutine({ variables: { id: r.id, data } });
-      } else {
-        await createRoutine({ variables: { data } });
-      }
-      return true;
-    } catch {
-      return false;
-    }
+    // Crear y editar funcionan sin red: van por la cola (`lib/outbox`).
+    return r.id ? outbox.updateRoutine(r.id, data) : outbox.createRoutine(data);
   };
 
   const archiveRoutine = async (id: string, archived: boolean): Promise<void> => {

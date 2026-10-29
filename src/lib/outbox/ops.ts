@@ -6,6 +6,7 @@ import {
   COMPLETE_ROUTINE_OCCURRENCE,
   CREATE_IDEA,
   CREATE_QUICK_NOTE,
+  CREATE_ROUTINE,
   CREATE_TASK,
   DASHBOARD_QUERY,
   QUICK_NOTES_QUERY,
@@ -13,6 +14,7 @@ import {
   UNCOMPLETE_ROUTINE_OCCURRENCE,
   UPDATE_NOTE_SECTION,
   UPDATE_QUICK_NOTE,
+  UPDATE_ROUTINE,
   UPDATE_TASK,
 } from "@/lib/graphql";
 
@@ -37,6 +39,8 @@ export type OpKind =
   | "task.setDone"
   | "idea.create"
   | "projectNote.add"
+  | "routine.create"
+  | "routine.update"
   | "routine.complete"
   | "routine.uncomplete"
   | "quickNote.create"
@@ -140,6 +144,35 @@ export function localTask(id: string, data: Vars): Record<string, any> {
           },
         ]
       : [],
+  };
+}
+
+/** Los campos de recurrencia que manda el formulario de rutina. */
+function routineFields(d: Vars): Vars {
+  return {
+    title: d.title,
+    description: d.description ?? "",
+    recurrenceType: d.recurrenceType,
+    startDate: d.startDate,
+    endDate: d.endDate ?? null,
+    weekdays: d.weekdays ?? [],
+    intervalN: d.intervalN ?? null,
+    intervalUnit: d.intervalUnit ?? null,
+    monthlyDay: d.monthlyDay ?? null,
+    effortHours: d.effortHours ?? null,
+    projectId: d.projectId ?? null,
+  };
+}
+
+export function localRoutine(id: string, data: Vars): Record<string, any> {
+  return {
+    __typename: "Routine",
+    id,
+    ...routineFields(data),
+    archived: false,
+    created: now(),
+    timeOfDay: data.timeOfDay ?? null,
+    durationMinutes: data.durationMinutes ?? null,
   };
 }
 
@@ -255,6 +288,21 @@ export const OPS: Record<OpKind, OpSpec> = {
           created: now(),
         })
       ),
+  },
+  "routine.create": {
+    mutation: CREATE_ROUTINE,
+    apply: (cache, v) =>
+      editDashboardList(cache, "routines", (items) =>
+        items.some((r) => r.id === v.data.id)
+          ? items
+          : [...items, localRoutine(v.data.id, v.data)]
+      ),
+  },
+  "routine.update": {
+    mutation: UPDATE_ROUTINE,
+    // Solo lo que manda el formulario: hora y duración no se tocan aquí.
+    apply: (cache, v) => modify(cache, "Routine", v.id, routineFields(v.data)),
+    coalesceKey: (v) => `routine.update:${v.id}`,
   },
   "routine.complete": {
     mutation: COMPLETE_ROUTINE_OCCURRENCE,

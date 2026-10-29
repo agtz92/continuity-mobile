@@ -59,6 +59,28 @@ export function addProjectNote(projectId: string, note: string): Promise<boolean
   return submit("projectNote.add", { id: newId(), projectId, note });
 }
 
+export interface RoutineData {
+  title: string;
+  description: string;
+  recurrenceType: string;
+  startDate: string;
+  endDate: string | null;
+  weekdays: number[];
+  intervalN: number | null;
+  intervalUnit: string | null;
+  monthlyDay: number | null;
+  effortHours: number | null;
+  projectId: string | null;
+}
+
+export function createRoutine(data: RoutineData): Promise<boolean> {
+  return submit("routine.create", { data: { ...data, id: newId() } });
+}
+
+export function updateRoutine(id: string, data: RoutineData): Promise<boolean> {
+  return submit("routine.update", { id, data });
+}
+
 export function completeOccurrence(
   routineId: string,
   scheduledDate: string
