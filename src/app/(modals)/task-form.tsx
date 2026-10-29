@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
 import { Lock, X } from "lucide-react-native";
 import { ModalScaffold } from "@/components/ui/ModalScaffold";
@@ -140,13 +141,13 @@ export default function TaskForm() {
       effortHours: Number.isFinite(parsed) ? parsed : null,
     });
     setSaving(false);
-    if (ok) router.back();
+    if (ok) closeModal(router);
   };
 
   const handleDelete = async () => {
     if (!existing?.id) return;
     await deleteTask(existing.id);
-    router.back();
+    closeModal(router);
   };
 
   return (

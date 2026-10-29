@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react-native";
 import { useThemeColors } from "@/theme/useThemeColors";
@@ -44,7 +45,7 @@ export function ModalScaffold({
       <View className="flex-row items-center justify-between border-b border-border px-4 pb-3 pt-6">
         <Text className="text-base font-sans-semibold text-text">{title}</Text>
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => closeModal(router)}
           hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel={t("common.cancel")}
@@ -83,7 +84,7 @@ export function ModalScaffold({
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => closeModal(router)}
             accessibilityRole="button"
             className="rounded-lg border border-border bg-surface px-5 py-3"
           >

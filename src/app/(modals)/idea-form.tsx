@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Text } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
 import { ModalScaffold } from "@/components/ui/ModalScaffold";
 import { Field } from "@/components/ui/Field";
@@ -34,7 +35,7 @@ export default function IdeaForm() {
       why,
     });
     setSaving(false);
-    if (ok) router.back();
+    if (ok) closeModal(router);
   };
 
   return (

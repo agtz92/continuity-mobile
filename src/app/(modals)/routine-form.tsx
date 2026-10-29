@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
 import { ModalScaffold } from "@/components/ui/ModalScaffold";
 import { ModalDeleteButton } from "@/components/ui/ModalDeleteButton";
@@ -152,13 +153,13 @@ export default function RoutineForm() {
       projectId: projectId || null,
     });
     setSaving(false);
-    if (ok) router.back();
+    if (ok) closeModal(router);
   };
 
   const handleDelete = async () => {
     if (!existing?.id) return;
     await deleteRoutine(existing.id);
-    router.back();
+    closeModal(router);
   };
 
   const recurrenceOptions: ChipOption<RecurrenceType>[] = RECURRENCE_TYPES.map(
