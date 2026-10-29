@@ -1484,25 +1484,6 @@
       "editAria": "Edit category",
       "deleteAria": "Delete category",
       "footnote": "Deleting a category leaves its projects intact (just uncategorized)."
-    },
-    "backup": {
-      "title": "Backup & Restore",
-      "intro": "Export a JSON file with all your projects, tasks, ideas, and activity log. Save it somewhere safe (Google Drive, Dropbox, iCloud).",
-      "currentData": "Current data",
-      "counts": "{projects} projects · {tasks} tasks · {ideas} ideas · {updates} updates",
-      "lastBackup": "Last backup: {when}",
-      "exportCta": "Export to JSON file",
-      "restoreHeader": "Restore from backup",
-      "restoreIntro": "Select a previously exported JSON file. Choose how to handle existing data:",
-      "importMerge": "Import & merge with current data",
-      "importReplace": "Import & replace all data",
-      "replaceConfirm": "This will DELETE all current data and replace it with the backup. Continue?",
-      "toast": {
-        "exported": "Backup exported",
-        "invalidFile": "Invalid file. Expected a Continuity export.",
-        "readError": "Could not read backup file: {message}",
-        "imported": "Imported {projects} projects, {tasks} tasks, {ideas} ideas, {notes} notes, {projectNotes} project notes."
-      }
     }
   },
   "avatars": {

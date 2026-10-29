@@ -1484,25 +1484,6 @@
       "editAria": "Editar categoría",
       "deleteAria": "Eliminar categoría",
       "footnote": "Al eliminar una categoría sus proyectos quedan sin categoría (no se borran)."
-    },
-    "backup": {
-      "title": "Respaldo y restauración",
-      "intro": "Exporta un archivo JSON con todos tus proyectos, tareas, ideas y bitácora. Guárdalo en un lugar seguro (Google Drive, Dropbox, iCloud).",
-      "currentData": "Información actual",
-      "counts": "{projects} proyectos · {tasks} tareas · {ideas} ideas · {updates} updates",
-      "lastBackup": "Último respaldo: {when}",
-      "exportCta": "Exportar a archivo JSON",
-      "restoreHeader": "Restaurar desde respaldo",
-      "restoreIntro": "Selecciona un JSON exportado previamente. Elige cómo manejar la información actual:",
-      "importMerge": "Importar y mezclar con la información actual",
-      "importReplace": "Importar y reemplazar todo",
-      "replaceConfirm": "Esto BORRARÁ toda la información actual y la reemplazará con el respaldo. ¿Continuar?",
-      "toast": {
-        "exported": "Respaldo exportado",
-        "invalidFile": "Archivo inválido. Se esperaba un export de Continuity.",
-        "readError": "No se pudo leer el archivo de respaldo: {message}",
-        "imported": "Importados {projects} proyectos, {tasks} tareas, {ideas} ideas, {notes} notas, {projectNotes} notas de proyecto."
-      }
     }
   },
   "avatars": {
