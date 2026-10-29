@@ -18,6 +18,10 @@ const emit = () => {
 };
 
 const push = (kind: ToastKind, message: string, ttl = DEFAULT_TTL_MS) => {
+  // El mismo aviso ya en pantalla no se apila: sin red, plegar secciones de
+  // una nota (cada una es una mutación) llenaba la pantalla de copias.
+  const same = toasts.find((t) => t.kind === kind && t.message === message);
+  if (same) return same.id;
   const id = ++nextId;
   toasts = [...toasts, { id, kind, message }];
   emit();
