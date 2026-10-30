@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { CheckCircle2, Clock, Sparkles, TrendingUp, Undo2 } from "lucide-react-native";
+import { CheckCircle2, Clock, Sunset, TrendingUp, Undo2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 
 import type { Project, Task } from "@/lib/types";
@@ -150,7 +150,7 @@ export function DoneTodaySection({
     <CollapsibleSection
       open={open}
       onToggle={() => setOpen((s) => !s)}
-      icon={<Sparkles size={18} color={c.accent} />}
+      icon={<Sunset size={18} color={c.accent} />}
       title={t("views.today.doneToday.title")}
       meta={
         <>
