@@ -1,27 +1,24 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
 import { signInWithGoogle, OAuthCancelled } from "@/lib/oauth";
-import { useTheme } from "@/theme/ThemeProvider";
-import { THEME_SURFACES } from "@/theme/tokens";
+import { FormInput } from "@/components/ui/FormInput";
+import {
+  AuthButton,
+  AuthError,
+  AuthHeading,
+  AuthLabel,
+  AuthLinkRow,
+  AuthScaffold,
+  OrDivider,
+  PasswordInput,
+} from "@/components/auth/AuthParts";
 
 export default function Login() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { effective } = useTheme();
-  const muted = THEME_SURFACES[effective].textMuted;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,100 +53,60 @@ export default function Login() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
-          <View className="gap-1">
-            <Text className="text-3xl font-sans-bold text-text">
-              {t("auth.login.title")}
-            </Text>
-            <Text className="font-sans text-base text-text-muted">{t("auth.login.subtitle")}</Text>
-          </View>
+    <AuthScaffold>
+      <AuthHeading title={t("auth.login.headline")} lede={t("auth.login.subtitle")} />
 
-          <View className="gap-3">
-            <View className="gap-1">
-              <Text className="text-sm font-sans-medium text-text">
-                {t("auth.login.email")}
-              </Text>
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                autoComplete="email"
-                keyboardType="email-address"
-                placeholder={t("auth.login.emailPlaceholder")}
-                placeholderTextColor={muted}
-                className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-              />
-            </View>
-            <View className="gap-1">
-              <Text className="text-sm font-sans-medium text-text">
-                {t("auth.login.password")}
-              </Text>
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoComplete="current-password"
-                placeholder={t("auth.login.passwordPlaceholder")}
-                placeholderTextColor={muted}
-                className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-              />
-            </View>
+      <View style={{ gap: 20 }}>
+        <View style={{ gap: 8 }}>
+          <AuthLabel label={t("auth.login.email")} />
+          <FormInput
+            auth
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            placeholder={t("auth.login.emailPlaceholder")}
+            accessibilityLabel={t("auth.login.email")}
+          />
+        </View>
+        <View style={{ gap: 8 }}>
+          <AuthLabel
+            label={t("auth.login.password")}
+            action={{ label: t("auth.login.forgotShort"), onPress: () => router.push("/reset-password") }}
+          />
+          <PasswordInput
+            value={password}
+            onChangeText={setPassword}
+            autoComplete="current-password"
+            textContentType="password"
+            placeholder={t("auth.login.passwordPlaceholder")}
+            accessibilityLabel={t("auth.login.password")}
+            returnKeyType="go"
+            onSubmitEditing={() => void onSignIn()}
+          />
+        </View>
 
-            <Pressable
-              onPress={() => router.push("/reset-password")}
-              className="self-end"
-            >
-              <Text className="font-sans text-sm text-accent">
-                {t("auth.login.forgot")}
-              </Text>
-            </Pressable>
+        <AuthError message={error} />
 
-            {error && <Text className="font-sans text-signal">{error}</Text>}
+        <AuthButton label={t("auth.login.signIn")} onPress={() => void onSignIn()} busy={busy} />
+        <OrDivider />
+        <AuthButton
+          variant="secondary"
+          label={t("auth.login.google")}
+          onPress={() => void onGoogle()}
+          busy={googleBusy}
+        />
+      </View>
 
-            <Pressable
-              onPress={onSignIn}
-              disabled={busy}
-              className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
-            >
-              {busy && <ActivityIndicator size="small" />}
-              <Text className="text-base font-sans-semibold text-bg">
-                {t("auth.login.signIn")}
-              </Text>
-            </Pressable>
-          </View>
-
-          <View className="flex-row items-center gap-3">
-            <View className="h-px flex-1 bg-border" />
-            <Text className="font-sans text-base text-text-muted">{t("auth.divider")}</Text>
-            <View className="h-px flex-1 bg-border" />
-          </View>
-
-          <Pressable
-            onPress={onGoogle}
-            disabled={googleBusy}
-            className="flex-row items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-3"
-          >
-            {googleBusy && <ActivityIndicator size="small" />}
-            <Text className="text-base font-sans-semibold text-text">
-              {t("auth.login.google")}
-            </Text>
-          </Pressable>
-
-          <View className="flex-row justify-center gap-1">
-            <Text className="font-sans text-base text-text-muted">{t("auth.login.noAccount")}</Text>
-            <Pressable onPress={() => router.push("/signup")}>
-              <Text className="text-base font-sans-semibold text-accent">
-                {t("auth.login.signUpLink")}
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <View className="flex-1 justify-end" style={{ paddingTop: 32 }}>
+        <AuthLinkRow
+          prompt={t("auth.login.noAccount")}
+          label={t("auth.login.signUpLink")}
+          onPress={() => router.push("/signup")}
+        />
+      </View>
+    </AuthScaffold>
   );
 }

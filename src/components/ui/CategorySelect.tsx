@@ -5,6 +5,7 @@ import { Check, ChevronDown } from "lucide-react-native";
 
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { CategoryTag } from "@/components/ui/CategoryTag";
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 /**
@@ -43,7 +44,9 @@ export function CategorySelect({
       <Pressable
         onPress={() => setOpen(true)}
         accessibilityRole="button"
-        className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
+        // Campo del rediseño: 48 px sobre `surface`, nunca fondo `border`.
+        className="flex-row items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3.5"
+        style={{ height: SIZE.input }}
       >
         {selected ? (
           <CategoryTag name={selected.name} color={selected.color} />
@@ -61,7 +64,8 @@ export function CategorySelect({
         <View className="gap-1">
           <Pressable
             onPress={() => select(null)}
-            className="flex-row items-center justify-between rounded-lg px-3 py-3"
+            className="flex-row items-center justify-between rounded-lg px-3"
+            style={{ minHeight: 48 }}
           >
             <CategoryTag loose />
             {!value && <Check size={18} color={c.accent} />}
@@ -72,7 +76,8 @@ export function CategorySelect({
               <Pressable
                 key={cat.id}
                 onPress={() => select(cat.id)}
-                className="flex-row items-center justify-between rounded-lg px-3 py-3"
+                className="flex-row items-center justify-between rounded-lg px-3"
+            style={{ minHeight: 48 }}
               >
                 <CategoryTag name={cat.name} color={cat.color} />
                 {active && <Check size={18} color={c.accent} />}

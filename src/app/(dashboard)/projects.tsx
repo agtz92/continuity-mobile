@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -17,30 +16,40 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  ArrowUpDown,
-  Check,
-  GripVertical,
-  Plus,
-  Search,
-  SlidersHorizontal,
-} from "lucide-react-native";
-import type { Project, ProjectStatus } from "@/lib/types";
+import { ArrowUpDown, Check, Plus, Search } from "lucide-react-native";
+import type { Project, ProjectStatus, Task } from "@/lib/types";
 import { priorityRank } from "@/lib/types";
 import { isDueToday, isOverdue } from "@/lib/date";
 import { STATUS_FILTER_ORDER } from "@/lib/status";
 import { PROJECT_SORT_MODES, type ProjectSortMode } from "@/lib/priority";
+import { projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
 import { useStableLayout, type LayoutEntry } from "@/lib/useStableLayout";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { selectionFeedback } from "@/lib/feedback";
-import { ProjectCardCompact } from "@/components/projects/ProjectCardCompact";
+import { ProjectListItem } from "@/components/projects/ProjectListItem";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Meta } from "@/components/ui/Meta";
 import { ListSkeleton } from "@/components/ui/Skeletons";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { FAB } from "@/components/ui/FAB";
+import { ScreenHeadline } from "@/components/ui/ScreenHeadline";
+import { FilterChips, type FilterChipItem } from "@/components/ui/FilterChips";
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors, alpha } from "@/theme/useThemeColors";
+
+type StatusKey = "all" | ProjectStatus;
+type ListRow =
+  | { type: "header"; key: string; label: string }
+  | { type: "project"; key: string; project: Project };
+
+// Virtualización: filas de alto variable (el título envuelve), así que nada de
+// getItemLayout; solo ventanas más cortas que el default (21).
+const LIST_PERF = {
+  initialNumToRender: 8,
+  maxToRenderPerBatch: 8,
+  windowSize: 7,
+} as const;
 
 export default function Projects() {
   const { t, i18n } = useTranslation();
@@ -50,7 +59,7 @@ export default function Projects() {
     useDashboardData();
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | ProjectStatus>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusKey>("all");
   const [sortMode, setSortMode] = useState<ProjectSortMode>("manual");
   const [sortSheet, setSortSheet] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -74,6 +83,30 @@ export default function Projects() {
     [projects]
   );
 
+  // Tareas por proyecto, una sola pasada: arrays estables para las filas memo.
+  const tasksByProject = useMemo(() => {
+    const m = new Map<string, Task[]>();
+    for (const tk of tasks) {
+      if (!tk.projectId) continue;
+      const list = m.get(tk.projectId);
+      if (list) list.push(tk);
+      else m.set(tk.projectId, [tk]);
+    }
+    return m;
+  }, [tasks]);
+
+  // Horas invertidas (tareas cerradas con esfuerzo), igual que Today.
+  const hoursByProject = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const [pid, list] of tasksByProject) {
+      const sum = list
+        .filter((tk) => tk.done && tk.effortHours != null)
+        .reduce((acc, tk) => acc + (tk.effortHours as number), 0);
+      m.set(pid, Math.round(sum * 10) / 10);
+    }
+    return m;
+  }, [tasksByProject]);
+
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: visibleProjects.length };
     for (const p of visibleProjects) {
@@ -81,6 +114,18 @@ export default function Projects() {
     }
     return counts;
   }, [visibleProjects]);
+
+  const blockedTotal = useMemo(
+    () =>
+      visibleProjects.filter((p) =>
+        projectIsBlocked(
+          p,
+          (tasksByProject.get(p.id) ?? []).filter((tk) => !tk.done && taskIsBlocked(tk))
+            .length
+        )
+      ).length,
+    [visibleProjects, tasksByProject]
+  );
 
   const { reorderProjects } = useProjectMutations();
 
@@ -107,7 +152,7 @@ export default function Projects() {
   // key that flings edited projects to the top of their band).
   const { sorted, sectionById } = useMemo(() => {
     const urgencyBucket = (p: Project) => {
-      const pt = tasks.filter((tk) => tk.projectId === p.id);
+      const pt = tasksByProject.get(p.id) ?? [];
       if (pt.some((tk) => !tk.done && isOverdue(tk.dueDate))) return 0;
       if (pt.some((tk) => !tk.done && isDueToday(tk.dueDate))) return 1;
       if (p.status === "stalled") return 2;
@@ -176,7 +221,7 @@ export default function Projects() {
       map.set(p.id, b <= 1 ? "attention" : b === 2 ? "risk" : "rest");
     }
     return { sorted: s, sectionById: map };
-  }, [filtered, tasks, sortMode, i18n.language]);
+  }, [filtered, tasksByProject, sortMode, i18n.language]);
 
   const ideal: LayoutEntry[] = useMemo(
     () =>
@@ -203,128 +248,155 @@ export default function Projects() {
   const manualDragEnabled =
     sortMode === "manual" && !q && statusFilter === "all";
 
-  const onManualDragEnd = (next: Project[]) => {
-    selectionFeedback();
-    void reorderProjects(next.map((p) => p.id));
-  };
-
-  const statusChips = STATUS_FILTER_ORDER.filter(
-    (s) => s === "all" || (statusCounts[s] ?? 0) > 0
+  const onManualDragEnd = useCallback(
+    ({ data }: { data: Project[] }) => {
+      selectionFeedback();
+      void reorderProjects(data.map((p) => p.id));
+    },
+    [reorderProjects]
   );
 
-  const renderCard = (project: Project) => (
-    <ProjectCardCompact
-      project={project}
-      projectTasks={tasks.filter((tk) => tk.projectId === project.id)}
-      variant={project.status === "launched" ? "launched" : "active"}
-      categoryById={categoryById}
-      onPress={() =>
-        router.push({ pathname: "/project/[id]", params: { id: project.id } })
-      }
-    />
+  const openProject = useCallback(
+    (id: string) => router.push({ pathname: "/project/[id]", params: { id } }),
+    [router]
+  );
+
+  const chipItems: FilterChipItem<StatusKey>[] = useMemo(
+    () =>
+      STATUS_FILTER_ORDER.filter((s) => s === "all" || (statusCounts[s] ?? 0) > 0).map(
+        (s) => ({
+          key: s as StatusKey,
+          label: s === "all" ? t("status.all") : t(`status.${s}`),
+          count: statusCounts[s] ?? 0,
+        })
+      ),
+    [statusCounts, t]
   );
 
   // Flat list of rows for non-manual modes: section headers (Smart) interleaved
   // with project cards, walking the frozen layout so edits don't reshuffle.
-  type ListRow =
-    | { type: "header"; key: string; label: string }
-    | { type: "project"; key: string; project: Project };
-  const listRows: ListRow[] = [];
-  {
+  const listRows = useMemo(() => {
+    const rows: ListRow[] = [];
     let currentSection: string | null = null;
     for (const entry of entries) {
       const p = projectById.get(entry.id);
       if (!p) continue;
       if (sortMode === "smart" && entry.section !== currentSection) {
         currentSection = entry.section;
-        listRows.push({
+        rows.push({
           type: "header",
           key: `sec-${entry.section}`,
           label: t(`views.projects.sections.${entry.section}`),
         });
       }
-      listRows.push({ type: "project", key: p.id, project: p });
+      rows.push({ type: "project", key: p.id, project: p });
     }
-  }
+    return rows;
+  }, [entries, projectById, sortMode, t]);
+
+  const renderDraggable = useCallback(
+    ({ item, drag, isActive }: RenderItemParams<Project>) => (
+      <ScaleDecorator>
+        <View style={{ paddingBottom: 16 }}>
+          <ProjectListItem
+            project={item}
+            projectTasks={tasksByProject.get(item.id)}
+            categoryById={categoryById}
+            totalEffortHours={hoursByProject.get(item.id)}
+            onOpen={openProject}
+            drag={drag}
+            dragging={isActive}
+          />
+        </View>
+      </ScaleDecorator>
+    ),
+    [tasksByProject, categoryById, hoursByProject, openProject]
+  );
+
+  const renderRow = useCallback(
+    ({ item }: { item: ListRow }) =>
+      item.type === "header" ? (
+        <Meta variant="cintillo" tone="muted" className="px-1 pb-3 pt-2">
+          {item.label}
+        </Meta>
+      ) : (
+        <View style={{ paddingBottom: 16 }}>
+          <ProjectListItem
+            project={item.project}
+            projectTasks={tasksByProject.get(item.project.id)}
+            categoryById={categoryById}
+            totalEffortHours={hoursByProject.get(item.project.id)}
+            onOpen={openProject}
+          />
+        </View>
+      ),
+    [tasksByProject, categoryById, hoursByProject, openProject]
+  );
+
+  const outlineButton = (label: string, onPress: () => void) => (
+    <Pressable
+      onPress={onPress}
+      className="items-center justify-center rounded-md border px-4"
+      style={{ borderColor: c.accent, height: SIZE.hit }}
+    >
+      <Text className="font-sans-medium" style={{ fontSize: 15, color: c.accent }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       {/* Admin announcements + derived alerts: en web viven sobre todas las
           vistas del dashboard, así que aquí también sobre cada pestaña. */}
       <NotificationStack className="gap-2 px-5 pt-2" />
-      <View className="gap-3 px-5 pb-3 pt-2">
-        <Text
-          className="font-display text-text"
-          style={{ fontSize: 30, lineHeight: 32, letterSpacing: -1 }}
-        >
-          {t("views.projects.title")}
-        </Text>
+      <View className="gap-4 px-5 pb-3 pt-3">
+        <ScreenHeadline
+          primary={t("views.projects.headline", { count: visibleProjects.length })}
+          secondary={
+            blockedTotal > 0
+              ? t("views.projects.headlineBlocked", { count: blockedTotal })
+              : null
+          }
+          secondaryTone="signal"
+        />
 
-        <View className="flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3">
-          <Search size={16} color={c.textMuted} />
-          <TextInput
-            value={search}
-            onChangeText={setSearch}
-            placeholder={t("views.projects.search")}
-            placeholderTextColor={c.textMuted}
-            className="flex-1 py-2.5"
-            style={{ color: c.text }}
-          />
+        <View className="flex-row items-center gap-2">
+          <View
+            className="flex-1 flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3"
+            style={{ height: SIZE.hit }}
+          >
+            <Search size={18} color={c.text3} />
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder={t("views.projects.searchShort")}
+              accessibilityLabel={t("views.projects.search")}
+              placeholderTextColor={c.text5}
+              className="flex-1"
+              style={{ color: c.text, fontSize: 16, height: SIZE.hit }}
+            />
+          </View>
+          <Pressable
+            onPress={() => setSortSheet(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`${t("views.projects.sortAria")}: ${t(`views.projects.sortBy.${sortMode}`)}`}
+            className="flex-row items-center gap-1.5 rounded-lg border border-border bg-surface px-3 active:opacity-70"
+            style={{ height: SIZE.hit }}
+          >
+            <ArrowUpDown size={16} color={c.text3} />
+            <Text
+              className="font-sans-semibold uppercase"
+              style={{ fontSize: 11, letterSpacing: 0.8, color: c.text3 }}
+            >
+              {t(`views.projects.sortBy.${sortMode}`)}
+            </Text>
+          </Pressable>
         </View>
 
-        {visibleProjects.length > 0 && (
-          <View className="flex-row items-center gap-2">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="gap-1.5 pr-2"
-              className="flex-1"
-            >
-              {statusChips.map((s) => {
-                const active = statusFilter === s;
-                const label = s === "all" ? t("status.all") : t(`status.${s}`);
-                const count = statusCounts[s] ?? 0;
-                return (
-                  <Pressable
-                    key={s}
-                    onPress={() => setStatusFilter(s)}
-                    className={
-                      "flex-row items-center gap-1.5 rounded-full border px-3 py-1.5 " +
-                      (active
-                        ? "border-accent bg-accent"
-                        : "border-border bg-surface")
-                    }
-                  >
-                    <Text
-                      className={
-                        "text-xs font-sans-medium " +
-                        (active ? "text-bg" : "text-text-muted")
-                      }
-                    >
-                      {label}
-                    </Text>
-                    <Text
-                      className={"font-sans " + 
-                        "text-[10px] " + (active ? "text-bg" : "text-text-muted")
-                      }
-                    >
-                      {count}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-            <Pressable
-              onPress={() => setSortSheet(true)}
-              className="flex-row items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5"
-            >
-              <SlidersHorizontal size={14} color={c.textMuted} />
-              <Text className="font-sans text-xs text-text-muted">
-                {t(`views.projects.sortBy.${sortMode}`)}
-              </Text>
-            </Pressable>
-          </View>
-        )}
+        {visibleProjects.length > 0 ? (
+          <FilterChips items={chipItems} value={statusFilter} onChange={setStatusFilter} />
+        ) : null}
       </View>
 
       {initialLoading && visibleProjects.length === 0 ? (
@@ -334,17 +406,9 @@ export default function Projects() {
           <EmptyState
             title={t("views.projects.empty")}
             body={t("views.projects.emptyBody")}
-            actions={
-              <Pressable
-                onPress={() => router.push("/project-form")}
-                className="rounded-md border px-4 py-2"
-                style={{ borderColor: c.accent }}
-              >
-                <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
-                  {t("modals.project.newTitle")}
-                </Text>
-              </Pressable>
-            }
+            actions={outlineButton(t("modals.project.newTitle"), () =>
+              router.push("/project-form")
+            )}
           />
         </View>
       ) : filtered.length === 0 ? (
@@ -359,52 +423,26 @@ export default function Projects() {
               count: visibleProjects.length - filtered.length,
             })}
             actions={
-              statusFilter !== "all" || search.trim() ? (
-                <Pressable
-                  onPress={() => {
+              statusFilter !== "all" || search.trim()
+                ? outlineButton(t("views.projects.clearFilters"), () => {
                     setStatusFilter("all");
                     setSearch("");
-                  }}
-                  className="rounded-md border px-4 py-2"
-                  style={{ borderColor: c.accent }}
-                >
-                  <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
-                    {t("views.projects.clearFilters")}
-                  </Text>
-                </Pressable>
-              ) : null
+                  })
+                : null
             }
           />
         </View>
-      ) : sortMode === "manual" && manualDragEnabled ? (
-        // (D) Drag to reorder — persisted as "Mi orden".
+      ) : manualDragEnabled ? (
+        // (D) Drag to reorder — persisted as "Mi orden". Long-press sobre la
+        // tarjeta entera; el ⠿ de la derecha es solo la afordancia.
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <View className="flex-row items-center gap-1.5 px-5 pb-1">
-            <ArrowUpDown size={12} color={c.textMuted} />
-            <Text className="font-sans text-xs text-text-muted">
-              {t("views.projects.manualHint")}
-            </Text>
-          </View>
           <DraggableFlatList
             data={sorted}
             keyExtractor={(p) => p.id}
-            contentContainerStyle={{ gap: 16, padding: 20, paddingTop: 4 }}
-            onDragEnd={({ data }) => onManualDragEnd(data)}
-            renderItem={({ item, drag, isActive }: RenderItemParams<Project>) => (
-              <ScaleDecorator>
-                <View className="flex-row items-center gap-2">
-                  <Pressable
-                    onLongPress={drag}
-                    disabled={isActive}
-                    hitSlop={8}
-                    className="py-2"
-                  >
-                    <GripVertical size={18} color={c.textMuted} />
-                  </Pressable>
-                  <View className="flex-1">{renderCard(item)}</View>
-                </View>
-              </ScaleDecorator>
-            )}
+            contentContainerStyle={{ padding: 20, paddingTop: 4, paddingBottom: 96 }}
+            onDragEnd={onManualDragEnd}
+            renderItem={renderDraggable}
+            {...LIST_PERF}
           />
         </GestureHandlerRootView>
       ) : (
@@ -413,7 +451,10 @@ export default function Projects() {
         <FlatList
           data={listRows}
           keyExtractor={(row) => row.key}
-          contentContainerStyle={{ gap: 16, padding: 20, paddingTop: 4 }}
+          contentContainerStyle={{ padding: 20, paddingTop: 4, paddingBottom: 96 }}
+          renderItem={renderRow}
+          removeClippedSubviews
+          {...LIST_PERF}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -423,44 +464,33 @@ export default function Projects() {
           }
           ListHeaderComponent={
             sortMode === "manual" ? (
-              <View className="flex-row items-center gap-1.5 pb-2">
-                <ArrowUpDown size={12} color={c.textMuted} />
-                <Text className="font-sans text-xs text-text-muted">
-                  {t("views.projects.manualFilteredHint")}
-                </Text>
+              <View className="flex-row items-center gap-1.5 pb-3">
+                <ArrowUpDown size={12} color={c.text3} />
+                <Meta tone="muted">{t("views.projects.manualFilteredHint")}</Meta>
               </View>
             ) : isStale ? (
               <View
-                className="mb-1 flex-row items-center justify-between gap-3 rounded-lg border px-3 py-2"
+                className="mb-4 flex-row items-center justify-between gap-3 rounded-lg border px-3 py-2"
                 style={{
                   borderColor: alpha(c.accent, 0.3),
                   backgroundColor: alpha(c.accent, 0.1),
                 }}
               >
-                <Text className="font-sans flex-1 text-sm text-text-muted">
+                <Text className="font-sans flex-1" style={{ fontSize: 15, color: c.text2 }}>
                   {t("views.projects.orderChanged")}
                 </Text>
                 <Pressable
                   onPress={resync}
-                  className="flex-row items-center gap-1.5 rounded-md border px-3 py-1.5"
-                  style={{ borderColor: alpha(c.accent, 0.3) }}
+                  className="flex-row items-center gap-1.5 rounded-md border px-3"
+                  style={{ borderColor: alpha(c.accent, 0.3), height: SIZE.hit }}
                 >
-                  <ArrowUpDown size={12} color={c.accent} />
-                  <Text className="font-sans text-xs" style={{ color: c.accent }}>
+                  <ArrowUpDown size={14} color={c.accent} />
+                  <Text className="font-sans-medium" style={{ fontSize: 14, color: c.accent }}>
                     {t("views.projects.reorder")}
                   </Text>
                 </Pressable>
               </View>
             ) : null
-          }
-          renderItem={({ item }) =>
-            item.type === "header" ? (
-              <Meta variant="cintillo" tone="muted" className="px-1 pt-3">
-                {item.label}
-              </Meta>
-            ) : (
-              renderCard(item.project)
-            )
           }
         />
       )}
@@ -470,7 +500,7 @@ export default function Projects() {
         onClose={() => setSortSheet(false)}
         title={t("views.projects.sortSheet.title")}
       >
-        <View className="gap-1">
+        <View>
           {PROJECT_SORT_MODES.map((m) => {
             const active = sortMode === m;
             return (
@@ -480,12 +510,18 @@ export default function Projects() {
                   setSortMode(m);
                   setSortSheet(false);
                 }}
-                className="flex-row items-center justify-between rounded-lg px-3 py-3"
+                accessibilityRole="radio"
+                accessibilityState={{ selected: active }}
+                className="flex-row items-center justify-between rounded-lg px-3"
+                style={{ minHeight: 48 }}
               >
-                <Text className={"font-sans " + "text-base " + (active ? "text-accent" : "text-text")}>
+                <Text
+                  className={active ? "font-sans-medium" : "font-sans"}
+                  style={{ fontSize: 16, color: active ? c.accent : c.text }}
+                >
                   {t(`views.projects.sortBy.${m}`)}
                 </Text>
-                {active && <Check size={18} color={c.accent} />}
+                {active ? <Check size={18} color={c.accent} /> : null}
               </Pressable>
             );
           })}

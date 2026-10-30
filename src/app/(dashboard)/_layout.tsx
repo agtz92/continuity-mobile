@@ -1,5 +1,8 @@
 import { useMemo } from "react";
+import { Text, View } from "react-native";
 import { Tabs } from "expo-router";
+import { PlatformPressable } from "@react-navigation/elements";
+import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 import { useTranslation } from "react-i18next";
 import {
   FolderKanban,
@@ -63,6 +66,22 @@ export default function DashboardLayout() {
           backgroundColor: surfaces.surface,
           borderTopColor: surfaces.border,
         },
+        // Etiqueta a 11 px (600 en la activa). El color solo no basta para
+        // saber dónde estás: la activa lleva además una regla de 2 px arriba.
+        tabBarLabel: ({ focused, color, children }) => (
+          <Text
+            style={{
+              fontSize: 11,
+              color,
+              fontFamily: focused ? "SchibstedGrotesk_600SemiBold" : "SchibstedGrotesk_500Medium",
+            }}
+          >
+            {children}
+          </Text>
+        ),
+        tabBarButton: (props: BottomTabBarButtonProps) => (
+          <TabButton {...props} accent={accent} />
+        ),
       }}
     >
       <Tabs.Screen
@@ -130,6 +149,36 @@ export default function DashboardLayout() {
     </Tabs>
     <DashboardTour />
     </>
+  );
+}
+
+/**
+ * Botón de pestaña con la regla superior de 2 px en `accent` cuando está
+ * activa. Va en `tabBarButton` (no en el icono) para que la regla toque el
+ * borde de la barra sin depender del padding del icono.
+ */
+function TabButton({
+  accent,
+  children,
+  style,
+  ...rest
+}: BottomTabBarButtonProps & { accent: string }) {
+  const focused = rest["aria-selected"] === true;
+  return (
+    <PlatformPressable {...rest} style={[style, { position: "relative" }]}>
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "22%",
+          right: "22%",
+          height: 2,
+          backgroundColor: focused ? accent : "transparent",
+        }}
+      />
+      {children}
+    </PlatformPressable>
   );
 }
 

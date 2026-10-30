@@ -35,7 +35,9 @@
       "google": "Continue with Google",
       "forgot": "Forgot password?",
       "noAccount": "Don't have an account?",
-      "signUpLink": "Sign up"
+      "signUpLink": "Sign up",
+      "headline": "Pick up where you left off.",
+      "forgotShort": "Forgot?"
     },
     "signup": {
       "title": "Create your account",
@@ -49,7 +51,8 @@
       "signUp": "Create account",
       "haveAccount": "Already have an account?",
       "signInLink": "Sign in",
-      "checkEmail": "Account created. Check your email to confirm it, then sign in."
+      "checkEmail": "Account created. Check your email to confirm it, then sign in.",
+      "headline": "Start a loop."
     },
     "reset": {
       "title": "Reset your password",
@@ -58,7 +61,49 @@
       "emailPlaceholder": "you@example.com",
       "send": "Send reset link",
       "sent": "If that email has an account, a reset link is on its way.",
-      "backToLogin": "Back to sign in"
+      "backToLogin": "Back to sign in",
+      "headline": "Forgot it?\nHappens.",
+      "lede": "Tell us your email and we'll send you a link. Open it on this phone to choose a new password.",
+      "afterTitle": "After you tap send",
+      "afterBody": "Check spam if nothing arrives in a few minutes. The link only works once, and only on the phone where you asked for it."
+    },
+    "newPassword": {
+      "headline": "Pick a new one.",
+      "lede": "At least 8 characters. You'll stay signed in on this phone.",
+      "password": "New password",
+      "confirm": "Repeat it",
+      "save": "Save password",
+      "saved": "Password updated. You're in.",
+      "verifying": "Checking your link…",
+      "errorTooShort": "Use at least 8 characters.",
+      "errorMismatch": "The two passwords don't match.",
+      "requestNew": "Send me a new link",
+      "retry": "Try again",
+      "failure": {
+        "network": {
+          "title": "We could not reach the server.",
+          "body": "Your link is still good. Check that you have signal or Wi-Fi and try again."
+        },
+        "otherDevice": {
+          "title": "Open the link on this phone.",
+          "body": "For your security, the link only works on the phone where you asked for it. Ask for a new one here and open the email on this same phone."
+        },
+        "expired": {
+          "title": "This link already expired.",
+          "body": "Reset links last one hour and work only once. Ask for a new one and use it right away."
+        },
+        "unknown": {
+          "title": "That link did not work.",
+          "body": "Ask for a new link from this phone and open the most recent email."
+        }
+      },
+      "errorSame": "That is your current password. Pick a different one.",
+      "errorWeak": "That password is too easy to guess. Try a longer one.",
+      "errorSave": "We could not save your password. Check your connection and try again."
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
     },
     "divider": "or",
     "errors": {
@@ -103,7 +148,8 @@
       "uncapped": "Unlimited",
       "upgrade": "Upgrade",
       "dailyMessages": "Messages today",
-      "monthlyTokens": "Tokens this month"
+      "monthlyTokens": "Tokens this month",
+      "left": "{count, plural, one {# message left today} other {# messages left today}}"
     },
     "errors": {
       "stopped": "Stopped",
@@ -413,7 +459,10 @@
       "heading": "Welcome, builder.",
       "sub": "This takes 90 seconds. Let's start with how it looks.",
       "mode": "Mode",
-      "palette": "Palette"
+      "palette": "Palette",
+      "preview": "Preview",
+      "previewProject": "Your first project",
+      "previewMeta": "Active · touched today"
     },
     "name": {
       "heading": "What should I call you?",
@@ -557,7 +606,10 @@
       "replayHeading": "Watch again",
       "replayHint": "Replay either one whenever. Nothing you already set up is lost.",
       "replayTourHint": "Ten steps over the app, section by section.",
-      "replaySetupHint": "Theme, name, avatar and plan — the initial setup."
+      "replaySetupHint": "Theme, name, avatar and plan — the initial setup.",
+      "headline": "Appearance",
+      "vocabAccent": "Accent",
+      "vocabFixed": "Signal · Closed · Ink"
     },
     "billing": {
       "title": "Billing & plan",
@@ -831,9 +883,28 @@
       "90d": "90d",
       "1y": "1y",
       "all": "All"
+    },
+    "rangeButton": "Range",
+    "rangeLong": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "1y": "Last 12 months",
+      "all": "All time"
+    },
+    "figures": {
+      "tasksDone": "Tasks done",
+      "mostTouched": "Most touched"
     }
   },
   "views": {
+    "more": {
+      "messagesLeft": "{count, plural, one {# message left} other {# messages left}}",
+      "calendarMeta": "{today} today · {hours} this week",
+      "logToday": "{count} today",
+      "on": "On",
+      "off": "Off"
+    },
     "calendar": {
       "viewDay": "Day",
       "viewWeek": "Week",
@@ -843,13 +914,37 @@
       "load": "Load",
       "allDay": "All day",
       "withTime": "With time",
-      "allDayMore": "Show {count} more",
-      "allDayLess": "Show less",
       "openDay": "Open day",
-      "activities": "{count, plural, one {# activity} other {# activities}}",
       "now": "now",
-      "dash": "—",
-      "empty": "Nothing scheduled here"
+      "late": "late",
+      "completeTask": "Complete {title}",
+      "editRoutine": "Edit routine {title}",
+      "taskCount": "{count, plural, one {# task} other {# tasks}}",
+      "tasksCount": "{count, plural, one {# task} other {# tasks}}",
+      "routinesCount": "{count, plural, one {# routine} other {# routines}}",
+      "previous": "Previous",
+      "next": "Next",
+      "filters": "Filters",
+      "nothingScheduled": "Nothing scheduled",
+      "loadLevel": {
+        "calm": "Light",
+        "busy": "Busy",
+        "over": "Over"
+      },
+      "legend": {
+        "over": "Over 8h",
+        "busy": "Busy",
+        "bar": "Bar = one item, colored by category"
+      },
+      "addTo": "Add to {day}",
+      "nothingOn": "Nothing on {day}.",
+      "overloadedDays": "{count, plural, one {# overloaded day} other {# overloaded days}}",
+      "itemsCount": "{count, plural, one {# item} other {# items}}",
+      "hoursOfCap": "≈ {hours} of {cap}",
+      "moreCount": "+ {count} more",
+      "routineLabel": "Routine",
+      "doneAt": "Done {time}",
+      "done": "Done"
     },
     "today": {
       "greeting": {
@@ -857,6 +952,7 @@
         "afternoon": "Good afternoon",
         "evening": "Good evening"
       },
+      "sectionCount": "{count, plural, one {# project} other {# projects}}",
       "counters": {
         "active": "Active",
         "launched": "Launched",
@@ -1003,6 +1099,11 @@
       "completed": "Completed",
       "filterCta": "Filter",
       "newAria": "New task",
+      "headline": {
+        "open": "{count, plural, =0 {Nothing open.} other {# open.}}",
+        "overdue": "{count} overdue.",
+        "dueToday": "{count} due today."
+      },
       "range": {
         "today": "Today",
         "week": "Week",
@@ -1032,12 +1133,19 @@
       "later": "Later",
       "archived": "Archived",
       "newAria": "New routine",
+      "headline": {
+        "dueToday": "{count, plural, =0 {Nothing due today.} other {# due today.}}",
+        "late": "{count, plural, one {# is late.} other {# are late.}}"
+      },
       "emptyBody": "A routine is the work that never finishes: the weekly review, the daily walk. It doesn't belong on a task list, because ticking it off is not the point.",
       "emptyRule": "What repeats is what actually changes things"
     },
     "projects": {
       "title": "All Projects",
       "search": "Search by name, description, category...",
+      "searchShort": "Search",
+      "headline": "{count, plural, one {# project.} other {# projects.}}",
+      "headlineBlocked": "{count} blocked.",
       "empty": "Nothing started yet",
       "addFirst": "Add your first project",
       "noMatchSearch": "No projects match \"{query}\"",
@@ -1140,7 +1248,14 @@
       "noMatch": "No ideas match \"{query}\"",
       "promote": "Promote to project",
       "emptyBody": "An idea is a project you haven't committed to. Park it here so it stops taking up room in your head, and promote it when it earns a first step.",
-      "emptyRule": "Ideas don't expire — they just get quieter"
+      "emptyRule": "Ideas don't expire — they just get quieter",
+      "headline": "{count, plural, one {# idea.} other {# ideas.}}",
+      "olderHeadline": "{count} older than a month.",
+      "promoteShort": "Promote",
+      "ageMeta": "Idea · {days} d",
+      "ideaLabel": "Idea",
+      "moreActions": "More actions for {title}",
+      "deleteConfirm": "Delete “{title}”?"
     },
     "quickNotes": {
       "title": "Quick Notes",
@@ -1187,7 +1302,16 @@
         "loose": "Standalone",
         "pinned": "Pinned"
       },
-      "emptyBody": "Somewhere to put what doesn't fit in a task: the decision, the reference, the thing someone told you once and you'll need in a month."
+      "emptyBody": "Somewhere to put what doesn't fit in a task: the decision, the reference, the thing someone told you once and you'll need in a month.",
+      "headline": "{count, plural, one {# note.} other {# notes.}}",
+      "pinnedHeadline": "{count} pinned.",
+      "recent": "Recent",
+      "ageDays": "{days} d",
+      "unpin": "Unpin note",
+      "noteMenu": "Note actions",
+      "sectionMenu": "Actions for {title}",
+      "editText": "Edit text",
+      "addSectionShort": "Add section"
     },
     "log": {
       "title": "Activity Log",
@@ -1203,6 +1327,7 @@
         "achievements": "Achievements",
         "notes": "Notes",
         "changes": "Changes",
+        "done": "Done",
         "deleted": "Deleted"
       },
       "buckets": {
@@ -1250,9 +1375,21 @@
       "ai": "AI",
       "revive": "Revive",
       "askLoop": "Ask Loop to go deeper",
-      "askLoopPrompt": "Analyze my graveyard: what pattern is there in why I kill my projects?"
+      "askLoopPrompt": "Analyze my graveyard: what pattern is there in why I kill my projects?",
+      "headline": "{count} buried.",
+      "restartHeadline": "{count} you'd restart.",
+      "patternAcross": "{count, plural, one {Pattern across # death} other {Pattern across # deaths}}",
+      "askLoopShort": "Ask Loop about it",
+      "killedOn": "killed {date}",
+      "loopReflection": "Loop's reflection"
     },
     "projectDetail": {
+      "daysIdle": "{count, plural, one {day idle} other {days idle}}",
+      "continueHere": "Continue here",
+      "continueHint": "Turns the next step into a task for today",
+      "update": "Update",
+      "tasksMeta": "{open} open · {done} done",
+      "deleteProject": "Delete project",
       "statusAction": {
         "launch": "Launch",
         "pause": "Pause",
@@ -1342,9 +1479,7 @@
     "completedToast": "✓ Task completed",
     "overdueDays": "Overdue · {count, plural, one {# day} other {# days}}",
     "todayBadge": "Today",
-    "moveToToday": "Move to today",
-    "reschedule": "Reschedule",
-    "movedToast": "✓ Moved to today"
+    "reschedule": "Reschedule"
   },
   "routineRow": {
     "markDone": "Mark as done",
@@ -1389,7 +1524,9 @@
     "todayHoursLabel": "+{hours}h today",
     "totalHoursTooltip": "Total hours invested across completed tasks",
     "totalHoursLabel": "{hours}h total",
-    "daysAgo": "{days}d ago"
+    "daysAgo": "{days}d ago",
+    "touchedToday": "today",
+    "hoursShort": "{hours}h"
   },
   "notes": {
     "newNote": "New note",
@@ -1424,7 +1561,12 @@
       "deleteConfirm": "Delete this project?",
       "deleteConfirmBody": "Its tasks and notes go with it. This can't be undone.",
       "killInstead": "Kill",
-      "killInsteadNote": "Why not kill it instead? Killing a project (instead of deleting it) helps build stats on why you kill your projects."
+      "killInsteadNote": "Why not kill it instead? Killing a project (instead of deleting it) helps build stats on why you kill your projects.",
+      "namePlaceholder": "What are you starting?",
+      "statusHint": "Pausing or killing happens later, from the status pill on the project's page — you don't start a project paused or dead.",
+      "more": "More",
+      "createCta": "Create project",
+      "saveCta": "Save project"
     },
     "task": {
       "newTitle": "New Task",
@@ -1447,6 +1589,15 @@
       "searchTaskPlaceholder": "Search task…",
       "noBlockerTasks": "No other tasks to select",
       "unknownTask": "Unknown task",
+      "save": "Save task",
+      "pickDate": "Pick a date",
+      "daysLate": "{count, plural, one {# day late} other {# days late}}",
+      "effortHours": "{count, plural, one {# hour} other {# hours}}",
+      "effortMinutes": "{count, plural, one {# minute} other {# minutes}}",
+      "effortCustom": "Custom amount",
+      "addTaskBlocker": "Another task",
+      "addExternalBlocker": "Someone / something",
+      "removeBlocker": "Remove blocker",
       "chips": {
         "today": "Today",
         "tomorrow": "Tomorrow",
@@ -1499,7 +1650,15 @@
       "errorStartDate": "Pick a date.",
       "errorWeekdays": "Select at least one weekday.",
       "errorIntervalN": "Interval must be a number ≥ 1.",
-      "errorMonthlyDay": "Day of month must be between 1 and 31."
+      "errorMonthlyDay": "Day of month must be between 1 and 31.",
+      "save": "Save routine",
+      "never": "Never",
+      "segment": {
+        "once": "Once",
+        "weekly": "Weekly",
+        "everyN": "Every N",
+        "monthly": "Monthly"
+      }
     },
     "update": {
       "newTitle": "Log update",

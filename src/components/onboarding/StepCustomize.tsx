@@ -1,19 +1,19 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Settings2 } from "lucide-react-native";
 import { useThemeColors } from "@/theme/useThemeColors";
-import { PrimaryButton } from "./controls";
+import { PrimaryButton, StepHeading, StepLayout, TextButton } from "./controls";
 
 /**
- * Step 5 — closing onboarding beat: introduce the Today customize editor and
+ * Paso 5 — closing onboarding beat: introduce the Today customize editor and
  * hand the user into it.
  *
- *  - primary ("Personalize Today") → `onCustomize`: completes onboarding and
- *    opens the Today layout editor (see onboarding.tsx → finishWithCustomize).
+ *  - primary ("Personalize Today", pie fijo) → `onCustomize`: completes
+ *    onboarding and opens the Today layout editor (see onboarding.tsx →
+ *    finishWithCustomize).
  *  - secondary → `onFinish`: first-time "Maybe later" (tour auto-starts) or
  *    replay "Done".
- *  - replay only: "Watch the dashboard tour again" → `onWatchTour` (moved here
- *    from the plan step so the tour CTA lives on the final screen).
+ *  - replay only: "Watch the dashboard tour again" → `onWatchTour`.
  */
 export function StepCustomize({
   replay,
@@ -32,56 +32,45 @@ export function StepCustomize({
   const c = useThemeColors();
 
   return (
-    <View className="gap-6">
-      <View className="gap-3">
-        <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.customize.heading")}
-        </Text>
-        <Text className="font-sans text-base leading-relaxed text-text-muted">
-          {t("onboarding.customize.sub")}
-        </Text>
-      </View>
+    <StepLayout
+      footer={
+        <PrimaryButton label={t("onboarding.customize.primary")} onPress={onCustomize} busy={busy} />
+      }
+    >
+      <StepHeading title={t("onboarding.customize.heading")} sub={t("onboarding.customize.sub")} />
 
-      <View className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4">
-        <Settings2 size={20} color={c.textMuted} />
-        <Text className="font-sans flex-1 text-sm text-text-muted">
+      <View
+        className="flex-row items-center"
+        style={{
+          gap: 12,
+          padding: 16,
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: c.line[14],
+          backgroundColor: c.surface,
+        }}
+      >
+        <Settings2 size={20} color={c.text3} />
+        <Text className="font-sans flex-1" style={{ fontSize: 15, lineHeight: 21, color: c.text2 }}>
           {t("onboarding.customize.hint")}
         </Text>
       </View>
 
-      <PrimaryButton
-        label={t("onboarding.customize.primary")}
-        onPress={onCustomize}
-        busy={busy}
-      />
-
-      {replay && (
-        <Pressable
-          onPress={onWatchTour}
+      <View style={{ gap: 4 }}>
+        {replay && (
+          <TextButton
+            label={t("onboarding.replay.replayTourButton")}
+            onPress={onWatchTour}
+            disabled={busy}
+            tone="accent"
+          />
+        )}
+        <TextButton
+          label={replay ? t("onboarding.replay.finishButton") : t("onboarding.customize.later")}
+          onPress={onFinish}
           disabled={busy}
-          accessibilityRole="button"
-          className="items-center py-1"
-          style={busy ? { opacity: 0.5 } : undefined}
-        >
-          <Text className="text-sm font-sans-medium text-accent">
-            {t("onboarding.replay.replayTourButton")}
-          </Text>
-        </Pressable>
-      )}
-
-      <Pressable
-        onPress={onFinish}
-        disabled={busy}
-        accessibilityRole="button"
-        className="items-center py-1"
-        style={busy ? { opacity: 0.5 } : undefined}
-      >
-        <Text className="font-sans text-sm text-text-muted">
-          {replay
-            ? t("onboarding.replay.finishButton")
-            : t("onboarding.customize.later")}
-        </Text>
-      </Pressable>
-    </View>
+        />
+      </View>
+    </StepLayout>
   );
 }

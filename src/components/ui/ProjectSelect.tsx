@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronDown } from "lucide-react-native";
 import { BottomSheet } from "@/components/ui/BottomSheet";
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 /**
@@ -34,9 +35,14 @@ export function ProjectSelect({
       <Pressable
         onPress={() => setOpen(true)}
         accessibilityRole="button"
-        className="flex-row items-center justify-between rounded-lg border border-border bg-border px-3 py-2.5"
+        // Campo del rediseño: 48 px sobre `surface`, nunca fondo `border`.
+        className="flex-row items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3.5"
+        style={{ height: SIZE.input }}
       >
-        <Text className={"font-sans " + "text-base " + (selected ? "text-text" : "text-text-muted")}>
+        <Text
+          className={"min-w-0 flex-shrink font-sans text-base " + (selected ? "text-text" : "text-text-muted")}
+          numberOfLines={1}
+        >
           {selected ? selected.name : t("modals.task.noProject")}
         </Text>
         <ChevronDown size={18} color={c.textMuted} />
@@ -50,7 +56,8 @@ export function ProjectSelect({
         <View className="gap-1">
           <Pressable
             onPress={() => select(null)}
-            className="flex-row items-center justify-between rounded-lg px-3 py-3"
+            className="flex-row items-center justify-between rounded-lg px-3"
+            style={{ minHeight: 48 }}
           >
             <Text className={"font-sans " + "text-base " + (!value ? "text-accent" : "text-text")}>
               {t("modals.task.noProject")}
@@ -63,7 +70,8 @@ export function ProjectSelect({
               <Pressable
                 key={p.id}
                 onPress={() => select(p.id)}
-                className="flex-row items-center justify-between rounded-lg px-3 py-3"
+                className="flex-row items-center justify-between rounded-lg px-3"
+            style={{ minHeight: 48 }}
               >
                 <Text className={"font-sans " + "text-base " + (active ? "text-accent" : "text-text")}>
                   {p.name}

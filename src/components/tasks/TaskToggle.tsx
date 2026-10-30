@@ -2,11 +2,16 @@ import { Pressable, View } from "react-native";
 import { Check, Lock, Repeat } from "lucide-react-native";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
+const SIZE_RING = 28;
+
 /**
  * Circular completion toggle shared by every task/routine row (mirror of the
  * web `tasks/TaskToggle.tsx`). Replaces the old 18px muted CheckCircle2 icon,
- * which read as decoration rather than a control: an empty 24px ring reads as
+ * which read as decoration rather than a control: an empty ring reads as
  * "fill me in", and the done state fills with the theme accent plus a check.
+ *
+ * Rediseño "Breathe": el anillo pasa de 24 a 28 px; con `hitSlop` de 8 el
+ * blanco de toque efectivo es 44.
  *
  * - kind "task": solid ring; turns red while overdue, shows a lock when blocked.
  * - kind "routine": dashed ring with a Repeat glyph ("this one recurs").
@@ -32,14 +37,14 @@ export function TaskToggle({
       onPress={onToggle}
       accessibilityRole="button"
       accessibilityLabel={label}
-      hitSlop={10}
+      hitSlop={8}
     >
       <View
         className="items-center justify-center"
         style={{
-          width: 24,
-          height: 24,
-          borderRadius: 12,
+          width: SIZE_RING,
+          height: SIZE_RING,
+          borderRadius: SIZE_RING / 2,
           borderWidth: 2,
           borderColor: done
             ? c.accent
@@ -51,11 +56,11 @@ export function TaskToggle({
         }}
       >
         {done ? (
-          <Check size={14} color={c.bg} strokeWidth={3} />
+          <Check size={16} color={c.bg} strokeWidth={3} />
         ) : blocked ? (
-          <Lock size={11} color={c.textMuted} />
+          <Lock size={13} color={c.textMuted} />
         ) : kind === "routine" ? (
-          <Repeat size={11} color={c.textMuted} />
+          <Repeat size={13} color={c.textMuted} />
         ) : null}
       </View>
     </Pressable>

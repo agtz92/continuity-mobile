@@ -3,12 +3,15 @@
 ## Navegación — back button visible en el stack `(more)`
 
 Todas las pantallas con header del stack `(more)` usan un **`headerLeft` compartido**
-(`src/components/ui/HeaderBackButton.tsx`, flecha `ArrowLeft` temática) definido en
+(`src/components/ui/HeaderBackButton.tsx`, flecha `ArrowLeft` temática de 24 px en caja de 44) definido en
 `(more)/_layout.tsx` con `headerBackVisible:false`. Motivo: el chevron nativo de iOS
 era demasiado sutil (a veces solo la flecha, etiquetada con el título previo) y los
 usuarios no notaban que el header era tocable. El botón se oculta solo cuando
 `canGoBack === false`. Las pantallas presentadas como **modal** usan su propia **X**
-(`ModalScaffold`); el chat usa una **X** propia en su header.
+(`FormScaffold`, con "Cancel" como texto); el chat usa una **X** propia en su header.
+Desde el rediseño Breathe la flecha lleva el **nombre del destino** ("More", "Notes",
+"Projects"): `headerOptionsFor(s, { backLabel, bare })`. Con `bare` la cabecera no lleva
+título y la pantalla abre con su propio `ScreenHeadline`.
 
 ## Safe-area — `SafeAreaProvider` en el root (obligatorio)
 
@@ -158,7 +161,7 @@ Notas con **secciones plegables** (toggles), **categorizables** y ligables a un 
 - **Pantallas** (registradas en `(more)/_layout.tsx`, enlazadas desde `more.tsx` con icono `NotebookPen`, `href:"/quick-notes"`):
   - Lista: `src/app/(dashboard)/(more)/quick-notes.tsx` — búsqueda, chips de filtro (Todas / categorías / Sueltas / Fijadas), cards con franja de color de categoría, pull-to-refresh, FAB.
   - Editor: `src/app/(dashboard)/(more)/quick-note.tsx` (`?id=`) — título, categoría en chips, proyecto vía `ProjectSelect`, secciones, fijar/borrar. El título se re-siembra por `useEffect` sobre `note?.id` (estable mientras escribes, no pisa ediciones). La lista de secciones es un **`DraggableFlatList`** (`react-native-draggable-flatlist`) envuelto en `GestureHandlerRootView`; título/categoría/proyecto van en `ListHeaderComponent` y "agregar sección" en `ListFooterComponent` (se pasan como **elementos JSX**, no componentes inline, para no remontar los `TextInput` al teclear).
-- **Sección:** `src/components/notes/NoteSectionCard.tsx` — toggle plegable, guarda al perder foco, **reorden por arrastre** (handle ⠿ con `onLongPress={onDrag}`; el `DraggableFlatList` pasa `onDrag`/`isActive`), botón **copiar al portapapeles** (`expo-clipboard`, swap Copy→Check 1.5s) y **toggle vista/edición** (👁/✎). Las flechas ▲▼ se quitaron. Caret por `transform` inline (no className alternante — regla 4).
+- **Sección:** `src/components/notes/NoteSectionCard.tsx` — chevron a la izquierda (caja 36×44) que pliega y **persiste `collapsed`** por sección, guarda al perder foco, **reorden por arrastre con long-press sobre la cabecera** (el `DraggableFlatList` pasa `onDrag`/`isActive`). Dos acciones de 44 px: **copiar** (`expo-clipboard`, swap Copy→Check 1.5s) y **⋯**, que abre una hoja con Editar texto/Vista previa · Plegar/Desplegar · Mover arriba/abajo (`reorderSections`) · Borrar. Caret por `transform` inline (no className alternante — regla 4).
 - **Markdown:** `src/components/notes/MarkdownText.tsx` — renderer **propio sin dependencias** (RN `Text`/`View`; encabezados, listas, **negrita**, *cursiva*, `código`, enlaces vía `Linking`). ⚠️ El JSDoc **no** debe contener `*/` (cierra el bloque).
 - **Datos:** hooks `src/hooks/useQuickNotes.ts` (query lazy) y `useQuickNoteMutations.ts` (refetch `QUICK_NOTES_QUERY`, vía `@apollo/client/react`). Tipos `QuickNote`/`NoteSection` en `src/lib/types.ts`. Reusa `categoryChipColors`/`alpha` para colores (regla 5). i18n `views.quickNotes.*` (en/es, ICU llave simple).
 - **Onboarding:** el `DashboardTour` (`src/components/onboarding/DashboardTour.tsx`) tiene un coachmark de Notes (`STEPS` → `key:"stepNotes"`, icono `NotebookPen`, i18n `onboarding.tour.stepNotes`). Los puntos de progreso/`next()` se ajustan solos al tamaño de `STEPS`. La nota de ejemplo para usuarios nuevos la siembra el backend (seed). No se tocó `TOTAL_STEPS`.
@@ -167,18 +170,19 @@ Notas con **secciones plegables** (toggles), **categorizables** y ligables a un 
 
 Pantalla `src/app/(dashboard)/(more)/calendar.tsx` (bajo "More"). Los sub-views y chips se comparten en `src/components/calendar/` y la lógica de fechas en `src/lib/calendar.ts`. **Espejo de la web** (`continuity/frontend`, mismos archivos), con dos adaptaciones al ancho del teléfono.
 
-- **Vista Día** (`DayGrid.tsx`): invierte la jerarquía del espacio. Los items **sin hora** van en una **lista vertical legible** ("Todo el día · N", colapsa a partir de 4 con "Ver N más"), no en la tira de chips vieja. La **rejilla horaria solo se dibuja si hay eventos con hora** (`timedCount > 0`) — un día todo-all-day ya no deja la rejilla 7–21 vacía ocupando la pantalla. Sección "Con hora · N" aparte.
-- **Vista Mes** (`MonthGrid.tsx`): cada celda muestra hasta **2 micro-barras con el color de categoría** de sus items (+N si hay más); la carga se movió del punto al **tinte del número del día** (ámbar/rojo). **Un tap SELECCIONA** el día → su agenda se renderiza **debajo** de la matriz (`SelectedDayAgenda.tsx`, con "Abrir día →"); tap en el día **ya seleccionado** (o "Abrir día") entra a la vista Día. O sea, **un tap ≠ navegar**. Al cambiar de mes la selección se reubica sola (hoy si es visible, si no el día 1).
-- **Vista Semana** = `WeekAgenda.tsx` (lista vertical), no `WeekGrid` de columnas como la web (adaptación al ancho).
-- **Chips** (`parts.tsx`, `ProjectChip`/`TaskChip`/`RoutineChip`) tienen prop **`size`**: `sm` (escala densa de celdas Semana/Mes) o `md` (renglón cómodo, usado por la lista del Día y el panel de agenda).
-- **Las rutinas NO se completan desde el calendario** (decisión de producto). `RoutineChip` y el bloque de rutina con hora **navegan a la edición** (`routine-form`) vía `handlers.onOpenRoutine`. `CalendarHandlers` **ya no tiene** `onCompleteOccurrence`/`onUncompleteOccurrence`. El estado "completada" se ve (tachado + opacidad) pero es de solo lectura.
+- **Cabecera** (`CalendarHeader.tsx`): fija fuera del scroll, compartida por las tres vistas (periodo 26/30, meta en versalitas, flechas 44, `Segmented` + filtros). Los datos salen de `hooks/useCalendarData.ts` (cubetas, resumen, barras y carga del Mes una vez por mes, ítems del día enfocado vía `components/calendar/entries.ts`).
+- **Vista Día** (`DayGrid.tsx`): barra de carga de 6 px con "Light/Busy/Over"; ítems **sin hora** como filas (`CalendarItemRow`, espina del color de la categoría, rutinas en `accent`), más de 6 → 5 + "+N more"; la **rejilla horaria solo si hay eventos con hora** (60 px/hora, bloques `TimedBlock` con `minHeight` 48 que crecen si el título envuelve, columnas por solape con `layoutOverlaps` de `lib/calendar`); línea "ahora" en `signal` (`NowLine`, un solo intervalo de 60 s en la pantalla); "Add to Thursday" abre `task-form` con `due` = ese día. Vacío: "Nothing on Thursday." + el mismo botón.
+- **Vista Mes** (`MonthGrid.tsx` + `MonthCell.tsx` memo + `MonthLegend.tsx`): celdas sin tarjeta de 60 px separadas por regla; hasta **3 barras** del color de categoría y "+N"; carga por **peso** (busy = número en 700) y **regla superior de 3 px `signal`** si está sobrecargado. **Un tap SELECCIONA** el día → su agenda (`DayAgenda.tsx`, regla 3 px `accent`, hasta 4 filas, "Open day →") se pinta **debajo**; tocar el **ya seleccionado** entra a la vista Día. O sea, **un tap ≠ navegar**.
+- **Color de un ítem**: espina del bloque, barra de la celda y espina de la fila salen de `projectColor()` (`parts.tsx`, `categoryChipColors(...).dot`); sin categoría `line[34]`, rutinas `accent`.
+- **Vista Semana** = `WeekAgenda.tsx`: filas rayadas por día (columna de 40 px con día en versalitas + número display de 22), ítems a 15 px con `TaskToggle` y meta a la derecha (horas, "late"); hoy lleva espina accent y barra de carga de 3 px; "Nothing scheduled" en días vacíos. No es `WeekGrid` de columnas como la web (adaptación al ancho). El titular es el periodo (`ScreenHeadline size={26}`) con "N tasks · N routines · Xh" (`components/calendar/summary.ts`); los toggles de tareas/carga viven en una hoja de filtros (tareas visibles por defecto).
+- **Las rutinas NO se completan desde el calendario** (decisión de producto). Las filas y bloques de rutina **navegan a la edición** (`routine-form`) vía `handlers.onOpenRoutine`. `CalendarHandlers` **ya no tiene** `onCompleteOccurrence`/`onUncompleteOccurrence`. El estado "completada" se ve (tachado + opacidad) pero es de solo lectura.
 
 ## Filas de tarea/rutina + borrar en el detalle (no en la fila)
 
 Rediseño de `TaskRow`/`RoutineRow` (`src/components/tasks|routines/`) por nota de diseñador — homologado con la web.
 
-- **`TaskToggle` compartido** (`src/components/tasks/TaskToggle.tsx`) es el control de completar de toda fila de tarea/rutina: círculo de **24px** (vacío = "lléname"), se llena con accent + palomita al completar; **`signal`** si vencida, candado si bloqueada, **punteado + ↻** para rutina. Reemplazó al `CheckCircle2` de 18px que se leía como decoración.
-- **Spine de urgencia** de 3px en el borde izquierdo (`signal` vencida / `accent` hoy / neutro) + **badges sólidos** "Vencida · Nd" / "Hoy" (i18n `taskRow.overdueDays`/`todayBadge`, **plural ICU**). Filas vencidas exponen acciones rápidas **"Mover a hoy"** / **"Reprogramar"**.
+- **`TaskToggle` compartido** (`src/components/tasks/TaskToggle.tsx`) es el control de completar de toda fila de tarea/rutina: círculo de **28px** (vacío = "lléname"; 24 en la semana del calendario), se llena con accent + palomita al completar; **`signal`** si vencida, candado si bloqueada, **punteado + ↻** para rutina. Reemplazó al `CheckCircle2` de 18px que se leía como decoración.
+- **Spine de urgencia** de 3px en el borde izquierdo (`signal` vencida / `accent` hoy / neutro) + **badges sólidos** "Vencida · Nd" / "Hoy" (i18n `taskRow.overdueDays`/`todayBadge`, **plural ICU**). Filas vencidas exponen **solo "Reprogramar"** (36 px): "Mover a hoy" se quitó en el rediseño Breathe (fila y Today's Focus). `TaskRow` acepta `onLongPress` y `dragHandle` (el ⠿ de 36×44 del detalle de proyecto).
 - **Borrar NO vive en la fila** — se movió al **detalle de edición** para evitar el mis-tap junto al toggle. `ModalDeleteButton` (`src/components/ui/ModalDeleteButton.tsx`) usa **`confirmAsync`** (Alert nativo + haptic warning) al final de `task-form`/`routine-form`. Las filas conservan `onDelete?` **opcional sin usar** (con comentario) para no romper los ~call sites; el tap en la fila abre la edición. (En web el confirm es de dos pasos inline, no Alert.)
 - **Today's Focus** (`src/components/today/TodayFocusSection.tsx`) es un **componente aparte** a propósito: lista cosas **mixtas** en una lista priorizada (tareas vencidas/hoy + **proyectos estancados** + **próximos pasos**), por eso no reusa `TaskRow`. Comparte el **lenguaje visual** (mismo `TaskToggle` + spine + badges), no el componente.
 
@@ -220,3 +224,16 @@ veces se honra y a veces se ignora en silencio es peor que no tener botón.
 
 **`budget_exhausted` no es un error.** El stream lo emite y **sigue**: lo que llega después
 es el cierre que escribe el modelo sin herramientas, diciendo qué alcanzó a hacer.
+
+## Rediseño UX "Breathe" (2026-10)
+
+Handoff de diseño aplicado a las 23 pantallas. Reglas que quedaron fijas:
+
+- **Medidas en `SIZE`** (`src/theme/tokens.ts`): toque 44, chips de preset 40, chips de filtro 36, input 48 (52 en auth), botón 52, fila 56, gap de sección 24, gutter 20. No escribas un 42 suelto.
+- **Primitivas** en `src/components/ui/`: `ScreenHeadline` (titular con la cifra: "18 open." / "2 overdue."), `SectionHeader` + `CollapsibleSection` (conteos en **segunda línea**, nunca en la del título; ya no hay variante "card"), `FilterChips`, `IconAction` (botón-icono 44, `label` obligatorio), `Segmented`, `PresetChips`, `RuledRow`, `FormScaffold` (reemplazó a `ModalScaffold`), `Field` (con `aside`), `DatePickerSheet`/`DateInput`.
+- **Títulos nunca con `numberOfLines={1}`**: envuelven. Solo la meta secundaria elipsa.
+- **Una tarjeta por fila** (sin card-en-card); listas como filas rayadas con espina de 3 px cuando hay estado.
+- **Pestañas**: etiqueta 11 px (600 en la activa) y regla superior de 2 px en `accent` (`TabButton` en `(dashboard)/_layout.tsx`).
+- **"Continue here"** en el detalle de proyecto crea una tarea desde el next step: `task-form` acepta `title` y `due: "today"` de prellenado (solo al crear).
+- **Reset de contraseña**: el enlace del correo abre `continuity://auth/reset` → `src/app/auth/reset.tsx` (canje PKCE + `updateUser`). La Redirect URL tiene que estar permitida en Supabase. `src/lib/passwordRecovery.ts` evita que el guard saque al usuario de la pantalla.
+- **Pruebas**: `npm test` (jest-expo + Testing Library; `jest.setup.js` mockea el tema con `global.__THEME__` para probar los tres). Cada primitiva verifica hit-area y `accessibilityLabel`. Código sin uso: `npm run knip` (línea base en `reports/knip-baseline.json`).

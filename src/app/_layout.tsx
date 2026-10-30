@@ -19,6 +19,7 @@ import { startOutbox } from "@/lib/outbox";
 import { ONBOARDING_STATE_QUERY } from "@/lib/graphql";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { isRecoveryPending } from "@/lib/passwordRecovery";
 import { Toaster } from "@/components/ui/Toaster";
 import { useLiveSync } from "@/hooks/useLiveSync";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
@@ -53,6 +54,14 @@ function useProtectedRoute() {
 
   useEffect(() => {
     if (loading) return;
+    // Rutas de deep link de auth (`auth/reset`): manejan su propia salida. La
+    // de recuperación deja una sesión válida antes de pedir la contraseña
+    // nueva; sin esto el gate la mandaría a Today. Ver lib/passwordRecovery.
+    if ((segments[0] as string | undefined) === "auth") return;
+    if (session && isRecoveryPending()) {
+      router.replace("/auth/reset");
+      return;
+    }
     const inAuthGroup = segments[0] === "(auth)";
     const onSplash = (segments as string[]).length === 0;
     const onOnboarding = segments[0] === "onboarding";

@@ -1,39 +1,24 @@
-import { useMemo, useState } from "react";
-import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { HeartPulse, MessageCircle, RefreshCw, Sparkles } from "lucide-react-native";
-import { Tombstone } from "@/components/icons/Tombstone";
-import type { Project } from "@/lib/types";
-import { daysSince } from "@/lib/date";
+import { MessageCircle, InfinityIcon } from "lucide-react-native";
+
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Meta } from "@/components/ui/Meta";
+import { ScreenHeadline } from "@/components/ui/ScreenHeadline";
+import { GraveBlock } from "@/components/more/GraveBlock";
+import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useGraveyardInsight } from "@/hooks/useGraveyardInsight";
-import { useProjectClosure } from "@/hooks/useProjectClosure";
 import { countsTowardCap, usePlan } from "@/hooks/usePlan";
-import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
-import { alpha, useThemeColors } from "@/theme/useThemeColors";
-import { Meta } from "@/components/ui/Meta";
-
-function Note({ label, body }: { label: string; body: string }) {
-  if (!body) return null;
-  return (
-    <View>
-      <Text className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
-        {label}
-      </Text>
-      <Text className="font-sans text-sm text-text">{body}</Text>
-    </View>
-  );
-}
+import { useProjectClosure } from "@/hooks/useProjectClosure";
+import type { Project } from "@/lib/types";
+import { SIZE } from "@/theme/tokens";
+import { useThemeColors } from "@/theme/useThemeColors";
 
 export default function Graveyard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { projects, refetch } = useDashboardData();
@@ -48,20 +33,14 @@ export default function Graveyard() {
     () =>
       projects
         .filter((p) => p.status === "killed")
-        .sort((a, b) =>
-          (b.killedAt ?? b.lastActivity).localeCompare(a.killedAt ?? a.lastActivity)
-        ),
-    [projects]
+        .sort((a, b) => (b.killedAt ?? b.lastActivity).localeCompare(a.killedAt ?? a.lastActivity)),
+    [projects],
   );
-
   const activeUsed = useMemo(
     () => projects.filter((p) => countsTowardCap(p.status)).length,
-    [projects]
+    [projects],
   );
-
-  const wouldRestartCount = killed.filter((p) =>
-    (p.killedWouldRestart ?? "").trim()
-  ).length;
+  const wouldRestartCount = killed.filter((p) => (p.killedWouldRestart ?? "").trim()).length;
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -77,166 +56,85 @@ export default function Graveyard() {
     const ok = await closure.setStatus(reviveTarget, target);
     if (ok) setReviveTarget(null);
   };
+  const pickRevive = useCallback((p: Project) => setReviveTarget(p), []);
 
   const askLoop = () =>
-    router.push({
-      pathname: "/assistant",
-      params: { prompt: t("views.graveyard.askLoopPrompt") },
-    });
+    router.push({ pathname: "/assistant", params: { prompt: t("views.graveyard.askLoopPrompt") } });
 
   const showAutopsy = !!insight && insight.deathsCount >= 3 && !!insight.body;
 
   return (
     <ScrollView
       className="flex-1 bg-bg"
-      contentContainerStyle={{ gap: 16, padding: 20, paddingBottom: 60 }}
+      contentContainerStyle={{ paddingHorizontal: SIZE.gutter, paddingTop: 8, paddingBottom: 60 }}
       refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          tintColor={c.accent}
-        />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} />
       }
     >
-      {/* Autopsy block (Layer B insight). */}
-      {showAutopsy ? (
-        <View
-          className="flex-row overflow-hidden rounded-xl border"
-          style={{ backgroundColor: c.surface, borderColor: c.border }}
-        >
-          {/* La autopsia lleva espina de acento: es lo que el sistema usa para
-              decir "esto es lectura tuya", no un segundo color de marca. */}
-          <View style={{ width: 3, alignSelf: "stretch", backgroundColor: c.accent }} />
-          <View className="flex-1 gap-2 p-4">
-          <View className="flex-row items-center gap-2">
-            <Sparkles size={16} color={c.accent} />
-            <Meta variant="cintillo" tone="inherit" style={{ color: c.accent }}>
-              {t("views.graveyard.patternTitle")}
+      <ScreenHeadline
+        primary={t("views.graveyard.headline", { count: killed.length })}
+        secondary={
+          wouldRestartCount > 0
+            ? t("views.graveyard.restartHeadline", { count: wouldRestartCount })
+            : null
+        }
+      />
+
+      {/* Autopsia: bajo una regla de 3 px accent, sin tarjeta. El acento dice
+          "esto es lectura tuya", no un segundo color de marca. */}
+      <View style={{ marginTop: 24, marginBottom: 20 }}>
+        <View style={{ height: 3, backgroundColor: showAutopsy ? c.accent : c.line[22] }} />
+        <View style={{ paddingTop: 14, gap: 8 }}>
+          <View className="flex-row items-center" style={{ gap: 6 }}>
+            <InfinityIcon size={14} color={showAutopsy ? c.accent : c.text3} />
+            <Meta
+              variant="cintillo"
+              tone="inherit"
+              style={{ color: showAutopsy ? c.accent : c.text3 }}
+            >
+              {showAutopsy
+                ? t("views.graveyard.patternAcross", { count: insight!.deathsCount })
+                : t("views.graveyard.noPatternTitle")}
             </Meta>
           </View>
-          <Text className="font-sans text-sm leading-snug text-text">{insight!.body}</Text>
-          <Pressable
-            onPress={askLoop}
-            accessibilityRole="button"
-            className="mt-1 flex-row items-center gap-1.5 self-start rounded-lg border px-3 py-2"
-            style={{ borderColor: alpha(c.accent, 0.4) }}
-          >
-            <MessageCircle size={14} color={c.accent} />
-            <Text className="text-sm font-sans-medium" style={{ color: c.accent }}>
-              {t("views.graveyard.askLoop")}
-            </Text>
-          </Pressable>
-          </View>
-        </View>
-      ) : (
-        <View className="gap-1.5 rounded-xl border border-border bg-surface p-4">
-          <View className="flex-row items-center gap-2">
-            <Sparkles size={16} color={c.textMuted} />
-            <Text className="text-sm font-sans-semibold text-text">
-              {t("views.graveyard.noPatternTitle")}
-            </Text>
-          </View>
-          <Text className="font-sans text-sm text-text-muted">
-            {t("views.graveyard.noPatternBody")}
+          <Text className="font-sans" style={{ fontSize: 16, lineHeight: 24, color: showAutopsy ? c.text : c.text3 }}>
+            {showAutopsy ? insight!.body : t("views.graveyard.noPatternBody")}
           </Text>
+          {showAutopsy ? (
+            <Pressable
+              onPress={askLoop}
+              accessibilityRole="button"
+              className="mt-1 flex-row items-center self-start rounded-md active:opacity-70"
+              style={{
+                height: SIZE.hit,
+                paddingHorizontal: 14,
+                gap: 8,
+                borderWidth: 1,
+                borderColor: c.line[22],
+                backgroundColor: c.surface,
+              }}
+            >
+              <MessageCircle size={18} color={c.accent} />
+              <Text className="font-sans-medium" style={{ fontSize: 15, color: c.accent }}>
+                {t("views.graveyard.askLoopShort")}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
-      )}
+      </View>
 
       {killed.length === 0 ? (
-        <View className="items-center gap-2 rounded-xl border border-border bg-surface p-8">
-          <Tombstone size={28} color={c.textMuted} />
-          <Text className="font-sans text-center text-sm text-text-muted">
-            {t("views.graveyard.empty")}
-          </Text>
-        </View>
+        <EmptyState title={t("views.graveyard.title")} body={t("views.graveyard.empty")} />
       ) : (
-        <>
-          <Text className="font-sans text-xs text-text-muted">
-            {t("views.graveyard.wouldRestartCount", {
-              count: wouldRestartCount,
-              total: killed.length,
-            })}
-          </Text>
-          {killed.map((p) => (
-            <View
-              key={p.id}
-              className="gap-3 rounded-xl border border-border bg-surface p-4"
-            >
-              <View className="flex-row items-start justify-between gap-2">
-                <View className="flex-1">
-                  <Text className="text-base font-sans-semibold text-text">
-                    {p.name}
-                  </Text>
-                  <Text className="font-sans text-xs text-text-muted">
-                    {t("views.graveyard.lived", {
-                      count: daysSince(p.created) ?? 0,
-                    })}
-                  </Text>
-                </View>
-                {(p.killedWouldRestart ?? "").trim() ? (
-                  <View
-                    className="flex-row items-center gap-1 self-start rounded-full border px-2 py-0.5"
-                    style={{
-                      backgroundColor: alpha(c.accent, 0.12),
-                      borderColor: alpha(c.accent, 0.35),
-                    }}
-                  >
-                    <RefreshCw size={11} color={c.accent} />
-                    <Text className="font-sans text-[11px] text-accent">
-                      {t("views.graveyard.wouldRestartBadge")}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-
-              <Note
-                label={t("views.graveyard.whyKilled")}
-                body={p.killedReason ?? ""}
-              />
-              <Note
-                label={t("views.graveyard.learnings")}
-                body={p.killedLearnings ?? ""}
-              />
-              <Note
-                label={t("views.graveyard.wouldRestart")}
-                body={p.killedWouldRestart ?? ""}
-              />
-
-              {!!(p.killedAiReflection ?? "").trim() && (
-                <View
-                  className="gap-1 rounded-lg border p-3"
-                  style={{
-                    backgroundColor: c.line[4],
-                    borderColor: c.line[14],
-                  }}
-                >
-                  <View className="flex-row items-center gap-1.5">
-                    <Sparkles size={13} color={c.text3} />
-                    <Meta variant="cintillo" tone="muted">
-                      {t("views.graveyard.ai")}
-                    </Meta>
-                  </View>
-                  <Text className="font-sans text-sm leading-snug text-text">
-                    {p.killedAiReflection}
-                  </Text>
-                </View>
-              )}
-
-              <Pressable
-                onPress={() => setReviveTarget(p)}
-                disabled={closure.saving}
-                accessibilityRole="button"
-                className="flex-row items-center gap-1.5 self-start rounded-lg border px-3 py-2"
-                style={{ borderColor: c.border }}
-              >
-                <HeartPulse size={15} color={c.accent} />
-                <Text className="text-sm font-sans-medium text-accent">
-                  {t("views.graveyard.revive")}
-                </Text>
-              </Pressable>
-            </View>
-          ))}
-        </>
+        killed.map((p) => (
+          <GraveBlock
+            key={p.id}
+            project={p}
+            locale={i18n.language || "en"}
+            onRevive={pickRevive}
+            disabled={closure.saving}
+          />
+        ))
       )}
 
       <ReviveProjectModal

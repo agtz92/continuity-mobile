@@ -1,60 +1,34 @@
-import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
-import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { FormScaffold } from "@/components/ui/FormScaffold";
 import { ModalDeleteButton } from "@/components/ui/ModalDeleteButton";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
-import { DateField } from "@/components/ui/DateField";
+import { PresetChips } from "@/components/ui/PresetChips";
 import { ProjectSelect } from "@/components/ui/ProjectSelect";
-import { ChipGroup, type ChipOption } from "@/components/ui/ChipGroup";
+import { Segmented } from "@/components/ui/Segmented";
+import { DateInput } from "@/components/ui/DatePickerSheet";
+import { EffortPresets, useEffortAside } from "@/components/tasks/EffortPresets";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useRoutineMutations } from "@/hooks/useRoutineMutations";
-import { weekdayShortLabels } from "@/lib/recurrence";
+import { describeRecurrence, weekdayShortLabels } from "@/lib/recurrence";
 import { todayLocalISODate } from "@/lib/date";
-import type { IntervalUnit, RecurrenceType } from "@/lib/types";
+import type { IntervalUnit, RecurrenceType, Routine } from "@/lib/types";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
-const RECURRENCE_TYPES: RecurrenceType[] = [
-  "once",
-  "weekly_days",
-  "every_n",
-  "monthly_day",
-];
 const INTERVAL_UNITS: IntervalUnit[] = ["days", "weeks", "months"];
-const EFFORT_PRESETS = [0.25, 0.5, 1, 2] as const;
+const WEEKDAY_VALUES = ["0", "1", "2", "3", "4", "5", "6"] as const;
+type WeekdayValue = (typeof WEEKDAY_VALUES)[number];
 
-function Chip({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityState={{ selected: active }}
-      className={
-        "rounded-lg border px-3 py-1.5 " +
-        (active ? "border-accent bg-accent" : "border-border bg-border")
-      }
-    >
-      <Text
-        className={
-          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
-        }
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
+/**
+ * Formulario de rutina (3f), rediseño "Breathe": segmentado Once / Weekly /
+ * Every N / Monthly (→ `recurrenceType` once / weekly_days / every_n /
+ * monthly_day), días como 7 celdas de 44, Starts/Ends lado a lado y esfuerzo
+ * en presets. El archivado NO vive aquí: se queda en la fila (`RoutineRow`).
+ */
 export default function RoutineForm() {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -92,14 +66,39 @@ export default function RoutineForm() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const toggleWeekday = (d: number) =>
+  const toggleWeekday = (v: WeekdayValue) => {
+    const d = Number(v);
     setWeekdays((cur) =>
       cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d].sort()
     );
-  const toggleHour = (h: number) =>
-    setEffortHours((cur) => (cur === String(h) ? "" : String(h)));
+  };
 
   const canSave = title.trim().length > 0;
+  const monthlyDay = parseInt(startDate.split("-")[2] ?? "1", 10);
+  const parsedN = parseInt(intervalN, 10);
+
+  const recLabel = useCallback(
+    (key: string, vars?: Record<string, string | number>) =>
+      t(`recurrence.${key}`, vars),
+    [t]
+  );
+  // El resumen de la regla en borrador ("T · F", "Every 2 weeks") como `aside`.
+  const recurrenceAside =
+    recurrenceType === "once"
+      ? null
+      : describeRecurrence(
+          {
+            ...(existing ?? {}),
+            recurrenceType,
+            startDate,
+            weekdays,
+            intervalN: Number.isFinite(parsedN) && parsedN >= 1 ? parsedN : 1,
+            intervalUnit,
+            monthlyDay: Number.isFinite(monthlyDay) ? monthlyDay : 1,
+          } as Routine,
+          recLabel
+        );
+  const effortAside = useEffortAside(effortHours);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -116,22 +115,19 @@ export default function RoutineForm() {
     }
     let n: number | null = null;
     if (recurrenceType === "every_n") {
-      const parsed = parseInt(intervalN, 10);
-      if (!Number.isFinite(parsed) || parsed < 1) {
+      if (!Number.isFinite(parsedN) || parsedN < 1) {
         setError(t("modals.routine.errorIntervalN"));
         return;
       }
-      n = parsed;
+      n = parsedN;
     }
     let mDay: number | null = null;
     if (recurrenceType === "monthly_day") {
-      const [, , dayStr] = startDate.split("-");
-      const parsed = parseInt(dayStr ?? "", 10);
-      if (!Number.isFinite(parsed) || parsed < 1 || parsed > 31) {
+      if (!Number.isFinite(monthlyDay) || monthlyDay < 1 || monthlyDay > 31) {
         setError(t("modals.routine.errorMonthlyDay"));
         return;
       }
-      mDay = parsed;
+      mDay = monthlyDay;
     }
     setError(null);
 
@@ -162,49 +158,22 @@ export default function RoutineForm() {
     closeModal(router);
   };
 
-  const recurrenceOptions: ChipOption<RecurrenceType>[] = RECURRENCE_TYPES.map(
-    (type) => ({
-      value: type,
-      label:
-        type === "once"
-          ? t("modals.routine.type.once")
-          : type === "weekly_days"
-          ? t("modals.routine.type.weeklyDays")
-          : type === "every_n"
-          ? t("modals.routine.type.everyN")
-          : t("modals.routine.type.monthlyDay"),
-    })
-  );
-  const unitOptions: ChipOption<IntervalUnit>[] = INTERVAL_UNITS.map((u) => ({
-    value: u,
-    label: t(`modals.routine.unit.${u}`),
-  }));
-
   const weekdayLabels = weekdayShortLabels((key) =>
     t(`recurrence.weekday.short.${key}`)
   );
-  const monthlyDay = parseInt(startDate.split("-")[2] ?? "1", 10);
 
   return (
-    <ModalScaffold
+    <FormScaffold
       title={
         existing ? t("modals.routine.editTitle") : t("modals.routine.newTitle")
       }
       onSave={handleSave}
+      saveLabel={t("modals.routine.save")}
       canSave={canSave}
       saving={saving}
     >
       <Field label={t("modals.routine.titleField")}>
-        <FormInput value={title} onChangeText={setTitle} autoFocus />
-      </Field>
-
-      <Field label={t("modals.routine.description")}>
-        <FormInput
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          placeholder={t("modals.routine.descriptionPlaceholder")}
-        />
+        <FormInput value={title} onChangeText={setTitle} autoFocus={!title} />
       </Field>
 
       {projects.length > 0 && (
@@ -217,119 +186,109 @@ export default function RoutineForm() {
         </Field>
       )}
 
-      <Field label={t("modals.routine.recurrenceType")}>
-        <ChipGroup
-          value={recurrenceType}
-          options={recurrenceOptions}
-          onChange={setRecurrenceType}
-        />
-      </Field>
+      <Field label={t("modals.routine.recurrenceType")} aside={recurrenceAside}>
+        <View style={{ gap: 8 }}>
+          <Segmented<RecurrenceType>
+            options={[
+              { value: "once", label: t("modals.routine.segment.once") },
+              { value: "weekly_days", label: t("modals.routine.segment.weekly") },
+              { value: "every_n", label: t("modals.routine.segment.everyN") },
+              { value: "monthly_day", label: t("modals.routine.segment.monthly") },
+            ]}
+            value={recurrenceType}
+            onChange={setRecurrenceType}
+          />
 
-      <Field
-        label={
-          recurrenceType === "once"
-            ? t("modals.routine.dateField")
-            : t("modals.routine.startDateField")
-        }
-      >
-        <DateField
-          value={startDate}
-          onChange={setStartDate}
-          title={
-            recurrenceType === "once"
-              ? t("modals.routine.dateField")
-              : t("modals.routine.startDateField")
-          }
-        />
-      </Field>
-
-      {recurrenceType === "weekly_days" && (
-        <Field label={t("modals.routine.weekdaysField")}>
-          <View className="flex-row flex-wrap gap-1.5">
-            {weekdayLabels.map((label, idx) => (
-              <Pressable
-                key={idx}
-                onPress={() => toggleWeekday(idx)}
-                accessibilityState={{ selected: weekdays.includes(idx) }}
-                className={
-                  "h-9 w-9 items-center justify-center rounded-lg border " +
-                  (weekdays.includes(idx)
-                    ? "border-accent bg-accent"
-                    : "border-border bg-border")
-                }
-              >
-                <Text
-                  className={
-                    "text-sm font-sans-medium " +
-                    (weekdays.includes(idx) ? "text-bg" : "text-text-muted")
-                  }
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </Field>
-      )}
-
-      {recurrenceType === "every_n" && (
-        <Field label={t("modals.routine.intervalField")}>
-          <View className="gap-2">
-            <FormInput
-              value={intervalN}
-              onChangeText={setIntervalN}
-              keyboardType="number-pad"
+          {recurrenceType === "weekly_days" && (
+            <PresetChips<WeekdayValue>
+              cell={44}
+              options={WEEKDAY_VALUES.map((v, idx) => ({
+                value: v,
+                label: weekdayLabels[idx],
+              }))}
+              value={weekdays.map((d) => String(d) as WeekdayValue)}
+              onChange={toggleWeekday}
             />
-            <ChipGroup
-              value={intervalUnit}
-              options={unitOptions}
-              onChange={setIntervalUnit}
-            />
-          </View>
-        </Field>
-      )}
+          )}
 
-      {recurrenceType === "monthly_day" && (
-        <View className="rounded-lg border border-border bg-surface px-3 py-2">
-          <Text className="font-sans text-xs text-text-muted">
-            {t("modals.routine.monthlyDayHint", {
-              day: Number.isFinite(monthlyDay) ? monthlyDay : 1,
-            })}
-          </Text>
+          {recurrenceType === "every_n" && (
+            <View className="flex-row items-start" style={{ gap: 8 }}>
+              <View style={{ width: 72 }}>
+                <FormInput
+                  value={intervalN}
+                  onChangeText={setIntervalN}
+                  keyboardType="number-pad"
+                  accessibilityLabel={t("modals.routine.intervalField")}
+                  style={{ height: 40, textAlign: "center" }}
+                />
+              </View>
+              <View className="min-w-0 flex-1">
+                <PresetChips<IntervalUnit>
+                  options={INTERVAL_UNITS.map((u) => ({
+                    value: u,
+                    label: t(`modals.routine.unit.${u}`),
+                  }))}
+                  value={intervalUnit}
+                  onChange={setIntervalUnit}
+                />
+              </View>
+            </View>
+          )}
+
+          {recurrenceType === "monthly_day" && (
+            <Text className="font-sans" style={{ fontSize: 14, color: c.text3 }}>
+              {t("modals.routine.monthlyDayHint", {
+                day: Number.isFinite(monthlyDay) ? monthlyDay : 1,
+              })}
+            </Text>
+          )}
         </View>
-      )}
+      </Field>
 
-      {recurrenceType !== "once" && (
-        <Field label={t("modals.routine.endDateField")}>
-          <DateField
-            value={endDate}
-            onChange={setEndDate}
-            title={t("modals.routine.endDateField")}
-            placeholder="YYYY-MM-DD"
-            clearable
+      {recurrenceType === "once" ? (
+        <Field label={t("modals.routine.dateField")}>
+          <DateInput
+            value={startDate}
+            onChange={setStartDate}
+            title={t("modals.routine.dateField")}
           />
         </Field>
-      )}
-
-      <Field label={t("modals.routine.effort")}>
-        <View className="gap-2">
-          <View className="flex-row flex-wrap gap-1.5">
-            {EFFORT_PRESETS.map((h) => (
-              <Chip
-                key={h}
-                label={`${h}h`}
-                active={effortHours.trim() === String(h)}
-                onPress={() => toggleHour(h)}
+      ) : (
+        <View className="flex-row" style={{ gap: 12 }}>
+          <View className="min-w-0 flex-1">
+            <Field label={t("modals.routine.startDateField")}>
+              <DateInput
+                value={startDate}
+                onChange={setStartDate}
+                title={t("modals.routine.startDateField")}
               />
-            ))}
+            </Field>
           </View>
-          <FormInput
-            value={effortHours}
-            onChangeText={setEffortHours}
-            placeholder={t("modals.routine.effortPlaceholder")}
-            keyboardType="decimal-pad"
-          />
+          <View className="min-w-0 flex-1">
+            <Field label={t("modals.routine.endDateField")}>
+              <DateInput
+                value={endDate}
+                onChange={setEndDate}
+                title={t("modals.routine.endDateField")}
+                placeholder={t("modals.routine.never")}
+                clearable
+              />
+            </Field>
+          </View>
         </View>
+      )}
+
+      <Field label={t("modals.routine.effort")} aside={effortAside}>
+        <EffortPresets value={effortHours} onChange={setEffortHours} />
+      </Field>
+
+      <Field label={t("modals.routine.description")}>
+        <FormInput
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          placeholder={t("modals.routine.descriptionPlaceholder")}
+        />
       </Field>
 
       {error && (
@@ -340,7 +299,7 @@ export default function RoutineForm() {
             borderColor: alpha(c.signal, 0.3),
           }}
         >
-          <Text className="font-sans text-sm" style={{ color: c.signal }}>
+          <Text className="font-sans" style={{ fontSize: 15, color: c.signal }}>
             {error}
           </Text>
         </View>
@@ -354,6 +313,6 @@ export default function RoutineForm() {
           onConfirm={handleDelete}
         />
       )}
-    </ModalScaffold>
+    </FormScaffold>
   );
 }

@@ -1,5 +1,8 @@
-import { Pressable, Text, View } from "react-native";
+import { memo } from "react";
+import { Pressable, ScrollView, Text } from "react-native";
 import { useTranslation } from "react-i18next";
+import { SIZE } from "@/theme/tokens";
+import { useThemeColors } from "@/theme/useThemeColors";
 
 const ACTION_KEYS = [
   "priorities",
@@ -22,7 +25,8 @@ const PROMPTS: Record<ActionKey, string> = {
     "Show me stale ideas (older than 30 days) and tell me which look most promising.",
 };
 
-export function QuickActionChips({
+/** Cinta horizontal de píldoras de 40 px con las consultas de arranque (`llm`). */
+export const QuickActionChips = memo(function QuickActionChips({
   onPick,
   disabled,
 }: {
@@ -30,22 +34,43 @@ export function QuickActionChips({
   disabled?: boolean;
 }) {
   const { t } = useTranslation();
+  const c = useThemeColors();
   return (
-    <View className="flex-row flex-wrap gap-1.5 px-4 pb-2">
-      {ACTION_KEYS.map((k) => (
-        <Pressable
-          key={k}
-          onPress={() => onPick(PROMPTS[k])}
-          disabled={disabled}
-          accessibilityRole="button"
-          className="rounded-full border border-border px-2.5 py-1 active:bg-surface"
-          style={disabled ? { opacity: 0.5 } : undefined}
-        >
-          <Text className="font-sans text-[11px] text-text-muted">
-            {t(`assistant.quickActions.${k}`)}
-          </Text>
-        </Pressable>
-      ))}
-    </View>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      style={{ flexGrow: 0 }}
+      contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 10 }}
+    >
+      {ACTION_KEYS.map((k) => {
+        const label = t(`assistant.quickActions.${k}`);
+        return (
+          <Pressable
+            key={k}
+            onPress={() => onPick(PROMPTS[k])}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            accessibilityState={{ disabled: !!disabled }}
+            className="items-center justify-center rounded-full active:opacity-70"
+            style={[
+              {
+                height: SIZE.chip,
+                paddingHorizontal: 16,
+                borderWidth: 1,
+                borderColor: c.line[18],
+                backgroundColor: c.surface,
+              },
+              disabled ? { opacity: 0.5 } : null,
+            ]}
+          >
+            <Text className="font-sans-medium" style={{ fontSize: 14, color: c.text2 }}>
+              {label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
-}
+});

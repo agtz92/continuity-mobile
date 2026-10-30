@@ -49,7 +49,7 @@ export function MessageList({
     <ScrollView
       ref={scrollRef}
       className="flex-1"
-      contentContainerClassName="gap-4 px-4 py-4"
+      contentContainerClassName="gap-5 px-5 py-4"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="interactive"
       onContentSizeChange={() =>
@@ -69,7 +69,7 @@ export function MessageList({
         </Fragment>
       ))}
       {showWorking && (
-        <View className="flex-row items-center gap-2 pl-9">
+        <View className="flex-row items-center gap-2">
           <View className="flex-row gap-1">
             <View
               className="h-1.5 w-1.5 rounded-full"

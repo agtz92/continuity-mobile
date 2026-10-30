@@ -1,32 +1,31 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
-import { useTheme } from "@/theme/ThemeProvider";
-import { THEME_SURFACES } from "@/theme/tokens";
+import { signInWithGoogle, OAuthCancelled } from "@/lib/oauth";
+import { FormInput } from "@/components/ui/FormInput";
+import {
+  AuthButton,
+  AuthError,
+  AuthHeading,
+  AuthLabel,
+  AuthLinkRow,
+  AuthScaffold,
+  OrDivider,
+  PasswordInput,
+} from "@/components/auth/AuthParts";
 
 export default function Signup() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { effective } = useTheme();
-  const muted = THEME_SURFACES[effective].textMuted;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
@@ -46,107 +45,94 @@ export default function Signup() {
     setBusy(false);
   }
 
+  // Mismo flujo que en login: Google crea la cuenta si no existe, y el gate de
+  // auth manda al onboarding a quien aún no lo hizo.
+  async function onGoogle() {
+    setGoogleBusy(true);
+    setError(null);
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      if (!(e instanceof OAuthCancelled)) {
+        setError(e instanceof Error ? e.message : t("auth.errors.generic"));
+      }
+    } finally {
+      setGoogleBusy(false);
+    }
+  }
+
+  if (done) {
+    return (
+      <AuthScaffold>
+        <AuthHeading title={t("auth.signup.headline")} lede={t("auth.signup.checkEmail")} />
+        <AuthButton label={t("auth.signup.signInLink")} onPress={() => router.replace("/login")} />
+      </AuthScaffold>
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-bg">
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
-          <View className="gap-1">
-            <Text className="text-3xl font-sans-bold text-text">
-              {t("auth.signup.title")}
-            </Text>
-            <Text className="font-sans text-base text-text-muted">{t("auth.signup.subtitle")}</Text>
-          </View>
+    <AuthScaffold>
+      <AuthHeading title={t("auth.signup.headline")} lede={t("auth.signup.subtitle")} />
 
-          {done ? (
-            <View className="gap-4">
-              <Text className="font-sans text-base text-text">{t("auth.signup.checkEmail")}</Text>
-              <Pressable
-                onPress={() => router.replace("/login")}
-                className="flex-row items-center justify-center rounded-xl bg-accent px-4 py-3"
-              >
-                <Text className="text-base font-sans-semibold text-bg">
-                  {t("auth.signup.signInLink")}
-                </Text>
-              </Pressable>
-            </View>
-          ) : (
-            <>
-              <View className="gap-3">
-                <View className="gap-1">
-                  <Text className="text-sm font-sans-medium text-text">
-                    {t("auth.signup.name")}
-                  </Text>
-                  <TextInput
-                    value={name}
-                    onChangeText={setName}
-                    autoCapitalize="words"
-                    autoComplete="given-name"
-                    placeholder={t("auth.signup.namePlaceholder")}
-                    placeholderTextColor={muted}
-                    className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-                  />
-                </View>
-                <View className="gap-1">
-                  <Text className="text-sm font-sans-medium text-text">
-                    {t("auth.signup.email")}
-                  </Text>
-                  <TextInput
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    keyboardType="email-address"
-                    placeholder={t("auth.signup.emailPlaceholder")}
-                    placeholderTextColor={muted}
-                    className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-                  />
-                </View>
-                <View className="gap-1">
-                  <Text className="text-sm font-sans-medium text-text">
-                    {t("auth.signup.password")}
-                  </Text>
-                  <TextInput
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    autoComplete="new-password"
-                    placeholder={t("auth.signup.passwordPlaceholder")}
-                    placeholderTextColor={muted}
-                    className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-                  />
-                </View>
+      <View style={{ gap: 20 }}>
+        <View style={{ gap: 8 }}>
+          <AuthLabel label={t("auth.signup.name")} />
+          <FormInput
+            auth
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            autoComplete="given-name"
+            textContentType="givenName"
+            placeholder={t("auth.signup.namePlaceholder")}
+            accessibilityLabel={t("auth.signup.name")}
+          />
+        </View>
+        <View style={{ gap: 8 }}>
+          <AuthLabel label={t("auth.signup.email")} />
+          <FormInput
+            auth
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            placeholder={t("auth.signup.emailPlaceholder")}
+            accessibilityLabel={t("auth.signup.email")}
+          />
+        </View>
+        <View style={{ gap: 8 }}>
+          <AuthLabel label={t("auth.signup.password")} />
+          <PasswordInput
+            value={password}
+            onChangeText={setPassword}
+            autoComplete="new-password"
+            textContentType="newPassword"
+            placeholder={t("auth.signup.passwordPlaceholder")}
+            accessibilityLabel={t("auth.signup.password")}
+          />
+        </View>
 
-                {error && <Text className="font-sans text-signal">{error}</Text>}
+        <AuthError message={error} />
 
-                <Pressable
-                  onPress={onSignUp}
-                  disabled={busy}
-                  className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
-                >
-                  {busy && <ActivityIndicator size="small" />}
-                  <Text className="text-base font-sans-semibold text-bg">
-                    {t("auth.signup.signUp")}
-                  </Text>
-                </Pressable>
-              </View>
+        <AuthButton label={t("auth.signup.signUp")} onPress={() => void onSignUp()} busy={busy} />
+        <OrDivider />
+        <AuthButton
+          variant="secondary"
+          label={t("auth.login.google")}
+          onPress={() => void onGoogle()}
+          busy={googleBusy}
+        />
+      </View>
 
-              <View className="flex-row justify-center gap-1">
-                <Text className="font-sans text-base text-text-muted">
-                  {t("auth.signup.haveAccount")}
-                </Text>
-                <Pressable onPress={() => router.replace("/login")}>
-                  <Text className="text-base font-sans-semibold text-accent">
-                    {t("auth.signup.signInLink")}
-                  </Text>
-                </Pressable>
-              </View>
-            </>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <View className="flex-1 justify-end" style={{ paddingTop: 32 }}>
+        <AuthLinkRow
+          prompt={t("auth.signup.haveAccount")}
+          label={t("auth.signup.signInLink")}
+          onPress={() => router.replace("/login")}
+        />
+      </View>
+    </AuthScaffold>
   );
 }

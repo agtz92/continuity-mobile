@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Sparkles, Zap } from "lucide-react-native";
+import { InfinityIcon, Zap } from "lucide-react-native";
 import { CaptureSheet } from "@/components/capture/CaptureSheet";
 import { impactFeedback, selectionFeedback } from "@/lib/feedback";
 import { useThemeColors } from "@/theme/useThemeColors";
@@ -122,7 +122,7 @@ export function FAB({
           <View className="items-end gap-3">
             <ActionRow
               label={t("assistant.buttonLabel")}
-              icon={<Sparkles size={22} color={c.bg} />}
+              icon={<InfinityIcon size={22} color={c.bg} />}
               onPress={openLoop}
               borderColor={c.border}
             />

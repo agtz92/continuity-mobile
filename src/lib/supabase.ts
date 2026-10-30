@@ -14,6 +14,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: AsyncStorage,
+    // Pinned to the project-ref key: the default derives from the URL host,
+    // and pointing EXPO_PUBLIC_SUPABASE_URL at auth.continuu.it would rename
+    // it and log every user out.
+    storageKey: "sb-mhvmliwlhavjpdgpdzss-auth-token",
     autoRefreshToken: true,
     persistSession: true,
     // PKCE so signInWithOAuth returns `?code=` (exchanged via

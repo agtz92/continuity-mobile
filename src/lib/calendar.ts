@@ -22,6 +22,8 @@ export interface RoutineItem {
   completed: boolean;
   /** Id of the completion row when completed (needed to un-complete). */
   occurrenceId: string | null;
+  /** When it was completed (ISO datetime), for "Done 9:05". */
+  completedAt: string | null;
 }
 
 export interface ProjectRollup {
@@ -126,26 +128,27 @@ export const routineItemsByDay = (
   toISO: string
 ): Map<string, RoutineItem[]> => {
   const out = new Map<string, RoutineItem[]>();
-  // date -> occurrenceId, per routine (occurrence rows = completions).
-  const occByRoutine = new Map<string, Map<string, string>>();
+  // date -> occurrence, per routine (occurrence rows = completions).
+  const occByRoutine = new Map<string, Map<string, RoutineOccurrence>>();
   for (const o of occurrences) {
     let m = occByRoutine.get(o.routineId);
     if (!m) {
-      m = new Map<string, string>();
+      m = new Map<string, RoutineOccurrence>();
       occByRoutine.set(o.routineId, m);
     }
-    m.set(o.scheduledDate, o.id);
+    m.set(o.scheduledDate, o);
   }
   for (const routine of routines) {
     if (routine.archived) continue;
     const occ = occByRoutine.get(routine.id);
     for (const day of computeDueDates(routine, fromISO, toISO)) {
-      const occurrenceId = occ?.get(day) ?? null;
+      const o = occ?.get(day) ?? null;
       const item: RoutineItem = {
         routine,
         scheduledDate: day,
-        completed: occurrenceId != null,
-        occurrenceId,
+        completed: o != null,
+        occurrenceId: o?.id ?? null,
+        completedAt: o?.completedAt ?? null,
       };
       const list = out.get(day);
       if (list) list.push(item);
@@ -264,4 +267,34 @@ export const hoursRange = (
     if (h + 1 > end) end = Math.min(24, h + 1);
   }
   return [start, end];
+};
+
+/**
+ * Side-by-side columns for overlapping timed blocks in the Day grid. Blocks
+ * are grouped into clusters of transitive overlap; inside a cluster each block
+ * takes the first free column, and every block of the cluster shares the
+ * cluster's column count. Mobile-only (the web grid is wide enough to stack).
+ */
+export const layoutOverlaps = (
+  blocks: { key: string; start: number; end: number }[]
+): Map<string, { col: number; cols: number }> => {
+  const out = new Map<string, { col: number; cols: number }>();
+  const sorted = [...blocks].sort((a, b) => a.start - b.start || b.end - a.end);
+  let cluster: { key: string; end: number; col: number }[] = [];
+  let clusterEnd = -1;
+  const flush = () => {
+    const cols = cluster.reduce((m, b) => Math.max(m, b.col + 1), 1);
+    for (const b of cluster) out.set(b.key, { col: b.col, cols });
+    cluster = [];
+  };
+  for (const b of sorted) {
+    if (cluster.length && b.start >= clusterEnd) flush();
+    const taken = new Set(cluster.filter((x) => x.end > b.start).map((x) => x.col));
+    let col = 0;
+    while (taken.has(col)) col += 1;
+    cluster.push({ key: b.key, end: b.end, col });
+    clusterEnd = Math.max(clusterEnd, b.end);
+  }
+  if (cluster.length) flush();
+  return out;
 };

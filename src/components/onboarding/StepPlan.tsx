@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Meta } from "@/components/ui/Meta";
-import { PrimaryButton } from "./controls";
+import { PrimaryButton, StepLayout } from "./controls";
 
 /**
  * Paso 4 — el plan. **Informativo, y sin ninguna salida de la app.**
@@ -39,7 +39,7 @@ function PlanInfo({
   const { t } = useTranslation();
   return (
     <View className="gap-2">
-      <Text className="text-3xl font-sans-bold text-text">
+      <Text accessibilityRole="header" className="font-display text-text" style={{ fontSize: 34, lineHeight: 36, letterSpacing: -1 }}>
         {t("onboarding.replay.planHeading")}
       </Text>
       <Text className="font-sans text-base text-text-muted">
@@ -74,7 +74,7 @@ export function StepPlan({
   // A los exentos (beta) no se les habla de planes: se les da las gracias.
   const body = isExempt && !replay ? (
     <View className="gap-3">
-      <Text className="text-3xl font-sans-bold text-text">
+      <Text accessibilityRole="header" className="font-display text-text" style={{ fontSize: 34, lineHeight: 36, letterSpacing: -1 }}>
         {t("onboarding.planBeta.heading", { name })}
       </Text>
       <Text className="font-sans text-base leading-relaxed text-text-muted">
@@ -92,13 +92,10 @@ export function StepPlan({
   );
 
   return (
-    <View className="gap-6">
+    <StepLayout
+      footer={<PrimaryButton label={t("onboarding.continue")} onPress={onContinue} busy={busy} />}
+    >
       {body}
-      <PrimaryButton
-        label={t("onboarding.continue")}
-        onPress={onContinue}
-        busy={busy}
-      />
-    </View>
+    </StepLayout>
   );
 }

@@ -85,7 +85,7 @@ function BlockView({
 
   const bodyStyle =
     variant === "chat"
-      ? { fontSize: 15, lineHeight: 24, color: c.text2 }
+      ? { fontSize: 16, lineHeight: 24, color: c.text2 }
       : { fontSize: 14, lineHeight: 21, color: c.text };
 
   switch (block.kind) {

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/app/**/*.{ts,tsx}", "scripts/**/*.{js,mjs}"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["src/theme/tokens.generated.ts"],
+  "ignoreDependencies": ["@expo/ngrok"]
+}

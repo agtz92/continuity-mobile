@@ -1,41 +1,34 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ScreenTitle } from "@/components/ui/ScreenTitle";
 import {
   RefreshControl,
-  ScrollView,
+  SectionList,
   Text,
   TextInput,
   View,
+  type SectionListData,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NotificationStack } from "@/components/notifications/NotificationStack";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  Archive,
-  CheckCircle2,
-  Clock,
-  Hourglass,
-  Plus,
-  Search,
-  Target,
-} from "lucide-react-native";
+import { Plus, Search } from "lucide-react-native";
 import type { Routine } from "@/lib/types";
 import { todayLocalISODate, toLocalISO } from "@/lib/date";
 import { completedDatesFor, computeDueDates } from "@/lib/recurrence";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useRoutineMutations } from "@/hooks/useRoutineMutations";
-import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { ScreenHeadline } from "@/components/ui/ScreenHeadline";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ListSkeleton } from "@/components/ui/Skeletons";
 import { FAB } from "@/components/ui/FAB";
 import { RoutineRow } from "@/components/routines/RoutineRow";
-import { alpha, useThemeColors } from "@/theme/useThemeColors";
+import { SIZE } from "@/theme/tokens";
+import { useThemeColors } from "@/theme/useThemeColors";
 
 const HORIZON_DAYS = 7; // how far ahead we materialize pending occurrences for "Upcoming"
 const BACKLOG_DAYS = 14; // how far back we surface missed pending occurrences
 const LATER_LOOKAHEAD = 365; // one row per routine whose next date is beyond the horizon
-
 
 interface DueItem {
   routine: Routine;
@@ -43,6 +36,28 @@ interface DueItem {
   occurrenceId: string | null;
 }
 
+type BucketKey = "today" | "completed" | "upcoming" | "later" | "archived";
+
+/** Fila centinela: el bucket "Today & overdue" abierto y vacío. */
+const EMPTY_ROW = "__empty__" as const;
+type Item = DueItem | typeof EMPTY_ROW;
+
+type Bucket = {
+  key: BucketKey;
+  title: string;
+  count: number;
+  open: boolean;
+  /** Las filas del bucket exponen archivar/restaurar. */
+  withArchive: boolean;
+  data: Item[];
+};
+
+/**
+ * Routines (1k), rediseño "Breathe": titular "N due today. / N is late.",
+ * buscador de 44 y buckets como cabecera plegable sobre fondo plano (sin
+ * tarjeta exterior); cerrados se leen como filas de ~48 con el conteo a la
+ * derecha. Virtualizada con `SectionList`.
+ */
 export default function Routines() {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -58,11 +73,13 @@ export default function Routines() {
 
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [showToday, setShowToday] = useState(true);
-  const [showCompleted, setShowCompleted] = useState(false);
-  const [showUpcoming, setShowUpcoming] = useState(false);
-  const [showLater, setShowLater] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
+  const [openState, setOpenState] = useState<Record<BucketKey, boolean>>({
+    today: true,
+    completed: false,
+    upcoming: false,
+    later: false,
+    archived: false,
+  });
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -183,54 +200,159 @@ export default function Routines() {
   ]);
 
   const q = search.trim().toLowerCase();
-  const filterByQuery = <T extends { routine: Routine }>(items: T[]): T[] =>
-    q ? items.filter((i) => i.routine.title.toLowerCase().includes(q)) : items;
-  const filterRoutinesByQuery = (rs: Routine[]): Routine[] =>
-    q ? rs.filter((r) => r.title.toLowerCase().includes(q)) : rs;
-
-  const filteredToday = filterByQuery(todayBucket);
-  const filteredCompleted = filterByQuery(completedTodayBucket);
-  const filteredUpcoming = filterByQuery(upcomingBucket);
-  const filteredLater = filterByQuery(laterBucket);
-  const filteredArchived = filterRoutinesByQuery(archivedRoutines);
-
   const searching = q.length > 0;
-  const todayOpen = searching || showToday;
-  const completedOpen = searching || showCompleted;
-  const upcomingOpen = searching || showUpcoming;
-  const laterOpen = searching || showLater;
-  const archivedOpen = searching || showArchived;
 
-  const onArchive = (r: Routine) => archiveRoutine(r.id, !r.archived);
-  const onEdit = (r: Routine) =>
-    router.push({ pathname: "/routine-form", params: { id: r.id } });
+  // Titular: lo que toca hoy (incluye lo atrasado) y cuánto de eso va tarde.
+  const lateCount = todayBucket.filter((it) => it.scheduledDate < today).length;
 
-  const renderRow = (
-    it: DueItem,
-    opts?: { withArchive?: boolean; withDelete?: boolean }
-  ) => (
-    <RoutineRow
-      key={`${it.routine.id}-${it.scheduledDate}`}
-      routine={it.routine}
-      scheduledDate={it.scheduledDate}
-      occurrenceId={it.occurrenceId}
-      project={resolveRoutineProject(it.routine)}
-      onComplete={completeOccurrence}
-      onUncomplete={uncompleteOccurrence}
-      onEdit={onEdit}
-      onArchive={opts?.withArchive ? onArchive : undefined}
-      onDelete={opts?.withDelete ? deleteRoutine : undefined}
-    />
+  const sections: Bucket[] = useMemo(() => {
+    const byQuery = (items: DueItem[]) =>
+      q ? items.filter((i) => i.routine.title.toLowerCase().includes(q)) : items;
+    const archivedItems: DueItem[] = archivedRoutines.map((r) => ({
+      routine: r,
+      scheduledDate: r.startDate,
+      occurrenceId: null,
+    }));
+    const out: Bucket[] = [];
+    const push = (
+      key: BucketKey,
+      title: string,
+      items: DueItem[],
+      opts?: { always?: boolean; withArchive?: boolean }
+    ) => {
+      const filtered = byQuery(items);
+      if (!opts?.always && filtered.length === 0) return;
+      const open = searching || openState[key];
+      out.push({
+        key,
+        title,
+        count: filtered.length,
+        open,
+        withArchive: opts?.withArchive ?? false,
+        data: !open ? [] : filtered.length === 0 ? [EMPTY_ROW] : filtered,
+      });
+    };
+    push("today", t("views.routines.todayBucket"), todayBucket, {
+      always: true,
+      withArchive: true,
+    });
+    push("completed", t("views.routines.completedToday"), completedTodayBucket);
+    push("upcoming", t("views.routines.upcoming"), upcomingBucket, { withArchive: true });
+    push("later", t("views.routines.later"), laterBucket, { withArchive: true });
+    push("archived", t("views.routines.archived"), archivedItems, { withArchive: true });
+    return out;
+  }, [
+    q,
+    searching,
+    openState,
+    todayBucket,
+    completedTodayBucket,
+    upcomingBucket,
+    laterBucket,
+    archivedRoutines,
+    t,
+  ]);
+
+  const toggleBucket = useCallback(
+    (key: BucketKey) => setOpenState((s) => ({ ...s, [key]: !s[key] })),
+    []
   );
 
-  const pill = (n: number, bg: string, border: string, color: string) => (
-    <View
-      className="rounded-full border px-2 py-0.5"
-      style={{ backgroundColor: bg, borderColor: border }}
-    >
-      <Text className="font-sans text-xs" style={{ color }}>
-        {n}
-      </Text>
+  const onArchive = useCallback(
+    (r: Routine) => archiveRoutine(r.id, !r.archived),
+    [archiveRoutine]
+  );
+  const onEdit = useCallback(
+    (r: Routine) => router.push({ pathname: "/routine-form", params: { id: r.id } }),
+    [router]
+  );
+  const noop = useCallback(() => Promise.resolve(), []);
+
+  const renderItem = ({
+    item,
+    section,
+  }: {
+    item: Item;
+    section: SectionListData<Item, Bucket>;
+  }) => {
+    if (item === EMPTY_ROW) {
+      return (
+        <Text
+          className="font-sans text-center"
+          style={{ fontSize: 15, color: c.text3, paddingVertical: 16 }}
+        >
+          {t("views.routines.todayEmpty")}
+        </Text>
+      );
+    }
+    // Las archivadas no se completan desde aquí: solo editar o restaurar.
+    const archived = section.key === "archived";
+    return (
+      <View style={{ marginBottom: 10 }}>
+        <RoutineRow
+          routine={item.routine}
+          scheduledDate={item.scheduledDate}
+          occurrenceId={item.occurrenceId}
+          project={resolveRoutineProject(item.routine)}
+          onComplete={archived ? noop : completeOccurrence}
+          onUncomplete={archived ? noop : uncompleteOccurrence}
+          onEdit={onEdit}
+          onArchive={section.withArchive ? onArchive : undefined}
+          onDelete={deleteRoutine}
+        />
+      </View>
+    );
+  };
+
+  const renderSectionHeader = ({
+    section,
+  }: {
+    section: SectionListData<Item, Bucket>;
+  }) => (
+    <View style={{ paddingTop: 12, paddingBottom: section.open ? 6 : 0 }}>
+      <View style={{ height: 1, backgroundColor: c.line[14], marginBottom: 4 }} />
+      <SectionHeader
+        title={section.title}
+        open={section.open}
+        onToggle={() => toggleBucket(section.key)}
+        trailing={
+          <Text
+            className="font-sans-semibold"
+            style={{ fontSize: 15, fontVariant: ["tabular-nums"], color: c.text3 }}
+          >
+            {section.count}
+          </Text>
+        }
+      />
+    </View>
+  );
+
+  const header = (
+    <View style={{ gap: 12, paddingBottom: 4 }}>
+      <ScreenHeadline
+        primary={t("views.routines.headline.dueToday", { count: todayBucket.length })}
+        secondary={
+          lateCount > 0 ? t("views.routines.headline.late", { count: lateCount }) : null
+        }
+        secondaryTone="signal"
+      />
+      {routines.length > 0 ? (
+        <View
+          className="flex-row items-center rounded-lg border border-border bg-surface"
+          style={{ height: SIZE.hit, paddingHorizontal: 12, gap: 8 }}
+        >
+          <Search size={18} color={c.text3} />
+          <TextInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder={t("views.routines.search")}
+            placeholderTextColor={c.text5}
+            accessibilityLabel={t("views.routines.search")}
+            className="flex-1"
+            style={{ color: c.text, fontSize: 16, height: SIZE.hit }}
+          />
+        </View>
+      ) : null}
     </View>
   );
 
@@ -239,39 +361,40 @@ export default function Routines() {
       {/* Admin announcements + derived alerts: en web viven sobre todas las
           vistas del dashboard, así que aquí también sobre cada pestaña. */}
       <NotificationStack className="gap-2 px-5 pt-2" />
-      <View className="gap-3 px-5 pb-3 pt-2">
-        <ScreenTitle>
-          {t("views.routines.title")}
-        </ScreenTitle>
 
-        {routines.length > 0 && (
-          <View className="flex-row items-center gap-2 rounded-lg border border-border bg-surface px-3">
-            <Search size={16} color={c.textMuted} />
-            <TextInput
-              value={search}
-              onChangeText={setSearch}
-              placeholder={t("views.routines.search")}
-              placeholderTextColor={c.textMuted}
-              className="flex-1 py-2.5"
-              style={{ color: c.text }}
+      {routines.length === 0 ? (
+        <View className="flex-1" style={{ paddingHorizontal: SIZE.gutter, paddingTop: 8 }}>
+          {header}
+          {initialLoading ? (
+            <ListSkeleton />
+          ) : (
+            <EmptyState
+              title={t("views.routines.empty")}
+              body={t("views.routines.emptyBody")}
+              rule={t("views.routines.emptyRule")}
             />
-          </View>
-        )}
-      </View>
-
-      {initialLoading && routines.length === 0 ? (
-        <ListSkeleton />
-      ) : routines.length === 0 ? (
-        <View className="flex-1 px-5">
-          <EmptyState
-            title={t("views.routines.empty")}
-            body={t("views.routines.emptyBody")}
-            rule={t("views.routines.emptyRule")}
-          />
+          )}
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{ gap: 12, padding: 20, paddingTop: 4, paddingBottom: 96 }}
+        <SectionList<Item, Bucket>
+          sections={sections}
+          keyExtractor={(item) =>
+            item === EMPTY_ROW
+              ? EMPTY_ROW
+              : `${item.routine.id}-${item.scheduledDate}-${item.occurrenceId ?? ""}`
+          }
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          stickySectionHeadersEnabled={false}
+          // Elemento, no componente inline: el buscador no se remonta al teclear.
+          ListHeaderComponent={header}
+          contentContainerStyle={{
+            paddingHorizontal: SIZE.gutter,
+            paddingTop: 8,
+            paddingBottom: 112,
+          }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -279,126 +402,7 @@ export default function Routines() {
               tintColor={c.accent}
             />
           }
-        >
-          <CollapsibleSection
-            variant="card"
-            open={todayOpen}
-            onToggle={() => setShowToday((s) => !s)}
-            icon={<Target size={14} color={c.accent} />}
-            title={t("views.routines.todayBucket")}
-            rightSlot={pill(
-              filteredToday.length,
-              alpha(c.accent, 0.1),
-              alpha(c.accent, 0.3),
-              c.accent
-            )}
-          >
-            {filteredToday.length === 0 ? (
-              <Text className="font-sans py-4 text-center text-sm text-text-muted">
-                {t("views.routines.todayEmpty")}
-              </Text>
-            ) : (
-              <View className="gap-2">
-                {filteredToday.map((it) =>
-                  renderRow(it, { withArchive: true, withDelete: true })
-                )}
-              </View>
-            )}
-          </CollapsibleSection>
-
-          {filteredCompleted.length > 0 && (
-            <CollapsibleSection
-              variant="card"
-              open={completedOpen}
-              onToggle={() => setShowCompleted((s) => !s)}
-              icon={<CheckCircle2 size={14} color={c.accent} />}
-              title={t("views.routines.completedToday")}
-              rightSlot={pill(
-                filteredCompleted.length,
-                alpha(c.accent, 0.1),
-                alpha(c.accent, 0.3),
-                c.accent
-              )}
-            >
-              <View className="gap-2">
-                {filteredCompleted.map((it) => renderRow(it))}
-              </View>
-            </CollapsibleSection>
-          )}
-
-          {filteredUpcoming.length > 0 && (
-            <CollapsibleSection
-              variant="card"
-              open={upcomingOpen}
-              onToggle={() => setShowUpcoming((s) => !s)}
-              icon={<Clock size={14} color={c.text3} />}
-              title={t("views.routines.upcoming")}
-              rightSlot={pill(
-                filteredUpcoming.length,
-                alpha(c.text3, 0.1),
-                alpha(c.text3, 0.3),
-                c.text3
-              )}
-            >
-              <View className="gap-2">
-                {filteredUpcoming.map((it) => renderRow(it, { withArchive: true }))}
-              </View>
-            </CollapsibleSection>
-          )}
-
-          {filteredLater.length > 0 && (
-            <CollapsibleSection
-              variant="card"
-              open={laterOpen}
-              onToggle={() => setShowLater((s) => !s)}
-              icon={<Hourglass size={14} color={c.textMuted} />}
-              title={t("views.routines.later")}
-              rightSlot={pill(
-                filteredLater.length,
-                alpha(c.border, 0.5),
-                c.border,
-                c.textMuted
-              )}
-            >
-              <View className="gap-2">
-                {filteredLater.map((it) => renderRow(it, { withArchive: true }))}
-              </View>
-            </CollapsibleSection>
-          )}
-
-          {filteredArchived.length > 0 && (
-            <CollapsibleSection
-              variant="card"
-              open={archivedOpen}
-              onToggle={() => setShowArchived((s) => !s)}
-              icon={<Archive size={14} color={c.textMuted} />}
-              title={t("views.routines.archived")}
-              rightSlot={pill(
-                filteredArchived.length,
-                alpha(c.border, 0.5),
-                c.border,
-                c.textMuted
-              )}
-            >
-              <View className="gap-2">
-                {filteredArchived.map((r) => (
-                  <RoutineRow
-                    key={r.id}
-                    routine={r}
-                    scheduledDate={r.startDate}
-                    occurrenceId={null}
-                    project={resolveRoutineProject(r)}
-                    onComplete={() => Promise.resolve()}
-                    onUncomplete={() => Promise.resolve()}
-                    onEdit={onEdit}
-                    onArchive={onArchive}
-                    onDelete={deleteRoutine}
-                  />
-                ))}
-              </View>
-            </CollapsibleSection>
-          )}
-        </ScrollView>
+        />
       )}
 
       <FAB

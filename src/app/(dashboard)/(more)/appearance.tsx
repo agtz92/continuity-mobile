@@ -1,12 +1,13 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import type { ReactNode } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client/react";
-import { Compass, RotateCcw } from "lucide-react-native";
+import { ChevronRight, Compass, RotateCcw } from "lucide-react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useThemeColors } from "@/theme/useThemeColors";
-import { SUPPORTED_THEMES, THEME_LABEL_KEY } from "@/theme/config";
-import { SUPPORTED_PALETTES, PALETTE_LABEL_KEY } from "@/palette/config";
+import type { Theme } from "@/theme/config";
+import type { Palette } from "@/palette/config";
 import {
   SUPPORTED_LOCALES,
   LOCALE_LABEL,
@@ -16,32 +17,44 @@ import {
 import { UPDATE_NOTIFICATION_SETTINGS } from "@/lib/graphql";
 import { requestTour } from "@/lib/tour";
 import { toast } from "@/lib/toast";
-import { selectionFeedback } from "@/lib/feedback";
+import { ScreenHeadline } from "@/components/ui/ScreenHeadline";
+import { Segmented } from "@/components/ui/Segmented";
+import { RuledRow } from "@/components/ui/RuledRow";
+import {
+  PaletteSwatches,
+  ThemeSwatches,
+  VocabularyBar,
+} from "@/components/onboarding/AppearancePickers";
 
-function Pill({
+/** Sección: etiqueta en versalitas, explicación en tinta apagada, controles. */
+function Section({
   label,
-  active,
-  onPress,
+  hint,
+  children,
 }: {
   label: string;
-  active: boolean;
-  onPress: () => void;
+  hint?: string;
+  children: ReactNode;
 }) {
+  const c = useThemeColors();
   return (
-    <Pressable
-      onPress={() => {
-        selectionFeedback();
-        onPress();
-      }}
-      className={
-        "rounded-full border px-3 py-1 " +
-        (active ? "border-accent bg-accent" : "border-border bg-surface")
-      }
-    >
-      <Text className={"text-base " + (active ? "font-sans-semibold text-bg" : "text-text")}>
-        {label}
-      </Text>
-    </Pressable>
+    <View style={{ gap: 10 }}>
+      <View style={{ gap: 4 }}>
+        <Text
+          accessibilityRole="header"
+          className="font-sans-semibold uppercase"
+          style={{ fontSize: 11, letterSpacing: 0.8, color: c.text3 }}
+        >
+          {label}
+        </Text>
+        {hint ? (
+          <Text className="font-sans" style={{ fontSize: 15, lineHeight: 21, color: c.text3 }}>
+            {hint}
+          </Text>
+        ) : null}
+      </View>
+      {children}
+    </View>
   );
 }
 
@@ -74,11 +87,11 @@ export default function Appearance() {
   // local AsyncStorage — otherwise the next launch's server hydration re-applies
   // the stale server value and *reverts* the user's change. Apply locally first
   // for an instant flip; the backend write is non-fatal (error link toasts).
-  const changeTheme = (next: (typeof SUPPORTED_THEMES)[number]) => {
+  const changeTheme = (next: Theme) => {
     setTheme(next);
     void updateSettings({ variables: { data: { theme: next } } }).catch(() => {});
   };
-  const changePalette = (next: (typeof SUPPORTED_PALETTES)[number]) => {
+  const changePalette = (next: Palette) => {
     setPalette(next);
     void updateSettings({ variables: { data: { palette: next } } }).catch(() => {});
   };
@@ -97,125 +110,61 @@ export default function Appearance() {
     toast.success(t("common.saved"));
   };
 
+  const localeOptions = SUPPORTED_LOCALES.map((loc) => ({ value: loc, label: LOCALE_LABEL[loc] }));
+
   return (
     <ScrollView
       className="flex-1 bg-bg"
-      contentContainerClassName="gap-6 p-5"
+      contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 4, paddingBottom: 40, gap: 28 }}
     >
-      <View className="gap-2">
-        <Text className="text-base font-sans-semibold text-text">
-          {t("settings.appearance.language")}
-        </Text>
-        <Text className="font-sans text-sm text-text-muted">
-          {t("settings.appearance.languageHint")}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {SUPPORTED_LOCALES.map((loc) => (
-            <Pill
-              key={loc}
-              label={LOCALE_LABEL[loc]}
-              active={activeLocale === loc}
-              onPress={() => void changeLocale(loc)}
-            />
-          ))}
-        </View>
-      </View>
+      <ScreenHeadline primary={t("settings.appearance.headline")} />
 
-      <View className="gap-2">
-        <Text className="text-base font-sans-semibold text-text">
-          {t("settings.appearance.theme")}
-        </Text>
-        <Text className="font-sans text-sm text-text-muted">
-          {t("settings.appearance.themeHint")}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {SUPPORTED_THEMES.map((th) => (
-            <Pill
-              key={th}
-              label={t(`settings.appearance.${THEME_LABEL_KEY[th]}`)}
-              active={theme === th}
-              onPress={() => changeTheme(th)}
-            />
-          ))}
-        </View>
-      </View>
+      <Section label={t("settings.appearance.language")} hint={t("settings.appearance.languageHint")}>
+        <Segmented options={localeOptions} value={activeLocale} onChange={(v) => void changeLocale(v)} />
+      </Section>
 
-      <View className="gap-2">
-        <Text className="text-base font-sans-semibold text-text">
-          {t("settings.appearance.palette")}
-        </Text>
-        <Text className="font-sans text-sm text-text-muted">
-          {t("settings.appearance.paletteHint")}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {SUPPORTED_PALETTES.map((pl) => (
-            <Pill
-              key={pl}
-              label={t(`settings.appearance.${PALETTE_LABEL_KEY[pl]}`)}
-              active={palette === pl}
-              onPress={() => changePalette(pl)}
-            />
-          ))}
-        </View>
-        {/* La muestra enseña **el vocabulario entero**, no dos acentos: lo que
-            la paleta cambia (acento y su segundo, que hoy solo vive en las
-            gráficas) y lo que no cambia nunca (lo que duele, lo que se cerró,
-            y la rampa de tinta). Antes eran dos bloques iguales y no se veía
-            que el segundo casi no se usa. */}
-        <View className="mt-2 flex-row items-stretch gap-1">
-          <View className="h-8 flex-[3] rounded-lg bg-accent" />
-          <View className="h-8 flex-1 rounded-lg bg-accent-2" />
-          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.signal }} />
-          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.closed }} />
-          <View className="h-8 flex-1 rounded-lg" style={{ backgroundColor: c.line[34] }} />
-        </View>
-      </View>
+      <Section label={t("settings.appearance.theme")} hint={t("settings.appearance.themeHint")}>
+        <ThemeSwatches value={theme} onChange={changeTheme} />
+      </Section>
 
-      {/* Los dos estaban sueltos al final de la pantalla, sin título y con
-          seis secciones tituladas por encima: el del tour se leía como el pie
-          de la paleta y no como una acción. Ahora son una sección con la misma
-          forma que las demás — título, explicación, controles — y se ven como
-          lo que son: dos cosas que puedes repetir. */}
-      <View className="gap-2">
-        <Text className="text-base font-sans-semibold text-text">
-          {t("settings.appearance.replayHeading")}
-        </Text>
-        <Text className="font-sans text-sm text-text-muted">
-          {t("settings.appearance.replayHint")}
-        </Text>
+      <Section label={t("settings.appearance.palette")} hint={t("settings.appearance.paletteHint")}>
+        <PaletteSwatches value={palette} onChange={changePalette} />
+        <View style={{ marginTop: 6 }}>
+          <VocabularyBar />
+        </View>
+      </Section>
 
-        <Pressable
-          onPress={replayTour}
-          accessibilityRole="button"
-          className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
-        >
-          <Compass size={18} color={c.text} />
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-sans-semibold text-text">
+      {/* Dos cosas que se pueden repetir, como lista rayada de 56. */}
+      <Section label={t("settings.appearance.replayHeading")} hint={t("settings.appearance.replayHint")}>
+        <View style={{ borderTopWidth: 1, borderTopColor: c.line[14] }}>
+          <RuledRow
+            onPress={replayTour}
+            accessibilityLabel={t("onboarding.replay.replayTourButton")}
+            leading={<View style={{ paddingTop: 2 }}><Compass size={20} color={c.text2} /></View>}
+            trailing={<View style={{ alignSelf: "center" }}><ChevronRight size={18} color={c.text3} /></View>}
+          >
+            <Text className="font-sans-medium" style={{ fontSize: 17, lineHeight: 22, color: c.text }}>
               {t("onboarding.replay.replayTourButton")}
             </Text>
-            <Text className="mt-0.5 font-sans text-xs text-text-3">
+            <Text className="font-sans" style={{ fontSize: 14, lineHeight: 19, color: c.text3, marginTop: 2 }}>
               {t("settings.appearance.replayTourHint")}
             </Text>
-          </View>
-        </Pressable>
-
-        <Pressable
-          onPress={replaySetup}
-          accessibilityRole="button"
-          className="flex-row items-center gap-3 rounded-xl border border-border bg-surface px-4 py-4 active:opacity-80"
-        >
-          <RotateCcw size={18} color={c.text} />
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-sans-semibold text-text">
+          </RuledRow>
+          <RuledRow
+            onPress={replaySetup}
+            accessibilityLabel={t("onboarding.replay.replaySetupButton")}
+            leading={<View style={{ paddingTop: 2 }}><RotateCcw size={20} color={c.text2} /></View>}
+            trailing={<View style={{ alignSelf: "center" }}><ChevronRight size={18} color={c.text3} /></View>}
+          >
+            <Text className="font-sans-medium" style={{ fontSize: 17, lineHeight: 22, color: c.text }}>
               {t("onboarding.replay.replaySetupButton")}
             </Text>
-            <Text className="mt-0.5 font-sans text-xs text-text-3">
+            <Text className="font-sans" style={{ fontSize: 14, lineHeight: 19, color: c.text3, marginTop: 2 }}>
               {t("settings.appearance.replaySetupHint")}
             </Text>
-          </View>
-        </Pressable>
-      </View>
+          </RuledRow>
+        </View>
+      </Section>
     </ScrollView>
   );
 }

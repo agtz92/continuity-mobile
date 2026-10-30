@@ -3,6 +3,8 @@ import { Pressable, Switch, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { Project } from "@/lib/types";
 import { BottomSheet } from "@/components/ui/BottomSheet";
+import { PresetChips, type PresetOption } from "@/components/ui/PresetChips";
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 export type TaskFilterDraft = {
@@ -11,6 +13,9 @@ export type TaskFilterDraft = {
   showCompleted: boolean;
   showBlocked: boolean;
 };
+
+/** Centinela de "sin proyecto" para los chips (los ids reales son UUID). */
+const NO_PROJECT = "__none__";
 
 export const EMPTY_TASK_FILTER: TaskFilterDraft = {
   projectIds: new Set(),
@@ -54,6 +59,16 @@ export function TasksFilterSheet({
 
   const count = previewCount(draft);
 
+  // `PresetChips` trabaja con strings; el "sin proyecto" (`null`) viaja como
+  // centinela y se traduce de vuelta al alternar.
+  const projectOptions: PresetOption<string>[] = [
+    ...(hasUnassigned
+      ? [{ value: NO_PROJECT, label: t("views.tasks.filterSheet.noProject") }]
+      : []),
+    ...projects.map((p) => ({ value: p.id, label: p.name })),
+  ];
+  const selected = [...draft.projectIds].map((id) => id ?? NO_PROJECT);
+
   return (
     <BottomSheet
       visible={visible}
@@ -66,10 +81,17 @@ export function TasksFilterSheet({
             onClose();
           }}
           disabled={count === 0}
-          className="rounded-lg bg-accent px-4 py-2.5"
-          style={{ opacity: count === 0 ? 0.5 : 1 }}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: count === 0 }}
+          className="items-center justify-center active:opacity-80"
+          style={{
+            height: SIZE.button,
+            borderRadius: 8,
+            backgroundColor: c.accent,
+            opacity: count === 0 ? 0.4 : 1,
+          }}
         >
-          <Text className="text-center text-sm font-sans-medium text-bg">
+          <Text className="font-sans-semibold" style={{ fontSize: 16, color: c.bg }}>
             {count === 0
               ? t("views.tasks.filterSheet.applyEmpty")
               : t("views.tasks.filterSheet.apply", { count })}
@@ -77,58 +99,47 @@ export function TasksFilterSheet({
         </Pressable>
       }
     >
-      <View className="mb-2 flex-row justify-end">
-        <Pressable onPress={() => setDraft(EMPTY_TASK_FILTER)} hitSlop={6}>
-          <Text className="font-sans px-2 py-1 text-xs text-accent">
+      <View className="flex-row justify-end">
+        <Pressable
+          onPress={() => setDraft(EMPTY_TASK_FILTER)}
+          accessibilityRole="button"
+          className="items-center justify-center active:opacity-60"
+          style={{ height: SIZE.hit, paddingHorizontal: 8 }}
+        >
+          <Text className="font-sans-medium" style={{ fontSize: 15, color: c.accent }}>
             {t("views.tasks.filterSheet.clear")}
           </Text>
         </Pressable>
       </View>
 
-      <View className="gap-4">
-        {(projects.length > 0 || hasUnassigned) && (
-          <View>
-            <Text className="font-sans mb-2 text-[11px] uppercase tracking-wider text-text-muted">
+      <View style={{ gap: SIZE.sectionGap }}>
+        {projectOptions.length > 0 && (
+          <View style={{ gap: 8 }}>
+            <Text
+              className="font-sans-semibold uppercase"
+              style={{ fontSize: 11, letterSpacing: 0.8, color: c.text3 }}
+            >
               {t("views.tasks.filterSheet.byProject")}
             </Text>
-            <View className="flex-row flex-wrap gap-1.5">
-              {hasUnassigned && (
-                <ProjectChip
-                  active={draft.projectIds.has(null)}
-                  label={t("views.tasks.filterSheet.noProject")}
-                  onPress={() => toggleProject(null)}
-                />
-              )}
-              {projects.map((p) => (
-                <ProjectChip
-                  key={p.id}
-                  active={draft.projectIds.has(p.id)}
-                  label={p.name}
-                  onPress={() => toggleProject(p.id)}
-                />
-              ))}
-            </View>
+            <PresetChips
+              options={projectOptions}
+              value={selected}
+              onChange={(v) => toggleProject(v === NO_PROJECT ? null : v)}
+            />
           </View>
         )}
 
-        <View className="flex-row items-center justify-between px-1 py-2">
-          <Text className="font-sans text-sm text-text">
-            {t("views.tasks.filterSheet.showCompleted")}
-          </Text>
-          <Switch
+        <View>
+          <SwitchRow
+            label={t("views.tasks.filterSheet.showCompleted")}
             value={draft.showCompleted}
-            onValueChange={(v) => setDraft((d) => ({ ...d, showCompleted: v }))}
-            trackColor={{ true: c.accent, false: c.border }}
+            onChange={(v) => setDraft((d) => ({ ...d, showCompleted: v }))}
           />
-        </View>
-        <View className="flex-row items-center justify-between px-1 py-2">
-          <Text className="font-sans text-sm text-text">
-            {t("views.tasks.filterSheet.showBlocked")}
-          </Text>
-          <Switch
+          <SwitchRow
+            label={t("views.tasks.filterSheet.showBlocked")}
             value={draft.showBlocked}
-            onValueChange={(v) => setDraft((d) => ({ ...d, showBlocked: v }))}
-            trackColor={{ true: c.accent, false: c.border }}
+            onChange={(v) => setDraft((d) => ({ ...d, showBlocked: v }))}
+            last
           />
         </View>
       </View>
@@ -136,31 +147,36 @@ export function TasksFilterSheet({
   );
 }
 
-function ProjectChip({
-  active,
+function SwitchRow({
   label,
-  onPress,
+  value,
+  onChange,
+  last = false,
 }: {
-  active: boolean;
   label: string;
-  onPress: () => void;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  last?: boolean;
 }) {
+  const c = useThemeColors();
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityState={{ selected: active }}
-      className={
-        "rounded-lg border px-3 py-1.5 " +
-        (active ? "border-accent bg-accent" : "border-border bg-border")
-      }
+    <View
+      className="flex-row items-center justify-between"
+      style={{
+        minHeight: 48,
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: c.line[14],
+      }}
     >
-      <Text
-        className={
-          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
-        }
-      >
+      <Text className="font-sans min-w-0 flex-1" style={{ fontSize: 15, color: c.text }}>
         {label}
       </Text>
-    </Pressable>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        accessibilityLabel={label}
+        trackColor={{ true: c.accent, false: c.line[22] }}
+      />
+    </View>
   );
 }

@@ -3,20 +3,24 @@ import { Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
-import { Lock, X } from "lucide-react-native";
-import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { Calendar, ListTodo, Lock, User, X } from "lucide-react-native";
+import { FormScaffold } from "@/components/ui/FormScaffold";
 import { ModalDeleteButton } from "@/components/ui/ModalDeleteButton";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
-import { DateField } from "@/components/ui/DateField";
+import { IconAction } from "@/components/ui/IconAction";
+import { PresetChips } from "@/components/ui/PresetChips";
 import { ProjectSelect } from "@/components/ui/ProjectSelect";
-import { BlockerTaskSelect } from "@/components/ui/BlockerTaskSelect";
+import { BlockerTaskPicker } from "@/components/tasks/BlockerTaskPicker";
+import { DatePickerSheet } from "@/components/ui/DatePickerSheet";
+import { EffortPresets, useEffortAside } from "@/components/tasks/EffortPresets";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
-import { todayLocalISODate, toLocalISO } from "@/lib/date";
+import { daysOverdue, todayLocalISODate, toLocalISO } from "@/lib/date";
 
-const HOUR_PRESETS = [0.25, 0.5, 1, 2, 4] as const;
+type DatePreset = "today" | "tomorrow" | "thisWeek";
 
 function addDays(iso: string, days: number): string {
   const [y, m, d] = iso.split("-").map(Number);
@@ -41,54 +45,57 @@ function inputDateToIso(s: string): string {
   return new Date(y, (m ?? 1) - 1, d ?? 1, 0, 0, 0).toISOString();
 }
 
-function Chip({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityState={{ selected: active }}
-      className={
-        "rounded-lg border px-3 py-1.5 " +
-        (active ? "border-accent bg-accent" : "border-border bg-border")
-      }
-    >
-      <Text
-        className={
-          "text-sm font-sans-medium " + (active ? "text-bg" : "text-text-muted")
-        }
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
+/**
+ * Formulario de tarea (2a), rediseño "Breathe": `FormScaffold` + `Field` +
+ * `PresetChips`.
+ *
+ * Params:
+ * - `id` — editar una tarea existente.
+ * - `projectId` — proyecto preseleccionado al crear.
+ * - `title` — título precargado al crear (p. ej. "Continue here" desde el
+ *   next step del detalle de proyecto).
+ * - `due: "today"` o `due: "YYYY-MM-DD"` — fecha de vencimiento al crear
+ *   ("Continue here" del proyecto; "Add to Thursday" del calendario).
+ * `title` y `due` solo aplican al crear (sin `id`).
+ */
 export default function TaskForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
-  const params = useLocalSearchParams<{ id?: string; projectId?: string }>();
+  const params = useLocalSearchParams<{
+    id?: string;
+    projectId?: string;
+    title?: string;
+    due?: string;
+  }>();
   const c = useThemeColors();
   const { tasks, projects } = useDashboardData();
   const { saveTask, deleteTask, addTaskBlocker, removeTaskBlocker } =
     useTaskMutations();
 
   const existing = params.id ? tasks.find((tk) => tk.id === params.id) : null;
+  const creating = !params.id;
 
-  const [title, setTitle] = useState(existing?.title ?? "");
+  const [title, setTitle] = useState(
+    existing?.title ?? (creating && typeof params.title === "string" ? params.title : "")
+  );
   const [projectId, setProjectId] = useState<string | null>(
     existing?.projectId ?? params.projectId ?? null
   );
-  const [dueDate, setDueDate] = useState(isoToInputDate(existing?.dueDate));
+  const [dueDate, setDueDate] = useState(
+    existing
+      ? isoToInputDate(existing.dueDate)
+      : creating && params.due === "today"
+        ? todayLocalISODate()
+        : creating && params.due && /^\d{4}-\d{2}-\d{2}$/.test(params.due)
+          ? params.due
+          : ""
+  );
   const [effortHours, setEffortHours] = useState(
     existing?.effortHours != null ? String(existing.effortHours) : ""
   );
+  const [pickingDate, setPickingDate] = useState(false);
+  const [pickingTask, setPickingTask] = useState(false);
+  const [addingExternal, setAddingExternal] = useState(false);
   const [externalBlocker, setExternalBlocker] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -114,19 +121,43 @@ export default function TaskForm() {
     const desc = externalBlocker.trim();
     if (!existing?.id || !desc) return;
     setExternalBlocker("");
+    setAddingExternal(false);
     void addTaskBlocker({ blockedTaskId: existing.id, externalDescription: desc });
   };
 
   const datePresets = useMemo(() => {
     const today = todayLocalISODate();
-    return { today, tomorrow: addDays(today, 1), friday: upcomingFridayISO() };
+    return { today, tomorrow: addDays(today, 1), thisWeek: upcomingFridayISO() };
   }, []);
+  const activePreset: DatePreset | null =
+    dueDate === datePresets.today
+      ? "today"
+      : dueDate === datePresets.tomorrow
+        ? "tomorrow"
+        : dueDate === datePresets.thisWeek
+          ? "thisWeek"
+          : null;
+  const customDate = !!dueDate && activePreset === null;
+  const togglePreset = (p: DatePreset) =>
+    setDueDate((cur) => (cur === datePresets[p] ? "" : datePresets[p]));
+
+  // "Mon, Oct 26 · 3 days late": la fecha actual a la derecha del label.
+  const lateDays = dueDate ? daysOverdue(dueDate) : null;
+  const dueAside = dueDate
+    ? (() => {
+        const [y, m, d] = dueDate.split("-").map(Number);
+        const label = new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString(
+          i18n.language,
+          { weekday: "short", month: "short", day: "numeric" }
+        );
+        return lateDays
+          ? `${label} · ${t("modals.task.daysLate", { count: lateDays })}`
+          : label;
+      })()
+    : null;
+  const effortAside = useEffortAside(effortHours);
 
   const canSave = title.trim().length > 0;
-  const toggleDate = (iso: string) =>
-    setDueDate((cur) => (cur === iso ? "" : iso));
-  const toggleHour = (h: number) =>
-    setEffortHours((cur) => (cur === String(h) ? "" : String(h)));
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -150,15 +181,48 @@ export default function TaskForm() {
     closeModal(router);
   };
 
+  const dashedButton = (
+    label: string,
+    Icon: typeof ListTodo,
+    onPress: () => void,
+    disabled = false
+  ) => (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      className="min-w-0 flex-1 flex-row items-center justify-center rounded-lg active:opacity-70"
+      style={{
+        minHeight: SIZE.hit,
+        paddingHorizontal: 10,
+        gap: 8,
+        borderWidth: 1,
+        borderStyle: "dashed",
+        borderColor: c.line[22],
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <Icon size={16} color={c.text3} />
+      <Text
+        className="font-sans-medium flex-shrink"
+        style={{ fontSize: 14, color: c.text2 }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+
   return (
-    <ModalScaffold
+    <FormScaffold
       title={existing ? t("modals.task.editTitle") : t("modals.task.newTitle")}
       onSave={handleSave}
+      saveLabel={t("modals.task.save")}
       canSave={canSave}
       saving={saving}
     >
       <Field label={t("modals.task.titleField")}>
-        <FormInput value={title} onChangeText={setTitle} autoFocus />
+        <FormInput value={title} onChangeText={setTitle} autoFocus={!title} />
       </Field>
 
       <Field label={t("modals.task.project")}>
@@ -169,65 +233,57 @@ export default function TaskForm() {
         />
       </Field>
 
-      <Field label={t("modals.task.dueDate")}>
-        <View className="gap-2">
-          <View className="flex-row flex-wrap gap-1.5">
-            <Chip
-              label={t("modals.task.chips.today")}
-              active={dueDate === datePresets.today}
-              onPress={() => toggleDate(datePresets.today)}
+      <Field
+        label={t("modals.task.dueDate")}
+        aside={dueAside}
+        asideTone={lateDays ? "signal" : "muted"}
+      >
+        <View className="flex-row items-start" style={{ gap: 8 }}>
+          <View className="min-w-0 flex-1">
+            <PresetChips<DatePreset>
+              options={[
+                { value: "today", label: t("modals.task.chips.today") },
+                { value: "tomorrow", label: t("modals.task.chips.tomorrow") },
+                { value: "thisWeek", label: t("modals.task.chips.thisWeek") },
+              ]}
+              value={activePreset}
+              onChange={togglePreset}
             />
-            <Chip
-              label={t("modals.task.chips.tomorrow")}
-              active={dueDate === datePresets.tomorrow}
-              onPress={() => toggleDate(datePresets.tomorrow)}
-            />
-            <Chip
-              label={t("modals.task.chips.thisWeek")}
-              active={dueDate === datePresets.friday}
-              onPress={() => toggleDate(datePresets.friday)}
-            />
-            {!!dueDate && (
-              <Chip
-                label={t("modals.task.chips.clear")}
-                active={false}
-                onPress={() => setDueDate("")}
-              />
-            )}
           </View>
-          <DateField
-            value={dueDate}
-            onChange={setDueDate}
-            title={t("modals.task.dueDate")}
-            clearable
-          />
+          <Pressable
+            onPress={() => setPickingDate(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t("modals.task.pickDate")}
+            className="items-center justify-center active:opacity-70"
+            style={{
+              width: SIZE.chip,
+              height: SIZE.chip,
+              borderRadius: 6,
+              borderWidth: 1,
+              borderColor: customDate ? c.accent : c.line[18],
+              backgroundColor: customDate ? c.accent : c.surface,
+            }}
+          >
+            <Calendar size={18} color={customDate ? c.bg : c.text2} />
+          </Pressable>
         </View>
+        <DatePickerSheet
+          visible={pickingDate}
+          value={dueDate}
+          onChange={setDueDate}
+          onClose={() => setPickingDate(false)}
+          title={t("modals.task.dueDate")}
+          clearable
+        />
       </Field>
 
-      <Field label={t("modals.task.effort")}>
-        <View className="gap-2">
-          <View className="flex-row flex-wrap gap-1.5">
-            {HOUR_PRESETS.map((h) => (
-              <Chip
-                key={h}
-                label={`${h}h`}
-                active={effortHours.trim() === String(h)}
-                onPress={() => toggleHour(h)}
-              />
-            ))}
-          </View>
-          <FormInput
-            value={effortHours}
-            onChangeText={setEffortHours}
-            placeholder={t("modals.task.effortPlaceholder")}
-            keyboardType="decimal-pad"
-          />
-        </View>
+      <Field label={t("modals.task.effort")} aside={effortAside}>
+        <EffortPresets value={effortHours} onChange={setEffortHours} />
       </Field>
 
       {existing && (
         <Field label={t("modals.task.blockers")}>
-          <View className="gap-2">
+          <View style={{ gap: 8 }}>
             {blockers.map((b) => {
               const found = b.blockingTaskId
                 ? tasks.find((tk) => tk.id === b.blockingTaskId)
@@ -238,78 +294,85 @@ export default function TaskForm() {
               return (
                 <View
                   key={b.id}
-                  className="flex-row items-center gap-2 rounded-lg bg-border px-3 py-2"
+                  className="flex-row items-center rounded-lg border border-border bg-surface"
+                  style={{ minHeight: SIZE.hit, paddingLeft: 14, paddingVertical: 4, gap: 12 }}
                 >
-                  <Lock size={13} color={c.textMuted} />
-                  <View className="min-w-0 flex-1 flex-row items-center gap-1.5">
-                    {b.blockingTaskId ? (
-                      <>
-                        {proj && (
-                          <View className="rounded-md border border-border bg-surface px-1.5 py-0.5">
-                            <Text className="text-[10px] font-sans-medium text-text-muted">
-                              {proj.name}
-                            </Text>
-                          </View>
-                        )}
-                        <Text
-                          className="font-sans flex-1 text-sm text-text-muted"
-                          numberOfLines={1}
-                        >
-                          {found?.title ?? t("modals.task.unknownTask")}
-                        </Text>
-                      </>
-                    ) : (
+                  <Lock size={18} color={c.text3} />
+                  <View className="min-w-0 flex-1" style={{ paddingVertical: 6 }}>
+                    <Text className="font-sans" style={{ fontSize: 15, color: c.text }}>
+                      {b.blockingTaskId
+                        ? found?.title ?? t("modals.task.unknownTask")
+                        : b.externalDescription}
+                    </Text>
+                    {proj ? (
                       <Text
-                        className="font-sans flex-1 text-sm text-text-muted"
+                        className="font-sans-semibold uppercase"
                         numberOfLines={1}
+                        style={{ fontSize: 11, letterSpacing: 0.6, color: c.text3, marginTop: 2 }}
                       >
-                        {b.externalDescription}
+                        {proj.name}
                       </Text>
-                    )}
+                    ) : null}
                   </View>
-                  <Pressable
+                  <IconAction
+                    icon={X}
+                    label={t("modals.task.removeBlocker")}
                     onPress={() => void removeTaskBlocker(b.id)}
-                    accessibilityLabel={t("common.delete")}
-                    hitSlop={8}
-                  >
-                    <X size={14} color={c.textMuted} />
-                  </Pressable>
+                  />
                 </View>
               );
             })}
 
-            {availableBlockerTasks.length > 0 && (
-              <BlockerTaskSelect
-                tasks={availableBlockerTasks}
-                projects={projects}
-                onSelect={handleAddTaskBlocker}
-              />
-            )}
-
-            <View className="flex-row items-center gap-2">
-              <View className="flex-1">
-                <FormInput
-                  value={externalBlocker}
-                  onChangeText={setExternalBlocker}
-                  placeholder={t("modals.task.externalBlockerPlaceholder")}
-                  onSubmitEditing={handleAddExternalBlocker}
-                  returnKeyType="done"
-                />
+            {addingExternal ? (
+              <View className="flex-row items-center" style={{ gap: 8 }}>
+                <View className="min-w-0 flex-1">
+                  <FormInput
+                    value={externalBlocker}
+                    onChangeText={setExternalBlocker}
+                    placeholder={t("modals.task.externalBlockerPlaceholder")}
+                    onSubmitEditing={handleAddExternalBlocker}
+                    returnKeyType="done"
+                    autoFocus
+                  />
+                </View>
+                <Pressable
+                  onPress={handleAddExternalBlocker}
+                  disabled={!externalBlocker.trim()}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !externalBlocker.trim() }}
+                  className="items-center justify-center rounded-lg bg-accent active:opacity-80"
+                  style={{
+                    height: SIZE.input,
+                    paddingHorizontal: 16,
+                    opacity: externalBlocker.trim() ? 1 : 0.4,
+                  }}
+                >
+                  <Text className="font-sans-semibold" style={{ fontSize: 15, color: c.bg }}>
+                    {t("modals.task.addBlocker")}
+                  </Text>
+                </Pressable>
               </View>
-              <Pressable
-                onPress={handleAddExternalBlocker}
-                disabled={!externalBlocker.trim()}
-                className={
-                  "rounded-lg border border-border bg-border px-3 py-2.5 " +
-                  (externalBlocker.trim() ? "" : "opacity-50")
-                }
-              >
-                <Text className="font-sans text-sm text-text">
-                  {t("modals.task.addBlocker")}
-                </Text>
-              </Pressable>
+            ) : null}
+
+            <View className="flex-row" style={{ gap: 8 }}>
+              {dashedButton(
+                t("modals.task.addTaskBlocker"),
+                ListTodo,
+                () => setPickingTask(true),
+                availableBlockerTasks.length === 0
+              )}
+              {dashedButton(t("modals.task.addExternalBlocker"), User, () =>
+                setAddingExternal((v) => !v)
+              )}
             </View>
           </View>
+          <BlockerTaskPicker
+            visible={pickingTask}
+            onClose={() => setPickingTask(false)}
+            tasks={availableBlockerTasks}
+            projects={projects}
+            onSelect={handleAddTaskBlocker}
+          />
         </Field>
       )}
 
@@ -321,6 +384,6 @@ export default function TaskForm() {
           onConfirm={handleDelete}
         />
       )}
-    </ModalScaffold>
+    </FormScaffold>
   );
 }

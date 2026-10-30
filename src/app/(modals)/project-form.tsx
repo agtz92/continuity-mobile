@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react-native";
-import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { ChevronRight, Plus } from "lucide-react-native";
+import { FormScaffold } from "@/components/ui/FormScaffold";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
-import { DateField } from "@/components/ui/DateField";
-import { ChipGroup, type ChipOption } from "@/components/ui/ChipGroup";
+import { DateInput } from "@/components/ui/DatePickerSheet";
+import { Segmented, type SegmentedOption } from "@/components/ui/Segmented";
+import { PresetChips, type PresetOption } from "@/components/ui/PresetChips";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { useCategoryMutations } from "@/hooks/useCategoryMutations";
+import { SIZE } from "@/theme/tokens";
 import { categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
 import {
   CATEGORY_COLORS,
@@ -21,17 +23,17 @@ import {
 } from "@/lib/types";
 
 // Paused/killed are intentionally NOT selectable here: those transitions
-// require closure notes (collected by the Pause/Kill modals on the project
-// detail screen) and the backend rejects them without notes. Stalled is
-// auto-detected by the backend, so it's shown only when a project is already
-// stalled (so editing doesn't silently flip it). Killed projects are revived
-// from the Graveyard, not edited back to life here.
-const STATUS_OPTIONS: ProjectStatus[] = [
-  "idea",
-  "active",
-  "launched",
-  "archived",
-];
+// require closure notes (collected by the Pause/Kill modals behind the status
+// pill on the project detail screen) and the backend rejects them without
+// notes. Stalled is auto-detected by the backend, so it's shown only when a
+// project is already stalled (so editing doesn't silently flip it). Archived
+// only makes sense for a project that already exists.
+const CREATE_STATUS: ProjectStatus[] = ["idea", "active", "launched"];
+const EDIT_STATUS: ProjectStatus[] = ["idea", "active", "launched", "archived"];
+
+/** Sentinela del chip "New" dentro de las categorías. */
+const NEW_CATEGORY = "__new";
+const NO_CATEGORY = "__none";
 
 function isoToInputDate(iso?: string | null) {
   if (!iso) return "";
@@ -45,6 +47,7 @@ function inputDateToIso(s: string) {
   return new Date(y, (m ?? 1) - 1, d ?? 1, 0, 0, 0).toISOString();
 }
 
+/** Formulario de proyecto (2b). */
 export default function ProjectForm() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -71,6 +74,10 @@ export default function ProjectForm() {
   );
   const [dueDate, setDueDate] = useState(isoToInputDate(existing?.dueDate));
   const [saving, setSaving] = useState(false);
+  // "More": descripción y fecha. Abierto de entrada si ya traen algo.
+  const [moreOpen, setMoreOpen] = useState(
+    !!existing?.description || !!existing?.dueDate
+  );
 
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCatName, setNewCatName] = useState("");
@@ -110,32 +117,66 @@ export default function ProjectForm() {
   };
 
   // Include the project's current status even if it's not normally selectable
-  // (stalled/paused/killed), so the chip group reflects reality. The user can
-  // still switch to a normal status from here; closure-note transitions live on
-  // the detail screen.
-  const optionValues: ProjectStatus[] = STATUS_OPTIONS.includes(status)
-    ? STATUS_OPTIONS
-    : [...STATUS_OPTIONS, status];
-  const statusOptions: ChipOption<ProjectStatus>[] = optionValues.map((s) => ({
+  // (stalled/paused/killed), so the control reflects reality. The user can
+  // still switch to a normal status from here.
+  const base = existing ? EDIT_STATUS : CREATE_STATUS;
+  const optionValues: ProjectStatus[] = base.includes(status) ? base : [...base, status];
+  const statusOptions: SegmentedOption<ProjectStatus>[] = optionValues.map((s) => ({
     value: s,
     label: t(`status.${s}`),
   }));
-  const priorityOptions: ChipOption<Priority>[] = PRIORITIES.map((p) => ({
+  // De menos a más, como se lee de izquierda a derecha.
+  const priorityOptions: SegmentedOption<Priority>[] = [...PRIORITIES].reverse().map((p) => ({
     value: p,
     label: t(`priority.${p}`),
   }));
+  const categoryOptions: PresetOption<string>[] = [
+    { value: NO_CATEGORY, label: t("modals.project.noCategory") },
+    ...categories.map((cat) => ({
+      value: cat.id,
+      label: cat.name,
+      bar: categoryChipColors(cat.color, c).dot,
+    })),
+    {
+      value: NEW_CATEGORY,
+      label: t("common.new"),
+      prefix: <Plus size={14} color={c.text3} />,
+    },
+  ];
 
   return (
-    <ModalScaffold
+    <FormScaffold
       title={
         existing ? t("modals.project.editTitle") : t("modals.project.newTitle")
       }
       onSave={handleSave}
+      saveLabel={existing ? t("modals.project.saveCta") : t("modals.project.createCta")}
       canSave={canSave}
       saving={saving}
     >
       <Field label={t("modals.project.name")}>
-        <FormInput value={name} onChangeText={setName} autoFocus />
+        {/* El nombre como titular editable: sin caja, regla inferior de 2 px. */}
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          autoFocus={!existing}
+          multiline
+          blurOnSubmit
+          returnKeyType="next"
+          placeholder={t("modals.project.namePlaceholder")}
+          placeholderTextColor={c.text5}
+          accessibilityLabel={t("modals.project.name")}
+          className="font-display"
+          style={{
+            fontSize: 28,
+            letterSpacing: -0.8,
+            color: c.text,
+            paddingVertical: 6,
+            paddingHorizontal: 0,
+            borderBottomWidth: 2,
+            borderBottomColor: c.accent,
+          }}
+        />
       </Field>
       <Field label={t("modals.project.why")}>
         <FormInput
@@ -145,122 +186,64 @@ export default function ProjectForm() {
           placeholder={t("modals.project.whyPlaceholder")}
         />
       </Field>
-      <Field label={t("modals.project.description")}>
-        <FormInput
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          placeholder={t("modals.project.descriptionPlaceholder")}
-        />
-      </Field>
       <Field label={t("modals.project.nextStep")}>
         <FormInput
           value={nextStep}
           onChangeText={setNextStep}
-          placeholder={t("modals.project.nextStepPlaceholder")}
+          placeholder={`→ ${t("modals.project.nextStepPlaceholder")}`}
         />
       </Field>
       <Field label={t("modals.project.status")}>
-        <ChipGroup value={status} options={statusOptions} onChange={setStatus} />
+        <View className="gap-2">
+          <Segmented options={statusOptions} value={status} onChange={setStatus} />
+          <Text className="font-sans" style={{ fontSize: 13, lineHeight: 18, color: c.text3 }}>
+            {t("modals.project.statusHint")}
+          </Text>
+        </View>
       </Field>
       <Field label={t("modals.project.priority")}>
-        <ChipGroup
-          value={priority}
-          options={priorityOptions}
-          onChange={setPriority}
-        />
-      </Field>
-      <Field label={t("modals.task.dueDate")}>
-        <DateField
-          value={dueDate}
-          onChange={setDueDate}
-          title={t("modals.task.dueDate")}
-          clearable
-        />
+        <Segmented options={priorityOptions} value={priority} onChange={setPriority} />
       </Field>
       <Field label={t("modals.project.category")}>
         {!creatingCategory ? (
-          <View className="gap-2">
-            <View className="flex-row flex-wrap gap-1.5">
-              <Pressable
-                onPress={() => setCategoryId(null)}
-                className={
-                  "rounded-lg border px-3 py-1.5 " +
-                  (categoryId === null
-                    ? "border-accent bg-accent"
-                    : "border-border bg-border")
-                }
-              >
-                <Text
-                  className={
-                    "text-sm font-sans-medium " +
-                    (categoryId === null ? "text-bg" : "text-text-muted")
-                  }
-                >
-                  {t("modals.project.noCategory")}
-                </Text>
-              </Pressable>
-              {categories.map((cat) => {
-                const active = categoryId === cat.id;
-                const chip = categoryChipColors(cat.color, c);
-                return (
-                  <Pressable
-                    key={cat.id}
-                    onPress={() => setCategoryId(cat.id)}
-                    className="flex-row items-center gap-1.5 rounded-lg border px-3 py-1.5"
-                    style={{
-                      backgroundColor: active ? chip.bg : c.surface,
-                      borderColor: active ? chip.border : c.border,
-                    }}
-                  >
-                    <View
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: chip.dot }}
-                    />
-                    <Text
-                      className="text-sm font-sans-medium"
-                      style={{ color: active ? chip.text : c.textMuted }}
-                    >
-                      {cat.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-              <Pressable
-                onPress={() => setCreatingCategory(true)}
-                className="flex-row items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5"
-              >
-                <Plus size={13} color={c.textMuted} />
-                <Text className="font-sans text-sm text-text-muted">{t("common.new")}</Text>
-              </Pressable>
-            </View>
-          </View>
+          <PresetChips
+            options={categoryOptions}
+            value={categoryId ?? NO_CATEGORY}
+            onChange={(v) => {
+              if (v === NEW_CATEGORY) return setCreatingCategory(true);
+              setCategoryId(v === NO_CATEGORY ? null : v);
+            }}
+          />
         ) : (
-          <View className="gap-2 rounded-lg border border-border bg-surface p-3">
+          <View className="gap-3 rounded-lg border border-border bg-surface p-3">
             <FormInput
               value={newCatName}
               onChangeText={setNewCatName}
               placeholder={t("modals.project.newCategoryName")}
               autoFocus
             />
-            <View className="flex-row flex-wrap gap-2">
+            <View className="flex-row flex-wrap gap-1">
               {CATEGORY_COLORS.map((color) => {
-                const chip = categoryChipColors(color, c);
                 const active = newCatColor === color;
                 return (
                   <Pressable
                     key={color}
                     onPress={() => setNewCatColor(color)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: active }}
                     accessibilityLabel={color}
-                    className="h-7 w-7 items-center justify-center rounded-full border-2"
-                    style={{
-                      borderColor: active ? c.text : "transparent",
-                    }}
+                    className="items-center justify-center"
+                    style={{ width: SIZE.hit, height: SIZE.hit }}
                   >
                     <View
-                      className="h-5 w-5 rounded-full"
-                      style={{ backgroundColor: chip.dot }}
-                    />
+                      className="items-center justify-center rounded-full border-2"
+                      style={{ width: 30, height: 30, borderColor: active ? c.text : "transparent" }}
+                    >
+                      <View
+                        className="h-5 w-5 rounded-full"
+                        style={{ backgroundColor: categoryChipColors(color, c).dot }}
+                      />
+                    </View>
                   </Pressable>
                 );
               })}
@@ -268,9 +251,10 @@ export default function ProjectForm() {
             <View className="flex-row gap-2">
               <Pressable
                 onPress={handleCreateCategory}
-                className="flex-1 items-center rounded-lg bg-accent py-2"
+                className="flex-1 items-center justify-center rounded-md bg-accent"
+                style={{ height: SIZE.hit }}
               >
-                <Text className="text-sm font-sans-semibold text-bg">
+                <Text className="font-sans-semibold" style={{ fontSize: 15, color: c.bg }}>
                   {t("modals.project.createCategory")}
                 </Text>
               </Pressable>
@@ -279,14 +263,57 @@ export default function ProjectForm() {
                   setCreatingCategory(false);
                   setNewCatName("");
                 }}
-                className="rounded-lg border border-border bg-border px-4 py-2"
+                className="items-center justify-center rounded-md border border-border bg-surface px-4"
+                style={{ height: SIZE.hit }}
               >
-                <Text className="font-sans text-sm text-text">{t("common.cancel")}</Text>
+                <Text className="font-sans-medium" style={{ fontSize: 15, color: c.text }}>
+                  {t("common.cancel")}
+                </Text>
               </Pressable>
             </View>
           </View>
         )}
       </Field>
-    </ModalScaffold>
+
+      <View className="gap-6">
+        <Pressable
+          onPress={() => setMoreOpen((v) => !v)}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: moreOpen }}
+          className="flex-row items-center gap-2 active:opacity-60"
+          style={{ height: SIZE.hit, borderTopWidth: 1, borderTopColor: c.line[14] }}
+        >
+          <View style={{ transform: [{ rotate: moreOpen ? "90deg" : "0deg" }] }}>
+            <ChevronRight size={18} color={c.text3} />
+          </View>
+          <Text
+            className="font-sans-semibold uppercase"
+            style={{ fontSize: 11, letterSpacing: 0.8, color: c.text3 }}
+          >
+            {t("modals.project.more")}
+          </Text>
+        </Pressable>
+        {moreOpen ? (
+          <>
+            <Field label={t("modals.project.description")}>
+              <FormInput
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                placeholder={t("modals.project.descriptionPlaceholder")}
+              />
+            </Field>
+            <Field label={t("modals.task.dueDate")}>
+              <DateInput
+                value={dueDate}
+                onChange={setDueDate}
+                title={t("modals.task.dueDate")}
+                clearable
+              />
+            </Field>
+          </>
+        ) : null}
+      </View>
+    </FormScaffold>
   );
 }

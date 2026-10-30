@@ -1,170 +1,125 @@
 import { Pressable, Text, View } from "react-native";
-import { Check, Repeat } from "lucide-react-native";
-import type { Category, Task } from "@/lib/types";
-import {
-  alpha,
-  categoryChipColors,
-  type ThemeColors,
-} from "@/theme/useThemeColors";
-import {
-  OVERLOAD_HOURS,
-  type DayLoad,
-  type ProjectRollup,
-  type RoutineItem,
-} from "@/lib/calendar";
+import { Plus } from "lucide-react-native";
 
-/** Interactions shared by every calendar sub-view. */
+import type { Category, Project, Task } from "@/lib/types";
+import { categoryChipColors, type ThemeColors } from "@/theme/useThemeColors";
+import { OVERLOAD_HOURS, type DayLoad } from "@/lib/calendar";
+
+/** Interacciones compartidas por todas las vistas del calendario. */
 export interface CalendarHandlers {
   onOpenProject: (projectId: string) => void;
   onOpenTask: (taskId: string) => void;
   onToggleTask: (task: Task) => void | Promise<void>;
-  // Routines aren't completable from the calendar — tapping one opens its edit
-  // detail instead (completion happens from the Routines/Today views).
+  // Las rutinas no se completan desde el calendario: tocar una abre su edición
+  // (se completan desde Routines/Today).
   onOpenRoutine: (routineId: string) => void;
 }
 
-const projectColors = (
-  project: ProjectRollup["project"],
+/**
+ * El color de un ítem en las tres vistas: la espina del bloque (Día), la barra
+ * de la celda (Mes) y la espina de la fila de agenda salen de aquí, para que
+ * un proyecto se vea igual en todas. Sin categoría (o sin proyecto): neutro.
+ * Las rutinas usan siempre `accent` y no pasan por aquí.
+ */
+export function projectColor(
+  project: Project | null | undefined,
   categoryById: Record<string, Category>,
-  c: ThemeColors
-) => {
+  c: ThemeColors,
+): string {
   const cat = project?.categoryId ? categoryById[project.categoryId] : undefined;
-  if (cat) return categoryChipColors(cat.color, c);
-  // Sin categoría: neutro. Antes era el segundo acento, que lo hacía parecer
-  // una categoría más — la única que nadie eligió.
-  return { bg: c.line[8], text: c.text3, border: c.line[22], dot: c.line[34] };
-};
-
-/** One chip per project for a day (default view), with a task count badge. */
-export function ProjectChip({
-  rollup,
-  categoryById,
-  colors,
-  onOpenProject,
-}: {
-  rollup: ProjectRollup;
-  categoryById: Record<string, Category>;
-  colors: ThemeColors;
-  onOpenProject: (projectId: string) => void;
-}) {
-  const { project, tasks } = rollup;
-  const cc = projectColors(project, categoryById, colors);
-  return (
-    <Pressable
-      onPress={() => project && onOpenProject(project.id)}
-      disabled={!project}
-      className="flex-row items-center gap-1.5 rounded-md border px-2 py-1.5"
-      style={{ backgroundColor: cc.bg, borderColor: cc.border }}
-    >
-      <Text
-        numberOfLines={1}
-        className="flex-1 text-xs font-sans-medium"
-        style={{ color: cc.text }}
-      >
-        {project?.name ?? "—"}
-      </Text>
-      <View
-        className="rounded-full px-1.5"
-        style={{ backgroundColor: alpha(cc.text, 0.2) }}
-      >
-        <Text className="font-sans" style={{ color: cc.text, fontSize: 10 }}>{tasks.length}</Text>
-      </View>
-    </Pressable>
-  );
+  return cat ? categoryChipColors(cat.color, c).dot : c.line[34];
 }
 
-/** A single task (Ver tareas on, or tasks with no project). */
-export function TaskChip({
-  task,
+/**
+ * Barra de carga del Día (6 px): ancho = horas / capacidad, `accent` o `signal`
+ * si se pasa, y a la derecha la palabra del nivel. El nivel se dice con texto,
+ * no solo con color.
+ */
+export function DayLoadBar({
+  load,
   colors,
-  onOpenTask,
-  onToggleTask,
+  label,
 }: {
-  task: Task;
+  load: DayLoad;
   colors: ThemeColors;
-  onOpenTask: (taskId: string) => void;
-  onToggleTask: (task: Task) => void | Promise<void>;
+  label: string;
 }) {
+  const over = load.level === "over";
+  const pct = load.hours <= 0 ? 0 : Math.min(100, Math.round((load.hours / OVERLOAD_HOURS) * 100));
   return (
-    <View
-      className="flex-row items-center gap-2 rounded-md border px-2 py-1.5"
-      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-    >
-      <Pressable onPress={() => onToggleTask(task)} hitSlop={8}>
-        <Check size={14} color={colors.textMuted} />
-      </Pressable>
-      <Pressable className="flex-1" onPress={() => onOpenTask(task.id)}>
-        <Text numberOfLines={1} className="font-sans text-xs" style={{ color: colors.text }}>
-          {task.title}
-        </Text>
-      </Pressable>
-      {task.effortHours != null && (
-        <Text className="font-sans" style={{ color: colors.textMuted, fontSize: 10 }}>
-          {task.effortHours}h
-        </Text>
-      )}
+    <View className="flex-row items-center" style={{ gap: 12 }}>
+      <View className="flex-1" style={{ height: 6, backgroundColor: colors.line[8] }}>
+        <View
+          style={{ height: 6, width: `${pct}%`, backgroundColor: over ? colors.signal : colors.accent }}
+        />
+      </View>
+      <Text
+        className="font-sans-semibold uppercase"
+        style={{ fontSize: 12, letterSpacing: 0.8, color: over ? colors.signal : colors.text2 }}
+      >
+        {label}
+      </Text>
     </View>
   );
 }
 
-/** A routine occurrence chip; tap opens the routine's edit detail. The
- *  completed state is shown read-only (calendar doesn't toggle routines). */
-export function RoutineChip({
-  item,
+/** Cintillo de sección: versalitas 11/700, regla que llena y conteo a la derecha. */
+export function CalendarCintillo({
+  label,
+  count,
   colors,
-  onOpen,
 }: {
-  item: RoutineItem;
+  label: string;
+  count: number;
   colors: ThemeColors;
-  onOpen: (routineId: string) => void;
+}) {
+  return (
+    <View className="flex-row items-center" style={{ minHeight: 44, gap: 10 }}>
+      <Text
+        className="font-sans-bold uppercase"
+        style={{ fontSize: 11, letterSpacing: 1.5, color: colors.text }}
+      >
+        {label}
+      </Text>
+      <View className="flex-1" style={{ height: 1, backgroundColor: colors.line[14] }} />
+      <Text
+        className="font-sans-semibold"
+        style={{ fontSize: 12, color: colors.text3, fontVariant: ["tabular-nums"] }}
+      >
+        {count}
+      </Text>
+    </View>
+  );
+}
+
+/** "Add to Thursday": botón punteado de 48 px que crea una tarea para ese día. */
+export function AddToDayButton({
+  label,
+  colors,
+  onPress,
+}: {
+  label: string;
+  colors: ThemeColors;
+  onPress: () => void;
 }) {
   return (
     <Pressable
-      onPress={() => onOpen(item.routine.id)}
-      className="flex-row items-center gap-2 rounded-md border px-2 py-1.5"
+      onPress={onPress}
+      accessibilityRole="button"
+      className="flex-row items-center justify-center active:opacity-70"
       style={{
-        backgroundColor: alpha(colors.accent, 0.12),
-        borderColor: alpha(colors.accent, 0.28),
-        opacity: item.completed ? 0.55 : 1,
+        height: 48,
+        gap: 8,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderStyle: "dashed",
+        borderColor: colors.line[34],
       }}
     >
-      {item.completed ? (
-        <Check size={14} color={colors.accent} />
-      ) : (
-        <Repeat size={14} color={colors.accent} />
-      )}
-      <Text
-        numberOfLines={1}
-        className="font-sans flex-1 text-xs"
-        style={{
-          color: colors.accent,
-          textDecorationLine: item.completed ? "line-through" : "none",
-        }}
-      >
-        {item.routine.title}
+      <Plus size={18} color={colors.text2} />
+      <Text className="font-sans-medium" style={{ fontSize: 15, color: colors.text2 }}>
+        {label}
       </Text>
     </Pressable>
-  );
-}
-
-/** Thin per-day load bar; width and color scale with estimated hours. */
-export function LoadBar({ load, colors }: { load: DayLoad; colors: ThemeColors }) {
-  const color =
-    load.level === "over"
-      ? colors.signal
-      : load.level === "busy"
-        ? colors.accent
-        : colors.line[34];
-  const pct =
-    load.hours <= 0
-      ? 0
-      : Math.max(8, Math.min(100, Math.round((load.hours / OVERLOAD_HOURS) * 100)));
-  return (
-    <View
-      className="h-1 overflow-hidden rounded-full"
-      style={{ backgroundColor: colors.border }}
-    >
-      <View style={{ height: "100%", width: `${pct}%`, backgroundColor: color }} />
-    </View>
   );
 }

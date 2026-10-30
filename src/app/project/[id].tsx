@@ -1,98 +1,37 @@
-import { useState } from "react";
-import { ProjectStatusSheet } from "@/components/projects/ProjectStatusSheet";
-import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
-import { Spine, spineStrikesTitle } from "@/components/ui/Spine";
-import { CoolingRule } from "@/components/ui/CoolingRule";
-import { BlockerBadge } from "@/components/ui/BlockerBadge";
-import { CategoryTag } from "@/components/ui/CategoryTag";
-import { Meta } from "@/components/ui/Meta";
-import {
-  projectBlockedDays,
-  projectCooling,
-  projectDays,
-  taskIsBlocked,
-} from "@/lib/cooling";
+import { useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import {
-  NestableDraggableFlatList,
-  NestableScrollContainer,
-  ScaleDecorator,
-  type RenderItemParams,
-} from "react-native-draggable-flatlist";
+import { NestableScrollContainer } from "react-native-draggable-flatlist";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { GripVertical, Pencil, Plus, Trash2 } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import type { ProjectStatus, Task } from "@/lib/types";
-import { priorityFill } from "@/lib/priority";
-import { askAsync, confirmAsync } from "@/lib/confirm";
-import { todayLocalISODate } from "@/lib/date";
-import { toast } from "@/lib/toast";
-import { selectionFeedback } from "@/lib/feedback";
-import { byManualOrder, suggestDueDateAfterMove } from "@/lib/taskOrder";
+import { projectBlockedDays, taskIsBlocked } from "@/lib/cooling";
+import { byManualOrder } from "@/lib/taskOrder";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
-import { useProjectNoteMutations } from "@/hooks/useProjectNoteMutations";
-import { useProjectClosure } from "@/hooks/useProjectClosure";
-import { countsTowardCap, usePlan } from "@/hooks/usePlan";
-import { TaskRow } from "@/components/tasks/TaskRow";
-import { ShowMoreList } from "@/components/ui/ShowMoreList";
-import { StatusBadge } from "@/components/projects/StatusBadge";
+import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
+import { ProjectHero } from "@/components/projects/ProjectHero";
+import { BlockerBanner } from "@/components/projects/BlockerBanner";
+import { NextStepCard } from "@/components/projects/NextStepCard";
+import { ProjectProse, ProjectSection } from "@/components/projects/ProjectSection";
+import { ProjectTasks } from "@/components/projects/ProjectTasks";
+import { ProjectActivity } from "@/components/projects/ProjectActivity";
+import { ProjectNotes } from "@/components/projects/ProjectNotes";
+import { ProjectUpdateSheet } from "@/components/projects/ProjectUpdateSheet";
 import { WelcomeBackCard } from "@/components/projects/WelcomeBackCard";
-import {
-  PauseProjectModal,
-  type PauseNotes,
-} from "@/components/projects/PauseProjectModal";
-import {
-  KillProjectModal,
-  type KillNotes,
-} from "@/components/projects/KillProjectModal";
-import { ReviveProjectModal } from "@/components/projects/ReviveProjectModal";
+import { useProjectStatusFlow } from "@/components/projects/useProjectStatusFlow";
 import { useTheme } from "@/theme/ThemeProvider";
-import { THEME_SURFACES } from "@/theme/tokens";
+import { SIZE, THEME_SURFACES } from "@/theme/tokens";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
-function Section({
-  title,
-  count,
-  children,
-}: {
-  title: string;
-  count?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <View className="gap-1.5">
-      <View className="flex-row items-center gap-2">
-        <Meta variant="cintillo" tone="muted">
-          {title}
-        </Meta>
-        {count != null && count > 0 && (
-          <View className="rounded-full border border-border bg-surface px-2 py-0.5">
-            <Text className="font-sans text-[10px] tabular-nums text-text-muted">
-              {count}
-            </Text>
-          </View>
-        )}
-      </View>
-      {children}
-    </View>
-  );
-}
-
-function firstLine(s: string): string {
-  return s.split("\n", 1)[0]?.trim() ?? "";
-}
-
-function restAfterFirstLine(s: string): string {
-  return s.split("\n").slice(1).join("\n").trim();
-}
-
+/**
+ * Detalle de proyecto (1g). Cabecera nativa con "← Projects" y "Edit"; hero
+ * con espina y píldora de estado; banner de bloqueo; next step con
+ * Continue here / Update; secciones con cintillo + regla + conteo. Las piezas
+ * viven en `components/projects/`.
+ */
 export default function ProjectDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language;
+  const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { effective } = useTheme();
@@ -100,210 +39,84 @@ export default function ProjectDetail() {
 
   const { projects, tasks, activities, notesByProject, categoryById, initialLoading } =
     useDashboardData();
-  const { toggleTask, deleteTask, saveTask, reorderProjectTasks } = useTaskMutations();
   const { deleteProject } = useProjectMutations();
-  const { remove: removeNote } = useProjectNoteMutations();
-  const closure = useProjectClosure();
-  const { cap } = usePlan();
 
-  const activeUsed = projects.filter((p) => countsTowardCap(p.status)).length;
-
-  const [pauseOpen, setPauseOpen] = useState(false);
-  const [killOpen, setKillOpen] = useState(false);
-  const [reviveOpen, setReviveOpen] = useState(false);
+  const [updateOpen, setUpdateOpen] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const project = projects.find((p) => p.id === id);
-  const projectTasks = tasks.filter((tk) => tk.projectId === id);
-  // Pendientes en orden manual (arrastrables); hechas debajo por fecha de cierre.
-  const pending = projectTasks.filter((tk) => !tk.done).sort(byManualOrder);
-  // "Atorado" no es un estado del modelo: se deriva de tareas abiertas con
-  // blocker. La razón es lo que de verdad desatasca — "bloqueado" no le dice
-  // a nadie qué hacer, "esperando el contrato firmado" sí.
-  const blockedPending = pending.filter((tk) => taskIsBlocked(tk));
-  const blockedOpen = blockedPending.length;
-  const firstBlockerReason =
-    blockedPending[0]?.blockedReason ||
-    blockedPending[0]?.blockers?.[0]?.externalDescription ||
-    undefined;
-  const completed = projectTasks
-    .filter((tk) => tk.done)
-    .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));
-  const projectUpdates = activities
-    .filter((a) => a.kind === "note" && a.projectId === id)
-    .sort((a, b) => (b.created ?? "").localeCompare(a.created ?? ""));
+  const flow = useProjectStatusFlow(project, projects);
+
+  const { pending, completed, blockedPending } = useMemo(() => {
+    const projectTasks = tasks.filter((tk) => tk.projectId === id);
+    // Pendientes en orden manual (arrastrables); hechas debajo por fecha de cierre.
+    const pend = projectTasks.filter((tk) => !tk.done).sort(byManualOrder);
+    return {
+      pending: pend,
+      completed: projectTasks
+        .filter((tk) => tk.done)
+        .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? "")),
+      // "Atorado" no es un estado del modelo: se deriva de tareas abiertas con blocker.
+      blockedPending: pend.filter((tk) => taskIsBlocked(tk)),
+    };
+  }, [tasks, id]);
+  const projectUpdates = useMemo(
+    () =>
+      activities
+        .filter((a) => a.kind === "note" && a.projectId === id)
+        .sort((a, b) => (b.created ?? "").localeCompare(a.created ?? "")),
+    [activities, id]
+  );
   const notes = notesByProject[id] ?? [];
 
-  const relativeTime = (iso: string): string => {
-    const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-    if (seconds < 60) return t("notes.justNow");
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return t("notes.minutesAgo", { count: minutes });
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return t("notes.hoursAgo", { count: hours });
-    const days = Math.floor(hours / 24);
-    if (days < 7) return t("notes.daysAgo", { count: days });
-    return new Date(iso).toLocaleDateString(locale, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const onDeleteNote = async (noteId: string) => {
-    if (await confirmAsync(t("notes.deleteConfirm"))) removeNote(noteId);
-  };
-
-  const headerOptions = {
-    ...headerOptionsFor(s),
-    title: project?.name ?? t("views.projects.detail.title"),
-  } as const;
-
-  if (initialLoading && !project) {
-    return (
-      <View className="flex-1 items-center justify-center bg-bg">
-        <Stack.Screen options={headerOptions} />
-        <ActivityIndicator />
-      </View>
-    );
-  }
+  const headerOptions = headerOptionsFor(s, { backLabel: t("tabs.projects"), bare: true });
 
   if (!project) {
     return (
       <View className="flex-1 items-center justify-center bg-bg px-6">
         <Stack.Screen options={headerOptions} />
-        <Text className="font-sans text-base text-center text-text-muted">
-          {t("views.projects.empty")}
-        </Text>
+        {initialLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text className="font-sans text-center" style={{ fontSize: 16, color: c.text3 }}>
+            {t("views.projects.empty")}
+          </Text>
+        )}
       </View>
     );
   }
 
-  const cat = project.categoryId ? categoryById[project.categoryId] : undefined;
-
-  // Quick action on overdue rows: rewrite the due date to today.
-  const moveTaskToToday = async (task: Task) => {
-    const ok = await saveTask({
-      id: task.id,
-      title: task.title,
-      projectId: task.projectId,
-      dueDate: todayLocalISODate(),
-      done: task.done,
-      effortHours: task.effortHours,
-    });
-    if (ok) toast.success(t("taskRow.movedToast"), 2000);
-  };
-
-  // Mover cuenta como replanear: la tarea toma la fecha de la vecina que
-  // rebasó. Sin fecha propia se aplica sola; con fecha, se pregunta (y solo si
-  // quedó fuera de orden). Misma regla que la web (`suggestDueDateAfterMove`).
-  const fmtDay = (iso: string) =>
-    new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "short" });
-  const rescheduleAfterMove = async (
-    task: Task,
-    ordered: Task[],
-    direction: "up" | "down"
-  ) => {
-    const dueDate = suggestDueDateAfterMove(ordered, task.id, direction);
-    if (!dueDate) return;
-    const apply = () =>
-      saveTask({
-        id: task.id,
-        title: task.title,
-        projectId: task.projectId,
-        dueDate,
-        done: task.done,
-        effortHours: task.effortHours,
-        dueTime: task.dueTime,
-        durationMinutes: task.durationMinutes,
-      });
-    if (!task.dueDate) {
-      if (await apply()) {
-        toast.success(t("views.projects.card.dateAutoSet", { date: fmtDay(dueDate) }), 2000);
-      }
-      return;
-    }
-    const ok = await askAsync(
-      t("views.projects.card.moveDateTitle", { title: task.title }),
-      t("views.projects.card.moveDateBody", {
-        from: fmtDay(task.dueDate),
-        to: fmtDay(dueDate),
-      }),
-      t("views.projects.card.moveDateConfirm"),
-      t("views.projects.card.moveDateKeep")
-    );
-    if (ok) await apply();
-  };
-
-  const renderTask = (task: Task) => (
-    <TaskRow
-      task={task}
-      project={undefined}
-      onToggle={toggleTask}
-      onDelete={deleteTask}
-      onEdit={(tk) =>
-        router.push({ pathname: "/task-form", params: { id: tk.id } })
-      }
-      onMoveToday={moveTaskToToday}
-    />
-  );
+  const blockedOpen = blockedPending.length;
+  // La razón es lo que de verdad desatasca.
+  const firstBlockerReason =
+    blockedPending[0]?.blockedReason ||
+    blockedPending[0]?.blockers?.[0]?.externalDescription ||
+    undefined;
 
   const onDelete = async () => {
-    // "Matar" en vez de eliminar abre el mismo ritual que el chip de estado.
-    // Ya muerto, no hay alternativa que ofrecer: confirm simple. El modal
-    // espera a que la alerta termine de cerrarse (iOS no presenta un `<Modal>`
-    // encima de una alerta saliente; ver `pendingStatus` más abajo).
+    // "Matar" en vez de eliminar abre el mismo ritual que la píldora de estado.
+    // Ya muerto, confirm simple. El modal espera a que la alerta termine de
+    // cerrarse (iOS no presenta un `<Modal>` sobre una alerta saliente).
     const onKill =
-      project.status === "killed"
-        ? undefined
-        : () => setTimeout(() => setKillOpen(true), 350);
+      project.status === "killed" ? undefined : () => setTimeout(flow.openKill, 350);
     const ok = await deleteProject(project.id, { onKill });
     if (ok) router.back();
   };
 
-  const onPauseConfirm = async (notes: PauseNotes) => {
-    const ok = await closure.pause(project, notes);
-    if (ok) setPauseOpen(false);
-  };
-  const onKillConfirm = async (notes: KillNotes) => {
-    const ok = await closure.kill(project, notes);
-    if (ok) setKillOpen(false);
-  };
   const onResume = () => {
-    void closure.setStatus(project, "active");
+    void flow.closure.setStatus(project, "active");
     setWelcomeDismissed(true);
   };
-  // The success close: mark the project shipped. No notes modal (mirrors web,
-  // where "launched" is just another status in the selector).
-  const onLaunch = () => void closure.setStatus(project, "launched");
-  const onRevive = async (target: "active" | "idea") => {
-    const ok = await closure.setStatus(project, target);
-    if (ok) setReviveOpen(false);
-  };
 
-  const showWelcomeBack = project.status === "paused" && !welcomeDismissed;
+  // "Continue here": el next step se vuelve una tarea para hoy (task-form
+  // acepta `title`/`due` como prefill).
+  const onContinue = () =>
+    router.push({
+      pathname: "/task-form",
+      params: { projectId: project.id, title: project.nextStep, due: "today" },
+    });
 
-  // El cambio de estado ya no son botones sueltos: vive detrás del propio
-  // chip de estado. Ver `components/projects/ProjectStatusSheet`.
-  const [statusSheet, setStatusSheet] = useState(false);
-  // Lo elegido espera a que la hoja TERMINE de cerrarse. iOS no presenta un
-  // `<Modal>` mientras otro se descarta: hacerlo en el mismo tick congelaba la
-  // app —sin error, sin pantalla, con los toques bloqueados— al pasar a pausa
-  // o a muerto, que son los dos que abren modal.
-  const [pendingStatus, setPendingStatus] = useState<ProjectStatus | null>(null);
-
-  const applyStatus = (next: ProjectStatus) => {
-    if (next === "paused") return setPauseOpen(true);
-    if (next === "killed") return setKillOpen(true);
-    // Sacar algo del cementerio no es un cambio de estado más: `ReviveProjectModal`
-    // te enseña lo que escribiste al matarlo ("¿lo reintentarías?") y avisa si
-    // revivirlo te pasa del cupo de proyectos activos. Esa hoja no lo sabe.
-    if (project.status === "killed" && next !== "launched") {
-      return setReviveOpen(true);
-    }
-    // `active`, `idea` y `launched` no piden notas: las guardadas se conservan.
-    void closure.setStatus(project, next as "active" | "idea" | "launched");
-  };
+  const total = pending.length + completed.length;
 
   return (
     <View className="flex-1 bg-bg">
@@ -313,335 +126,118 @@ export default function ProjectDetail() {
           headerRight: () => (
             <Pressable
               onPress={() =>
-                router.push({
-                  pathname: "/project-form",
-                  params: { id: project.id },
-                })
+                router.push({ pathname: "/project-form", params: { id: project.id } })
               }
-              hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={t("common.edit")}
-              // Fixed centered box so the icon sits dead-center (incl. inside
-              // iOS 26's circular glass bar-button background).
-              style={{
-                width: 32,
-                height: 32,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="items-center justify-center active:opacity-60"
+              style={{ height: SIZE.hit, paddingHorizontal: 12 }}
             >
-              <Pencil size={20} color={s.text} />
+              <Text className="font-sans-semibold" style={{ fontSize: 16, color: c.accent }}>
+                {t("common.edit")}
+              </Text>
             </Pressable>
           ),
         }}
       />
       <GestureHandlerRootView className="flex-1 bg-bg">
-      {/* NestableScrollContainer en vez de ScrollView: deja que la lista de
-          pendientes se arrastre (long-press en ⠿) sin pelearse con el scroll. */}
-      <NestableScrollContainer contentContainerStyle={{ gap: 20, padding: 20 }}>
-        {/* Cabecera del rediseño: espina + nombre en display, y debajo la fila
-            de metadatos. El nombre estaba SOLO en el header de navegación, que
-            lo trunca; aquí es lo primero que se lee. La regla de enfriamiento
-            va a la derecha porque "97 días" es la respuesta a la pregunta que
-            trae a nadie a esta pantalla dos veces. */}
-        <View className="flex-row items-start gap-3">
-          <Spine
-            status={project.status}
-            priority={project.priority}
-            blocked={blockedOpen > 0}
-            height={56}
-          />
-          <View className="min-w-0 flex-1 gap-2">
-            <Text
-              className="font-display text-text"
-              style={{
-                fontSize: 26,
-                lineHeight: 29,
-                letterSpacing: -0.9,
-                textDecorationLine: spineStrikesTitle(project.status)
-                  ? "line-through"
-                  : "none",
-              }}
-            >
-              {project.name}
-            </Text>
-            <View className="flex-row flex-wrap items-center gap-x-3 gap-y-1.5">
-              <View className="flex-row items-center gap-1.5">
-                <View
-                  className="h-2 w-2 rounded-full"
-                  style={{ backgroundColor: priorityFill(project.priority, c) }}
-                />
-                <Meta variant="cintillo" tone="muted">
-                  {t(`priority.${project.priority}`)}
-                </Meta>
-              </View>
-              <StatusBadge
-                status={project.status}
-                onPress={() => setStatusSheet(true)}
-              />
-              <CategoryTag name={cat?.name} color={cat?.color} loose={!cat} />
-            </View>
-          </View>
-          <CoolingRule days={projectDays(project)} cooling={projectCooling(project)} />
-        </View>
-
-        {blockedOpen > 0 && (
-          <BlockerBadge
-            since={projectBlockedDays(project)}
-            reason={firstBlockerReason}
-            blocksCount={blockedOpen}
-          />
-        )}
-
-        {showWelcomeBack && (
-          <WelcomeBackCard
+        {/* NestableScrollContainer: deja que la lista de pendientes se arrastre
+            (long-press en ⠿) sin pelearse con el scroll. */}
+        <NestableScrollContainer
+          contentContainerStyle={{ gap: 28, padding: SIZE.gutter, paddingBottom: 48 }}
+        >
+          <ProjectHero
             project={project}
-            reactivating={closure.saving}
-            onReactivate={onResume}
-            onDismiss={() => setWelcomeDismissed(true)}
+            category={project.categoryId ? categoryById[project.categoryId] : undefined}
+            blocked={blockedOpen > 0}
+            onStatusPress={flow.openStatusSheet}
           />
-        )}
 
-
-        <View
-          className="rounded-lg border px-3 py-2.5"
-          style={{
-            backgroundColor: alpha(c.accent, 0.05),
-            borderColor: alpha(c.accent, 0.2),
-          }}
-        >
-          <Meta variant="cintillo" tone="inherit" className="mb-1" style={{ color: c.accent }}>
-            {t("views.projects.card.nextStep")}
-          </Meta>
-          {project.nextStep ? (
-            <Text className="font-sans text-sm text-text">→ {project.nextStep}</Text>
-          ) : (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("views.projects.card.nextStepEmpty")}
-            </Text>
-          )}
-        </View>
-
-        <Section title={t("views.projects.card.whyMatters")}>
-          {project.why ? (
-            <Text className="font-sans text-sm text-text-muted">{project.why}</Text>
-          ) : (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("views.projects.card.whyEmpty")}
-            </Text>
-          )}
-        </Section>
-
-        <Section title={t("views.projects.card.description")}>
-          {project.description ? (
-            <Text className="font-sans text-sm text-text-muted">{project.description}</Text>
-          ) : (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("views.projects.card.descriptionEmpty")}
-            </Text>
-          )}
-        </Section>
-
-        <Section title={t("views.projects.card.tasks")}>
-          {projectTasks.length === 0 ? (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("views.projects.card.noTasks")}
-            </Text>
-          ) : (
-            <View className="gap-2">
-              <NestableDraggableFlatList
-                data={pending}
-                keyExtractor={(tk) => tk.id}
-                contentContainerStyle={{ gap: 8 }}
-                onDragEnd={({ data, from, to }) => {
-                  if (from === to) return;
-                  selectionFeedback();
-                  void reorderProjectTasks(
-                    project.id,
-                    data.map((tk) => tk.id)
-                  );
-                  void rescheduleAfterMove(pending[from], data, to < from ? "up" : "down");
-                }}
-                renderItem={({ item, drag, isActive }: RenderItemParams<Task>) => (
-                  <ScaleDecorator>
-                    <View className="flex-row items-center gap-1.5">
-                      <Pressable
-                        onLongPress={drag}
-                        delayLongPress={150}
-                        disabled={isActive}
-                        hitSlop={8}
-                        accessibilityLabel={t("views.projects.card.dragTask")}
-                        className="py-2"
-                      >
-                        <GripVertical size={16} color={c.textMuted} />
-                      </Pressable>
-                      <View className="flex-1">{renderTask(item)}</View>
-                    </View>
-                  </ScaleDecorator>
-                )}
-              />
-              {/* Sangría = ancho del handle ⠿, para alinear con las pendientes. */}
-              <View className="gap-2" style={{ paddingLeft: 22 }}>
-                <ShowMoreList
-                  items={completed}
-                  initialCount={5}
-                  itemKey={(task) => task.id}
-                  renderItem={(task) => renderTask(task)}
-                />
-              </View>
-            </View>
-          )}
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/task-form",
-                params: { projectId: project.id },
-              })
-            }
-            className="mt-1 flex-row items-center gap-1.5 self-start rounded-md border border-border bg-surface px-3 py-1.5"
-          >
-            <Plus size={14} color={c.textMuted} />
-            <Text className="font-sans text-xs text-text-muted">
-              {t("modals.task.newTitle")}
-            </Text>
-          </Pressable>
-        </Section>
-
-        <Section
-          title={t("views.projects.card.recentActivity")}
-          count={projectUpdates.length}
-        >
-          {projectUpdates.length === 0 ? (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("views.projects.card.noUpdates")}
-            </Text>
-          ) : (
-            <ShowMoreList
-              items={projectUpdates}
-              initialCount={5}
-              itemKey={(a) => a.id}
-              renderItem={(a) => (
-                <View className="flex-row gap-2 py-0.5">
-                  <Text className="font-sans w-24 shrink-0 text-xs text-text-muted">
-                    {new Date(a.created).toLocaleDateString(locale, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </Text>
-                  <Text className="font-sans flex-1 text-sm text-text-muted">{a.note}</Text>
-                </View>
-              )}
+          {blockedOpen > 0 ? (
+            <BlockerBanner
+              since={projectBlockedDays(project)}
+              reason={firstBlockerReason}
+              blocksCount={blockedOpen}
             />
-          )}
-        </Section>
+          ) : null}
 
-        <Section title={t("views.projects.card.notes")} count={notes.length}>
-          {notes.length === 0 ? (
-            <Text className="font-sans text-sm italic text-text-muted">
-              {t("notes.empty")}
-            </Text>
-          ) : (
-            <View className="gap-2">
-              {notes.map((n) => {
-                const heading = n.title || firstLine(n.body);
-                const preview = n.title ? n.body : restAfterFirstLine(n.body);
-                return (
-                  <View
-                    key={n.id}
-                    className="rounded-lg border border-border bg-surface p-3"
-                  >
-                    <View className="mb-1 flex-row items-start justify-between gap-2">
-                      <Text
-                        className={
-                          "flex-1 text-sm font-sans-medium " +
-                          (heading ? "text-text" : "italic text-text-muted")
-                        }
-                        numberOfLines={1}
-                      >
-                        {heading || t("notes.untitled")}
-                      </Text>
-                      <Pressable
-                        onPress={() => onDeleteNote(n.id)}
-                        hitSlop={8}
-                        accessibilityRole="button"
-                        accessibilityLabel={t("common.delete")}
-                      >
-                        <Trash2 size={13} color={c.textMuted} />
-                      </Pressable>
-                    </View>
-                    {!!preview && (
-                      <Text
-                        className="font-sans mb-1.5 text-sm text-text-muted"
-                        numberOfLines={3}
-                      >
-                        {preview}
-                      </Text>
-                    )}
-                    <Text className="font-sans text-[10px] uppercase tracking-wider text-text-muted">
-                      {relativeTime(n.updatedAt)}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-        </Section>
+          {project.status === "paused" && !welcomeDismissed ? (
+            <WelcomeBackCard
+              project={project}
+              reactivating={flow.closure.saving}
+              onReactivate={onResume}
+              onDismiss={() => setWelcomeDismissed(true)}
+            />
+          ) : null}
 
-        <View className="pt-2">
+          <NextStepCard
+            nextStep={project.nextStep}
+            onContinue={onContinue}
+            onUpdate={() => setUpdateOpen(true)}
+          />
+
+          <ProjectSection title={t("views.projects.card.whyMatters")}>
+            <ProjectProse text={project.why} empty={t("views.projects.card.whyEmpty")} />
+          </ProjectSection>
+
+          <ProjectSection title={t("views.projects.card.description")}>
+            <ProjectProse
+              text={project.description}
+              empty={t("views.projects.card.descriptionEmpty")}
+            />
+          </ProjectSection>
+
+          <ProjectSection
+            title={t("views.projects.card.tasks")}
+            meta={
+              total > 0
+                ? t("views.projectDetail.tasksMeta", {
+                    open: pending.length,
+                    done: completed.length,
+                  })
+                : null
+            }
+          >
+            <ProjectTasks project={project} pending={pending} completed={completed} />
+          </ProjectSection>
+
+          <ProjectSection
+            title={t("views.projects.card.recentActivity")}
+            meta={projectUpdates.length > 0 ? String(projectUpdates.length) : null}
+          >
+            <ProjectActivity updates={projectUpdates} />
+          </ProjectSection>
+
+          <ProjectSection
+            title={t("views.projects.card.notes")}
+            meta={notes.length > 0 ? String(notes.length) : null}
+          >
+            <ProjectNotes notes={notes} />
+          </ProjectSection>
+
           <Pressable
             onPress={onDelete}
-            className="flex-row items-center gap-1.5 self-start rounded-md px-3 py-2"
-            style={{ backgroundColor: alpha(c.signal, 0.1) }}
+            accessibilityRole="button"
+            className="items-center justify-center rounded-md border active:opacity-70"
+            style={{
+              height: 48,
+              borderColor: alpha(c.signal, 0.35),
+              backgroundColor: alpha(c.signal, 0.06),
+            }}
           >
-            <Trash2 size={14} color={c.signal} />
-            <Text className="font-sans text-xs" style={{ color: c.signal }}>
-              {t("common.delete")}
+            <Text className="font-sans-semibold" style={{ fontSize: 15, color: c.signal }}>
+              {t("views.projectDetail.deleteProject")}
             </Text>
           </Pressable>
-        </View>
-      </NestableScrollContainer>
+        </NestableScrollContainer>
       </GestureHandlerRootView>
 
-      <ProjectStatusSheet
-        visible={statusSheet}
-        current={project.status}
-        onClose={() => setStatusSheet(false)}
-        onPick={(next) => {
-          setPendingStatus(next);
-          setStatusSheet(false);
-        }}
-        onClosed={() => {
-          const next = pendingStatus;
-          setPendingStatus(null);
-          if (next) applyStatus(next);
-        }}
+      <ProjectUpdateSheet
+        visible={updateOpen}
+        projectId={project.id}
+        onClose={() => setUpdateOpen(false)}
       />
-
-      <PauseProjectModal
-        visible={pauseOpen}
-        projectName={project.name}
-        saving={closure.saving}
-        onCancel={() => setPauseOpen(false)}
-        onConfirm={onPauseConfirm}
-      />
-      <KillProjectModal
-        visible={killOpen}
-        projectName={project.name}
-        saving={closure.saving}
-        onCancel={() => setKillOpen(false)}
-        onConfirm={onKillConfirm}
-      />
-      <ReviveProjectModal
-        visible={reviveOpen}
-        projectName={project.name}
-        wouldRestart={project.killedWouldRestart}
-        activeUsed={activeUsed}
-        activeCap={cap ?? undefined}
-        saving={closure.saving}
-        onCancel={() => setReviveOpen(false)}
-        onRevive={onRevive}
-      />
+      {flow.element}
     </View>
   );
 }

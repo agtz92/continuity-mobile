@@ -1,27 +1,30 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
-import { useTheme } from "@/theme/ThemeProvider";
-import { THEME_SURFACES } from "@/theme/tokens";
+import { FormInput } from "@/components/ui/FormInput";
+import { useThemeColors } from "@/theme/useThemeColors";
+import {
+  AuthBackRow,
+  AuthButton,
+  AuthError,
+  AuthHeading,
+  AuthLabel,
+  AuthScaffold,
+} from "@/components/auth/AuthParts";
 
+/**
+ * Pide el enlace de recuperación. El enlace vuelve a `auth/reset`
+ * (`src/app/auth/reset.tsx`), que canjea el código y pide la contraseña nueva.
+ * Con PKCE el canje necesita el verificador que se guardó **en este teléfono**
+ * al pedir el enlace: por eso el texto dice que se abra aquí.
+ */
 export default function ResetPassword() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { effective } = useTheme();
-  const muted = THEME_SURFACES[effective].textMuted;
+  const c = useThemeColors();
 
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
@@ -40,62 +43,63 @@ export default function ResetPassword() {
     setBusy(false);
   }
 
+  const goLogin = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace("/login");
+  };
+
   return (
-    <SafeAreaView className="flex-1 bg-bg">
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <ScrollView contentContainerClassName="flex-grow justify-center gap-6 p-6">
-          <View className="gap-1">
-            <Text className="text-3xl font-sans-bold text-text">
-              {t("auth.reset.title")}
-            </Text>
-            <Text className="font-sans text-base text-text-muted">{t("auth.reset.subtitle")}</Text>
+    <AuthScaffold top={<AuthBackRow label={t("auth.signup.signInLink")} onPress={goLogin} />}>
+      <AuthHeading title={t("auth.reset.headline")} lede={t("auth.reset.lede")} />
+
+      {sent ? (
+        <Text
+          accessibilityLiveRegion="polite"
+          className="font-sans"
+          style={{ fontSize: 16, lineHeight: 23, color: c.text }}
+        >
+          {t("auth.reset.sent")}
+        </Text>
+      ) : (
+        <View style={{ gap: 20 }}>
+          <View style={{ gap: 8 }}>
+            <AuthLabel label={t("auth.reset.email")} />
+            <FormInput
+              auth
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              placeholder={t("auth.reset.emailPlaceholder")}
+              accessibilityLabel={t("auth.reset.email")}
+              returnKeyType="send"
+              onSubmitEditing={() => void onSend()}
+            />
           </View>
+          <AuthError message={error} />
+          <AuthButton
+            label={t("auth.reset.send")}
+            onPress={() => void onSend()}
+            busy={busy}
+            disabled={!email.trim()}
+          />
+        </View>
+      )}
 
-          {sent ? (
-            <Text className="font-sans text-base text-text">{t("auth.reset.sent")}</Text>
-          ) : (
-            <View className="gap-3">
-              <View className="gap-1">
-                <Text className="text-sm font-sans-medium text-text">
-                  {t("auth.reset.email")}
-                </Text>
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  placeholder={t("auth.reset.emailPlaceholder")}
-                  placeholderTextColor={muted}
-                  className="rounded-xl border border-border bg-surface px-4 py-3 text-text"
-                />
-              </View>
-
-              {error && <Text className="font-sans text-signal">{error}</Text>}
-
-              <Pressable
-                onPress={onSend}
-                disabled={busy}
-                className="mt-1 flex-row items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3"
-              >
-                {busy && <ActivityIndicator size="small" />}
-                <Text className="text-base font-sans-semibold text-bg">
-                  {t("auth.reset.send")}
-                </Text>
-              </Pressable>
-            </View>
-          )}
-
-          <Pressable onPress={() => router.replace("/login")} className="self-center">
-            <Text className="text-base font-sans-semibold text-accent">
-              {t("auth.reset.backToLogin")}
-            </Text>
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      {/* "Después de enviar", bajo regla de 3 px. */}
+      <View style={{ marginTop: 32, borderTopWidth: 3, borderTopColor: c.text, paddingTop: 14, gap: 8 }}>
+        <Text
+          className="font-sans-semibold uppercase"
+          style={{ fontSize: 11, letterSpacing: 0.8, color: c.text3 }}
+        >
+          {t("auth.reset.afterTitle")}
+        </Text>
+        <Text className="font-sans" style={{ fontSize: 15, lineHeight: 22, color: c.text2 }}>
+          {t("auth.reset.afterBody")}
+        </Text>
+      </View>
+    </AuthScaffold>
   );
 }

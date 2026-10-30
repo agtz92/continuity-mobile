@@ -47,7 +47,8 @@ export function StatusBadge({
   onPress,
 }: {
   status: ProjectStatus;
-  size?: "sm" | "md";
+  /** `lg` es la píldora de 36 px del detalle de proyecto (cabecera 1g). */
+  size?: "sm" | "md" | "lg";
   /** Con esto el badge deja de ser etiqueta y pasa a ser control: el estado
    *  se cambia tocándolo, que es lo que hace que se lea como un estado y no
    *  como una decoración. */
@@ -60,9 +61,27 @@ export function StatusBadge({
     color?: string;
   }>;
   const { ink, fill, border } = look(status, c);
-  const iconSize = size === "md" ? 14 : 12;
+  const iconSize = size === "lg" ? 16 : size === "md" ? 14 : 12;
 
   const Wrapper = onPress ? Pressable : View;
+
+  if (size === "lg") {
+    return (
+      <Wrapper
+        onPress={onPress}
+        accessibilityRole={onPress ? "button" : undefined}
+        accessibilityLabel={t(`status.${status}`)}
+        className="flex-row items-center self-start rounded-full border active:opacity-70"
+        style={{ height: 36, paddingHorizontal: 14, gap: 8, backgroundColor: fill, borderColor: border }}
+      >
+        <Icon size={iconSize} color={ink} />
+        <Text className="font-sans-medium" style={{ fontSize: 15, color: ink }}>
+          {t(`status.${status}`)}
+        </Text>
+        {onPress ? <ChevronDown size={14} color={ink} /> : null}
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper

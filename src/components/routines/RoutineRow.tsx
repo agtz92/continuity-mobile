@@ -1,13 +1,7 @@
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
-import {
-  Archive,
-  ArchiveRestore,
-  Clock,
-  Pencil,
-  Repeat,
-} from "lucide-react-native";
+import { Archive, ArchiveRestore, Pencil, Repeat } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Routine } from "@/lib/types";
 import { describeRecurrence } from "@/lib/recurrence";
@@ -15,18 +9,23 @@ import { daysOverdue, todayLocalISODate } from "@/lib/date";
 import { confirmCompleted } from "@/lib/feedback";
 import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColors";
 import { Meta } from "@/components/ui/Meta";
-import { EffortBadge } from "@/components/today/EffortBadge";
+import { IconAction } from "@/components/ui/IconAction";
 import { TaskToggle } from "@/components/tasks/TaskToggle";
 
-
 /**
- * Row for a single routine occurrence. `scheduledDate` is the day this row
- * represents; `occurrenceId` is non-null iff already completed that day.
+ * Fila de una ocurrencia de rutina, rediseño "Breathe". `scheduledDate` es el
+ * día que representa; `occurrenceId` no es null si ya se completó ese día.
  *
- * Completing gives instant confirmation (success haptic + toast) and an
- * optimistic checked state, then the row fades out when the refetch drops it.
+ * Una tarjeta por fila: toggle de 28 px (punteado + ↻) · espina de 3 px ·
+ * título a 17 px que envuelve · badge de estado y recurrencia/horas como
+ * metadato · proyecto en su propia línea. A la derecha, **editar** y
+ * **archivar** como `IconAction` de 44 px separados 8 (el archivado se queda en
+ * la fila por decisión del dueño, no se mueve al formulario).
+ *
+ * Completar da confirmación inmediata (haptic + toast) y un estado optimista;
+ * la fila se desvanece cuando el refetch la saca de la lista.
  */
-export function RoutineRow({
+export const RoutineRow = memo(function RoutineRow({
   routine,
   scheduledDate,
   occurrenceId,
@@ -35,7 +34,6 @@ export function RoutineRow({
   onUncomplete,
   onEdit,
   onArchive,
-  onDelete,
 }: {
   routine: Routine;
   scheduledDate: string;
@@ -45,6 +43,8 @@ export function RoutineRow({
   onUncomplete: (occurrenceId: string) => void | Promise<void>;
   onEdit?: (r: Routine) => void;
   onArchive?: (r: Routine) => void | Promise<void>;
+  // Borrar vive en el formulario (routine-form). Opcional sin usar para no
+  // romper call sites.
   onDelete?: (id: string) => void | Promise<void>;
 }) {
   const { t, i18n } = useTranslation();
@@ -80,15 +80,42 @@ export function RoutineRow({
   const borderColor = overdue
     ? alpha(c.signal, 0.3)
     : dueToday
-    ? alpha(c.accent, 0.3)
-    : c.border;
-  const spineColor = overdue
-    ? c.signal
-    : dueToday
-    ? c.accent
-    : c.border;
+      ? alpha(c.accent, 0.3)
+      : c.line[14];
+  const spineColor = overdue ? c.signal : dueToday ? c.accent : c.line[14];
 
   const projectDot = project ? categoryChipColors(project.color, c).dot : null;
+
+  const badge = (label: string, tone: string) => (
+    <View
+      className="rounded-md px-1.5 py-0.5"
+      style={{
+        backgroundColor: alpha(tone, 0.14),
+        borderWidth: 1,
+        borderColor: alpha(tone, 0.35),
+      }}
+    >
+      <Text
+        className="font-sans-semibold uppercase"
+        style={{ fontSize: 11, letterSpacing: 0.6, color: tone }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+
+  // Recurrencia · horas (· fecha si no es hoy ni vencida): metadato.
+  const metaParts = [describeRecurrence(routine, recLabel)];
+  if (routine.effortHours != null) metaParts.push(`${routine.effortHours}h`);
+  if (!overdue && !dueToday && !isDone) {
+    metaParts.push(
+      new Date(scheduledDate + "T00:00:00").toLocaleDateString(i18n.language, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      })
+    );
+  }
 
   return (
     <Animated.View
@@ -96,129 +123,108 @@ export function RoutineRow({
       layout={LinearTransition.duration(220)}
     >
       <View
-        className="flex-row items-center gap-3 rounded-lg border bg-surface p-3"
-        style={{ borderColor, borderLeftWidth: 3, borderLeftColor: spineColor }}
+        className="flex-row items-center rounded-lg border bg-surface"
+        style={{
+          gap: 12,
+          paddingVertical: 12,
+          paddingLeft: 14,
+          paddingRight: 6,
+          borderColor,
+          borderLeftWidth: 3,
+          borderLeftColor: spineColor,
+        }}
       >
         <TaskToggle
           done={isDone}
           overdue={overdue}
           kind="routine"
           onToggle={handleToggle}
-          label={
-            isDone ? t("routineRow.markNotDone") : t("routineRow.markDone")
-          }
+          label={isDone ? t("routineRow.markNotDone") : t("routineRow.markDone")}
         />
 
         <Pressable
           className="min-w-0 flex-1"
           onPress={onEdit ? () => onEdit(routine) : undefined}
           disabled={!onEdit}
+          accessibilityRole={onEdit ? "button" : undefined}
+          accessibilityLabel={routine.title}
         >
-          <View className="flex-row flex-wrap items-center gap-2">
-            <Text
-              className={"font-sans " + 
-                "text-base " +
-                (isDone ? "text-text-muted line-through" : "text-text")
-              }
-            >
-              {routine.title}
-            </Text>
-            {/* La recurrencia y las horas son metadato, no señal: mismo
-                tratamiento que en `TaskRow`. El ↻ ya lo dice el toggle. */}
-            <View className="flex-row items-center gap-1">
-              <Repeat size={10} color={c.text5} />
-              <Meta tone="faint">{describeRecurrence(routine, recLabel)}</Meta>
+          <Text
+            className={
+              "font-sans " + (isDone ? "text-text-muted line-through" : "text-text")
+            }
+            style={{ fontSize: 17, lineHeight: 23 }}
+          >
+            {routine.title}
+          </Text>
+
+          <View
+            className="flex-row flex-wrap items-center"
+            style={{ marginTop: 6, columnGap: 8, rowGap: 4 }}
+          >
+            {overdue && lateDays !== null
+              ? badge(t("routineRow.overdueDays", { count: lateDays }), c.signal)
+              : null}
+            {dueToday ? badge(t("routineRow.todayBadge"), c.accent) : null}
+            {/* La recurrencia y las horas son metadato, no señal. */}
+            <View className="min-w-0 flex-shrink flex-row items-center" style={{ gap: 4 }}>
+              <Repeat size={12} color={c.text5} />
+              <Meta tone="muted" className="flex-shrink" numberOfLines={1} style={{ fontSize: 13 }}>
+                {metaParts.join(" · ")}
+              </Meta>
             </View>
-            {routine.effortHours != null && (
-              <EffortBadge hours={routine.effortHours} />
-            )}
           </View>
-          <View className="mt-0.5 flex-row flex-wrap items-center gap-x-2 gap-y-1">
-            {overdue && lateDays !== null ? (
+
+          {project ? (
+            <View className="flex-row items-center" style={{ gap: 6, marginTop: 4 }}>
               <View
-                className="rounded-md px-1.5 py-0.5"
-                style={{
-                  backgroundColor: alpha(c.signal, 0.2),
-                  borderWidth: 1,
-                  borderColor: alpha(c.signal, 0.4),
-                }}
+                className="rounded-full"
+                style={{ width: 8, height: 8, backgroundColor: projectDot ?? c.text5 }}
+              />
+              <Text
+                className="font-sans min-w-0 flex-shrink"
+                numberOfLines={1}
+                style={{ fontSize: 13, color: c.text3 }}
               >
-                <Text
-                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
-                  style={{ color: c.signal }}
-                >
-                  {t("routineRow.overdueDays", { count: lateDays })}
-                </Text>
-              </View>
-            ) : dueToday ? (
-              <View
-                className="rounded-md px-1.5 py-0.5"
-                style={{
-                  backgroundColor: alpha(c.accent, 0.2),
-                  borderWidth: 1,
-                  borderColor: alpha(c.accent, 0.4),
-                }}
-              >
-                <Text
-                  className="text-[10px] font-sans-semibold uppercase tracking-wide"
-                  style={{ color: c.accent }}
-                >
-                  {t("routineRow.todayBadge")}
-                </Text>
-              </View>
-            ) : (
-              <Text className="font-sans text-xs" style={{ color: c.textMuted }}>
-                {new Date(scheduledDate + "T00:00:00").toLocaleDateString(
-                  i18n.language
-                )}
+                {project.name}
               </Text>
-            )}
-            {project && (
-              <View className="flex-row items-center gap-1">
-                <View
-                  className="h-2 w-2 rounded-full"
-                  style={{ backgroundColor: projectDot ?? c.textMuted }}
-                />
-                <Text className="font-sans text-xs text-text-muted">{project.name}</Text>
-              </View>
-            )}
-            {!!routine.description && (
-              <Text className="font-sans text-xs text-text-muted">
-                · {routine.description}
-              </Text>
-            )}
-          </View>
+            </View>
+          ) : null}
+
+          {routine.description ? (
+            <Text
+              className="font-sans"
+              numberOfLines={1}
+              style={{ fontSize: 13, color: c.text3, marginTop: 2 }}
+            >
+              {routine.description}
+            </Text>
+          ) : null}
         </Pressable>
 
-        {onEdit && (
-          <Pressable
-            onPress={() => onEdit(routine)}
-            accessibilityRole="button"
-            accessibilityLabel={t("routineRow.editAria")}
-            hitSlop={8}
-          >
-            <Pencil size={14} color={c.textMuted} />
-          </Pressable>
-        )}
-        {onArchive && (
-          <Pressable
-            onPress={() => onArchive(routine)}
-            accessibilityRole="button"
-            accessibilityLabel={
-              routine.archived
-                ? t("routineRow.unarchiveAria")
-                : t("routineRow.archiveAria")
-            }
-            hitSlop={8}
-          >
-            {routine.archived ? (
-              <ArchiveRestore size={14} color={c.textMuted} />
-            ) : (
-              <Archive size={14} color={c.textMuted} />
-            )}
-          </Pressable>
-        )}
+        {onEdit || onArchive ? (
+          <View className="flex-row items-center" style={{ gap: 8 }}>
+            {onEdit ? (
+              <IconAction
+                icon={Pencil}
+                label={t("routineRow.editAria")}
+                onPress={() => onEdit(routine)}
+              />
+            ) : null}
+            {onArchive ? (
+              <IconAction
+                icon={routine.archived ? ArchiveRestore : Archive}
+                label={
+                  routine.archived
+                    ? t("routineRow.unarchiveAria")
+                    : t("routineRow.archiveAria")
+                }
+                onPress={() => void onArchive(routine)}
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
     </Animated.View>
   );
-}
+});

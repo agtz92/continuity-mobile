@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Meta } from "@/components/ui/Meta";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -16,7 +22,10 @@ import {
 import { supabase } from "@/lib/supabase";
 import { requestCustomize, requestTour } from "@/lib/tour";
 import { useThemeColors } from "@/theme/useThemeColors";
-import { TextButton } from "@/components/onboarding/controls";
+import {
+  OnboardingBackContext,
+  TextButton,
+} from "@/components/onboarding/controls";
 import { StepTheme } from "@/components/onboarding/StepTheme";
 import { StepName } from "@/components/onboarding/StepName";
 import { StepAvatar } from "@/components/onboarding/StepAvatar";
@@ -222,10 +231,24 @@ export default function Onboarding() {
     );
   }
 
+  // "Back" en los pasos 2–5 (replay también): fila de 44 que cada paso
+  // coloca al final de su contenido (ver `StepLayout`).
+  const backRow =
+    step > 1 ? (
+      <TextButton
+        label={t("onboarding.back")}
+        onPress={() => void goToStep(step - 1)}
+        disabled={busy}
+      />
+    ) : null;
+
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top", "bottom"]}>
-      {/* Header: progress label + skip (skip hidden in replay) */}
-      <View className="flex-row items-center justify-between px-5 pb-3 pt-2">
+      {/* Header: "Step n of 5" en versalitas + Skip de 44 (oculto en replay). */}
+      <View
+        className="flex-row items-center justify-between pl-5 pr-3"
+        style={{ minHeight: 44 }}
+      >
         <Meta variant="cintillo" tone="muted">
           {t("onboarding.progress", { current: step, total: TOTAL_STEPS })}
         </Meta>
@@ -238,84 +261,83 @@ export default function Onboarding() {
         )}
       </View>
 
-      {/* Progress dots */}
-      <View className="flex-row gap-2 px-5 pb-4">
+      {/* Progreso: cinco barras de 3 px. */}
+      <View
+        className="flex-row px-5"
+        style={{ gap: 6, paddingTop: 6, paddingBottom: 16 }}
+        accessibilityRole="progressbar"
+        accessibilityValue={{ min: 1, max: TOTAL_STEPS, now: step }}
+      >
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => {
           const idx = i + 1;
           const done = idx <= step;
           return (
             <View
               key={idx}
-              className="h-1 flex-1 rounded-full"
-              style={{ backgroundColor: done ? c.accent : c.border }}
+              className="flex-1"
+              style={{ height: 3, backgroundColor: done ? c.accent : c.line[14] }}
             />
           );
         })}
       </View>
 
       {replay && (
-        <View className="mx-5 mb-2 rounded-lg border border-border bg-surface px-3 py-2">
-          <Text className="font-sans text-xs text-text-muted">
+        <View
+          className="mx-5 mb-3 rounded-lg px-3 py-2"
+          style={{ borderWidth: 1, borderColor: c.line[14], backgroundColor: c.surface }}
+        >
+          <Text className="font-sans" style={{ fontSize: 14, color: c.text2 }}>
             {t("onboarding.replay.banner")}
           </Text>
         </View>
       )}
 
-      <ScrollView
+      <KeyboardAvoidingView
         className="flex-1"
-        contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-        keyboardShouldPersistTaps="handled"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {step === 1 && (
-          <StepTheme busy={busy} onNext={(v) => void handleTheme(v)} />
-        )}
-        {step === 2 && (
-          <StepName
-            initialName={name || oauthName}
-            prefilled={!name && !!oauthName}
-            busy={busy}
-            onNext={(v) => void handleName(v)}
-          />
-        )}
-        {step === 3 && (
-          <StepAvatar
-            name={name}
-            initialAvatar={state.avatar ?? null}
-            busy={busy}
-            onNext={(id) => void handleAvatar(id)}
-          />
-        )}
-        {step === 4 && (
-          <StepPlan
-            name={name}
-            planLabel={planLabel}
-            isExempt={state.isBillingExempt}
-            replay={replay}
-            busy={busy}
-            onContinue={() => void goToStep(5)}
-          />
-        )}
-        {step === 5 && (
-          <StepCustomize
-            replay={replay}
-            busy={busy}
-            onCustomize={() => void finishWithCustomize()}
-            onFinish={() => void finish()}
-            onWatchTour={watchTour}
-          />
-        )}
-
-        {/* Back link on steps 2–5 (replay too). */}
-        {step > 1 && (
-          <View className="mt-6 items-center">
-            <TextButton
-              label={t("onboarding.back")}
-              onPress={() => void goToStep(step - 1)}
-              disabled={busy}
+        <OnboardingBackContext.Provider value={backRow}>
+          {step === 1 && (
+            <StepTheme busy={busy} onNext={(v) => void handleTheme(v)} />
+          )}
+          {step === 2 && (
+            <StepName
+              initialName={name || oauthName}
+              prefilled={!name && !!oauthName}
+              busy={busy}
+              onNext={(v) => void handleName(v)}
             />
-          </View>
-        )}
-      </ScrollView>
+          )}
+          {step === 3 && (
+            <StepAvatar
+              name={name}
+              planLabel={planLabel}
+              initialAvatar={state.avatar ?? null}
+              busy={busy}
+              onNext={(id) => void handleAvatar(id)}
+            />
+          )}
+          {step === 4 && (
+            <StepPlan
+              name={name}
+              planLabel={planLabel}
+              isExempt={state.isBillingExempt}
+              replay={replay}
+              busy={busy}
+              onContinue={() => void goToStep(5)}
+            />
+          )}
+          {step === 5 && (
+            <StepCustomize
+              replay={replay}
+              busy={busy}
+              onCustomize={() => void finishWithCustomize()}
+              onFinish={() => void finish()}
+              onWatchTour={watchTour}
+            />
+          )}
+        </OnboardingBackContext.Provider>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

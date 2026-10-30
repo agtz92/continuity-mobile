@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Sparkles } from "lucide-react-native";
+import { InfinityIcon } from "lucide-react-native";
 import type { StudioHint as StudioHintData } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
@@ -31,7 +31,7 @@ export function StudioHint({
       style={{ borderLeftColor: alpha(c.accent, 0.35) }}
     >
       <View className="flex-row items-center gap-1.5">
-        <Sparkles size={11} color={c.accent} />
+        <InfinityIcon size={11} color={c.accent} />
         <Text className="font-sans-medium text-xs" style={{ color: c.accent }}>
           {hint.label}
         </Text>

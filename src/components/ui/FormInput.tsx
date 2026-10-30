@@ -1,29 +1,30 @@
 import { forwardRef } from "react";
 import { TextInput, type TextInputProps } from "react-native";
+
+import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 /**
- * Themed text input for modal forms. Wraps RN TextInput with the surface/border
- * styling and theme-resolved text + placeholder colors (className can't express
- * the placeholder color or reliable text color over theme vars).
+ * Input temático de formulario: 48 px de alto (52 en auth), radio 10, fondo
+ * `surface` y borde `border` — **nunca** fondo `border`, que se leía como un
+ * botón deshabilitado.
  */
-export const FormInput = forwardRef<TextInput, TextInputProps>(
-  ({ multiline, style, ...props }, ref) => {
+export const FormInput = forwardRef<TextInput, TextInputProps & { auth?: boolean }>(
+  ({ multiline, style, auth = false, ...props }, ref) => {
     const c = useThemeColors();
     return (
       <TextInput
         ref={ref}
         multiline={multiline}
-        placeholderTextColor={c.textMuted}
-        // No `text-base`: its lineHeight (24) clips descenders (g/p/y) in an iOS
-        // TextInput. fontSize via style with no lineHeight + padding for height.
-        className={
-          "rounded-lg border border-border bg-surface px-3 py-3 " +
-          (multiline ? "min-h-20" : "")
-        }
+        placeholderTextColor={c.text5}
+        // Sin `text-base`: su lineHeight (24) corta los descendentes (g/p/y) en
+        // un TextInput de iOS. fontSize por style, sin lineHeight.
+        className="rounded-lg border border-border bg-surface px-3.5"
         style={[
           { color: c.text, fontSize: 16 },
-          multiline ? { textAlignVertical: "top" } : null,
+          multiline
+            ? { minHeight: 96, paddingVertical: 12, textAlignVertical: "top" }
+            : { height: auth ? SIZE.inputAuth : SIZE.input },
           style,
         ]}
         {...props}

@@ -32,13 +32,21 @@ export type AssistantToolUseBlock = {
 export type AssistantBlock = AssistantTextBlock | AssistantToolUseBlock;
 
 export type ChatMessage =
-  | { id: string; role: "user"; text: string }
+  | {
+      id: string;
+      role: "user";
+      text: string;
+      /** Epoch ms. Solo en mensajes creados en esta sesión; el historial no la trae. */
+      createdAt?: number;
+    }
   | {
       id: string;
       role: "assistant";
       blocks: AssistantBlock[];
       /** `canned` only: what Studio would do with this answer. Not stored. */
       hint?: StudioHint;
+      /** Epoch ms. Solo en mensajes creados en esta sesión ("Loop · 2:36"). */
+      createdAt?: number;
     };
 
 export type AssistantState = {
@@ -149,7 +157,8 @@ export function useAssistant() {
       const trimmed = content.trim();
       if (!trimmed) return;
 
-      const userId = `local-${Date.now()}`;
+      const now = Date.now();
+      const userId = `local-${now}`;
       usedToolRef.current = false;
       setState((s) => ({
         ...s,
@@ -158,8 +167,8 @@ export function useAssistant() {
         connectionCut: false,
         messages: [
           ...s.messages,
-          { id: userId, role: "user", text: trimmed },
-          { id: `${userId}-pending`, role: "assistant", blocks: [] },
+          { id: userId, role: "user", text: trimmed, createdAt: now },
+          { id: `${userId}-pending`, role: "assistant", blocks: [], createdAt: now },
         ],
       }));
 
@@ -328,15 +337,16 @@ export function useAssistant() {
   const runCanned = useCallback(
     async (actionId: string, label: string, query = "") => {
       if (state.streaming) return;
-      const localId = `local-${Date.now()}`;
+      const now = Date.now();
+      const localId = `local-${now}`;
       setState((s) => ({
         ...s,
         streaming: true,
         error: null,
         messages: [
           ...s.messages,
-          { id: localId, role: "user", text: label },
-          { id: `${localId}-pending`, role: "assistant", blocks: [] },
+          { id: localId, role: "user", text: label, createdAt: now },
+          { id: `${localId}-pending`, role: "assistant", blocks: [], createdAt: now },
         ],
       }));
 

@@ -1,404 +1,153 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { ChevronDown, ChevronUp, Repeat } from "lucide-react-native";
-import type { Category, Project, Task } from "@/lib/types";
-import {
-  alpha,
-  categoryChipColors,
-  type ThemeColors,
-} from "@/theme/useThemeColors";
-import {
-  blockMinutes,
-  hoursRange,
-  rollupByProject,
-  timeToMinutes,
-  type DayLoad,
-  type RoutineItem,
-} from "@/lib/calendar";
-import {
-  LoadBar,
-  ProjectChip,
-  RoutineChip,
-  TaskChip,
-  type CalendarHandlers,
-} from "./parts";
+import { useTranslation } from "react-i18next";
 
-const HOUR_PX = 52;
-const GUTTER = 48;
-const MIN_BLOCK = 28;
-// Above this many all-day items, collapse the tail behind a "Show more" toggle
-// so a day full of untimed work doesn't push the timed grid off-screen.
-const ALL_DAY_COLLAPSED = 4;
+import { hoursRange, layoutOverlaps, type DayLoad } from "@/lib/calendar";
+import type { ThemeColors } from "@/theme/useThemeColors";
+import { CalendarItemRow, type CalendarEntry } from "./CalendarItemRow";
+import { NowLine } from "./NowLine";
+import { HOUR_PX, TimedBlock } from "./TimedBlock";
+import { AddToDayButton, CalendarCintillo, DayLoadBar, type CalendarHandlers } from "./parts";
+import { clock, type TimedEntry } from "./entries";
 
+const GUTTER = 52;
+/** Más de esto en "All day": se ven 5 y una fila "+N more". */
+const ALL_DAY_MAX = 6;
+
+/** Vista Día: carga, ítems sin hora como filas, cuadrícula horaria y "Add to …". */
 export function DayGrid({
-  iso,
-  todayISO,
-  locale,
-  dayTasks,
-  dayRoutines,
+  allDay,
+  timed,
+  isToday,
+  nowMinutes,
+  dayName,
   load,
-  projectsById,
-  categoryById,
-  showTasks,
   showLoad,
-  colors,
+  locale,
+  colors: c,
   handlers,
-  allDayLabel,
-  withTimeLabel,
-  moreLabel,
-  lessLabel,
-  nowLabel,
-  emptyLabel,
+  onAdd,
 }: {
-  iso: string;
-  todayISO: string;
-  locale: string;
-  dayTasks: Task[];
-  dayRoutines: RoutineItem[];
+  allDay: CalendarEntry[];
+  timed: TimedEntry[];
+  isToday: boolean;
+  nowMinutes: number;
+  /** "Thursday": nombre del día para "Add to Thursday". */
+  dayName: string;
   load: DayLoad;
-  projectsById: Map<string, Project>;
-  categoryById: Record<string, Category>;
-  showTasks: boolean;
   showLoad: boolean;
+  locale: string;
   colors: ThemeColors;
   handlers: CalendarHandlers;
-  allDayLabel: string;
-  withTimeLabel: string;
-  moreLabel: (count: number) => string;
-  lessLabel: string;
-  nowLabel: string;
-  emptyLabel: string;
+  onAdd: () => void;
 }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
-  const timedTasks = dayTasks.filter((t) => t.dueTime);
-  const untimedTasks = dayTasks.filter((t) => !t.dueTime);
-  const timedRoutines = dayRoutines.filter((r) => r.routine.timeOfDay);
-  const untimedRoutines = dayRoutines.filter((r) => !r.routine.timeOfDay);
-
-  const starts = [
-    ...timedTasks.map((t) => timeToMinutes(t.dueTime) ?? 0),
-    ...timedRoutines.map((r) => timeToMinutes(r.routine.timeOfDay) ?? 0),
-  ];
-  const [startHour, endHour] = hoursRange(starts);
+  const [startHour, endHour] = hoursRange(timed.map((b) => b.start));
   const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
-  const gridHeight = (endHour - startHour) * HOUR_PX;
-  const topFor = (minutes: number) => (minutes / 60 - startHour) * HOUR_PX;
+  const topFor = (min: number) => (min / 60 - startHour) * HOUR_PX;
+  const cols = layoutOverlaps(timed.map((b) => ({ key: b.key, start: b.start, end: b.start + b.minutes })));
+  const showNow = isToday && nowMinutes >= startHour * 60 && nowMinutes <= endHour * 60;
 
-  const untimedRollups = rollupByProject(untimedTasks, projectsById);
+  const collapsed = allDay.length > ALL_DAY_MAX && !expanded;
+  const visible = collapsed ? allDay.slice(0, 5) : allDay;
 
-  // Flatten every untimed entry (project rollup, standalone task, or routine)
-  // into a single readable list — a full-width row per item instead of the old
-  // wrap-of-tiny-chips where only a color and a count were legible.
-  const allDayItems: { key: string; node: ReactNode }[] = [];
-  untimedRollups.forEach((r, i) => {
-    if (showTasks || !r.project) {
-      r.tasks.forEach((tk) => {
-        allDayItems.push({
-          key: tk.id,
-          node: (
-            <TaskChip
-              task={tk}
-              colors={colors}
-              onOpenTask={handlers.onOpenTask}
-              onToggleTask={handlers.onToggleTask}
-            />
-          ),
-        });
-      });
-    } else {
-      allDayItems.push({
-        key: r.project?.id ?? `none-${i}`,
-        node: (
-          <ProjectChip
-            rollup={r}
-            categoryById={categoryById}
-            colors={colors}
-            onOpenProject={handlers.onOpenProject}
-          />
-        ),
-      });
-    }
-  });
-  untimedRoutines.forEach((item) => {
-    allDayItems.push({
-      key: `${item.routine.id}-${item.scheduledDate}`,
-      node: (
-        <RoutineChip
-          item={item}
-          colors={colors}
-          onOpen={handlers.onOpenRoutine}
-        />
-      ),
-    });
-  });
+  const openTimed = (b: TimedEntry) => {
+    if (b.task) handlers.onOpenTask(b.task.id);
+    else if (b.routineId) handlers.onOpenRoutine(b.routineId);
+  };
 
-  const hasOverflow = allDayItems.length > ALL_DAY_COLLAPSED;
-  const visibleItems =
-    hasOverflow && !expanded
-      ? allDayItems.slice(0, ALL_DAY_COLLAPSED)
-      : allDayItems;
-  const hiddenCount = allDayItems.length - visibleItems.length;
+  const addButton = <AddToDayButton label={t("views.calendar.addTo", { day: dayName })} colors={c} onPress={onAdd} />;
 
-  const timedCount = timedTasks.length + timedRoutines.length;
-
-  const isToday = iso === todayISO;
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const showNow =
-    isToday && nowMinutes >= startHour * 60 && nowMinutes <= endHour * 60;
-
-  const sectionHeader = (label: string, count: number) => (
-    <Text
-      className="px-0.5 text-xs font-sans-medium"
-      style={{ color: colors.textMuted }}
-    >
-      {label} · {count}
-    </Text>
-  );
+  if (allDay.length === 0 && timed.length === 0) {
+    return (
+      <View style={{ borderTopWidth: 3, borderTopColor: c.accent, paddingTop: 14, gap: 16 }}>
+        <Text className="font-display" style={{ fontSize: 20, lineHeight: 24, color: c.text }}>
+          {t("views.calendar.nothingOn", { day: dayName })}
+        </Text>
+        {addButton}
+      </View>
+    );
+  }
 
   return (
-    <View className="gap-4">
-      {showLoad && (
-        <View className="flex-row items-center gap-2">
-          <Text className="font-sans text-xs" style={{ color: colors.textMuted }}>
-            ≈ {load.hours}h
-          </Text>
-          <View className="flex-1">
-            <LoadBar load={load} colors={colors} />
-          </View>
-        </View>
-      )}
+    <View style={{ gap: 8 }}>
+      {showLoad ? (
+        <DayLoadBar load={load} colors={c} label={t(`views.calendar.loadLevel.${load.level}`)} />
+      ) : null}
 
-      {/* All-day section — a readable vertical list, not a chip strip */}
-      {allDayItems.length > 0 && (
-        <View className="gap-1.5">
-          {sectionHeader(allDayLabel, allDayItems.length)}
-          <View className="gap-1.5">
-            {visibleItems.map((it) => (
-              <View key={it.key}>{it.node}</View>
-            ))}
-          </View>
-          {hasOverflow && (
+      {allDay.length > 0 ? (
+        <View>
+          <CalendarCintillo label={t("views.calendar.allDay")} count={allDay.length} colors={c} />
+          {visible.map((e, i) => (
+            <CalendarItemRow key={e.key} entry={e} handlers={handlers} last={!collapsed && i === visible.length - 1} />
+          ))}
+          {collapsed ? (
             <Pressable
-              onPress={() => setExpanded((v) => !v)}
-              className="flex-row items-center gap-1 self-start px-1 py-1"
-              hitSlop={6}
+              onPress={() => setExpanded(true)}
+              accessibilityRole="button"
+              className="justify-center active:opacity-60"
+              style={{ minHeight: 44 }}
             >
-              {expanded ? (
-                <ChevronUp size={14} color={colors.accent} />
-              ) : (
-                <ChevronDown size={14} color={colors.accent} />
-              )}
-              <Text className="font-sans text-xs" style={{ color: colors.accent }}>
-                {expanded ? lessLabel : moreLabel(hiddenCount)}
+              <Text className="font-sans-medium" style={{ fontSize: 14, color: c.accent }}>
+                {t("views.calendar.moreCount", { count: allDay.length - 5 })}
               </Text>
             </Pressable>
-          )}
+          ) : null}
         </View>
-      )}
+      ) : null}
 
-      {/* Timed section — the hourly grid only exists when something has a time */}
-      {timedCount > 0 && (
-        <View className="gap-1.5">
-          {sectionHeader(withTimeLabel, timedCount)}
-          <View
-            className="overflow-hidden rounded-xl border"
-            style={{ borderColor: colors.border, backgroundColor: colors.surface }}
-          >
-            <View style={{ height: gridHeight }}>
-              {hours.map((h, idx) => (
-                <View
-                  key={h}
-                  className="flex-row"
-                  style={{
-                    height: HOUR_PX,
-                    borderTopWidth: idx === 0 ? 0 : 1,
-                    borderTopColor: colors.border,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: GUTTER,
-                      borderRightWidth: 1,
-                      borderRightColor: colors.border,
-                    }}
-                  >
-                    <Text
-                      className="font-sans px-1 pt-0.5"
-                      style={{ color: colors.textMuted, fontSize: 10 }}
-                    >
-                      {new Date(2000, 0, 1, h).toLocaleTimeString(locale, {
-                        hour: "numeric",
-                      })}
-                    </Text>
-                  </View>
-                  <View className="flex-1" />
-                </View>
-              ))}
-
-              {/* events overlay */}
+      {timed.length > 0 ? (
+        <View style={{ marginTop: allDay.length > 0 ? 16 : 0 }}>
+          <CalendarCintillo label={t("views.calendar.withTime")} count={timed.length} colors={c} />
+          <View style={{ height: hours.length * HOUR_PX }}>
+            {hours.map((h, i) => (
               <View
-                style={{ position: "absolute", left: GUTTER, right: 0, top: 0, height: gridHeight }}
+                key={h}
+                className="flex-row"
+                style={{ height: HOUR_PX, borderTopWidth: 1, borderTopColor: i === 0 ? c.line[22] : c.line[10] }}
               >
-                {timedTasks.map((t) => {
-                  const start = timeToMinutes(t.dueTime) ?? 0;
-                  const project = t.projectId
-                    ? projectsById.get(t.projectId) ?? null
-                    : null;
-                  const cat = project?.categoryId
-                    ? categoryById[project.categoryId]
-                    : undefined;
-                  const cc = cat
-                    ? categoryChipColors(cat.color, colors)
-                    : {
-                        bg: colors.line[8],
-                        text: colors.text3,
-                        border: colors.line[22],
-                        dot: colors.line[34],
-                      };
-                  const h = Math.max(
-                    MIN_BLOCK,
-                    (blockMinutes(t.durationMinutes, t.effortHours) / 60) * HOUR_PX
-                  );
-                  return (
-                    <Pressable
-                      key={t.id}
-                      onPress={() => handlers.onOpenTask(t.id)}
-                      style={{
-                        position: "absolute",
-                        top: topFor(start),
-                        height: h,
-                        left: 6,
-                        right: 8,
-                        backgroundColor: cc.bg,
-                        borderColor: cc.border,
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        paddingHorizontal: 6,
-                        paddingVertical: 3,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Text
-                        numberOfLines={1}
-                        className="text-xs font-sans-medium"
-                        style={{ color: cc.text }}
-                      >
-                        {t.title}
-                      </Text>
-                      {project && (
-                        <Text className="font-sans"
-                          numberOfLines={1}
-                          style={{ color: cc.text, opacity: 0.7, fontSize: 10 }}
-                        >
-                          {project.name}
-                        </Text>
-                      )}
-                    </Pressable>
-                  );
-                })}
-                {timedRoutines.map((item) => {
-                  const start = timeToMinutes(item.routine.timeOfDay) ?? 0;
-                  const h = Math.max(
-                    MIN_BLOCK,
-                    (blockMinutes(
-                      item.routine.durationMinutes,
-                      item.routine.effortHours
-                    ) /
-                      60) *
-                      HOUR_PX
-                  );
-                  return (
-                    <Pressable
-                      key={`${item.routine.id}-${item.scheduledDate}`}
-                      onPress={() => handlers.onOpenRoutine(item.routine.id)}
-                      style={{
-                        position: "absolute",
-                        top: topFor(start),
-                        height: h,
-                        left: 6,
-                        right: 8,
-                        backgroundColor: alpha(colors.accent, 0.14),
-                        borderColor: alpha(colors.accent, 0.3),
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        paddingHorizontal: 6,
-                        paddingVertical: 3,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                        overflow: "hidden",
-                        opacity: item.completed ? 0.55 : 1,
-                      }}
-                    >
-                      <Repeat size={11} color={colors.accent} />
-                      <Text
-                        numberOfLines={1}
-                        className="font-sans flex-1 text-xs"
-                        style={{
-                          color: colors.accent,
-                          textDecorationLine: item.completed ? "line-through" : "none",
-                        }}
-                      >
-                        {item.routine.title}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-
-                {showNow && (
-                  <View
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      right: 0,
-                      top: topFor(nowMinutes),
-                      height: 0,
-                      borderTopWidth: 2,
-                      borderTopColor: colors.accent,
-                    }}
+                <View style={{ width: GUTTER, borderRightWidth: 1, borderRightColor: c.line[14], paddingTop: 4 }}>
+                  <Text
+                    className="font-sans-semibold uppercase"
+                    style={{ fontSize: 12, letterSpacing: 0.6, color: c.text3, fontVariant: ["tabular-nums"] }}
                   >
-                    <View
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        top: -4,
-                        width: 8,
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: colors.accent,
-                      }}
-                    />
-                    <Text className="font-sans"
-                      style={{
-                        position: "absolute",
-                        left: 12,
-                        top: -7,
-                        fontSize: 10,
-                        color: colors.accent,
-                        backgroundColor: colors.surface,
-                        paddingHorizontal: 3,
-                      }}
-                    >
-                      {nowLabel}
-                    </Text>
-                  </View>
-                )}
+                    {new Date(2000, 0, 1, h).toLocaleTimeString(locale, { hour: "numeric" })}
+                  </Text>
+                </View>
               </View>
+            ))}
+            {/* Un solo View absoluto para todos los bloques. */}
+            <View style={{ position: "absolute", left: GUTTER, right: 0, top: 0, bottom: 0 }}>
+              {timed.map((b) => {
+                const pos = cols.get(b.key) ?? { col: 0, cols: 1 };
+                return (
+                  <TimedBlock
+                    key={b.key}
+                    entry={b}
+                    top={topFor(b.start) + 2}
+                    left={`${(pos.col / pos.cols) * 100}%`}
+                    width={`${100 / pos.cols}%`}
+                    colors={c}
+                    onPress={openTimed}
+                  />
+                );
+              })}
             </View>
+            {showNow ? (
+              <NowLine
+                top={topFor(nowMinutes)}
+                gutter={GUTTER}
+                label={`${t("views.calendar.now")} ${clock(nowMinutes, locale)}`}
+                colors={c}
+              />
+            ) : null}
           </View>
         </View>
-      )}
+      ) : null}
 
-      {allDayItems.length === 0 && timedCount === 0 && (
-        <Text
-          className="font-sans px-1 py-2 text-xs italic"
-          style={{ color: colors.textMuted }}
-        >
-          {emptyLabel}
-        </Text>
-      )}
+      <View style={{ marginTop: 16 }}>{addButton}</View>
     </View>
   );
 }

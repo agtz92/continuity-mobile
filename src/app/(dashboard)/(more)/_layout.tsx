@@ -9,40 +9,47 @@ export default function MoreLayout() {
   const { effective } = useTheme();
   const s = THEME_SURFACES[effective];
 
-  const headered = headerOptionsFor(s);
+  // Atrás dice adónde lleva: casi todo vuelve a "More". Las pantallas `bare`
+  // abren con su propio titular, así que la cabecera no repite el título.
+  const more = t("tabs.more");
+  const headered = headerOptionsFor(s, { backLabel: more });
+  const bare = headerOptionsFor(s, { backLabel: more, bare: true });
 
   return (
     <Stack initialRouteName="more">
       <Stack.Screen name="more" options={{ headerShown: false }} />
       <Stack.Screen
         name="calendar"
-        options={{ ...headered, title: t("tabs.calendar") }}
+        options={{ ...bare, title: t("tabs.calendar") }}
       />
-      <Stack.Screen name="ideas" options={{ ...headered, title: t("tabs.ideas") }} />
+      <Stack.Screen name="ideas" options={{ ...bare, title: t("tabs.ideas") }} />
       <Stack.Screen
         name="plans"
         options={{ ...headered, title: t("plans.title") }}
       />
       <Stack.Screen
         name="quick-notes"
-        options={{ ...headered, title: t("tabs.notes") }}
+        options={{ ...bare, title: t("tabs.notes") }}
       />
       <Stack.Screen
         name="quick-note"
-        options={{ ...headered, title: t("views.quickNotes.noteTitle") }}
+        options={{
+          ...headerOptionsFor(s, { backLabel: t("tabs.notes"), bare: true }),
+          title: t("views.quickNotes.noteTitle"),
+        }}
       />
-      <Stack.Screen name="log" options={{ ...headered, title: t("tabs.log") }} />
+      <Stack.Screen name="log" options={{ ...bare, title: t("tabs.log") }} />
       <Stack.Screen
         name="graveyard"
-        options={{ ...headered, title: t("views.graveyard.title") }}
+        options={{ ...bare, title: t("views.graveyard.title") }}
       />
       <Stack.Screen
         name="analytics"
-        options={{ ...headered, title: t("tabs.analytics") }}
+        options={{ ...bare, title: t("tabs.analytics") }}
       />
       <Stack.Screen
         name="appearance"
-        options={{ ...headered, title: t("settings.appearance.title") }}
+        options={{ ...bare, title: t("settings.appearance.title") }}
       />
       <Stack.Screen
         name="profile"
@@ -62,7 +69,7 @@ export default function MoreLayout() {
       />
       <Stack.Screen
         name="google-tasks"
-        options={{ ...headered, title: t("settings.plugins.googleTasks.title") }}
+        options={{ ...headerOptionsFor(s, { backLabel: t("settings.nav.plugins") }), title: t("settings.plugins.googleTasks.title") }}
       />
       <Stack.Screen
         name="report-bug"

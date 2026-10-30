@@ -35,7 +35,9 @@
       "google": "Continuar con Google",
       "forgot": "¿Olvidaste tu contraseña?",
       "noAccount": "¿No tienes cuenta?",
-      "signUpLink": "Regístrate"
+      "signUpLink": "Regístrate",
+      "headline": "Retoma donde lo dejaste.",
+      "forgotShort": "¿La olvidaste?"
     },
     "signup": {
       "title": "Crea tu cuenta",
@@ -49,7 +51,8 @@
       "signUp": "Crear cuenta",
       "haveAccount": "¿Ya tienes cuenta?",
       "signInLink": "Inicia sesión",
-      "checkEmail": "Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión."
+      "checkEmail": "Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.",
+      "headline": "Empieza un loop."
     },
     "reset": {
       "title": "Restablece tu contraseña",
@@ -58,7 +61,49 @@
       "emailPlaceholder": "tu@ejemplo.com",
       "send": "Enviar enlace",
       "sent": "Si ese correo tiene cuenta, el enlace va en camino.",
-      "backToLogin": "Volver a iniciar sesión"
+      "backToLogin": "Volver a iniciar sesión",
+      "headline": "¿La olvidaste?\nPasa.",
+      "lede": "Dinos tu correo y te mandamos un enlace. Ábrelo en este teléfono para elegir una contraseña nueva.",
+      "afterTitle": "Después de enviar",
+      "afterBody": "Revisa spam si no llega nada en unos minutos. El enlace sirve una sola vez, y solo en el teléfono desde donde lo pediste."
+    },
+    "newPassword": {
+      "headline": "Elige una nueva.",
+      "lede": "Al menos 8 caracteres. Tu sesión queda iniciada en este teléfono.",
+      "password": "Contraseña nueva",
+      "confirm": "Repítela",
+      "save": "Guardar contraseña",
+      "saved": "Contraseña actualizada. Ya estás dentro.",
+      "verifying": "Revisando tu enlace…",
+      "errorTooShort": "Usa al menos 8 caracteres.",
+      "errorMismatch": "Las dos contraseñas no coinciden.",
+      "requestNew": "Mándame otro enlace",
+      "retry": "Reintentar",
+      "failure": {
+        "network": {
+          "title": "No pudimos conectarnos.",
+          "body": "Tu enlace sigue sirviendo. Revisa que tengas señal o Wi-Fi y vuelve a intentarlo."
+        },
+        "otherDevice": {
+          "title": "Abre el enlace en este teléfono.",
+          "body": "Por seguridad, el enlace solo funciona en el teléfono desde donde lo pediste. Pide uno nuevo aquí y abre el correo en este mismo teléfono."
+        },
+        "expired": {
+          "title": "Este enlace ya venció.",
+          "body": "Los enlaces para restablecer duran una hora y sirven una sola vez. Pide uno nuevo y úsalo enseguida."
+        },
+        "unknown": {
+          "title": "Ese enlace no funcionó.",
+          "body": "Pide un enlace nuevo desde este teléfono y abre el correo más reciente."
+        }
+      },
+      "errorSame": "Esa es tu contraseña actual. Elige una distinta.",
+      "errorWeak": "Esa contraseña es muy fácil de adivinar. Prueba con una más larga.",
+      "errorSave": "No pudimos guardar tu contraseña. Revisa tu conexión y vuelve a intentarlo."
+    },
+    "password": {
+      "show": "Mostrar contraseña",
+      "hide": "Ocultar contraseña"
     },
     "divider": "o",
     "errors": {
@@ -103,7 +148,8 @@
       "uncapped": "Sin límite",
       "upgrade": "Mejorar plan",
       "dailyMessages": "Mensajes hoy",
-      "monthlyTokens": "Tokens este mes"
+      "monthlyTokens": "Tokens este mes",
+      "left": "{count, plural, one {# mensaje restante hoy} other {# mensajes restantes hoy}}"
     },
     "errors": {
       "stopped": "Detenido",
@@ -413,7 +459,10 @@
       "heading": "Bienvenido, builder.",
       "sub": "Esto toma 90 segundos. Empecemos por cómo se ve.",
       "mode": "Modo",
-      "palette": "Paleta"
+      "palette": "Paleta",
+      "preview": "Vista previa",
+      "previewProject": "Tu primer proyecto",
+      "previewMeta": "Activo · tocado hoy"
     },
     "name": {
       "heading": "¿Cómo te llamo?",
@@ -557,7 +606,10 @@
       "replayHeading": "Volver a ver",
       "replayHint": "Repite cualquiera cuando quieras. No pierdes nada de lo que ya configuraste.",
       "replayTourHint": "Diez pasos por la app, sección por sección.",
-      "replaySetupHint": "Tema, nombre, avatar y plan — el setup inicial."
+      "replaySetupHint": "Tema, nombre, avatar y plan — el setup inicial.",
+      "headline": "Apariencia",
+      "vocabAccent": "Acento",
+      "vocabFixed": "Señal · Cerrado · Tinta"
     },
     "billing": {
       "title": "Facturación y plan",
@@ -831,9 +883,28 @@
       "90d": "90d",
       "1y": "1a",
       "all": "Todo"
+    },
+    "rangeButton": "Rango",
+    "rangeLong": {
+      "7d": "Últimos 7 días",
+      "30d": "Últimos 30 días",
+      "90d": "Últimos 90 días",
+      "1y": "Últimos 12 meses",
+      "all": "Todo el tiempo"
+    },
+    "figures": {
+      "tasksDone": "Tareas hechas",
+      "mostTouched": "Más trabajados"
     }
   },
   "views": {
+    "more": {
+      "messagesLeft": "{count, plural, one {Queda # mensaje} other {Quedan # mensajes}}",
+      "calendarMeta": "{today} hoy · {hours} esta semana",
+      "logToday": "{count} hoy",
+      "on": "Activadas",
+      "off": "Apagadas"
+    },
     "calendar": {
       "viewDay": "Día",
       "viewWeek": "Semana",
@@ -843,13 +914,37 @@
       "load": "Carga",
       "allDay": "Todo el día",
       "withTime": "Con hora",
-      "allDayMore": "Ver {count} más",
-      "allDayLess": "Ver menos",
       "openDay": "Abrir día",
-      "activities": "{count, plural, one {# actividad} other {# actividades}}",
       "now": "ahora",
-      "dash": "—",
-      "empty": "Nada agendado aquí"
+      "late": "tarde",
+      "completeTask": "Completar {title}",
+      "editRoutine": "Editar rutina {title}",
+      "taskCount": "{count, plural, one {# tarea} other {# tareas}}",
+      "tasksCount": "{count, plural, one {# tarea} other {# tareas}}",
+      "routinesCount": "{count, plural, one {# rutina} other {# rutinas}}",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "filters": "Filtros",
+      "nothingScheduled": "Nada agendado",
+      "loadLevel": {
+        "calm": "Ligero",
+        "busy": "Ocupado",
+        "over": "Saturado"
+      },
+      "legend": {
+        "over": "Más de 8h",
+        "busy": "Ocupado",
+        "bar": "Barra = un ítem, color de su categoría"
+      },
+      "addTo": "Agregar al {day}",
+      "nothingOn": "Nada el {day}.",
+      "overloadedDays": "{count, plural, one {# día saturado} other {# días saturados}}",
+      "itemsCount": "{count, plural, one {# ítem} other {# ítems}}",
+      "hoursOfCap": "≈ {hours} de {cap}",
+      "moreCount": "+ {count} más",
+      "routineLabel": "Rutina",
+      "doneAt": "Hecha {time}",
+      "done": "Hecha"
     },
     "today": {
       "greeting": {
@@ -857,6 +952,7 @@
         "afternoon": "Buenas tardes",
         "evening": "Buenas noches"
       },
+      "sectionCount": "{count, plural, one {# proyecto} other {# proyectos}}",
       "counters": {
         "active": "Activos",
         "launched": "Lanzados",
@@ -1003,6 +1099,11 @@
       "completed": "Completadas",
       "filterCta": "Filtrar",
       "newAria": "Nueva tarea",
+      "headline": {
+        "open": "{count, plural, =0 {Nada pendiente.} one {# abierta.} other {# abiertas.}}",
+        "overdue": "{count, plural, one {# vencida.} other {# vencidas.}}",
+        "dueToday": "{count} para hoy."
+      },
       "range": {
         "today": "Hoy",
         "week": "Semana",
@@ -1032,12 +1133,19 @@
       "later": "Más adelante",
       "archived": "Archivadas",
       "newAria": "Nueva rutina",
+      "headline": {
+        "dueToday": "{count, plural, =0 {Nada para hoy.} other {# para hoy.}}",
+        "late": "{count, plural, one {# va tarde.} other {# van tarde.}}"
+      },
       "emptyBody": "Una rutina es el trabajo que no termina nunca: la revisión semanal, la caminata diaria. No va en una lista de tareas, porque tacharla no es el objetivo.",
       "emptyRule": "Lo que se repite es lo que de verdad cambia las cosas"
     },
     "projects": {
       "title": "Todos los proyectos",
       "search": "Buscar por nombre, descripción, categoría...",
+      "searchShort": "Buscar",
+      "headline": "{count, plural, one {# proyecto.} other {# proyectos.}}",
+      "headlineBlocked": "{count, plural, one {# bloqueado.} other {# bloqueados.}}",
       "empty": "Todavía no has empezado nada",
       "addFirst": "Agrega tu primer proyecto",
       "noMatchSearch": "No hay proyectos que coincidan con \"{query}\"",
@@ -1140,7 +1248,14 @@
       "noMatch": "No hay ideas que coincidan con \"{query}\"",
       "promote": "Promover a proyecto",
       "emptyBody": "Una idea es un proyecto al que todavía no te comprometes. Guárdala aquí para que deje de ocuparte la cabeza, y prométela cuando se gane un primer paso.",
-      "emptyRule": "Las ideas no caducan — solo se van callando"
+      "emptyRule": "Las ideas no caducan — solo se van callando",
+      "headline": "{count, plural, one {# idea.} other {# ideas.}}",
+      "olderHeadline": "{count, plural, one {# con más de un mes.} other {# con más de un mes.}}",
+      "promoteShort": "Promover",
+      "ageMeta": "Idea · {days} d",
+      "ideaLabel": "Idea",
+      "moreActions": "Más acciones para {title}",
+      "deleteConfirm": "¿Borrar «{title}»?"
     },
     "quickNotes": {
       "title": "Quick Notes",
@@ -1187,7 +1302,16 @@
         "loose": "Sueltas",
         "pinned": "Fijadas"
       },
-      "emptyBody": "Un sitio para lo que no cabe en una tarea: la decisión, la referencia, eso que alguien te dijo una vez y vas a necesitar dentro de un mes."
+      "emptyBody": "Un sitio para lo que no cabe en una tarea: la decisión, la referencia, eso que alguien te dijo una vez y vas a necesitar dentro de un mes.",
+      "headline": "{count, plural, one {# nota.} other {# notas.}}",
+      "pinnedHeadline": "{count, plural, one {# fijada.} other {# fijadas.}}",
+      "recent": "Recientes",
+      "ageDays": "{days} d",
+      "unpin": "Desfijar nota",
+      "noteMenu": "Acciones de la nota",
+      "sectionMenu": "Acciones de {title}",
+      "editText": "Editar texto",
+      "addSectionShort": "Agregar sección"
     },
     "log": {
       "title": "Bitácora",
@@ -1203,6 +1327,7 @@
         "achievements": "Logros",
         "notes": "Notas",
         "changes": "Cambios",
+        "done": "Hecho",
         "deleted": "Eliminados"
       },
       "buckets": {
@@ -1250,9 +1375,21 @@
       "ai": "IA",
       "revive": "Revivir",
       "askLoop": "Pídele a Loop que profundice",
-      "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué mato mis proyectos?"
+      "askLoopPrompt": "Analiza mi cementerio: ¿qué patrón hay en por qué mato mis proyectos?",
+      "headline": "{count, plural, one {# enterrado.} other {# enterrados.}}",
+      "restartHeadline": "{count, plural, one {# lo reiniciarías.} other {# los reiniciarías.}}",
+      "patternAcross": "{count, plural, one {Patrón en # muerte} other {Patrón en # muertes}}",
+      "askLoopShort": "Pregúntale a Loop",
+      "killedOn": "matado el {date}",
+      "loopReflection": "Reflexión de Loop"
     },
     "projectDetail": {
+      "daysIdle": "{count, plural, one {día sin tocar} other {días sin tocar}}",
+      "continueHere": "Seguir aquí",
+      "continueHint": "Convierte el siguiente paso en una tarea para hoy",
+      "update": "Avance",
+      "tasksMeta": "{open} abiertas · {done} hechas",
+      "deleteProject": "Eliminar proyecto",
       "statusAction": {
         "launch": "Lanzar",
         "pause": "Pausar",
@@ -1342,9 +1479,7 @@
     "completedToast": "✓ Tarea completada",
     "overdueDays": "Vencida · {count, plural, one {# día} other {# días}}",
     "todayBadge": "Hoy",
-    "moveToToday": "Mover a hoy",
-    "reschedule": "Reprogramar",
-    "movedToast": "✓ Movida a hoy"
+    "reschedule": "Reprogramar"
   },
   "routineRow": {
     "markDone": "Marcar como hecha",
@@ -1389,7 +1524,9 @@
     "todayHoursLabel": "+{hours}h hoy",
     "totalHoursTooltip": "Horas totales invertidas en tareas completadas",
     "totalHoursLabel": "{hours}h en total",
-    "daysAgo": "hace {days}d"
+    "daysAgo": "hace {days}d",
+    "touchedToday": "hoy",
+    "hoursShort": "{hours}h"
   },
   "notes": {
     "newNote": "Nueva nota",
@@ -1424,7 +1561,12 @@
       "deleteConfirm": "¿Eliminar este proyecto?",
       "deleteConfirmBody": "Se borran también sus tareas y notas. Esta acción no se puede deshacer.",
       "killInstead": "Matar",
-      "killInsteadNote": "¿Y si mejor lo matas? Matar un proyecto (en vez de eliminarlo) ayuda a generar estadísticas de por qué matas tus proyectos."
+      "killInsteadNote": "¿Y si mejor lo matas? Matar un proyecto (en vez de eliminarlo) ayuda a generar estadísticas de por qué matas tus proyectos.",
+      "namePlaceholder": "¿Qué vas a empezar?",
+      "statusHint": "Pausar o matar se hace después, desde la píldora de estado en la página del proyecto: un proyecto no empieza pausado ni muerto.",
+      "more": "Más",
+      "createCta": "Crear proyecto",
+      "saveCta": "Guardar proyecto"
     },
     "task": {
       "newTitle": "Nueva tarea",
@@ -1447,6 +1589,15 @@
       "searchTaskPlaceholder": "Buscar tarea…",
       "noBlockerTasks": "No hay otras tareas para seleccionar",
       "unknownTask": "Tarea desconocida",
+      "save": "Guardar tarea",
+      "pickDate": "Elegir fecha",
+      "daysLate": "{count, plural, one {# día tarde} other {# días tarde}}",
+      "effortHours": "{count, plural, one {# hora} other {# horas}}",
+      "effortMinutes": "{count, plural, one {# minuto} other {# minutos}}",
+      "effortCustom": "Otra cantidad",
+      "addTaskBlocker": "Otra tarea",
+      "addExternalBlocker": "Alguien / algo",
+      "removeBlocker": "Quitar bloqueo",
       "chips": {
         "today": "Hoy",
         "tomorrow": "Mañana",
@@ -1499,7 +1650,15 @@
       "errorStartDate": "Elige una fecha.",
       "errorWeekdays": "Selecciona al menos un día.",
       "errorIntervalN": "El intervalo debe ser un número ≥ 1.",
-      "errorMonthlyDay": "El día del mes debe estar entre 1 y 31."
+      "errorMonthlyDay": "El día del mes debe estar entre 1 y 31.",
+      "save": "Guardar rutina",
+      "never": "Nunca",
+      "segment": {
+        "once": "Una vez",
+        "weekly": "Semanal",
+        "everyN": "Cada N",
+        "monthly": "Mensual"
+      }
     },
     "update": {
       "newTitle": "Registrar update",

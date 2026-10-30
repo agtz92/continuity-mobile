@@ -67,7 +67,7 @@ Dev build y TestFlight comparten bundle id → solo una instalada a la vez.
 con el peso de la tinta (`text3`/`text5`) o con la rampa de reglas.
 
 - **No inventes colores.** Nada de hex ni `rgb()` literales fuera de `src/theme/` y
-  `src/palette/`. La única excepción viva es `src/components/analytics/panels.tsx`, que conserva su
+  `src/palette/`. La única excepción viva es `src/components/analytics/panels.tsx` (los paneles de esa carpeta importan de ahí), que conserva su
   juego propio porque ahí el color **identifica una serie** (decisión del dueño).
 - **Metadato ≠ señal.** Horas, recurrencia, fechas, contadores: `<Meta>` con tinta apagada, no una
   pastilla de color. Un "2h" no duele.
@@ -81,7 +81,7 @@ con el peso de la tinta (`text3`/`text5`) o con la rampa de reglas.
 - **Sombras:** solo `lift("drag"|"float", c)` de `src/theme/lift.ts`. Lo demás se separa con filete.
 - **Radios:** tres — `rounded-md` (6, control), `rounded-lg` (10, fila), `rounded-xl` (14, hoja),
   más `rounded-full` para lo que sí es circular. `rounded` a secas son 4px de Tailwind: no se usa.
-- Primitivos en `src/components/ui/`: `Meta`, `Figure`, `ScreenTitle`, `Spine`, `Hatch`,
+- Primitivos en `src/components/ui/` (más los del rediseño Breathe, ver CLAUDE.md): `Meta`, `Figure`, `ScreenTitle`, `Spine`, `Hatch`,
   `BlockerBadge`, `CategoryTag`, `ProgressTicks`, `CoolingRule`, `EmptyState`.
 
 ## Tokens: no diverjas de web

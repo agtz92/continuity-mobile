@@ -3,7 +3,7 @@ import { Text } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { closeModal } from "@/lib/closeModal";
 import { useTranslation } from "react-i18next";
-import { ModalScaffold } from "@/components/ui/ModalScaffold";
+import { FormScaffold } from "@/components/ui/FormScaffold";
 import { Field } from "@/components/ui/Field";
 import { FormInput } from "@/components/ui/FormInput";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -39,7 +39,7 @@ export default function IdeaForm() {
   };
 
   return (
-    <ModalScaffold
+    <FormScaffold
       title={existing ? t("modals.idea.editTitle") : t("modals.idea.newTitle")}
       onSave={handleSave}
       saveLabel={existing ? undefined : t("modals.idea.captureCta")}
@@ -63,6 +63,6 @@ export default function IdeaForm() {
       <Field label={t("modals.idea.notes")}>
         <FormInput value={description} onChangeText={setDescription} multiline />
       </Field>
-    </ModalScaffold>
+    </FormScaffold>
   );
 }

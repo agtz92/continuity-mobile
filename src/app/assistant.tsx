@@ -14,11 +14,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
   AlertCircle,
+  ArrowUp,
   CloudOff,
-  Plus,
-  Send,
-  Sparkles,
+  InfinityIcon,
   Square,
+  SquarePen,
   X,
 } from "lucide-react-native";
 import { useAssistant } from "@/hooks/useAssistant";
@@ -30,6 +30,8 @@ import { ActionMenu } from "@/components/assistant/ActionMenu";
 import { AssistantLocked } from "@/components/assistant/AssistantLocked";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { useOnline } from "@/lib/network";
+import { IconAction } from "@/components/ui/IconAction";
+import { SIZE } from "@/theme/tokens";
 
 const MAX_INPUT_CHARS = 4000;
 
@@ -74,6 +76,10 @@ export default function AssistantScreen() {
   // Loop siempre necesita red: sin ella se ve el historial, pero no se envía.
   const online = useOnline();
   const canSend = !streaming && online && trimmed.length > 0;
+  // "N messages left today" solo cuando hay tope diario (modo llm).
+  const cap = usage?.daily_message_cap;
+  const messagesLeft =
+    isChat && usage && cap != null ? Math.max(0, cap - usage.messages_sent_today) : null;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -93,56 +99,61 @@ export default function AssistantScreen() {
           tappable. We pad explicitly instead of relying on the SafeAreaView top
           edge because the modal's own host view reported a 0 inset on iOS. */}
       <View
-        style={{ paddingTop: insets.top + 8 }}
-        className="flex-row items-center gap-2 border-b border-border px-4 pb-3"
+        style={{ paddingTop: insets.top + 6, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: c.line[14] }}
+        className="flex-row items-center pl-4 pr-2"
       >
         <View
-          className="h-8 w-8 items-center justify-center rounded-full"
-          style={{ backgroundColor: c.accent }}
+          className="items-center justify-center rounded-full"
+          style={{ width: 36, height: 36, backgroundColor: c.accent }}
         >
-          <Sparkles size={16} color={c.bg} />
+          <InfinityIcon size={18} color={c.bg} />
         </View>
-        <View className="min-w-0 flex-1">
-          <View className="flex-row items-center gap-2">
+        <View className="min-w-0 flex-1" style={{ marginLeft: 12 }}>
+          <View className="flex-row items-center" style={{ gap: 8 }}>
             <Text
-              className="font-display text-text"
-              style={{ fontSize: 18, lineHeight: 20, letterSpacing: -0.4 }}
+              accessibilityRole="header"
+              className="font-display"
+              style={{ fontSize: 20, lineHeight: 24, letterSpacing: -0.4, color: c.text }}
             >
               {t("assistant.title")}
             </Text>
             <PlanBadge plan={plan} />
           </View>
-          <Meta tone="faint" numberOfLines={1}>
-            {t(`assistant.subtitleFor.${mode ?? "none"}`)}
-          </Meta>
+          {/* Con tope diario (modo llm), la meta dice cuántos quedan, en
+              signal. Sin tope, el subtítulo del modo. */}
+          {messagesLeft != null ? (
+            <Meta variant="cintillo" tone="inherit" numberOfLines={1} style={{ color: c.signal }}>
+              {t("assistant.usage.left", { count: messagesLeft })}
+            </Meta>
+          ) : (
+            <Meta tone="faint" numberOfLines={1}>
+              {t(`assistant.subtitleFor.${mode ?? "none"}`)}
+            </Meta>
+          )}
         </View>
-        <Pressable
-          onPress={newConversation}
-          disabled={streaming || isEmpty}
-          accessibilityRole="button"
-          accessibilityLabel={t("assistant.newChat")}
-          hitSlop={8}
-          className="rounded-lg border border-border p-2"
-          style={streaming || isEmpty ? { opacity: 0.4 } : undefined}
-        >
-          <Plus size={18} color={c.text} />
-        </Pressable>
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel={t("assistant.close")}
-          hitSlop={8}
-          className="rounded-lg border border-border p-2"
-        >
-          <X size={18} color={c.text} />
-        </Pressable>
+        <View className="flex-row" style={{ gap: 8 }}>
+          <IconAction
+            icon={SquarePen}
+            label={t("assistant.newChat")}
+            onPress={newConversation}
+            disabled={streaming || isEmpty}
+            tone="text"
+          />
+          <IconAction
+            icon={X}
+            label={t("assistant.close")}
+            onPress={() => router.back()}
+            tone="text"
+            iconSize={22}
+          />
+        </View>
       </View>
 
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Only the llm tier has a budget to meter. */}
+        {/* Barra de uso de 3 px: solo el tier llm tiene cupo que medir. */}
         {isChat && <UsageMeter usage={usage} />}
 
         {isLocked ? (
@@ -205,38 +216,56 @@ export default function AssistantScreen() {
 
         {/* Input row — chat tier only; `canned` composes with ActionMenu. */}
         {isChat && (
-        <View className="flex-row items-end gap-2 border-t border-border px-4 py-3">
-          <TextInput
-            value={input}
-            onChangeText={(v) => setInput(v.slice(0, MAX_INPUT_CHARS))}
-            placeholder={t("assistant.inputPlaceholder")}
-            placeholderTextColor={c.textMuted}
-            multiline
-            className="max-h-32 flex-1 rounded-xl border border-border bg-surface px-4 py-2.5 text-text"
-          />
-          {streaming ? (
-            <Pressable
-              onPress={stop}
-              accessibilityRole="button"
-              accessibilityLabel={t("assistant.stop")}
-              className="h-11 w-11 items-center justify-center rounded-full"
-              style={{ backgroundColor: alpha(c.text, 0.12) }}
-            >
-              <Square size={18} color={c.text} fill={c.text} />
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={handleSend}
-              disabled={!canSend}
-              accessibilityRole="button"
-              accessibilityLabel={t("assistant.send")}
-              className="h-11 w-11 items-center justify-center rounded-full"
-              style={{ backgroundColor: canSend ? c.accent : c.border }}
-            >
-              <Send size={18} color={canSend ? c.bg : c.textMuted} />
-            </Pressable>
-          )}
-        </View>
+          <View
+            className="flex-row items-end px-4"
+            style={{ gap: 10, paddingVertical: 10, borderTopWidth: 1, borderTopColor: c.line[14] }}
+          >
+            <TextInput
+              value={input}
+              onChangeText={(v) => setInput(v.slice(0, MAX_INPUT_CHARS))}
+              placeholder={t("assistant.inputPlaceholder")}
+              placeholderTextColor={c.text5}
+              accessibilityLabel={t("assistant.inputPlaceholder")}
+              multiline
+              className="flex-1 rounded-lg border border-border bg-surface"
+              style={{
+                minHeight: SIZE.input,
+                maxHeight: 128,
+                paddingHorizontal: 14,
+                paddingTop: 13,
+                paddingBottom: 13,
+                fontSize: 16,
+                color: c.text,
+              }}
+            />
+            {streaming ? (
+              <Pressable
+                onPress={stop}
+                accessibilityRole="button"
+                accessibilityLabel={t("assistant.stop")}
+                className="items-center justify-center rounded-full active:opacity-70"
+                style={{ width: SIZE.input, height: SIZE.input, backgroundColor: alpha(c.text, 0.12) }}
+              >
+                <Square size={18} color={c.text} fill={c.text} />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={handleSend}
+                disabled={!canSend}
+                accessibilityRole="button"
+                accessibilityLabel={t("assistant.send")}
+                accessibilityState={{ disabled: !canSend }}
+                className="items-center justify-center rounded-full active:opacity-70"
+                style={{
+                  width: SIZE.input,
+                  height: SIZE.input,
+                  backgroundColor: canSend ? c.accent : c.line[14],
+                }}
+              >
+                <ArrowUp size={22} color={canSend ? c.bg : c.text3} />
+              </Pressable>
+            )}
+          </View>
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -1,116 +1,127 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Gauge,
-  ListChecks,
-} from "lucide-react-native";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useTaskMutations } from "@/hooks/useTaskMutations";
-import { alpha, useThemeColors } from "@/theme/useThemeColors";
-import { todayLocalISODate, toLocalISO } from "@/lib/date";
-import {
-  addDaysISO,
-  dayLoad,
-  isSameMonth,
-  monthMatrix,
-  routineItemsByDay,
-  tasksByDay,
-  weekDays,
-  type CalendarView,
-} from "@/lib/calendar";
-import { confirmCompleted } from "@/lib/feedback";
-import { isDailyViewStatus } from "@/lib/projectStatus";
-import type { CalendarHandlers } from "@/components/calendar/parts";
-import { WeekAgenda } from "@/components/calendar/WeekAgenda";
-import { MonthGrid } from "@/components/calendar/MonthGrid";
-import { DayGrid } from "@/components/calendar/DayGrid";
-import { ListSkeleton } from "@/components/ui/Skeletons";
-import { SelectedDayAgenda } from "@/components/calendar/SelectedDayAgenda";
 
+import { ListSkeleton } from "@/components/ui/Skeletons";
+import { CalendarFilters } from "@/components/calendar/CalendarFilters";
+import { CalendarHeader } from "@/components/calendar/CalendarHeader";
+import { DayGrid } from "@/components/calendar/DayGrid";
+import { MonthView } from "@/components/calendar/MonthView";
+import { itemsMeta, periodLabel } from "@/components/calendar/labels";
+import { WeekAgenda } from "@/components/calendar/WeekAgenda";
+import { projectColor, type CalendarHandlers } from "@/components/calendar/parts";
+import { formatHours } from "@/components/calendar/summary";
+import { useCalendarData } from "@/hooks/useCalendarData";
+import { useTaskMutations } from "@/hooks/useTaskMutations";
+import { addDaysISO, isSameMonth, type CalendarView } from "@/lib/calendar";
+import { todayLocalISODate, toLocalISO } from "@/lib/date";
+import { confirmCompleted } from "@/lib/feedback";
+import { SIZE } from "@/theme/tokens";
+import { useThemeColors } from "@/theme/useThemeColors";
+
+const minutesNow = () => {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+};
+
+/** Calendario: cabecera fija (periodo, flechas, vista) y debajo Día, Semana o Mes. */
 export default function Calendar() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const c = useThemeColors();
   const router = useRouter();
-  const locale = i18n.language || "en";
+  const navigation = useNavigation();
   const todayISO = todayLocalISODate();
-
-  const { projects, tasks, routines, routineOccurrences, categoryById, initialLoading, refetch } =
-    useDashboardData();
-  const { toggleTask } = useTaskMutations();
 
   const [view, setView] = useState<CalendarView>("week");
   const [refISO, setRefISO] = useState(todayISO);
-  // Day highlighted in the Month grid; its agenda renders under the matrix.
   const [selectedISO, setSelectedISO] = useState(todayISO);
-  const [showTasks, setShowTasks] = useState(false);
+  const [showTasks, setShowTasks] = useState(true);
   const [showLoad, setShowLoad] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  // Un solo intervalo para la línea "ahora", no uno por bloque.
+  const [nowMinutes, setNowMinutes] = useState(minutesNow);
+  useEffect(() => {
+    const id = setInterval(() => setNowMinutes(minutesNow()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await refetch();
-    } finally {
-      setRefreshing(false);
-    }
-  };
+  // El día que se ve en detalle: el de la vista Día o el seleccionado en el Mes.
+  const focusISO = view === "month" ? selectedISO : refISO;
+  const {
+    projects,
+    categoryById,
+    initialLoading,
+    refetch,
+    locale,
+    refDate,
+    days,
+    weeks,
+    projectsById,
+    tByDay,
+    rByDay,
+    summary,
+    barsByDay,
+    levelByDay,
+    overloaded,
+    focus,
+    focusLoad,
+  } = useCalendarData({ view, refISO, focusISO, showTasks });
+  const { toggleTask } = useTaskMutations();
 
-  const refDate = useMemo(() => new Date(refISO + "T00:00:00"), [refISO]);
+  const goToday = useCallback(() => {
+    setRefISO(todayISO);
+    setSelectedISO(todayISO);
+  }, [todayISO]);
 
-  const { fromISO, toISO, days, weeks } = useMemo(() => {
-    if (view === "day") {
-      return { fromISO: refISO, toISO: refISO, days: [refISO], weeks: [] as string[][] };
-    }
-    if (view === "week") {
-      const d = weekDays(refDate);
-      return { fromISO: d[0], toISO: d[6], days: d, weeks: [] as string[][] };
-    }
-    const w = monthMatrix(refDate);
-    return { fromISO: w[0][0], toISO: w[w.length - 1][6], days: [] as string[], weeks: w };
-  }, [view, refISO, refDate]);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={goToday}
+          accessibilityRole="button"
+          className="justify-center active:opacity-60"
+          style={{ minHeight: SIZE.hit, paddingHorizontal: 8 }}
+        >
+          <Text className="font-sans-semibold" style={{ fontSize: 15, color: c.accent }}>
+            {t("views.calendar.today")}
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation, t, c.accent, goToday]);
 
-  const projectsById = useMemo(
-    () => new Map(projects.map((p) => [p.id, p])),
-    [projects]
+  const dayName = new Date(focusISO + "T00:00:00").toLocaleDateString(locale, { weekday: "long" });
+
+  const handlers: CalendarHandlers = useMemo(
+    () => ({
+      onOpenProject: (id) => router.push({ pathname: "/project/[id]", params: { id } }),
+      onOpenTask: (id) => router.push({ pathname: "/task-form", params: { id } }),
+      onToggleTask: async (task) => {
+        const wasDone = task.done;
+        await toggleTask(task);
+        if (!wasDone) confirmCompleted(t("taskRow.completedToast"));
+      },
+      // Las rutinas no se completan desde el calendario: tocar abre su edición.
+      onOpenRoutine: (id) => router.push({ pathname: "/routine-form", params: { id } }),
+    }),
+    [router, toggleTask, t],
   );
-  // Mirror Today/Tasks: tasks of a closed project (paused/stalled/killed/
-  // archived) are withdrawn from the calendar; standalone tasks and tasks of a
-  // live project stay. Keeps the calendar in sync with the other task views.
-  const visibleTasks = useMemo(
-    () =>
-      tasks.filter((task) => {
-        if (!task.projectId) return true;
-        const parent = projectsById.get(task.projectId);
-        return parent ? isDailyViewStatus(parent.status) : true;
-      }),
-    [tasks, projectsById]
-  );
 
-  const tByDay = useMemo(
-    () => tasksByDay(visibleTasks, fromISO, toISO),
-    [visibleTasks, fromISO, toISO]
+  const openDay = useCallback((iso: string) => {
+    setRefISO(iso);
+    setView("day");
+  }, []);
+  // Primer toque selecciona; tocar el seleccionado entra al día. Lee la
+  // selección por ref para que el callback sea estable y las celdas memo no
+  // se vuelvan a pintar todas al cambiarla.
+  const selectedRef = useRef(selectedISO);
+  selectedRef.current = selectedISO;
+  const onPickDay = useCallback(
+    (iso: string) => (iso === selectedRef.current ? openDay(iso) : setSelectedISO(iso)),
+    [openDay],
   );
-  const rByDay = useMemo(
-    () => routineItemsByDay(routines, routineOccurrences, fromISO, toISO),
-    [routines, routineOccurrences, fromISO, toISO]
-  );
-
-  const handlers: CalendarHandlers = {
-    onOpenProject: (id) => router.push({ pathname: "/project/[id]", params: { id } }),
-    onOpenTask: (id) => router.push({ pathname: "/task-form", params: { id } }),
-    onToggleTask: async (task) => {
-      const wasDone = task.done;
-      await toggleTask(task);
-      if (!wasDone) confirmCompleted(t("taskRow.completedToast"));
-    },
-    // Routines aren't completable from the calendar — tapping opens edit.
-    onOpenRoutine: (id) =>
-      router.push({ pathname: "/routine-form", params: { id } }),
-  };
 
   const shift = (dir: number) => {
     if (view === "day") setRefISO(addDaysISO(refISO, dir));
@@ -119,78 +130,29 @@ export default function Calendar() {
       const d = new Date(refDate);
       d.setMonth(d.getMonth() + dir);
       setRefISO(toLocalISO(d));
-      // Keep the month selection meaningful: today when visible, else the 1st.
-      setSelectedISO(
-        isSameMonth(todayISO, d)
-          ? todayISO
-          : toLocalISO(new Date(d.getFullYear(), d.getMonth(), 1))
-      );
+      setSelectedISO(isSameMonth(todayISO, d) ? todayISO : toLocalISO(new Date(d.getFullYear(), d.getMonth(), 1)));
     }
   };
 
-  const goToday = () => {
-    setRefISO(todayISO);
-    setSelectedISO(todayISO);
-  };
+  const period = periodLabel(view, refDate, days, locale);
+  const counts = [
+    t("views.calendar.tasksCount", { count: summary.tasks }),
+    t("views.calendar.routinesCount", { count: summary.routines }),
+  ].join(" · ");
+  const meta =
+    view === "day" ? (
+      itemsMeta(t, focus.agenda.length, focusLoad.hours, true)
+    ) : view === "month" ? (
+      <>
+        {counts}
+        {showLoad && overloaded > 0 ? (
+          <Text style={{ color: c.signal }}>{` · ${t("views.calendar.overloadedDays", { count: overloaded })}`}</Text>
+        ) : null}
+      </>
+    ) : (
+      [counts, summary.hours > 0 ? formatHours(summary.hours) : null].filter(Boolean).join(" · ")
+    );
 
-  const periodLabel = useMemo(() => {
-    if (view === "day") {
-      return refDate.toLocaleDateString(locale, {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      });
-    }
-    if (view === "week") {
-      const a = new Date(days[0] + "T00:00:00");
-      const b = new Date(days[6] + "T00:00:00");
-      const fmt = (d: Date) =>
-        d.toLocaleDateString(locale, { day: "numeric", month: "short" });
-      return `${fmt(a)} – ${fmt(b)}`;
-    }
-    return refDate.toLocaleDateString(locale, { month: "long", year: "numeric" });
-  }, [view, refDate, days, locale]);
-
-  const hasAny = tByDay.size > 0 || rByDay.size > 0;
-
-  const seg = (mode: CalendarView, label: string) => (
-    <Pressable
-      key={mode}
-      onPress={() => setView(mode)}
-      className="px-3 py-1.5"
-      style={{ backgroundColor: view === mode ? c.accent : "transparent" }}
-    >
-      <Text
-        className="text-xs font-sans-medium"
-        style={{ color: view === mode ? c.bg : c.textMuted }}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-
-  const toggle = (
-    active: boolean,
-    onPress: () => void,
-    icon: ReactNode,
-    label: string
-  ) => (
-    <Pressable
-      onPress={onPress}
-      className="flex-row items-center gap-1 rounded-full border px-2.5 py-1.5"
-      style={{
-        backgroundColor: active ? alpha(c.accent, 0.16) : c.surface,
-        borderColor: active ? alpha(c.accent, 0.35) : c.border,
-      }}
-    >
-      {icon}
-      <Text className="font-sans text-xs" style={{ color: active ? c.accent : c.textMuted }}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-
-  // First load: spinner instead of flashing the "nothing scheduled" empty state.
   if (initialLoading) {
     return (
       <View className="flex-1 bg-bg pt-4">
@@ -201,87 +163,34 @@ export default function Calendar() {
 
   return (
     <View className="flex-1 bg-bg">
-      <View className="gap-2 px-4 pb-2 pt-3">
-        <View className="flex-row items-center justify-between">
-          <View
-            className="flex-row overflow-hidden rounded-lg border"
-            style={{ borderColor: c.border }}
-          >
-            {seg("day", t("views.calendar.viewDay"))}
-            {seg("week", t("views.calendar.viewWeek"))}
-            {seg("month", t("views.calendar.viewMonth"))}
-          </View>
-          <View className="flex-row items-center gap-1.5">
-            {toggle(
-              showTasks,
-              () => setShowTasks((v) => !v),
-              <ListChecks size={13} color={showTasks ? c.accent : c.textMuted} />,
-              t("views.calendar.showTasks")
-            )}
-            {toggle(
-              showLoad,
-              () => setShowLoad((v) => !v),
-              <Gauge size={13} color={showLoad ? c.accent : c.textMuted} />,
-              t("views.calendar.load")
-            )}
-          </View>
-        </View>
-        <View className="flex-row items-center gap-2">
-          <Pressable
-            onPress={() => shift(-1)}
-            hitSlop={6}
-            className="rounded-md border p-1.5"
-            style={{ borderColor: c.border }}
-          >
-            <ChevronLeft size={16} color={c.textMuted} />
-          </Pressable>
-          <Pressable
-            onPress={() => shift(1)}
-            hitSlop={6}
-            className="rounded-md border p-1.5"
-            style={{ borderColor: c.border }}
-          >
-            <ChevronRight size={16} color={c.textMuted} />
-          </Pressable>
-          <Pressable
-            onPress={goToday}
-            className="rounded-md border px-3 py-1.5"
-            style={{ borderColor: c.border }}
-          >
-            <Text className="font-sans text-xs" style={{ color: c.textMuted }}>
-              {t("views.calendar.today")}
-            </Text>
-          </Pressable>
-          <Text
-            className="flex-1 text-sm font-sans-medium capitalize"
-            style={{ color: c.text }}
-            numberOfLines={1}
-          >
-            {periodLabel}
-          </Text>
-        </View>
-      </View>
-
+      <CalendarHeader
+        period={period}
+        meta={meta}
+        view={view}
+        onChangeView={setView}
+        onPrev={() => shift(-1)}
+        onNext={() => shift(1)}
+        onOpenFilters={() => setFiltersOpen(true)}
+        filtersActive={!showTasks || !showLoad}
+      />
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingTop: 4, paddingBottom: 96 }}
+        contentContainerStyle={{ paddingHorizontal: SIZE.gutter, paddingTop: 12, paddingBottom: 96 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh}
+            onRefresh={async () => {
+              setRefreshing(true);
+              try {
+                await refetch();
+              } finally {
+                setRefreshing(false);
+              }
+            }}
             tintColor={c.accent}
           />
         }
       >
-        {!hasAny ? (
-          <View
-            className="items-center rounded-xl border py-12"
-            style={{ borderColor: c.border, backgroundColor: c.surface }}
-          >
-            <Text className="font-sans text-sm italic" style={{ color: c.textMuted }}>
-              {t("views.calendar.empty")}
-            </Text>
-          </View>
-        ) : view === "week" ? (
+        {view === "week" ? (
           <WeekAgenda
             days={days}
             todayISO={todayISO}
@@ -294,81 +203,50 @@ export default function Calendar() {
             showLoad={showLoad}
             colors={c}
             handlers={handlers}
-            emptyLabel={t("views.calendar.dash")}
+            emptyLabel={t("views.calendar.nothingScheduled")}
           />
         ) : view === "month" ? (
-          <View>
-            <MonthGrid
-              weeks={weeks}
-              refDate={refDate}
-              todayISO={todayISO}
-              selectedISO={selectedISO}
-              weekdayLabels={(weeks[0] ?? []).map((iso) =>
-                new Date(iso + "T00:00:00").toLocaleDateString(locale, {
-                  weekday: "short",
-                })
-              )}
-              tasksByDay={tByDay}
-              routinesByDay={rByDay}
-              projectsById={projectsById}
-              categoryById={categoryById}
-              showTasks={showTasks}
-              showLoad={showLoad}
-              colors={c}
-              onPickDay={(iso) => {
-                // First tap selects; tapping the selected day drills in.
-                if (iso === selectedISO) {
-                  setRefISO(iso);
-                  setView("day");
-                } else {
-                  setSelectedISO(iso);
-                }
-              }}
-            />
-            <SelectedDayAgenda
-              iso={selectedISO}
-              locale={locale}
-              dayTasks={tByDay.get(selectedISO) ?? []}
-              dayRoutines={rByDay.get(selectedISO) ?? []}
-              projectsById={projectsById}
-              categoryById={categoryById}
-              showTasks={showTasks}
-              colors={c}
-              handlers={handlers}
-              openDayLabel={t("views.calendar.openDay")}
-              activitiesLabel={(count) =>
-                t("views.calendar.activities", { count })
-              }
-              emptyLabel={t("views.calendar.empty")}
-              onOpenDay={(iso) => {
-                setRefISO(iso);
-                setView("day");
-              }}
-            />
-          </View>
-        ) : (
-          <DayGrid
-            iso={refISO}
+          <MonthView
+            weeks={weeks}
+            refDate={refDate}
             todayISO={todayISO}
+            selectedISO={selectedISO}
             locale={locale}
-            dayTasks={tByDay.get(refISO) ?? []}
-            dayRoutines={rByDay.get(refISO) ?? []}
-            load={dayLoad(tByDay.get(refISO) ?? [], rByDay.get(refISO) ?? [])}
-            projectsById={projectsById}
-            categoryById={categoryById}
-            showTasks={showTasks}
-            showLoad={showLoad}
+            barsByDay={barsByDay}
+            levelByDay={showLoad ? levelByDay : null}
+            sampleBar={projectColor(projects.find((p) => p.categoryId) ?? null, categoryById, c)}
+            agenda={focus.agenda}
+            agendaMeta={focus.agenda.length > 0 ? itemsMeta(t, focus.agenda.length, focusLoad.hours, false) : ""}
             colors={c}
             handlers={handlers}
-            allDayLabel={t("views.calendar.allDay")}
-            withTimeLabel={t("views.calendar.withTime")}
-            moreLabel={(count) => t("views.calendar.allDayMore", { count })}
-            lessLabel={t("views.calendar.allDayLess")}
-            nowLabel={t("views.calendar.now")}
-            emptyLabel={t("views.calendar.dash")}
+            onPickDay={onPickDay}
+            onOpenDay={() => openDay(selectedISO)}
+          />
+        ) : (
+          <DayGrid
+            allDay={focus.allDay}
+            timed={focus.timed}
+            isToday={refISO === todayISO}
+            nowMinutes={nowMinutes}
+            dayName={dayName}
+            load={focusLoad}
+            showLoad={showLoad}
+            locale={locale}
+            colors={c}
+            handlers={handlers}
+            onAdd={() => router.push({ pathname: "/task-form", params: { due: refISO } })}
           />
         )}
       </ScrollView>
+
+      <CalendarFilters
+        visible={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        showTasks={showTasks}
+        onToggleTasks={() => setShowTasks((v) => !v)}
+        showLoad={showLoad}
+        onToggleLoad={() => setShowLoad((v) => !v)}
+      />
     </View>
   );
 }

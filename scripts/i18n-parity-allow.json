@@ -13,7 +13,6 @@
   "settings.billing.freeBlurb": "regla 10: sin venta in-app hasta que exista el paywall",
   "settings.billing.exemptBlurb": "móvil menciona Stripe explícitamente",
   "settings.billing.storeManagedBlurb": "en móvil la suscripción se administra desde la tienda",
-  "settings.billing.checkoutSuccess": "móvil menciona Stripe explícitamente",
   "views.tasks.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
   "views.routines.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",
   "views.projects.empty": "rol distinto: en móvil `empty` es el título del EmptyState (cuerpo en emptyBody); en web es el cuerpo (título en emptyTitle)",

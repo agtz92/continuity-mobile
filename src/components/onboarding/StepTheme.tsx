@@ -1,20 +1,18 @@
-import { View, Text } from "react-native";
+import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
-import { SUPPORTED_THEMES, THEME_LABEL_KEY } from "@/theme/config";
-import {
-  SUPPORTED_PALETTES,
-  PALETTE_LABEL_KEY,
-  accentsFor,
-} from "@/palette/config";
-import { PrimaryButton, Pill } from "./controls";
+import { useThemeColors } from "@/theme/useThemeColors";
+import { Meta } from "@/components/ui/Meta";
+import { PaletteSwatches, ThemeSwatches } from "./AppearancePickers";
+import { PrimaryButton, StepHeading, StepLabel, StepLayout } from "./controls";
 
 /**
- * Step 2 — theme mode + palette. Drives the live ThemeProvider directly so the
- * whole app previews the choice instantly (setTheme/setPalette persist locally
- * to AsyncStorage). The flow's onNext mirrors the final pick to the backend via
- * updateNotificationSettings. Swatches preview the accent pair for the active
- * effective theme, matching the web StepTheme.
+ * Paso 1 — tema + paleta. Drives the live ThemeProvider directly so the whole
+ * app previews the choice instantly (setTheme/setPalette persist locally to
+ * AsyncStorage). The flow's onNext mirrors the final pick to the backend via
+ * updateNotificationSettings. Las muestras son las mismas de Appearance
+ * (`AppearancePickers`), y la tarjeta "Preview" enseña una fila de proyecto
+ * con su espina en el acento elegido.
  */
 export function StepTheme({
   busy,
@@ -24,80 +22,57 @@ export function StepTheme({
   onNext: (v: { theme: string; palette: string }) => void;
 }) {
   const { t } = useTranslation();
-  const { theme, palette, effective, setTheme, setPalette } = useTheme();
+  const c = useThemeColors();
+  const { theme, palette, setTheme, setPalette } = useTheme();
 
   return (
-    <View className="gap-6">
-      <View className="gap-2">
-        <Text className="text-3xl font-sans-bold text-text">
-          {t("onboarding.theme.heading")}
-        </Text>
-        <Text className="font-sans text-base text-text-muted">
-          {t("onboarding.theme.sub")}
-        </Text>
+    <StepLayout
+      footer={
+        <PrimaryButton
+          label={t("onboarding.next")}
+          onPress={() => onNext({ theme, palette })}
+          busy={busy}
+        />
+      }
+    >
+      <StepHeading title={t("onboarding.theme.heading")} sub={t("onboarding.theme.sub")} />
+
+      <View style={{ gap: 10 }}>
+        <StepLabel>{t("onboarding.theme.mode")}</StepLabel>
+        <ThemeSwatches value={theme} onChange={setTheme} />
       </View>
 
-      <View className="gap-2">
-        <Text className="text-sm font-sans-medium text-text">
-          {t("onboarding.theme.mode")}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {SUPPORTED_THEMES.map((th) => (
-            <Pill
-              key={th}
-              label={t(`settings.appearance.${THEME_LABEL_KEY[th]}`)}
-              active={theme === th}
-              onPress={() => setTheme(th)}
-            />
-          ))}
+      <View style={{ gap: 10 }}>
+        <StepLabel>{t("onboarding.theme.palette")}</StepLabel>
+        <PaletteSwatches value={palette} onChange={setPalette} />
+      </View>
+
+      {/* Una sola tarjeta: la vista previa de una fila de proyecto. */}
+      <View
+        style={{
+          gap: 12,
+          padding: 16,
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: c.line[14],
+          backgroundColor: c.surface,
+        }}
+      >
+        <Meta variant="cintillo" tone="muted">
+          {t("onboarding.theme.preview")}
+        </Meta>
+        <View className="flex-row" style={{ gap: 12 }}>
+          <View style={{ width: 3, borderRadius: 2, backgroundColor: c.accent }} />
+          <View className="min-w-0 flex-1" style={{ gap: 4, paddingVertical: 2 }}>
+            <Text className="font-display" style={{ fontSize: 20, lineHeight: 24, color: c.text }}>
+              {t("onboarding.theme.previewProject")}
+            </Text>
+            <Meta variant="cintillo" tone="inherit" style={{ color: c.accent }}>
+              {t("onboarding.theme.previewMeta")}
+            </Meta>
+          </View>
         </View>
       </View>
-
-      <View className="gap-2">
-        <Text className="text-sm font-sans-medium text-text">
-          {t("onboarding.theme.palette")}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {SUPPORTED_PALETTES.map((pl) => {
-            const [a, a2] = accentsFor(pl, effective);
-            return (
-              <Pill
-                key={pl}
-                label={t(`settings.appearance.${PALETTE_LABEL_KEY[pl]}`)}
-                active={palette === pl}
-                onPress={() => setPalette(pl)}
-                leading={
-                  <View className="flex-row">
-                    <View
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 6,
-                        backgroundColor: a,
-                      }}
-                    />
-                    <View
-                      style={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: 6,
-                        marginLeft: -4,
-                        backgroundColor: a2,
-                      }}
-                    />
-                  </View>
-                }
-              />
-            );
-          })}
-        </View>
-      </View>
-
-      <PrimaryButton
-        label={t("onboarding.next")}
-        onPress={() => onNext({ theme, palette })}
-        busy={busy}
-      />
-    </View>
+    </StepLayout>
   );
 }

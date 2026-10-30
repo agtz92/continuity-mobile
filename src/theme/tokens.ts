@@ -149,3 +149,26 @@ export const THEME_SURFACES: Record<EffectiveMode, Surfaces> = {
  */
 export const LINE_STEPS = [4, 8, 10, 14, 18, 22, 34] as const;
 export type LineStep = (typeof LINE_STEPS)[number];
+
+/**
+ * Medidas del rediseño "Breathe". Las repiten todas las pantallas: blanco de
+ * toque mínimo, chips, inputs, filas. Viven aquí para que nadie escriba un 42
+ * suelto. Sin color: no hay espejo en web que mantener (check-parity solo
+ * compara hex).
+ */
+export const SIZE = {
+  /** Blanco de toque mínimo de cualquier botón-icono. */
+  hit: 44,
+  /** Chips de preset (fecha, esfuerzo, días). */
+  chip: 40,
+  /** Chips de filtro en versalitas. */
+  filterChip: 36,
+  input: 48,
+  inputAuth: 52,
+  /** Botón primario de formulario. */
+  button: 52,
+  /** Altura mínima de una fila de lista. */
+  row: 56,
+  sectionGap: 24,
+  gutter: 20,
+} as const;

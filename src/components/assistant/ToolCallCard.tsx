@@ -3,6 +3,7 @@ import { Platform, Pressable, Text, View } from "react-native";
 import { ChevronDown, ChevronRight, Wrench } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { AssistantToolUseBlock } from "@/hooks/useAssistant";
+import { SIZE } from "@/theme/tokens";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const MONO = Platform.OS === "ios" ? "Courier" : "monospace";
@@ -99,35 +100,42 @@ export function ToolCallCard({ block }: { block: AssistantToolUseBlock }) {
   const isLoading = block.output === undefined;
   const hasInput = Object.keys(block.input).length > 0;
 
+  // Fila con espina gris, no tarjeta: es un rastro de lo que Loop consultó,
+  // no contenido que compita con la respuesta.
   return (
     <View
-      className="my-2 overflow-hidden rounded-lg border border-border"
-      style={{ backgroundColor: alpha(c.surface, 0.4) }}
+      className="my-1"
+      style={{ borderLeftWidth: 3, borderLeftColor: c.line[22], paddingLeft: 12 }}
     >
       <Pressable
         onPress={() => setOpen((o) => !o)}
         accessibilityRole="button"
-        className="flex-row items-center gap-2 px-3 py-2"
+        accessibilityState={{ expanded: open }}
+        accessibilityLabel={`${name}, ${isLoading ? t("assistant.tools.running") : t("assistant.tools.done")}`}
+        className="flex-row items-center active:opacity-60"
+        style={{ minHeight: SIZE.hit, gap: 8 }}
       >
-        {open ? (
-          <ChevronDown size={12} color={c.textMuted} />
-        ) : (
-          <ChevronRight size={12} color={c.textMuted} />
-        )}
-        <Wrench size={12} color={c.textMuted} />
-        <Text className="text-xs font-sans-medium text-text-muted">{name}</Text>
+        <Wrench size={14} color={c.text3} />
+        <Text className="font-sans-medium flex-1" style={{ fontSize: 14, color: c.text2 }}>
+          {name}
+        </Text>
         <Text
-          className="font-sans ml-auto text-[10px]"
-          style={{ color: isLoading ? c.accent : c.textMuted }}
+          className="font-sans"
+          style={{ fontSize: 12, color: isLoading ? c.accent : c.text3 }}
         >
           {isLoading ? t("assistant.tools.running") : t("assistant.tools.done")}
         </Text>
+        {open ? (
+          <ChevronDown size={16} color={c.text3} />
+        ) : (
+          <ChevronRight size={16} color={c.text3} />
+        )}
       </Pressable>
 
       {open && (
         <View
-          className="border-t border-border px-3 py-2"
-          style={{ backgroundColor: alpha(c.bg, 0.4) }}
+          className="rounded-md px-3 py-2"
+          style={{ backgroundColor: alpha(c.surface, 0.6), marginBottom: 6 }}
         >
           {hasInput && (
             <View className="mb-2">
