@@ -236,4 +236,4 @@ Handoff de diseño aplicado a las 23 pantallas. Reglas que quedaron fijas:
 - **Pestañas**: etiqueta 11 px (600 en la activa) y regla superior de 2 px en `accent` (`TabButton` en `(dashboard)/_layout.tsx`).
 - **"Continue here"** en el detalle de proyecto crea una tarea desde el next step: `task-form` acepta `title` y `due: "today"` de prellenado (solo al crear).
 - **Reset de contraseña**: el enlace del correo abre `continuity://auth/reset` → `src/app/auth/reset.tsx` (canje PKCE + `updateUser`). La Redirect URL tiene que estar permitida en Supabase. `src/lib/passwordRecovery.ts` evita que el guard saque al usuario de la pantalla.
-- **Pruebas**: `npm test` (jest-expo + Testing Library; `jest.setup.js` mockea el tema con `global.__THEME__` para probar los tres). Cada primitiva verifica hit-area y `accessibilityLabel`. Código sin uso: `npm run knip` (línea base en `reports/knip-baseline.json`).
+- **Pruebas**: `npm test` (jest-expo + Testing Library; `jest.setup.js` mockea el tema con `global.__THEME__` para probar los tres). Cada primitiva verifica hit-area y `accessibilityLabel`. Código sin uso: `npm run deadcode` (línea base en `reports/knip-baseline.json`).
