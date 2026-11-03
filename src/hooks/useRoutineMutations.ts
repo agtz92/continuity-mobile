@@ -1,9 +1,12 @@
 import { useMutation } from "@apollo/client/react";
+import { refetchUnlessLive } from "@/lib/liveStatus";
 import { ARCHIVE_ROUTINE, DASHBOARD_QUERY, DELETE_ROUTINE } from "@/lib/graphql";
 import * as outbox from "@/lib/outbox";
 import type { IntervalUnit, RecurrenceType } from "@/lib/types";
 
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
+// Con el canal en vivo arriba, la señal de esta escritura ya relanza el
+// dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
+const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export interface RoutineFormInput {
   id?: string;

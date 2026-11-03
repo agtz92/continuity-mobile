@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
-import { RefreshControl, SectionList, View } from "react-native";
+import { ActivityIndicator, Pressable, RefreshControl, SectionList, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useApolloClient, useQuery } from "@apollo/client/react";
 
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FilterChips, type FilterChipItem } from "@/components/ui/FilterChips";
@@ -13,6 +14,7 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useNoteMutations } from "@/hooks/useNoteMutations";
 import { confirmAsync } from "@/lib/confirm";
 import { toLocalISO, todayLocalISODate, weekStartISO } from "@/lib/date";
+import { ACTIVITY_QUERY } from "@/lib/graphql";
 import type { Activity } from "@/lib/types";
 import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
@@ -20,12 +22,59 @@ import { useThemeColors } from "@/theme/useThemeColors";
 type BucketKey = "today" | "yesterday" | "thisWeek" | "thisMonth" | "older";
 const BUCKET_ORDER: BucketKey[] = ["today", "yesterday", "thisWeek", "thisMonth", "older"];
 
+// El dashboard solo trae 60 días de actividad (`DASHBOARD_ACTIVITY_DAYS`), así
+// que la bitácora pide la suya: la primera página con caché (sirve sin red) y
+// las anteriores bajo demanda. El servidor topa cada página en 500.
+const PAGE = 200;
+
+type Feed = { activity: Activity[] };
+
 export default function Log() {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const locale = i18n.language;
-  const { activities, projects, initialLoading, refetch } = useDashboardData();
+  const client = useApolloClient();
+  const { projects } = useDashboardData();
+  const { data, loading, refetch } = useQuery<Feed>(ACTIVITY_QUERY, {
+    variables: { limit: PAGE },
+    fetchPolicy: "cache-and-network",
+  });
   const { deleteNote } = useNoteMutations();
+
+  // Páginas viejas: historia, casi no cambia. Se quedan en estado local (un
+  // refetch de la primera página no las tira) y se quitan a mano al borrar.
+  const [older, setOlder] = useState<Activity[]>([]);
+  const [exhausted, setExhausted] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+
+  const activities = useMemo(() => {
+    const byId = new Map<string, Activity>();
+    for (const a of [...(data?.activity ?? []), ...older]) byId.set(a.id, a);
+    return [...byId.values()].sort((a, b) => b.created.localeCompare(a.created));
+  }, [data, older]);
+  const initialLoading = loading && !data;
+  const canLoadOlder = !exhausted && (data?.activity.length ?? 0) >= PAGE;
+
+  const loadOlder = useCallback(async () => {
+    const oldest = activities[activities.length - 1];
+    if (!oldest || loadingOlder) return;
+    setLoadingOlder(true);
+    try {
+      const res = await client.query<Feed>({
+        query: ACTIVITY_QUERY,
+        variables: { limit: PAGE, until: oldest.created },
+        fetchPolicy: "network-only",
+      });
+      // `until` es inclusivo: la frontera vuelve repetida y el Map la junta.
+      const page = res.data?.activity ?? [];
+      if (page.length < PAGE) setExhausted(true);
+      setOlder((prev) => [...prev, ...page]);
+    } catch {
+      /* sin red: el botón sigue ahí para reintentar */
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [activities, client, loadingOlder]);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<LogFilter>("all");
@@ -108,10 +157,13 @@ export default function Log() {
 
   const onDeleteNote = useCallback(
     async (id: string) => {
-      if (await confirmAsync(t("views.log.deleteConfirm"), undefined, t("common.delete"), t("common.cancel")))
-        void deleteNote(id);
+      if (await confirmAsync(t("views.log.deleteConfirm"), undefined, t("common.delete"), t("common.cancel"))) {
+        await deleteNote(id);
+        setOlder((prev) => prev.filter((a) => a.id !== id));
+        void refetch().catch(() => undefined);
+      }
     },
-    [deleteNote, t],
+    [deleteNote, refetch, t],
   );
 
   const chips = useMemo<FilterChipItem<LogFilter>[]>(
@@ -155,6 +207,24 @@ export default function Log() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} />
         }
         ListHeaderComponent={header}
+        ListFooterComponent={
+          canLoadOlder ? (
+            <Pressable
+              onPress={() => void loadOlder()}
+              disabled={loadingOlder}
+              accessibilityRole="button"
+              accessibilityLabel={t("views.log.loadOlder")}
+              className="mt-4 items-center justify-center rounded-lg border border-border"
+              style={{ minHeight: SIZE.hit }}
+            >
+              {loadingOlder ? (
+                <ActivityIndicator color={c.accent} />
+              ) : (
+                <Text className="text-sm font-sans-medium text-accent">{t("views.log.loadOlder")}</Text>
+              )}
+            </Pressable>
+          ) : null
+        }
         ListEmptyComponent={
           activities.length === 0 ? (
             <EmptyState title={t("views.log.empty")} body={t("views.log.emptyBody")} />

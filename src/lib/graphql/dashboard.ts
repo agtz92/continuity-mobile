@@ -15,9 +15,16 @@ export const ME_QUERY = gql`
 // Avisos in-app (banners) que el usuario ve; `i18nKind`/`i18nVarsJson` permiten
 // traducir el texto en cliente en lugar de mostrar el `body` del servidor.
 
+// `activityDays` recorta las actividades a los últimos 60 días (todas las notas
+// se quedan). Va fijo en el documento y no como variable: así la clave de caché
+// es la misma en cada `refetchQueries`, `updateQuery` de la outbox y lectura.
+// El Log trae su historial con `ACTIVITY_QUERY`. Requiere el backend con el
+// argumento desplegado; contra uno viejo la query falla por validación.
+export const DASHBOARD_ACTIVITY_DAYS = 60;
+
 export const DASHBOARD_QUERY = gql`
   query Dashboard {
-    dashboard {
+    dashboard(activityDays: ${DASHBOARD_ACTIVITY_DAYS}) {
       projects {
         id
         name

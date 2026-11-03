@@ -41,7 +41,9 @@ export default function DashboardLayout() {
   // `tabBarBadge` es de react-navigation v7 y NO choca con `animation:"shift"`
   // —uno anima la transición, el otro pinta encima del icono—, pero el tinte
   // sí hay que fijarlo: `tabBarBadgeStyle` no hereda `tabBarActiveTintColor`.
-  const { projects, tasks } = useDashboardData();
+  // Este es el único `owner` del dashboard: el que lo pide a la red al
+  // arrancar. El resto de la app lo lee de caché (ver `useDashboardData`).
+  const { projects, tasks } = useDashboardData({ owner: true });
   const blockedCount = useMemo(() => {
     const withBlocked = new Set(
       tasks.filter((tk) => !tk.done && taskIsBlocked(tk)).map((tk) => tk.projectId)

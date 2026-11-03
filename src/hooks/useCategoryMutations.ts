@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { refetchUnlessLive } from "@/lib/liveStatus";
 import {
   CREATE_CATEGORY,
   DASHBOARD_QUERY,
@@ -8,7 +9,9 @@ import {
 import { confirmAsync } from "@/lib/confirm";
 import type { Category } from "@/lib/types";
 
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
+// Con el canal en vivo arriba, la señal de esta escritura ya relanza el
+// dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
+const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useCategoryMutations() {
   const [createCategoryM] = useMutation(CREATE_CATEGORY, refetchAfter);

@@ -4,6 +4,7 @@ import { CombinedGraphQLErrors, ServerError } from "@apollo/client/errors";
 import { apolloCache, apolloClient } from "@/lib/apollo";
 import i18n from "@/lib/i18n";
 import { isOnline, onReconnect } from "@/lib/network";
+import { isLiveConnected } from "@/lib/liveStatus";
 import { toast } from "@/lib/toast";
 import { OPS, newId, type OpKind } from "./ops";
 import { quotaHit, quotaMessage } from "./quota";
@@ -294,6 +295,9 @@ export async function flushOutbox(): Promise<void> {
   if (flushing || !userId || !isOnline() || queue.length === 0) return;
   flushing = true;
   let sent = false;
+  // Un rechazo del servidor no escribe nada, así que no genera señal en vivo:
+  // ese caso sí necesita el refetch para quitar lo pintado de forma optimista.
+  let rejected = false;
   try {
     while (queue.length > 0 && isOnline()) {
       const op = queue[0];
@@ -309,6 +313,7 @@ export async function flushOutbox(): Promise<void> {
         sent = true;
       } catch (err) {
         if (isPermanent(err)) {
+          rejected = true;
           queue = queue.filter((q) => q.opId !== op.opId);
           const message = errorMessage(err);
           if (waiters.has(op.opId)) {
@@ -339,7 +344,9 @@ export async function flushOutbox(): Promise<void> {
     flushing = false;
     inFlight = null;
   }
-  if (sent && queue.length === 0) {
+  // Con el canal en vivo arriba, lo que sí entró vuelve como señal y
+  // `useLiveSync` relanza todo; refetchear aquí también lo duplicaba.
+  if (sent && queue.length === 0 && (rejected || !isLiveConnected())) {
     void apolloClient.refetchQueries({ include: "active" });
   }
 }

@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { refetchUnlessLive } from "@/lib/liveStatus";
 import { useTranslation } from "react-i18next";
 import {
   CREATE_PROJECT,
@@ -10,7 +11,9 @@ import {
 import { choiceAsync, confirmAsync } from "@/lib/confirm";
 import type { Priority } from "@/lib/types";
 
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
+// Con el canal en vivo arriba, la señal de esta escritura ya relanza el
+// dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
+const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useProjectMutations() {
   const { t } = useTranslation();

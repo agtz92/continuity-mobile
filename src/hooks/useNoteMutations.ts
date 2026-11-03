@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { refetchUnlessLive } from "@/lib/liveStatus";
 import * as outbox from "@/lib/outbox";
 import {
   DASHBOARD_QUERY,
@@ -6,7 +7,9 @@ import {
   UPDATE_NOTE,
 } from "@/lib/graphql";
 
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
+// Con el canal en vivo arriba, la señal de esta escritura ya relanza el
+// dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
+const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useNoteMutations() {
   const [updateNoteM] = useMutation(UPDATE_NOTE, refetchAfter);

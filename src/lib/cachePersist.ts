@@ -1,4 +1,4 @@
-import { AppState, type NativeEventSubscription } from "react-native";
+import { AppState, InteractionManager, type NativeEventSubscription } from "react-native";
 import { File, Paths } from "expo-file-system";
 import * as Updates from "expo-updates";
 import type { InMemoryCache, NormalizedCacheObject } from "@apollo/client";
@@ -18,12 +18,19 @@ import type { InMemoryCache, NormalizedCacheObject } from "@apollo/client";
  *   inútil lo guardado.
  * - **Escritura con throttle.** Se envuelven los métodos que escriben en la
  *   caché (lo mismo que hace `apollo3-cache-persist`) y se guarda como mucho
- *   una vez por segundo, más al pasar a segundo plano.
+ *   una vez cada `SAVE_THROTTLE_MS`, más al pasar a segundo plano.
+ * - **Fuera del camino de los toques.** `save()` serializa la caché entera y
+ *   escribe síncrono en el hilo JS: con la cuenta grande son cientos de ms en
+ *   los que nada responde. Por eso el guardado en primer plano espera a que
+ *   terminen las animaciones/gestos (`InteractionManager`) y va espaciado; el
+ *   que de verdad protege los datos es el de segundo plano. Lo que el usuario
+ *   cambia no depende de esto: la outbox se persiste aparte, al instante.
  *
  * Plan completo: `continuity/docs/plan-offline-movil.md` (fase 1).
  */
-const CACHE_VERSION = 2;
-const SAVE_THROTTLE_MS = 1000;
+// 3: el dashboard pasó a `dashboard(activityDays: 60)`, otra clave de caché.
+const CACHE_VERSION = 3;
+const SAVE_THROTTLE_MS = 15_000;
 const PREFIX = "apollo-cache-";
 
 interface Persisted {
@@ -93,7 +100,9 @@ function save(): void {
 
 function scheduleSave(): void {
   if (!active || active.timer) return;
-  active.timer = setTimeout(save, SAVE_THROTTLE_MS);
+  active.timer = setTimeout(() => {
+    InteractionManager.runAfterInteractions(save);
+  }, SAVE_THROTTLE_MS);
 }
 
 /** Envuelve los métodos que escriben en la caché para agendar un guardado. */

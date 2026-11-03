@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client/react";
+import { refetchUnlessLive } from "@/lib/liveStatus";
 import {
   ADD_TASK_BLOCKER,
   DASHBOARD_QUERY,
@@ -9,7 +10,9 @@ import {
 import * as outbox from "@/lib/outbox";
 import type { Task } from "@/lib/types";
 
-const refetchAfter = { refetchQueries: [{ query: DASHBOARD_QUERY }] };
+// Con el canal en vivo arriba, la señal de esta escritura ya relanza el
+// dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
+const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useTaskMutations() {
   // Crear, editar y marcar funcionan sin red: van por la cola (`lib/outbox`).

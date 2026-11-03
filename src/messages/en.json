@@ -1321,6 +1321,7 @@
       "noneInFilter": "No items in this filter.",
       "deleteConfirm": "Delete this log entry?",
       "editEntryAria": "Edit log entry",
+      "loadOlder": "Load older entries",
       "deleteEntryAria": "Delete log entry",
       "filters": {
         "all": "All",

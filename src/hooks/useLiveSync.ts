@@ -3,6 +3,7 @@ import { AppState } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { refreshAll } from "@/lib/outbox";
+import { setLiveConnected } from "@/lib/liveStatus";
 
 /**
  * Datos frescos sin cerrar la app. Espejo de `useLiveInvalidation` +
@@ -79,6 +80,7 @@ export function useLiveSync() {
       if (cancelled) return;
       channel.subscribe((status) => {
         if (status === "SUBSCRIBED") {
+          setLiveConnected(true);
           // Al reconectar (p. ej. tras volver de segundo plano) pudo haber
           // avisos perdidos: se pide todo una vez, preferencias incluidas.
           if (wasDown) bump("notifications_notificationsettings");
@@ -88,6 +90,7 @@ export function useLiveSync() {
           status === "TIMED_OUT" ||
           status === "CLOSED"
         ) {
+          setLiveConnected(false);
           wasDown = true;
         }
       });
@@ -95,6 +98,7 @@ export function useLiveSync() {
 
     return () => {
       cancelled = true;
+      setLiveConnected(false);
       clearTimeout(timer);
       void supabase.removeChannel(channel);
     };

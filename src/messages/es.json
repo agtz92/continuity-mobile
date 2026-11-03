@@ -1321,6 +1321,7 @@
       "noneInFilter": "Sin entradas en este filtro.",
       "deleteConfirm": "¿Eliminar esta entrada?",
       "editEntryAria": "Editar entrada",
+      "loadOlder": "Cargar entradas anteriores",
       "deleteEntryAria": "Eliminar entrada",
       "filters": {
         "all": "Todos",
