@@ -15,6 +15,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { THEME_SURFACES } from "@/theme/tokens";
 import { accentsFor } from "@/palette/config";
 import { DashboardTour } from "@/components/onboarding/tour/DashboardTour";
+import { CaptureHost } from "@/components/capture/CaptureHost";
 import { TourAnchor } from "@/components/onboarding/tour/TourAnchor";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { usePurchasesIdentity } from "@/hooks/usePurchasesIdentity";
@@ -58,6 +59,11 @@ export default function DashboardLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Las pestañas visitadas siguen montadas; sin congelarlas, cada
+        // respuesta del dashboard volvía a renderizar Projects, Tasks y
+        // Routines aunque no se vieran. Congeladas muestran su último frame y
+        // se ponen al día al enfocarse.
+        freezeOnBlur: true,
         // La transición entre pestañas (`animation:"shift"`) está QUITADA a
         // propósito: es el otro sospechoso de la pantalla en blanco, porque es
         // justo lo que corre al tocar la barra. Si tras el arreglo de
@@ -150,6 +156,7 @@ export default function DashboardLayout() {
       />
     </Tabs>
     <DashboardTour />
+    <CaptureHost />
     </>
   );
 }

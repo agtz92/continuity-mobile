@@ -47,9 +47,12 @@ function localDateToIso(date: string): string {
 export function CaptureSheet({
   visible,
   onClose,
+  onClosed,
 }: {
   visible: boolean;
   onClose: () => void;
+  /** La hoja terminó de cerrarse (ver `BottomSheet.onClosed`). */
+  onClosed?: () => void;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -154,6 +157,7 @@ export function CaptureSheet({
     <BottomSheet
       visible={visible}
       onClose={close}
+      onClosed={onClosed}
       title={t("capture.title")}
       footer={
         <Pressable

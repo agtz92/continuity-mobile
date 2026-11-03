@@ -12,6 +12,7 @@ import {
   initialWindowMetrics,
 } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ApolloProvider, useQuery } from "@apollo/client/react";
 import { apolloCache, apolloClient } from "@/lib/apollo";
 import { startCachePersistence } from "@/lib/cachePersist";
@@ -152,18 +153,25 @@ export default function RootLayout() {
   // renders in its own host view and otherwise saw 0 top inset (the close X
   // landed under the notch and was untappable). initialWindowMetrics gives the
   // correct inset on the very first frame, avoiding a flash of mis-padded UI.
+  //
+  // GestureHandlerRootView en la raíz: el `+` (`ui/FAB`) usa un `GestureDetector`
+  // para responder en el hilo nativo, y eso exige un root de gesture-handler
+  // por encima. Los que ya envuelven listas arrastrables (projects, quick-note)
+  // pueden quedarse: anidarlos no hace daño.
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ApolloProvider client={apolloClient}>
-        <AuthProvider>
-          <CachePersistGate>
-            <ThemeProvider>
-              <RootNavigator />
-            </ThemeProvider>
-          </CachePersistGate>
-        </AuthProvider>
-      </ApolloProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <ApolloProvider client={apolloClient}>
+          <AuthProvider>
+            <CachePersistGate>
+              <ThemeProvider>
+                <RootNavigator />
+              </ThemeProvider>
+            </CachePersistGate>
+          </AuthProvider>
+        </ApolloProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

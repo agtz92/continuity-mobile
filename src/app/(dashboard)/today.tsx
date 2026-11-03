@@ -18,6 +18,7 @@ import { useRoutineMutations } from "@/hooks/useRoutineMutations";
 import { useTodayLayout } from "@/hooks/useTodayLayout";
 import type { TodaySectionId } from "@/lib/todaySections";
 import { consumeCustomizeRequest, subscribeCustomize } from "@/lib/tour";
+import { isLiveConnected } from "@/lib/liveStatus";
 import { FAB } from "@/components/ui/FAB";
 import { TodaySkeleton } from "@/components/ui/Skeletons";
 import { NotificationStack } from "@/components/notifications/NotificationStack";
@@ -90,8 +91,12 @@ export default function Today() {
   }, []);
 
   // Al volver de un formulario, lo recién creado aparece sin pull-to-refresh.
+  // Con el canal en vivo arriba no hace falta: la outbox ya lo pintó en caché y
+  // la señal de esa escritura relanza el dashboard. Refetchear en cada enfoque
+  // era bajar el dashboard completo cada vez que alguien tocaba "Hoy".
   useFocusEffect(
     useCallback(() => {
+      if (isLiveConnected()) return;
       refetch().catch(() => undefined);
     }, [refetch]),
   );

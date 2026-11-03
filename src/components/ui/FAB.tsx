@@ -1,12 +1,22 @@
-import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { InfinityIcon, Zap } from "lucide-react-native";
-import { CaptureSheet } from "@/components/capture/CaptureSheet";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { openCapture } from "@/components/capture/CaptureHost";
 import { impactFeedback, selectionFeedback } from "@/lib/feedback";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { lift } from "@/theme/lift";
+
+const OPEN_MS = 160;
 
 function ActionRow({
   label,
@@ -54,7 +64,14 @@ function ActionRow({
  * La captura rápida vive aquí, y no en la barra de pestañas, porque el `+` ya
  * es el sitio donde se crea algo en esta app: meterla en una sexta pestaña
  * habría puesto dos botones de "crear" en la misma pantalla diciendo cosas
- * distintas.
+ * distintas. La hoja es una sola para toda la app (`CaptureHost`).
+ *
+ * **Responde en el hilo nativo.** El toque del `+` es un `Gesture.Tap` cuyos
+ * callbacks son worklets: el hundido, el giro del icono y la aparición de las
+ * acciones arrancan en el hilo de UI aunque JS esté ocupado (procesando una
+ * respuesta del dashboard, por ejemplo). Las acciones están siempre montadas y
+ * solo se revelan; React se entera después (`runOnJS`) para el scrim, los
+ * toques de las filas, el háptico y la accesibilidad.
  */
 export function FAB({
   icon,
@@ -72,90 +89,160 @@ export function FAB({
   const { t } = useTranslation();
   const c = useThemeColors();
   const [open, setOpen] = useState(false);
-  const [capturing, setCapturing] = useState(false);
 
-  const toggle = () => {
-    if (open) {
-      selectionFeedback();
-      setOpen(false);
-    } else {
-      impactFeedback("light");
-      setOpen(true);
-    }
-  };
+  // `target` es el estado pedido (0/1); `progress` lo sigue animado.
+  const target = useSharedValue(0);
+  const progress = useSharedValue(0);
+  const pressed = useSharedValue(0);
+
+  const animateTo = useCallback(
+    (value: 0 | 1) => {
+      target.value = value;
+      progress.value = withTiming(value, { duration: OPEN_MS });
+    },
+    [target, progress]
+  );
+
+  // Lado JS del toque: lo que no puede hacer el worklet.
+  const syncOpen = useCallback((next: boolean) => {
+    if (next) impactFeedback("light");
+    else selectionFeedback();
+    setOpen(next);
+  }, []);
+
+  const close = useCallback(() => {
+    animateTo(0);
+    setOpen(false);
+  }, [animateTo]);
+
+  const toggleFromJs = useCallback(() => {
+    const next = target.value === 0;
+    animateTo(next ? 1 : 0);
+    syncOpen(next);
+  }, [animateTo, syncOpen, target]);
+
+  const tap = useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          pressed.value = withTiming(1, { duration: 80 });
+        })
+        .onFinalize(() => {
+          pressed.value = withTiming(0, { duration: 120 });
+        })
+        .onEnd((_e, success) => {
+          if (!success) return;
+          const next = target.value === 0 ? 1 : 0;
+          target.value = next;
+          progress.value = withTiming(next, { duration: OPEN_MS });
+          runOnJS(syncOpen)(next === 1);
+        }),
+    [pressed, progress, syncOpen, target]
+  );
 
   const runPrimary = () => {
     selectionFeedback();
-    setOpen(false);
+    close();
     onPress();
   };
 
   const openLoop = () => {
     selectionFeedback();
-    setOpen(false);
+    close();
     router.push("/assistant");
   };
 
-  const openCapture = () => {
+  const startCapture = () => {
     selectionFeedback();
-    setOpen(false);
-    setCapturing(true);
+    close();
+    openCapture();
   };
+
+  const scrimStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
+  const actionsStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ translateY: interpolate(progress.value, [0, 1], [12, 0]) }],
+  }));
+  const buttonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(pressed.value, [0, 1], [1, 0.92]) }],
+  }));
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${interpolate(progress.value, [0, 1], [0, 45])}deg` }],
+  }));
 
   return (
     <>
-      {open && (
+      <Animated.View
+        pointerEvents={open ? "auto" : "none"}
+        style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(0,0,0,0.35)" }, scrimStyle]}
+      >
         <Pressable
-          onPress={() => setOpen(false)}
+          onPress={close}
           accessibilityLabel={t("common.cancel")}
-          className="absolute bottom-0 left-0 right-0 top-0"
-          style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
+          style={StyleSheet.absoluteFill}
         />
-      )}
+      </Animated.View>
 
       <View
         className="absolute right-4 items-end gap-3"
         style={{ bottom: bottomOffset }}
         pointerEvents="box-none"
       >
-        {open && (
-          <View className="items-end gap-3">
-            <ActionRow
-              label={t("assistant.buttonLabel")}
-              icon={<InfinityIcon size={22} color={c.bg} />}
-              onPress={openLoop}
-              borderColor={c.border}
-            />
-            <ActionRow
-              label={t("capture.title")}
-              icon={<Zap size={22} color={c.bg} />}
-              onPress={openCapture}
-              borderColor={c.border}
-            />
-            <ActionRow
-              label={label}
-              icon={icon}
-              onPress={runPrimary}
-              borderColor={c.border}
-            />
-          </View>
-        )}
-
-        <Pressable
-          onPress={toggle}
-          accessibilityRole="button"
-          accessibilityLabel={open ? t("common.cancel") : label}
-          accessibilityState={{ expanded: open }}
-          className="h-14 w-14 items-center justify-center rounded-full bg-accent active:opacity-90"
-          style={lift("float", c)}
+        {/* Sin `className` en las vistas de Reanimated: el estilo animado va
+            por `style` y las clases en un View normal (como el resto del repo). */}
+        <Animated.View
+          pointerEvents={open ? "box-none" : "none"}
+          accessibilityElementsHidden={!open}
+          importantForAccessibility={open ? "auto" : "no-hide-descendants"}
+          style={[{ alignItems: "flex-end", gap: 12 }, actionsStyle]}
         >
-          <View style={{ transform: [{ rotate: open ? "45deg" : "0deg" }] }}>
-            {icon}
-          </View>
-        </Pressable>
-      </View>
+          <ActionRow
+            label={t("assistant.buttonLabel")}
+            icon={<InfinityIcon size={22} color={c.bg} />}
+            onPress={openLoop}
+            borderColor={c.border}
+          />
+          <ActionRow
+            label={t("capture.title")}
+            icon={<Zap size={22} color={c.bg} />}
+            onPress={startCapture}
+            borderColor={c.border}
+          />
+          <ActionRow
+            label={label}
+            icon={icon}
+            onPress={runPrimary}
+            borderColor={c.border}
+          />
+        </Animated.View>
 
-      <CaptureSheet visible={capturing} onClose={() => setCapturing(false)} />
+        <GestureDetector gesture={tap}>
+          <Animated.View
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={open ? t("common.cancel") : label}
+            accessibilityState={{ expanded: open }}
+            accessibilityActions={[{ name: "activate" }]}
+            onAccessibilityAction={(e) => {
+              if (e.nativeEvent.actionName === "activate") toggleFromJs();
+            }}
+            style={[
+              {
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: c.accent,
+              },
+              lift("float", c),
+              buttonStyle,
+            ]}
+          >
+            <Animated.View style={iconStyle}>{icon}</Animated.View>
+          </Animated.View>
+        </GestureDetector>
+      </View>
     </>
   );
 }
