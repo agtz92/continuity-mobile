@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { TaskToggle } from "@/components/tasks/TaskToggle";
+import { StrikeTitle } from "@/components/tasks/StrikeTitle";
 import { Meta } from "@/components/ui/Meta";
 import {
   OVERLOAD_HOURS,
@@ -61,6 +62,7 @@ const TaskItem = memo(function TaskItem({
   return (
     <View className="flex-row items-center" style={{ minHeight: 44, gap: 12 }}>
       <TaskToggle
+        size={24}
         done={task.done}
         overdue={late}
         onToggle={() => void handlers.onToggleTask(task)}
@@ -73,9 +75,9 @@ const TaskItem = memo(function TaskItem({
         className="flex-1 justify-center active:opacity-60"
         style={{ minHeight: 44 }}
       >
-        <Text className="font-sans" style={{ fontSize: 15, lineHeight: 20, color: colors.text }}>
+        <StrikeTitle done={task.done} color={colors.text} fontSize={15} lineHeight={20} compact>
           {task.title}
-        </Text>
+        </StrikeTitle>
       </Pressable>
       <ItemMeta hours={task.effortHours ?? null} late={late} colors={colors} />
     </View>
@@ -99,6 +101,7 @@ const RoutineItemRow = memo(function RoutineItemRow({
   return (
     <View className="flex-row items-center" style={{ minHeight: 44, gap: 12, opacity: item.completed ? 0.6 : 1 }}>
       <TaskToggle
+        size={24}
         kind="routine"
         done={item.completed}
         overdue={late && !item.completed}

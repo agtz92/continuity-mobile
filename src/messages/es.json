@@ -1478,6 +1478,9 @@
     "addDate": "Agregar fecha",
     "blocked": "Bloqueada",
     "completedToast": "✓ Tarea completada",
+    "undoToast": "{count, plural, one {Hecha} other {# hechas}}",
+    "undo": "Deshacer",
+    "undoAnnounce": "Hecha. Deshacer disponible.",
     "overdueDays": "Vencida · {count, plural, one {# día} other {# días}}",
     "todayBadge": "Hoy",
     "reschedule": "Reprogramar"

@@ -1478,6 +1478,9 @@
     "addDate": "Add date",
     "blocked": "Blocked",
     "completedToast": "✓ Task completed",
+    "undoToast": "{count, plural, one {Done} other {# done}}",
+    "undo": "Undo",
+    "undoAnnounce": "Done. Undo available.",
     "overdueDays": "Overdue · {count, plural, one {# day} other {# days}}",
     "todayBadge": "Today",
     "reschedule": "Reschedule"

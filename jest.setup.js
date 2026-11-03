@@ -24,4 +24,8 @@ jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (k) => k, i18n: { language: "en" } }),
 }));
 
-jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
+// El mock de reanimated no trae `useReducedMotion` (lo usa el cue de completar).
+jest.mock("react-native-reanimated", () => ({
+  ...require("react-native-reanimated/mock"),
+  useReducedMotion: () => false,
+}));

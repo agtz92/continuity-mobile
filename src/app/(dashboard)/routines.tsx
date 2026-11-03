@@ -299,6 +299,7 @@ export default function Routines() {
           onEdit={onEdit}
           onArchive={section.withArchive ? onArchive : undefined}
           onDelete={deleteRoutine}
+          undoable={!archived}
         />
       </View>
     );

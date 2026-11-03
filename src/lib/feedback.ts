@@ -1,8 +1,3 @@
-import { toast } from "./toast";
-
-// Quick confirmation — shorter than the default toast TTL so it doesn't linger.
-const COMPLETED_TOAST_MS = 2500;
-
 type HapticsModule = typeof import("expo-haptics");
 
 /**
@@ -23,11 +18,11 @@ async function runHaptic(fn: (h: HapticsModule) => Promise<void>): Promise<void>
 
 /**
  * Confirmation feedback for completing a task/routine: the gentle "two soft
- * taps" iOS success pattern plus a short toast.
+ * taps" iOS success pattern. Ya no lleva toast: el cue bajo el dedo confirma
+ * (ver `components/tasks/cue.ts`) y el toast solo ofrece "Deshacer".
  */
-export function confirmCompleted(message: string): void {
+export function confirmCompleted(): void {
   void runHaptic((H) => H.notificationAsync(H.NotificationFeedbackType.Success));
-  toast.success(message, COMPLETED_TOAST_MS);
 }
 
 /**

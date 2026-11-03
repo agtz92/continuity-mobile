@@ -22,6 +22,7 @@ import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { isRecoveryPending } from "@/lib/passwordRecovery";
 import { Toaster } from "@/components/ui/Toaster";
+import { UndoToast } from "@/components/ui/UndoToast";
 import { useLiveSync } from "@/hooks/useLiveSync";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 
@@ -143,6 +144,7 @@ function RootNavigator() {
       </Stack>
       <OfflineBanner />
       <Toaster />
+      <UndoToast />
     </>
   );
 }

@@ -98,10 +98,10 @@ export default function Calendar() {
     () => ({
       onOpenProject: (id) => router.push({ pathname: "/project/[id]", params: { id } }),
       onOpenTask: (id) => router.push({ pathname: "/task-form", params: { id } }),
+      // El haptic va antes de mandar: esperar a la cola lo atrasaba.
       onToggleTask: async (task) => {
-        const wasDone = task.done;
+        if (!task.done) confirmCompleted();
         await toggleTask(task);
-        if (!wasDone) confirmCompleted(t("taskRow.completedToast"));
       },
       // Las rutinas no se completan desde el calendario: tocar abre su edición.
       onOpenRoutine: (id) => router.push({ pathname: "/routine-form", params: { id } }),

@@ -1,8 +1,14 @@
-import { memo, useState, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, type ReactNode } from "react";
 import { BlockerBadge } from "@/components/ui/BlockerBadge";
 import { BlockedTaskDialog } from "./BlockedTaskDialog";
 import { Pressable, Text, View } from "react-native";
-import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  FadeOut,
+  interpolateColor,
+  LinearTransition,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { CalendarClock, CalendarPlus } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Project, Task } from "@/lib/types";
@@ -11,6 +17,9 @@ import { confirmCompleted } from "@/lib/feedback";
 import { Meta } from "@/components/ui/Meta";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { TaskToggle } from "./TaskToggle";
+import { StrikeTitle } from "./StrikeTitle";
+import { InkBadge } from "./InkBadge";
+import { afterCue, useCue } from "./cue";
 
 /** Alto del botón de acción secundaria de la fila (Reschedule / Add date). */
 const ROW_ACTION = 36;
@@ -24,8 +33,10 @@ const ROW_ACTION = 36;
  * como metadato. Las vencidas exponen **solo "Reschedule"** (36 px, abre la
  * edición): "Move to today" se quitó por decisión de diseño.
  *
- * Completar da confirmación inmediata (haptic + toast) y un estado optimista;
- * la fila se desvanece cuando el refetch la saca de la lista.
+ * Completar (cue "Trazo", ver `cue.ts`): haptic y cue en el mismo frame, con
+ * estado optimista; el cambio se manda a los 380 ms, cuando la fila ya dijo
+ * "hecha", y entonces sale de la lista. Con `undoable` entra el toast
+ * "Deshacer" (listas de las que la fila se va: Today, Tasks).
  */
 export const TaskRow = memo(function TaskRow({
   task,
@@ -35,6 +46,7 @@ export const TaskRow = memo(function TaskRow({
   onEdit,
   onLongPress,
   dragHandle,
+  undoable = false,
 }: {
   task: Task;
   project: Project | undefined;
@@ -49,14 +61,26 @@ export const TaskRow = memo(function TaskRow({
   onLongPress?: () => void;
   /** Slot a la derecha dentro de la tarjeta: el grip de 36×44 del detalle. */
   dragHandle?: ReactNode;
+  /** Ofrecer "Deshacer" al completar (solo donde la fila sale de la lista). */
+  undoable?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const [optimisticDone, setOptimisticDone] = useState(false);
   const done = task.done || optimisticDone;
-  const overdue = !done && isOverdue(task.dueDate);
-  const dueToday = !done && isDueToday(task.dueDate);
+  // El estado de la fila sale del servidor, no del optimista: durante el cue
+  // la espina y los badges se apagan con la tinta en vez de desaparecer.
+  const overdue = !task.done && isOverdue(task.dueDate);
+  const dueToday = !task.done && isDueToday(task.dueDate);
   const isBlocked = !done && task.blockers.length > 0;
+
+  // Si la tarea vuelve a pendiente (Deshacer, otro dispositivo), el optimista
+  // no puede dejarla marcada.
+  const wasDone = useRef(task.done);
+  useEffect(() => {
+    if (wasDone.current && !task.done) setOptimisticDone(false);
+    wasDone.current = task.done;
+  }, [task.done]);
   const lateDays = overdue ? daysOverdue(task.dueDate) : null;
 
   const blockedDays = isBlocked
@@ -73,6 +97,23 @@ export const TaskRow = memo(function TaskRow({
       ? alpha(c.accent, 0.3)
       : c.line[14];
   const spineColor = overdue ? c.signal : dueToday ? c.accent : c.line[14];
+  const borderDone = c.line[14];
+  const spineDone = c.closed;
+
+  const { ink } = useCue(done);
+  const cardInk = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(ink.value, [0, 1], [borderColor, borderDone]),
+    borderLeftColor: interpolateColor(ink.value, [0, 1], [spineColor, spineDone]),
+  }));
+
+  const complete = () => {
+    confirmCompleted();
+    setOptimisticDone(true);
+    afterCue(
+      () => onToggle(task),
+      undoable ? () => onToggle({ ...task, done: true }) : undefined
+    );
+  };
 
   const handleToggle = () => {
     // Cerrar algo que sigue bloqueado no es una acción, es una pregunta: ¿se
@@ -83,19 +124,19 @@ export const TaskRow = memo(function TaskRow({
       return;
     }
     if (!done) {
-      setOptimisticDone(true);
-      confirmCompleted(t("taskRow.completedToast"));
-    } else {
+      complete();
+    } else if (task.done) {
       setOptimisticDone(false);
+      onToggle(task);
     }
-    onToggle(task);
+    // Hecha en optimista y aún sin mandar: el toque se ignora.
   };
 
   // Proyecto · horas · fecha (si no es hoy ni vencida): todo metadato.
   const metaParts: string[] = [];
   if (project) metaParts.push(project.name);
   if (task.effortHours != null) metaParts.push(`${task.effortHours}h`);
-  if (task.dueDate && !overdue && !dueToday && !done) {
+  if (task.dueDate && !overdue && !dueToday && !task.done) {
     metaParts.push(
       new Date(task.dueDate).toLocaleDateString(i18n.language, {
         weekday: "short",
@@ -106,29 +147,15 @@ export const TaskRow = memo(function TaskRow({
   }
 
   const badge = (label: string, tone: string) => (
-    <View
-      className="rounded-md px-1.5 py-0.5"
-      style={{
-        backgroundColor: alpha(tone, 0.14),
-        borderWidth: 1,
-        borderColor: alpha(tone, 0.35),
-      }}
-    >
-      <Text
-        className="font-sans-semibold uppercase"
-        style={{ fontSize: 11, letterSpacing: 0.6, color: tone }}
-      >
-        {label}
-      </Text>
-    </View>
+    <InkBadge label={label} tone={tone} ink={ink} />
   );
 
-  const showSchedule = !task.dueDate && !done && !!onSchedule;
+  const showSchedule = !task.dueDate && !task.done && !!onSchedule;
   const showReschedule = overdue && !!onEdit;
 
   return (
     <Animated.View
-      exiting={FadeOut.duration(220)}
+      exiting={FadeOut.duration(160).easing(Easing.out(Easing.cubic))}
       layout={LinearTransition.duration(220)}
     >
       {askBlocked && (
@@ -136,23 +163,24 @@ export const TaskRow = memo(function TaskRow({
           task={task}
           visible={askBlocked}
           onClose={() => setAskBlocked(false)}
-          onResolve={() => {
-            setOptimisticDone(true);
-            confirmCompleted(t("taskRow.completedToast"));
-            onToggle(task);
-          }}
+          onResolve={complete}
         />
       )}
-      <View
-        className="flex-row items-start rounded-lg border bg-surface"
-        style={{
-          gap: 12,
-          padding: 14,
-          borderColor,
-          borderLeftWidth: 3,
-          borderLeftColor: spineColor,
-          opacity: isBlocked ? 0.6 : 1,
-        }}
+      <Animated.View
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "flex-start",
+            borderRadius: 10,
+            borderWidth: 1,
+            backgroundColor: c.surface,
+            gap: 12,
+            padding: 14,
+            borderLeftWidth: 3,
+            opacity: isBlocked ? 0.6 : 1,
+          },
+          cardInk,
+        ]}
       >
         <TaskToggle
           done={done}
@@ -171,14 +199,9 @@ export const TaskRow = memo(function TaskRow({
           accessibilityLabel={task.title}
         >
           {/* Título: envuelve, nunca se corta. */}
-          <Text
-            className={
-              "font-sans " + (done ? "text-text-muted line-through" : "text-text")
-            }
-            style={{ fontSize: 17, lineHeight: 23 }}
-          >
+          <StrikeTitle done={done} color={c.text} fontSize={17} lineHeight={23}>
             {task.title}
-          </Text>
+          </StrikeTitle>
 
           <View
             className="flex-row flex-wrap items-center"
@@ -236,7 +259,7 @@ export const TaskRow = memo(function TaskRow({
           ) : null}
         </Pressable>
         {dragHandle ?? null}
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 });

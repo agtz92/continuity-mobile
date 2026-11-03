@@ -22,6 +22,7 @@ import { usePurchasesIdentity } from "@/hooks/usePurchasesIdentity";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
 import { isDailyViewStatus } from "@/lib/projectStatus";
+import { clearUndo } from "@/lib/toast";
 
 export default function DashboardLayout() {
   const { t } = useTranslation();
@@ -57,6 +58,8 @@ export default function DashboardLayout() {
   return (
     <>
     <Tabs
+      // El toast "Deshacer" es de la lista que se dejó: cambiar de pestaña lo cierra.
+      screenListeners={{ tabPress: () => clearUndo() }}
       screenOptions={{
         headerShown: false,
         // Las pestañas visitadas siguen montadas; sin congelarlas, cada

@@ -3,6 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { TaskToggle } from "@/components/tasks/TaskToggle";
+import { StrikeTitle } from "@/components/tasks/StrikeTitle";
 import { RuledRow } from "@/components/ui/RuledRow";
 import type { RoutineItem } from "@/lib/calendar";
 import type { Task } from "@/lib/types";
@@ -71,17 +72,24 @@ export const CalendarItemRow = memo(function CalendarItemRow({
         className="active:opacity-60"
         style={{ minHeight: 32, justifyContent: "center" }}
       >
-        <Text
-          className="font-sans"
-          style={{
-            fontSize: 16,
-            lineHeight: 22,
-            color: done ? c.text3 : c.text,
-            textDecorationLine: done ? "line-through" : "none",
-          }}
-        >
-          {title}
-        </Text>
+        {entry.kind === "task" ? (
+          // La fila se queda: el calendario muestra lo hecho, tachado en una pasada.
+          <StrikeTitle done={entry.task.done} color={c.text} fontSize={16} lineHeight={22} compact>
+            {title}
+          </StrikeTitle>
+        ) : (
+          <Text
+            className="font-sans"
+            style={{
+              fontSize: 16,
+              lineHeight: 22,
+              color: done ? c.text3 : c.text,
+              textDecorationLine: done ? "line-through" : "none",
+            }}
+          >
+            {title}
+          </Text>
+        )}
         {entry.meta ? (
           <View style={{ marginTop: 3 }}>
             <Text

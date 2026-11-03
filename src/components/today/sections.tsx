@@ -134,7 +134,11 @@ export function RoutinesTodaySection({
   todayRoutineEffortHours: number;
   projects: Project[];
   categoryById: Record<string, Category>;
-  completeOccurrence: (routineId: string, scheduledDate: string) => void | Promise<void>;
+  completeOccurrence: (
+    routineId: string,
+    scheduledDate: string,
+    occurrenceId?: string
+  ) => void | Promise<void>;
   uncompleteOccurrence: (occurrenceId: string) => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(true);
@@ -180,6 +184,7 @@ export function RoutinesTodaySection({
             project={resolveRoutineProject(it.routine)}
             onComplete={completeOccurrence}
             onUncomplete={uncompleteOccurrence}
+            undoable
           />
         ))}
       </View>

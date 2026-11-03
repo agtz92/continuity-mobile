@@ -62,11 +62,13 @@ export function useRoutineMutations() {
   };
 
   // Palomear y despalomear funcionan sin red: van por la cola (`lib/outbox`).
+  // `id` opcional: la fila lo genera para poder deshacer la ocurrencia.
   const completeOccurrence = async (
     routineId: string,
-    scheduledDate: string
+    scheduledDate: string,
+    id?: string
   ): Promise<void> => {
-    await outbox.completeOccurrence(routineId, scheduledDate);
+    await outbox.completeOccurrence(routineId, scheduledDate, id);
   };
 
   const uncompleteOccurrence = async (id: string): Promise<void> => {

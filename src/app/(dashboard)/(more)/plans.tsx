@@ -111,7 +111,8 @@ export default function Plans() {
     try {
       const outcome = await purchasePackage(pkg);
       if (outcome === "cancelled") return; // Cancelar no es un error.
-      confirmCompleted(t("plans.purchased"));
+      confirmCompleted();
+      toast.success(t("plans.purchased"), 2500);
       // El plan lo dice el servidor, no el recibo.
       const snap = await getUsage().catch(() => null);
       if (snap) setUsage(snap);

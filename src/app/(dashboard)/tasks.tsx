@@ -297,6 +297,7 @@ export default function Tasks() {
           onDelete={deleteTask}
           onSchedule={section.key === "unscheduled" ? scheduleToday : undefined}
           onEdit={openEdit}
+          undoable
         />
       </View>
     );

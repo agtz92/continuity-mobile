@@ -89,10 +89,11 @@ export function updateRoutine(id: string, data: RoutineData): Promise<boolean> {
 
 export function completeOccurrence(
   routineId: string,
-  scheduledDate: string
+  scheduledDate: string,
+  id: string = newId()
 ): Promise<boolean> {
   return submit("routine.complete", {
-    id: newId(),
+    id,
     routineId,
     scheduledDate,
     note: "",

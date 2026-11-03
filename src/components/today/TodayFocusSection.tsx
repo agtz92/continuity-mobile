@@ -1,5 +1,12 @@
 import { memo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import Animated, {
+  Easing,
+  FadeOut,
+  interpolateColor,
+  LinearTransition,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { CalendarClock, ChevronRight, Target } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
@@ -11,6 +18,9 @@ import { SIZE } from "@/theme/tokens";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
 import { Meta } from "@/components/ui/Meta";
 import { TaskToggle } from "@/components/tasks/TaskToggle";
+import { StrikeTitle } from "@/components/tasks/StrikeTitle";
+import { afterCue, useCue } from "@/components/tasks/cue";
+import { confirmCompleted } from "@/lib/feedback";
 import type { useTodayFocus } from "@/hooks/useTodayFocus";
 import { EffortBadge } from "./EffortBadge";
 import { focusTint } from "./todayColors";
@@ -25,6 +35,9 @@ type FocusItem = FocusModel["todayFocus"]["items"][number];
  *
  * Breathe: badge "Overdue · 2 days" en su propia línea; en vencidas solo queda
  * **Reschedule** ("Move to today" se quitó).
+ *
+ * Completar lleva el cue "Trazo" de `TaskRow` (toggle, tachado, espina a
+ * `closed`) y "Deshacer": antes el toggle no cambiaba y la fila solo se iba.
  */
 const FocusRow = memo(function FocusRow({
   item,
@@ -40,6 +53,26 @@ const FocusRow = memo(function FocusRow({
   const { t } = useTranslation();
   const c = useThemeColors();
   const tint = focusTint(item.type, c);
+  const [done, setDone] = useState(false);
+  const { ink } = useCue(done);
+  const borderFrom = tint.border;
+  const spineFrom = tint.spine;
+  const borderTo = c.line[14];
+  const spineTo = c.closed;
+  const cardInk = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(ink.value, [0, 1], [borderFrom, borderTo]),
+    borderLeftColor: interpolateColor(ink.value, [0, 1], [spineFrom, spineTo]),
+  }));
+
+  const complete = (task: Task) => {
+    if (done) return;
+    confirmCompleted();
+    setDone(true);
+    afterCue(
+      () => onToggle(task),
+      () => onToggle({ ...task, done: true })
+    );
+  };
   const late =
     item.type === "overdue" && item.task?.dueDate ? daysOverdue(item.task.dueDate) : null;
   const label = t(
@@ -61,22 +94,28 @@ const FocusRow = memo(function FocusRow({
       : item.project?.nextStep;
 
   return (
-    <View
-      className="flex-row items-start rounded-lg bg-surface"
-      style={{
-        padding: 14,
-        gap: 14,
-        borderWidth: 1,
-        borderColor: tint.border,
-        borderLeftWidth: 3,
-        borderLeftColor: tint.spine,
-      }}
+    <Animated.View
+      exiting={FadeOut.duration(160).easing(Easing.out(Easing.cubic))}
+      layout={LinearTransition.duration(220)}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: "flex-start",
+          borderRadius: 10,
+          backgroundColor: c.surface,
+          padding: 14,
+          gap: 14,
+          borderWidth: 1,
+          borderLeftWidth: 3,
+        },
+        cardInk,
+      ]}
     >
       {item.task ? (
         <TaskToggle
-          done={false}
+          done={done}
           overdue={item.type === "overdue"}
-          onToggle={() => onToggle(item.task!)}
+          onToggle={() => complete(item.task!)}
           label={t("views.today.focus.markDone")}
         />
       ) : null}
@@ -104,9 +143,15 @@ const FocusRow = memo(function FocusRow({
             {item.project && item.task ? ` · ${item.project.name}` : ""}
           </Text>
         )}
-        <Text className="font-sans" style={{ fontSize: 17, lineHeight: 23, color: c.text }}>
-          {title}
-        </Text>
+        {item.task ? (
+          <StrikeTitle done={done} color={c.text} fontSize={17} lineHeight={23}>
+            {item.task.title}
+          </StrikeTitle>
+        ) : (
+          <Text className="font-sans" style={{ fontSize: 17, lineHeight: 23, color: c.text }}>
+            {title}
+          </Text>
+        )}
         <View className="mt-1 flex-row flex-wrap items-center gap-2">
           {late !== null && item.project ? (
             <Text className="font-sans" style={{ fontSize: 14, color: c.text3 }}>
@@ -129,7 +174,7 @@ const FocusRow = memo(function FocusRow({
           </Pressable>
         ) : null}
       </Pressable>
-    </View>
+    </Animated.View>
   );
 });
 

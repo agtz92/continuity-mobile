@@ -1,6 +1,12 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  FadeOut,
+  interpolateColor,
+  LinearTransition,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { Archive, ArchiveRestore, Pencil, Repeat } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import type { Routine } from "@/lib/types";
@@ -11,6 +17,10 @@ import { alpha, categoryChipColors, useThemeColors } from "@/theme/useThemeColor
 import { Meta } from "@/components/ui/Meta";
 import { IconAction } from "@/components/ui/IconAction";
 import { TaskToggle } from "@/components/tasks/TaskToggle";
+import { StrikeTitle } from "@/components/tasks/StrikeTitle";
+import { InkBadge } from "@/components/tasks/InkBadge";
+import { afterCue, useCue } from "@/components/tasks/cue";
+import { newId } from "@/lib/outbox/ops";
 
 /**
  * Fila de una ocurrencia de rutina, rediseño "Breathe". `scheduledDate` es el
@@ -22,8 +32,9 @@ import { TaskToggle } from "@/components/tasks/TaskToggle";
  * **archivar** como `IconAction` de 44 px separados 8 (el archivado se queda en
  * la fila por decisión del dueño, no se mueve al formulario).
  *
- * Completar da confirmación inmediata (haptic + toast) y un estado optimista;
- * la fila se desvanece cuando el refetch la saca de la lista.
+ * Completar usa el mismo cue "Trazo" que `TaskRow` (ver `tasks/cue.ts`): el
+ * cambio se manda a los 380 ms con un id propio de ocurrencia, que es lo que
+ * "Deshacer" (`undoable`) usa para desmarcarla aunque siga en la cola.
  */
 export const RoutineRow = memo(function RoutineRow({
   routine,
@@ -34,18 +45,25 @@ export const RoutineRow = memo(function RoutineRow({
   onUncomplete,
   onEdit,
   onArchive,
+  undoable = false,
 }: {
   routine: Routine;
   scheduledDate: string;
   occurrenceId: string | null;
   project?: { name: string; color: string } | null;
-  onComplete: (routineId: string, scheduledDate: string) => void | Promise<void>;
+  onComplete: (
+    routineId: string,
+    scheduledDate: string,
+    occurrenceId?: string
+  ) => void | Promise<void>;
   onUncomplete: (occurrenceId: string) => void | Promise<void>;
   onEdit?: (r: Routine) => void;
   onArchive?: (r: Routine) => void | Promise<void>;
   // Borrar vive en el formulario (routine-form). Opcional sin usar para no
   // romper call sites.
   onDelete?: (id: string) => void | Promise<void>;
+  /** Ofrecer "Deshacer" al completar (solo donde la fila sale de la lista). */
+  undoable?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
@@ -56,9 +74,17 @@ export const RoutineRow = memo(function RoutineRow({
   );
   const [optimisticDone, setOptimisticDone] = useState(false);
   const isDone = occurrenceId !== null || optimisticDone;
+  const serverDone = occurrenceId !== null;
   const today = todayLocalISODate();
-  const overdue = !isDone && scheduledDate < today;
-  const dueToday = !isDone && scheduledDate === today;
+  // Del servidor, no del optimista: durante el cue se apagan con la tinta.
+  const overdue = !serverDone && scheduledDate < today;
+  const dueToday = !serverDone && scheduledDate === today;
+
+  const wasDone = useRef(serverDone);
+  useEffect(() => {
+    if (wasDone.current && !serverDone) setOptimisticDone(false);
+    wasDone.current = serverDone;
+  }, [serverDone]);
 
   const handleToggle = () => {
     if (isDone) {
@@ -69,9 +95,13 @@ export const RoutineRow = memo(function RoutineRow({
         onUncomplete(occurrenceId);
       }
     } else {
+      confirmCompleted();
       setOptimisticDone(true);
-      confirmCompleted(t("routineRow.completedToast"));
-      onComplete(routine.id, scheduledDate);
+      const id = newId();
+      afterCue(
+        () => onComplete(routine.id, scheduledDate, id),
+        undoable ? () => onUncomplete(id) : undefined
+      );
     }
   };
 
@@ -83,31 +113,25 @@ export const RoutineRow = memo(function RoutineRow({
       ? alpha(c.accent, 0.3)
       : c.line[14];
   const spineColor = overdue ? c.signal : dueToday ? c.accent : c.line[14];
+  const borderDone = c.line[14];
+  const spineDone = c.closed;
+
+  const { ink } = useCue(isDone);
+  const cardInk = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(ink.value, [0, 1], [borderColor, borderDone]),
+    borderLeftColor: interpolateColor(ink.value, [0, 1], [spineColor, spineDone]),
+  }));
 
   const projectDot = project ? categoryChipColors(project.color, c).dot : null;
 
   const badge = (label: string, tone: string) => (
-    <View
-      className="rounded-md px-1.5 py-0.5"
-      style={{
-        backgroundColor: alpha(tone, 0.14),
-        borderWidth: 1,
-        borderColor: alpha(tone, 0.35),
-      }}
-    >
-      <Text
-        className="font-sans-semibold uppercase"
-        style={{ fontSize: 11, letterSpacing: 0.6, color: tone }}
-      >
-        {label}
-      </Text>
-    </View>
+    <InkBadge label={label} tone={tone} ink={ink} />
   );
 
   // Recurrencia · horas (· fecha si no es hoy ni vencida): metadato.
   const metaParts = [describeRecurrence(routine, recLabel)];
   if (routine.effortHours != null) metaParts.push(`${routine.effortHours}h`);
-  if (!overdue && !dueToday && !isDone) {
+  if (!overdue && !dueToday && !serverDone) {
     metaParts.push(
       new Date(scheduledDate + "T00:00:00").toLocaleDateString(i18n.language, {
         weekday: "short",
@@ -119,20 +143,25 @@ export const RoutineRow = memo(function RoutineRow({
 
   return (
     <Animated.View
-      exiting={FadeOut.duration(220)}
+      exiting={FadeOut.duration(160).easing(Easing.out(Easing.cubic))}
       layout={LinearTransition.duration(220)}
     >
-      <View
-        className="flex-row items-center rounded-lg border bg-surface"
-        style={{
-          gap: 12,
-          paddingVertical: 12,
-          paddingLeft: 14,
-          paddingRight: 6,
-          borderColor,
-          borderLeftWidth: 3,
-          borderLeftColor: spineColor,
-        }}
+      <Animated.View
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            borderRadius: 10,
+            borderWidth: 1,
+            backgroundColor: c.surface,
+            gap: 12,
+            paddingVertical: 12,
+            paddingLeft: 14,
+            paddingRight: 6,
+            borderLeftWidth: 3,
+          },
+          cardInk,
+        ]}
       >
         <TaskToggle
           done={isDone}
@@ -149,14 +178,9 @@ export const RoutineRow = memo(function RoutineRow({
           accessibilityRole={onEdit ? "button" : undefined}
           accessibilityLabel={routine.title}
         >
-          <Text
-            className={
-              "font-sans " + (isDone ? "text-text-muted line-through" : "text-text")
-            }
-            style={{ fontSize: 17, lineHeight: 23 }}
-          >
+          <StrikeTitle done={isDone} color={c.text} fontSize={17} lineHeight={23}>
             {routine.title}
-          </Text>
+          </StrikeTitle>
 
           <View
             className="flex-row flex-wrap items-center"
@@ -224,7 +248,7 @@ export const RoutineRow = memo(function RoutineRow({
             ) : null}
           </View>
         ) : null}
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 });
