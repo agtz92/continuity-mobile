@@ -20,6 +20,30 @@ export function isLiveConnected(): boolean {
 }
 
 /**
+ * Escrituras propias (la cola offline). La señal que vuelve de ellas es un eco:
+ * la caché ya tiene el cambio, así que `useLiveSync` puede esperar a que el
+ * usuario deje de tocar y juntar varios ecos en una sola descarga.
+ */
+let lastOwnWrite = 0;
+const ownWriteListeners = new Set<() => void>();
+
+export function noteOwnWrite(): void {
+  lastOwnWrite = Date.now();
+  ownWriteListeners.forEach((fn) => fn());
+}
+
+export function msSinceOwnWrite(): number {
+  return Date.now() - lastOwnWrite;
+}
+
+export function onOwnWrite(fn: () => void): () => void {
+  ownWriteListeners.add(fn);
+  return () => {
+    ownWriteListeners.delete(fn);
+  };
+}
+
+/**
  * `refetchQueries` para una mutation: la lista dada solo si no hay canal en
  * vivo. Es función para que Apollo lo evalúe al terminar la mutation, no al
  * montar el hook.

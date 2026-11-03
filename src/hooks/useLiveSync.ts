@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { AppState } from "react-native";
+import { AppState, InteractionManager } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { refreshAll } from "@/lib/outbox";
-import { setLiveConnected } from "@/lib/liveStatus";
+import { msSinceOwnWrite, onOwnWrite, setLiveConnected } from "@/lib/liveStatus";
 
 /**
  * Datos frescos sin cerrar la app. Espejo de `useLiveInvalidation` +
@@ -27,6 +27,13 @@ import { setLiveConnected } from "@/lib/liveStatus";
  */
 const DEBOUNCE_MS = 400;
 const FOREGROUND_MIN_GAP_MS = 15_000;
+// Eco de una escritura propia (palomear, capturar): la caché ya lo tiene, así
+// que la descarga espera a que el usuario deje de tocar. Palomear cinco tareas
+// seguidas cuesta una descarga al final, no cinco entre toque y toque. El tope
+// evita que una racha de toques retrase sin fin un cambio que vino de fuera.
+const ECHO_WINDOW_MS = 4_000;
+const ECHO_DEBOUNCE_MS = 1_500;
+const MAX_WAIT_MS = 5_000;
 
 type Listener = (tables: Set<string>) => void;
 const listeners = new Set<Listener>();
@@ -49,22 +56,47 @@ export function useLiveSync() {
     if (!userId || !enabled) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let pending = new Set<string>();
+    let firstPendingAt = 0;
     let cancelled = false;
     let wasDown = false;
 
+    const isEcho = () => msSinceOwnWrite() < ECHO_WINDOW_MS;
+
     // Un restore o el asistente tocan decenas de filas seguidas: se juntan.
     const flush = () => {
+      timer = undefined;
+      firstPendingAt = 0;
       const tables = pending;
       pending = new Set();
-      // Con cambios offline pendientes, primero se mandan (ver `refreshAll`).
-      refreshAll();
-      listeners.forEach((fn) => fn(tables));
+      const run = () => {
+        if (cancelled) return;
+        // Con cambios offline pendientes, primero se mandan (ver `refreshAll`).
+        refreshAll();
+        listeners.forEach((fn) => fn(tables));
+      };
+      // Tras un toque propio, que la animación (cue, salida de la fila)
+      // termine antes de meter la respuesta al hilo de JS.
+      if (isEcho()) InteractionManager.runAfterInteractions(run);
+      else run();
+    };
+    const schedule = () => {
+      const waited = Date.now() - firstPendingAt;
+      const delay = Math.min(
+        isEcho() ? ECHO_DEBOUNCE_MS : DEBOUNCE_MS,
+        Math.max(0, MAX_WAIT_MS - waited)
+      );
+      clearTimeout(timer);
+      timer = setTimeout(flush, delay);
     };
     const bump = (table?: string) => {
       if (table) pending.add(table);
-      clearTimeout(timer);
-      timer = setTimeout(flush, DEBOUNCE_MS);
+      if (!firstPendingAt) firstPendingAt = Date.now();
+      schedule();
     };
+    // Otro toque mientras esperamos: se corre la descarga para juntarlo.
+    const stopOwnWrite = onOwnWrite(() => {
+      if (timer) schedule();
+    });
 
     const channel = supabase.channel(`user:${userId}`, {
       config: { private: true },
@@ -99,6 +131,7 @@ export function useLiveSync() {
     return () => {
       cancelled = true;
       setLiveConnected(false);
+      stopOwnWrite();
       clearTimeout(timer);
       void supabase.removeChannel(channel);
     };

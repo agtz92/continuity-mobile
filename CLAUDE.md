@@ -74,6 +74,10 @@ Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
   venga de donde venga (web, Claude por MCP, syncs, jobs o esta app). El hook escucha y hace
   `refetchQueries({ include: "active" })` con debounce de 400 ms. El aviso solo trae
   `{table, op}`: los datos siguen saliendo por GraphQL.
+- **Eco de escrituras propias:** si el aviso llega ≤4 s después de algo que mandó la cola
+  (`noteOwnWrite` en `lib/liveStatus.ts`), el debounce sube a 1.5 s, cada toque nuevo lo
+  corre (tope 5 s desde el primer aviso) y el refetch espera a `runAfterInteractions`. Así
+  palomear varias tareas seguidas cuesta una descarga al final, no una por toque.
 - **Al volver a primer plano:** iOS suspende el socket en segundo plano, así que al regresar se
   relanzan las queries activas (mínimo 15 s entre llamadas).
 - **Tema, paleta e idioma:** `ThemeProvider` **no** aplica desde el caché reactivo (para no pisar

@@ -4,7 +4,7 @@ import { CombinedGraphQLErrors, ServerError } from "@apollo/client/errors";
 import { apolloCache, apolloClient } from "@/lib/apollo";
 import i18n from "@/lib/i18n";
 import { isOnline, onReconnect } from "@/lib/network";
-import { isLiveConnected } from "@/lib/liveStatus";
+import { isLiveConnected, noteOwnWrite } from "@/lib/liveStatus";
 import { toast } from "@/lib/toast";
 import { OPS, newId, type OpKind } from "./ops";
 import { quotaHit, quotaMessage } from "./quota";
@@ -174,6 +174,7 @@ export function purgeOutbox(): void {
  */
 export function submit(kind: OpKind, variables: Record<string, unknown>): Promise<boolean> {
   const spec = OPS[kind];
+  noteOwnWrite();
 
   // Sin red nadie más puede decir "no cabe": se revisa aquí. Con red decide el
   // servidor (y el formulario espera su respuesta).
@@ -311,6 +312,8 @@ export async function flushOutbox(): Promise<void> {
         queue = queue.filter((q) => q.opId !== op.opId);
         settle(op.opId, true);
         sent = true;
+        // La señal de esta escritura llega en un momento: que la trate como eco.
+        noteOwnWrite();
       } catch (err) {
         if (isPermanent(err)) {
           rejected = true;
