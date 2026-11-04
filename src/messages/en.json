@@ -1749,7 +1749,7 @@
             "Sleeping alerts and daily digest",
             "Email support within 48h"
           ],
-          "cta": "Try Pro free for 14 days"
+          "cta": "Get Pro"
         },
         "studio": {
           "name": "Studio",
@@ -1766,7 +1766,7 @@
             "1:1 onboarding and early access to new features",
             "Priority support within 24h"
           ],
-          "cta": "Try Studio free for 14 days"
+          "cta": "Get Studio"
         }
       }
     }

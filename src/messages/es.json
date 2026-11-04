@@ -1749,7 +1749,7 @@
             "Sleeping alerts y digest diario",
             "Soporte por email en 48h"
           ],
-          "cta": "Probar Pro 14 días gratis"
+          "cta": "Empezar con Pro"
         },
         "studio": {
           "name": "Studio",
@@ -1766,7 +1766,7 @@
             "Onboarding 1:1 y early access a features",
             "Soporte prioritario en menos de 24h"
           ],
-          "cta": "Probar Studio 14 días gratis"
+          "cta": "Empezar con Studio"
         }
       }
     }
