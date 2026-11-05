@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Trash2 } from "lucide-react-native";
 import type { ProjectNote } from "@/lib/types";
@@ -16,8 +16,17 @@ function restAfterFirstLine(s: string): string {
   return s.split("\n").slice(1).join("\n").trim();
 }
 
-/** Notas del proyecto: título (o primera línea), preview de 3 líneas, borrar. */
-export function ProjectNotes({ notes }: { notes: ProjectNote[] }) {
+/**
+ * Notas del proyecto: título (o primera línea), preview de 3 líneas, borrar.
+ * Tocar la nota la abre en la misma hoja con la que se crea (`onOpen`).
+ */
+export function ProjectNotes({
+  notes,
+  onOpen,
+}: {
+  notes: ProjectNote[];
+  onOpen: (note: ProjectNote) => void;
+}) {
   const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const { remove } = useProjectNoteMutations();
@@ -62,7 +71,12 @@ export function ProjectNotes({ notes }: { notes: ProjectNote[] }) {
             style={{ borderColor: c.line[14] }}
           >
             <View className="flex-row items-start gap-2">
-              <View className="min-w-0 flex-1 gap-1 py-2.5">
+              <Pressable
+                onPress={() => onOpen(n)}
+                accessibilityRole="button"
+                accessibilityLabel={heading || t("notes.untitled")}
+                className="min-w-0 flex-1 gap-1 py-2.5 active:opacity-70"
+              >
                 <Text
                   className={heading ? "font-sans-medium" : "font-sans-medium italic"}
                   style={{ fontSize: 16, color: heading ? c.text : c.text3 }}
@@ -81,7 +95,7 @@ export function ProjectNotes({ notes }: { notes: ProjectNote[] }) {
                 <Meta variant="cintillo" tone="faint">
                   {relativeTime(n.updatedAt)}
                 </Meta>
-              </View>
+              </Pressable>
               <IconAction
                 icon={Trash2}
                 label={t("common.delete")}

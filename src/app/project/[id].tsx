@@ -9,6 +9,7 @@ import { Plus } from "lucide-react-native";
 import { projectBlockedDays, taskIsBlocked } from "@/lib/cooling";
 import { byManualOrder } from "@/lib/taskOrder";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import type { ProjectNote } from "@/lib/types";
 import { useProjectMutations } from "@/hooks/useProjectMutations";
 import { headerOptionsFor } from "@/components/ui/HeaderBackButton";
 import { ProjectHero } from "@/components/projects/ProjectHero";
@@ -49,6 +50,8 @@ export default function ProjectDetail() {
 
   const [updateOpen, setUpdateOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
+  // Nota abierta en la hoja; null = crear una nueva.
+  const [editingNote, setEditingNote] = useState<ProjectNote | null>(null);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const project = projects.find((p) => p.id === id);
@@ -228,8 +231,18 @@ export default function ProjectDetail() {
             title={t("views.projects.card.notes")}
             meta={notes.length > 0 ? String(notes.length) : null}
           >
-            <ProjectNotes notes={notes} />
-            <DashedAddButton label={t("notes.newNote")} onPress={() => setNoteOpen(true)} />
+            <ProjectNotes
+              notes={notes}
+              onOpen={(n) => {
+                setEditingNote(n);
+                setNoteOpen(true);
+              }}
+            />
+            <DashedAddButton label={t("notes.newNote")} onPress={() => {
+                setEditingNote(null);
+                setNoteOpen(true);
+              }}
+            />
           </ProjectSection>
 
           <Pressable
@@ -268,6 +281,7 @@ export default function ProjectDetail() {
       <ProjectNoteSheet
         visible={noteOpen}
         projectId={project.id}
+        note={editingNote}
         onClose={() => setNoteOpen(false)}
       />
       {flow.element}
