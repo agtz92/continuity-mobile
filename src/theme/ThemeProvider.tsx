@@ -244,7 +244,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <ThemeContext.Provider
       value={{ theme, palette, effective, setTheme, setPalette }}
     >
-      <View style={[{ flex: 1 }, style]}>{children}</View>
+      {/* Nada se monta hasta que las fuentes están registradas: en iOS
+          (Fabric) un texto medido con la fuente de respaldo guarda ese ancho y
+          al llegar la fuente real no se vuelve a medir, así que salía cortado
+          ("Open Loop", "Reschedule"). El splash ya espera a las fuentes, así
+          que esto no añade ni un frame visible. */}
+      <View style={[{ flex: 1 }, style]}>{fontsReady ? children : null}</View>
     </ThemeContext.Provider>
   );
 }

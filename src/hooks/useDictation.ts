@@ -32,12 +32,40 @@ function loadSpeech(): SpeechModule | null {
   return cached;
 }
 
-/** BCP-47 para el reconocedor: el del sistema si coincide con el idioma de la app. */
-function recognizerLang(appLang: string): string {
+/**
+ * BCP-47 para el reconocedor: el regional del sistema si es del mismo idioma
+ * que la app **y** el reconocedor lo soporta; si no, el genérico. Sin esa
+ * comprobación, un iPhone en inglés con región México daba `en-MX`, que Apple
+ * no tiene para dictado ("language-not-supported").
+ */
+function recognizerLang(appLang: string, supported: string[]): string {
   const lang = appLang.startsWith("es") ? "es" : "en";
-  const device = getLocales()[0]?.languageTag;
-  if (device && device.toLowerCase().startsWith(lang)) return device;
-  return lang === "es" ? "es-MX" : "en-US";
+  const fallback = lang === "es" ? "es-MX" : "en-US";
+  const norm = (x: string) => x.replace("_", "-").toLowerCase();
+  const ok = (tag: string) =>
+    supported.length === 0 || supported.some((s) => norm(s) === norm(tag));
+  const candidates = [
+    ...getLocales()
+      .map((l) => l.languageTag)
+      .filter((tag) => tag?.toLowerCase().startsWith(lang)),
+    fallback,
+  ];
+  const pick = candidates.find(ok);
+  if (pick) return pick;
+  // El genérico no está en la lista: cualquier variante del idioma que sí esté.
+  return supported.find((s) => norm(s).startsWith(`${lang}-`)) ?? fallback;
+}
+
+let supportedCache: string[] | null = null;
+async function supportedLocales(speech: SpeechModule): Promise<string[]> {
+  if (supportedCache) return supportedCache;
+  try {
+    const { locales } = await speech.getSupportedLocales({});
+    supportedCache = locales ?? [];
+  } catch {
+    supportedCache = [];
+  }
+  return supportedCache;
 }
 
 /**
@@ -187,8 +215,9 @@ export function useDictation(onText: (text: string) => void) {
       committed.current = currentText.trimEnd();
       lastFinal.current = "";
       selectionFeedback();
+      const supported = await supportedLocales(speech);
       speech.start({
-        lang: recognizerLang(i18n.language || "en"),
+        lang: recognizerLang(i18n.language || "en", supported),
         interimResults: true,
         continuous: true,
         addsPunctuation: true,
