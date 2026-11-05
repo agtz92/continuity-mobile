@@ -35,11 +35,14 @@ function ActionRow({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}
-      className="flex-row items-center gap-2 active:opacity-80"
+      className="flex-row items-center active:opacity-80"
     >
+      {/* Margen en vez de `gap`: dentro de un contenedor absoluto sin ancho,
+          Yoga no sumaba el `gap` al medir la fila y la etiqueta salía
+          recortada por la derecha en iOS. */}
       <View
         className="rounded-lg bg-surface px-3 py-2"
-        style={{ borderWidth: 1, borderColor, ...lift("float", c) }}
+        style={{ borderWidth: 1, borderColor, marginRight: 8, flexShrink: 1, ...lift("float", c) }}
       >
         <Text className="text-sm font-sans-semibold text-text">{label}</Text>
       </View>
@@ -184,8 +187,11 @@ export function FAB({
       </Animated.View>
 
       <View
-        className="absolute right-4 items-end gap-3"
-        style={{ bottom: bottomOffset }}
+        // `left` además de `right`: con ancho definido la columna no depende de
+        // que Yoga mida bien el contenido (ver ActionRow). Las filas siguen
+        // alineadas a la derecha y `box-none` deja pasar los toques del hueco.
+        className="absolute left-4 right-4 items-end"
+        style={{ bottom: bottomOffset, gap: 12 }}
         pointerEvents="box-none"
       >
         {/* Sin `className` en las vistas de Reanimated: el estilo animado va

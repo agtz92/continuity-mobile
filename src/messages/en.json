@@ -120,6 +120,13 @@
     "send": "Send",
     "stop": "Stop",
     "inputPlaceholder": "Ask about your projects, tasks, or ideas…",
+    "dictation": {
+      "start": "Dictate",
+      "stop": "Stop dictating",
+      "denied": "Allow microphone access to dictate.",
+      "language": "Dictation isn't available for this language on your device.",
+      "failed": "Couldn't hear you. Try again."
+    },
     "welcome": {
       "title": "Hi! I'm here to help.",
       "bodyFor": {

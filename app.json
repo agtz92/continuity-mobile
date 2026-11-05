@@ -134,6 +134,13 @@
         }
       ],
       "expo-localization",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "continuu.it uses the microphone so you can dictate messages to Loop.",
+          "speechRecognitionPermission": "continuu.it turns your voice into text so you can dictate messages to Loop."
+        }
+      ],
       "expo-web-browser",
       [
         "expo-notifications",

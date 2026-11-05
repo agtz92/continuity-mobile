@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Meta } from "@/components/ui/Meta";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
+  Keyboard,
   KeyboardAvoidingView,
+  Platform,
   Pressable,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -16,11 +18,13 @@ import {
   ArrowUp,
   CloudOff,
   InfinityIcon,
+  Mic,
   Square,
   SquarePen,
   X,
 } from "lucide-react-native";
 import { useAssistant } from "@/hooks/useAssistant";
+import { useDictation } from "@/hooks/useDictation";
 import { MessageList } from "@/components/assistant/MessageList";
 import { PlanBadge } from "@/components/assistant/PlanBadge";
 import { UsageMeter } from "@/components/assistant/UsageMeter";
@@ -80,8 +84,30 @@ export default function AssistantScreen() {
   const messagesLeft =
     isChat && usage && cap != null ? Math.max(0, cap - usage.messages_sent_today) : null;
 
+  // Dictado: el reconocedor del sistema escribe en el campo; enviar sigue
+  // siendo decisión del usuario.
+  const dictation = useDictation((text) => setInput(text.slice(0, MAX_INPUT_CHARS)));
+  const showMic = dictation.available && !streaming;
+
+  // El borde inferior se padea a mano (igual que el superior): dentro del
+  // fullScreenModal el edge "bottom" del SafeAreaView llegaba en 0 en iOS y el
+  // compositor quedaba pegado al indicador de inicio. Con el teclado abierto el
+  // KeyboardAvoidingView ya lo separa, así que el hueco se quita.
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+  useEffect(() => {
+    const showEvt = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvt = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const subs = [
+      Keyboard.addListener(showEvt, () => setKeyboardOpen(true)),
+      Keyboard.addListener(hideEvt, () => setKeyboardOpen(false)),
+    ];
+    return () => subs.forEach((s) => s.remove());
+  }, []);
+  const bottomGap = keyboardOpen ? 0 : Math.max(insets.bottom, 12);
+
   const handleSend = () => {
     if (!canSend) return;
+    if (dictation.listening) dictation.cancel();
     send(trimmed);
     setInput("");
   };
@@ -92,7 +118,7 @@ export default function AssistantScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
+    <View className="flex-1 bg-bg">
       {/* Header. Full-screen modal goes under the status bar; pad the top by the
           real safe-area inset (+8) so the close X clears the notch and stays
           tappable. We pad explicitly instead of relying on the SafeAreaView top
@@ -228,6 +254,7 @@ export default function AssistantScreen() {
               placeholderTextColor={c.text5}
               accessibilityLabel={t("assistant.inputPlaceholder")}
               multiline
+              editable={!dictation.listening}
               className="flex-1 rounded-lg border border-border bg-surface"
               style={{
                 minHeight: SIZE.input,
@@ -239,6 +266,26 @@ export default function AssistantScreen() {
                 color: c.text,
               }}
             />
+            {showMic && (
+              <Pressable
+                onPress={() =>
+                  dictation.listening ? dictation.stop() : void dictation.start(input)
+                }
+                accessibilityRole="button"
+                accessibilityLabel={t(
+                  dictation.listening ? "assistant.dictation.stop" : "assistant.dictation.start",
+                )}
+                accessibilityState={{ selected: dictation.listening }}
+                className="items-center justify-center rounded-full active:opacity-70"
+                style={{
+                  width: SIZE.input,
+                  height: SIZE.input,
+                  backgroundColor: dictation.listening ? c.accent : alpha(c.text, 0.08),
+                }}
+              >
+                <Mic size={20} color={dictation.listening ? c.bg : c.text2} />
+              </Pressable>
+            )}
             {streaming ? (
               <Pressable
                 onPress={stop}
@@ -268,7 +315,8 @@ export default function AssistantScreen() {
             )}
           </View>
         )}
+        <View style={{ height: bottomGap }} />
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -120,6 +120,13 @@
     "send": "Enviar",
     "stop": "Detener",
     "inputPlaceholder": "Pregunta sobre tus proyectos, tareas o ideas…",
+    "dictation": {
+      "start": "Dictar",
+      "stop": "Dejar de dictar",
+      "denied": "Permite el acceso al micrófono para dictar.",
+      "language": "El dictado no está disponible para este idioma en tu dispositivo.",
+      "failed": "No te escuché bien. Inténtalo de nuevo."
+    },
     "welcome": {
       "title": "¡Hola! Estoy aquí para ayudar.",
       "bodyFor": {
