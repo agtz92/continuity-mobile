@@ -7,7 +7,7 @@ import {
 } from "react-native-draggable-flatlist";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { GripVertical, Plus } from "lucide-react-native";
+import { GripVertical } from "lucide-react-native";
 import type { Project, Task } from "@/lib/types";
 import { askAsync } from "@/lib/confirm";
 import { toast } from "@/lib/toast";
@@ -16,6 +16,7 @@ import { suggestDueDateAfterMove } from "@/lib/taskOrder";
 import { useTaskMutations } from "@/hooks/useTaskMutations";
 import { TaskRow } from "@/components/tasks/TaskRow";
 import { ShowMoreList } from "@/components/ui/ShowMoreList";
+import { DashedAddButton } from "@/components/projects/DashedAddButton";
 import { useThemeColors } from "@/theme/useThemeColors";
 
 const GRIP_W = 36;
@@ -153,24 +154,12 @@ export function ProjectTasks({
           </View>
         </View>
       )}
-      <Pressable
+      <DashedAddButton
+        label={t("modals.task.newTitle")}
         onPress={() =>
           router.push({ pathname: "/task-form", params: { projectId: project.id } })
         }
-        accessibilityRole="button"
-        className="flex-row items-center justify-center gap-2 rounded-lg active:opacity-70"
-        style={{
-          height: 48,
-          borderWidth: 1,
-          borderStyle: "dashed",
-          borderColor: c.line[34],
-        }}
-      >
-        <Plus size={16} color={c.text3} />
-        <Text className="font-sans-medium" style={{ fontSize: 15, color: c.text3 }}>
-          {t("modals.task.newTitle")}
-        </Text>
-      </Pressable>
+      />
     </View>
   );
 }

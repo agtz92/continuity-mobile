@@ -18,7 +18,9 @@ export function openCapture(): void {
  * oculta. Aquí se monta al abrir y se desmonta cuando la hoja **terminó** de
  * cerrarse (`onClosed`), así que la animación de salida se ve completa.
  *
- * Vive en el layout del dashboard, que es donde están todos los FAB.
+ * Vive en el layout del dashboard. El detalle de proyecto (fuera del grupo)
+ * también tiene FAB y le sirve el mismo host: el layout sigue montado debajo
+ * del stack y la hoja es un `<Modal>`, que se pinta encima de todo.
  */
 export function CaptureHost() {
   const [mounted, setMounted] = useState(false);

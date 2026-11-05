@@ -4,6 +4,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NestableScrollContainer } from "react-native-draggable-flatlist";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Plus } from "lucide-react-native";
 import { projectBlockedDays, taskIsBlocked } from "@/lib/cooling";
 import { byManualOrder } from "@/lib/taskOrder";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -17,7 +19,10 @@ import { ProjectTasks } from "@/components/projects/ProjectTasks";
 import { ProjectActivity } from "@/components/projects/ProjectActivity";
 import { ProjectNotes } from "@/components/projects/ProjectNotes";
 import { ProjectUpdateSheet } from "@/components/projects/ProjectUpdateSheet";
+import { ProjectNoteSheet } from "@/components/projects/ProjectNoteSheet";
+import { DashedAddButton } from "@/components/projects/DashedAddButton";
 import { WelcomeBackCard } from "@/components/projects/WelcomeBackCard";
+import { FAB } from "@/components/ui/FAB";
 import { useProjectStatusFlow } from "@/components/projects/useProjectStatusFlow";
 import { useTheme } from "@/theme/ThemeProvider";
 import { SIZE, THEME_SURFACES } from "@/theme/tokens";
@@ -34,6 +39,7 @@ export default function ProjectDetail() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const insets = useSafeAreaInsets();
   const { effective } = useTheme();
   const s = THEME_SURFACES[effective];
 
@@ -42,6 +48,7 @@ export default function ProjectDetail() {
   const { deleteProject } = useProjectMutations();
 
   const [updateOpen, setUpdateOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
   const [welcomeDismissed, setWelcomeDismissed] = useState(false);
 
   const project = projects.find((p) => p.id === id);
@@ -144,7 +151,12 @@ export default function ProjectDetail() {
         {/* NestableScrollContainer: deja que la lista de pendientes se arrastre
             (long-press en ⠿) sin pelearse con el scroll. */}
         <NestableScrollContainer
-          contentContainerStyle={{ gap: 28, padding: SIZE.gutter, paddingBottom: 48 }}
+          contentContainerStyle={{
+            gap: 28,
+            padding: SIZE.gutter,
+            // Deja libre el botón de borrar bajo el FAB.
+            paddingBottom: insets.bottom + 104,
+          }}
         >
           <ProjectHero
             project={project}
@@ -206,6 +218,10 @@ export default function ProjectDetail() {
             meta={projectUpdates.length > 0 ? String(projectUpdates.length) : null}
           >
             <ProjectActivity updates={projectUpdates} />
+            <DashedAddButton
+              label={t("views.projects.card.logUpdate")}
+              onPress={() => setUpdateOpen(true)}
+            />
           </ProjectSection>
 
           <ProjectSection
@@ -213,6 +229,7 @@ export default function ProjectDetail() {
             meta={notes.length > 0 ? String(notes.length) : null}
           >
             <ProjectNotes notes={notes} />
+            <DashedAddButton label={t("notes.newNote")} onPress={() => setNoteOpen(true)} />
           </ProjectSection>
 
           <Pressable
@@ -232,10 +249,26 @@ export default function ProjectDetail() {
         </NestableScrollContainer>
       </GestureHandlerRootView>
 
+      {/* El mismo speed-dial de las listas (crear tarea · captura · Loop):
+          sin él, crear una tarea obligaba a bajar hasta el final de la lista. */}
+      <FAB
+        icon={<Plus size={26} color={c.bg} />}
+        label={t("modals.task.newTitle")}
+        onPress={() =>
+          router.push({ pathname: "/task-form", params: { projectId: project.id } })
+        }
+        bottomOffset={insets.bottom + 20}
+      />
+
       <ProjectUpdateSheet
         visible={updateOpen}
         projectId={project.id}
         onClose={() => setUpdateOpen(false)}
+      />
+      <ProjectNoteSheet
+        visible={noteOpen}
+        projectId={project.id}
+        onClose={() => setNoteOpen(false)}
       />
       {flow.element}
     </View>
