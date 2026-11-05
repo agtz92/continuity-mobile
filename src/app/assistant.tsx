@@ -35,6 +35,7 @@ import { alpha, useThemeColors } from "@/theme/useThemeColors";
 import { useOnline } from "@/lib/network";
 import { IconAction } from "@/components/ui/IconAction";
 import { SIZE } from "@/theme/tokens";
+import { Toaster } from "@/components/ui/Toaster";
 
 const MAX_INPUT_CHARS = 4000;
 
@@ -317,6 +318,11 @@ export default function AssistantScreen() {
         )}
         <View style={{ height: bottomGap }} />
       </KeyboardAvoidingView>
+      {/* En iOS el fullScreenModal se presenta encima del <Toaster/> del root,
+          así que los avisos (errores del dictado, del stream) quedaban
+          tapados. En Android el modal vive en la misma jerarquía y el del
+          root ya se ve: montarlo aquí también los duplicaría. */}
+      {Platform.OS === "ios" && <Toaster />}
     </View>
   );
 }
