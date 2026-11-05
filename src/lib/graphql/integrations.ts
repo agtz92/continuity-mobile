@@ -1,47 +1,21 @@
 import { gql } from "@apollo/client";
 
-export const GOOGLE_TASKS_CONNECTION_QUERY = gql`
-  query GoogleTasksConnection {
-    googleTasksConnection {
-      connected
-      email
+// ===== Conector de Claude (MCP remoto) =====
+// Clientes OAuth (Claude) que el usuario autorizó contra el conector MCP.
+export const MCP_CONNECTIONS_QUERY = gql`
+  query McpConnections {
+    mcpConnections {
+      clientId
+      clientName
       connectedAt
     }
   }
 `;
 
 
-export const GOOGLE_TASKS_AUTH_URL = gql`
-  mutation GoogleTasksAuthUrl($returnTo: String!) {
-    googleTasksAuthUrl(returnTo: $returnTo)
-  }
-`;
-
-
-export const GOOGLE_TASK_LISTS_QUERY = gql`
-  query GoogleTaskLists {
-    googleTaskLists {
-      id
-      title
-    }
-  }
-`;
-
-
-export const IMPORT_GOOGLE_TASKS = gql`
-  mutation ImportGoogleTasks($mappings: [GoogleTasksImportMapping!]!) {
-    importGoogleTasks(mappings: $mappings) {
-      imported
-      skipped
-      createdProjects
-    }
-  }
-`;
-
-
-export const DISCONNECT_GOOGLE_TASKS = gql`
-  mutation DisconnectGoogleTasks {
-    disconnectGoogleTasks
+export const REVOKE_MCP_CONNECTION = gql`
+  mutation RevokeMcpConnection($clientId: ID!) {
+    revokeMcpConnection(clientId: $clientId)
   }
 `;
 

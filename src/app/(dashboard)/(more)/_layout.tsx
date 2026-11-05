@@ -68,8 +68,8 @@ export default function MoreLayout() {
         options={{ ...headered, title: t("settings.nav.plugins") }}
       />
       <Stack.Screen
-        name="google-tasks"
-        options={{ ...headerOptionsFor(s, { backLabel: t("settings.nav.plugins") }), title: t("settings.plugins.googleTasks.title") }}
+        name="claude"
+        options={{ ...headerOptionsFor(s, { backLabel: t("settings.nav.plugins") }), title: t("settings.plugins.claude.title") }}
       />
       <Stack.Screen
         name="report-bug"

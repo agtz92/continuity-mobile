@@ -2,27 +2,27 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client/react";
-import { ChevronRight, ListTodo } from "lucide-react-native";
-import { GOOGLE_TASKS_CONNECTION_QUERY } from "@/lib/graphql";
+import { ChevronRight, Sparkles } from "lucide-react-native";
+import { MCP_CONNECTIONS_QUERY } from "@/lib/graphql";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
-type ConnectionData = {
-  googleTasksConnection: { connected: boolean; email: string | null };
+type McpConnectionsData = {
+  mcpConnections: { clientId: string }[];
 };
 
 export default function Plugins() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { data } = useQuery<ConnectionData>(GOOGLE_TASKS_CONNECTION_QUERY, {
+  const { data } = useQuery<McpConnectionsData>(MCP_CONNECTIONS_QUERY, {
     fetchPolicy: "cache-and-network",
   });
-  const connected = !!data?.googleTasksConnection?.connected;
+  const connected = (data?.mcpConnections?.length ?? 0) > 0;
 
   return (
     <ScrollView className="flex-1 bg-bg" contentContainerClassName="gap-4 p-5">
       <Pressable
-        onPress={() => router.push("/google-tasks")}
+        onPress={() => router.push("/claude")}
         accessibilityRole="button"
         className="flex-row items-center gap-3 rounded-xl border border-border bg-surface p-4 active:opacity-80"
       >
@@ -30,14 +30,14 @@ export default function Plugins() {
           className="h-10 w-10 items-center justify-center rounded-lg border border-border"
           style={{ backgroundColor: alpha(c.accent, 0.12) }}
         >
-          <ListTodo size={20} color={c.accent} />
+          <Sparkles size={20} color={c.accent} />
         </View>
         <View className="min-w-0 flex-1">
           <Text className="text-sm font-sans-medium text-text">
-            {t("settings.plugins.googleTasks.name")}
+            {t("settings.plugins.claude.name")}
           </Text>
-          <Text className="font-sans mt-0.5 text-xs text-text-muted" numberOfLines={1}>
-            {t("settings.plugins.googleTasks.shortDescription")}
+          <Text className="font-sans mt-0.5 text-xs text-text-muted">
+            {t("settings.plugins.claude.shortDescription")}
           </Text>
         </View>
         <View

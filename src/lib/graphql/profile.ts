@@ -119,5 +119,3 @@ export const UPDATE_PROFILE = gql`
   }
 `;
 
-// ===== Integración Google Tasks (import) =====
-// Flujo OAuth + importación de listas de Google Tasks a proyectos/tareas.
