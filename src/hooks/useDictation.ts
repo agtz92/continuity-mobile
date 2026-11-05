@@ -81,7 +81,7 @@ function waitForActive(timeoutMs = 1500): Promise<void> {
   });
 }
 
-type StartOptions = Parameters<SpeechModule["start"]>[0];
+const QUICK_FAIL_MS = 1500;
 
 export function useDictation(onText: (text: string) => void) {
   const { t, i18n } = useTranslation();
@@ -101,12 +101,12 @@ export function useDictation(onText: (text: string) => void) {
   const lastFinal = useRef("");
   // Tras `cancel()` (p. ej. al enviar) un final rezagado no debe rellenar el campo.
   const ignoring = useRef(false);
-  // iOS: se intenta primero en el equipo (el audio no sale del teléfono). Si el
-  // modelo local del idioma no está o Dictado está apagado en Ajustes, iOS
-  // falla antes de transcribir nada; entonces se reintenta UNA vez con el
-  // servidor de Apple en vez de dejar el botón muerto.
-  const lastOptions = useRef<StartOptions | null>(null);
+  // Una sesión que muere en menos de QUICK_FAIL_MS sin oír nada no es que el
+  // usuario se haya callado: iOS la rechazó (p. ej. 1110 "no-speech" al
+  // instante). Antes se tragaba en silencio y el botón solo vibraba.
+  const startedAt = useRef(0);
   const heardSomething = useRef(false);
+  const lastError = useRef<string | null>(null);
   const onTextRef = useRef(onText);
   useEffect(() => {
     onTextRef.current = onText;
@@ -116,7 +116,19 @@ export function useDictation(onText: (text: string) => void) {
     if (!speech) return;
     const subs = [
       speech.addListener("start", () => setListening(true)),
-      speech.addListener("end", () => setListening(false)),
+      speech.addListener("end", () => {
+        setListening(false);
+        const quick = Date.now() - startedAt.current < QUICK_FAIL_MS;
+        const err = lastError.current;
+        if (!quick || heardSomething.current || ignoring.current) return;
+        // Los errores con aviso propio ya se mostraron en "error".
+        if (err && !SILENT_ERRORS.has(err) && err !== "nomatch") return;
+        toast.error(`${t("assistant.dictation.failed")} (${err ?? "end"})`);
+      }),
+      // iOS lo emite en lugar de "error" cuando no reconoce nada (203/Siri 1).
+      speech.addListener("nomatch", () => {
+        lastError.current = "nomatch";
+      }),
       speech.addListener("result", (e: ResultEvent) => {
         const transcript = (e.results[0]?.transcript ?? "").trim();
         if (!transcript || ignoring.current) return;
@@ -133,26 +145,7 @@ export function useDictation(onText: (text: string) => void) {
       speech.addListener("error", (e: ErrorEvent) => {
         setListening(false);
         if (__DEV__) console.warn("[dictation]", e.error, e.message);
-        const opts = lastOptions.current;
-        if (
-          opts?.requiresOnDeviceRecognition &&
-          !heardSomething.current &&
-          !ignoring.current &&
-          !SILENT_ERRORS.has(e.error) &&
-          e.error !== "not-allowed"
-        ) {
-          const retry = { ...opts, requiresOnDeviceRecognition: false };
-          lastOptions.current = retry;
-          setTimeout(() => {
-            if (ignoring.current) return;
-            try {
-              speech.start(retry);
-            } catch {
-              toast.error(t("assistant.dictation.failed"));
-            }
-          }, 150);
-          return;
-        }
+        lastError.current = e.error;
         if (SILENT_ERRORS.has(e.error)) return;
         if (e.error === "not-allowed") {
           toast.error(t("assistant.dictation.denied"));
@@ -162,7 +155,7 @@ export function useDictation(onText: (text: string) => void) {
           toast.error(t("assistant.dictation.language"));
           return;
         }
-        toast.error(t("assistant.dictation.failed"));
+        toast.error(`${t("assistant.dictation.failed")} (${e.error})`);
       }),
     ];
     return () => {
@@ -189,21 +182,23 @@ export function useDictation(onText: (text: string) => void) {
       if (!before.granted) await waitForActive();
       ignoring.current = false;
       heardSomething.current = false;
+      lastError.current = null;
+      startedAt.current = Date.now();
       committed.current = currentText.trimEnd();
       lastFinal.current = "";
       selectionFeedback();
-      const options: StartOptions = {
+      speech.start({
         lang: recognizerLang(i18n.language || "en"),
         interimResults: true,
         continuous: true,
         addsPunctuation: true,
-        // En iOS, si el equipo lo soporta, el audio no sale del teléfono.
-        requiresOnDeviceRecognition:
-          Platform.OS === "ios" ? speech.supportsOnDeviceRecognition() : false,
+        // NO exigir reconocimiento en el equipo: si el idioma no está
+        // descargado, iOS falla al instante con 1110 ("no-speech") y el botón
+        // quedaba muerto. Sin exigirlo, iOS decide (local si puede, si no los
+        // servidores de Apple), igual que Android.
+        requiresOnDeviceRecognition: false,
         iosTaskHint: "dictation",
-      };
-      lastOptions.current = options;
-      speech.start(options);
+      });
     },
     [speech, i18n.language, t],
   );
