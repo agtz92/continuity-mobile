@@ -11,7 +11,8 @@
       "bundleIdentifier": "it.continuu.app",
       "supportsTablet": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "continuu.it only accesses your photo library when you choose an image to attach or save."
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,
