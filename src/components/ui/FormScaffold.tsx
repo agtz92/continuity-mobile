@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -43,6 +43,11 @@ export function FormScaffold({
   const c = useThemeColors();
   const { t } = useTranslation();
   const enabled = canSave && !saving;
+  const insets = useSafeAreaInsets();
+  // iOS presenta el modal como hoja (ya lejos de la barra de estado); en
+  // Android `presentation:"modal"` es pantalla completa edge-to-edge y la
+  // cabecera quedaba pegada bajo el reloj.
+  const headerTop = Platform.OS === "android" ? insets.top + 14 : 18;
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
@@ -51,7 +56,7 @@ export function FormScaffold({
         style={{
           paddingLeft: SIZE.gutter,
           paddingRight: 8,
-          paddingTop: 18,
+          paddingTop: headerTop,
           paddingBottom: 8,
           borderBottomWidth: 1,
           borderBottomColor: c.line[14],
@@ -79,7 +84,9 @@ export function FormScaffold({
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        // "padding" también en Android: con edge-to-edge (SDK 54) la ventana ya
+        // no se redimensiona con el teclado y el pie quedaba debajo.
+        behavior="padding"
       >
         <ScrollView
           contentContainerStyle={{ gap: SIZE.sectionGap, padding: SIZE.gutter, paddingBottom: 32 }}

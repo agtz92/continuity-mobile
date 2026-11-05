@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import DraggableFlatList, { type RenderItemParams } from "react-native-draggable-flatlist";
@@ -190,7 +190,7 @@ export default function QuickNoteEditor() {
       <SafeAreaView className="flex-1 bg-bg" edges={["bottom"]}>
         <KeyboardAvoidingView
           className="flex-1"
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior="padding"
         >
           <DraggableFlatList
             data={sections}

@@ -23,12 +23,15 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { projectIsBlocked, taskIsBlocked } from "@/lib/cooling";
 import { isDailyViewStatus } from "@/lib/projectStatus";
 import { clearUndo } from "@/lib/toast";
+import { TAB_BAR_EXTRA_BOTTOM, TAB_BAR_HEIGHT } from "@/lib/tabBar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function DashboardLayout() {
   const { t } = useTranslation();
   const { effective, palette } = useTheme();
   const surfaces = THEME_SURFACES[effective];
   const [accent] = accentsFor(palette, effective);
+  const insets = useSafeAreaInsets();
 
   // Push registration + tap-to-navigate (Fase 8). Inert under Expo Go.
   usePushNotifications();
@@ -73,9 +76,16 @@ export default function DashboardLayout() {
         // `CollapsibleSection` el problema no vuelve, se puede reponer.
         tabBarActiveTintColor: accent,
         tabBarInactiveTintColor: surfaces.textMuted,
+        // En Android se suma aire bajo las etiquetas (ver `lib/tabBar`). Hay
+        // que fijar alto y padding juntos: react-navigation calcula el alto
+        // como 49 + inset y solo con padding se aplastaría el contenido.
         tabBarStyle: {
           backgroundColor: surfaces.surface,
           borderTopColor: surfaces.border,
+          ...(TAB_BAR_EXTRA_BOTTOM > 0 && {
+            height: TAB_BAR_HEIGHT + insets.bottom + TAB_BAR_EXTRA_BOTTOM,
+            paddingBottom: insets.bottom + TAB_BAR_EXTRA_BOTTOM,
+          }),
         },
         // Etiqueta a 11 px (600 en la activa). El color solo no basta para
         // saber dónde estás: la activa lleva además una regla de 2 px arriba.

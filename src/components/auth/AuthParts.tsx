@@ -2,7 +2,6 @@ import { useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -38,7 +37,7 @@ export function AuthScaffold({
     <SafeAreaView className="flex-1 bg-bg">
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior="padding"
       >
         {top}
         <ScrollView

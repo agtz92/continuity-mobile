@@ -7,8 +7,9 @@ import { runUndo, setUndoLongTtl, subscribeUndo } from "@/lib/toast";
 import { selectionFeedback } from "@/lib/feedback";
 import { useThemeColors } from "@/theme/useThemeColors";
 
-/** Alto por defecto de la barra de pestañas (react-navigation), sin el inset. */
-const TAB_BAR = 49;
+import { TAB_BAR_EXTRA_BOTTOM, TAB_BAR_HEIGHT } from "@/lib/tabBar";
+
+const TAB_BAR = TAB_BAR_HEIGHT + TAB_BAR_EXTRA_BOTTOM;
 
 const enter = FadeInDown.duration(160)
   .easing(Easing.out(Easing.cubic))

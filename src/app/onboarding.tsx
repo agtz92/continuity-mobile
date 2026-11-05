@@ -3,7 +3,6 @@ import { Meta } from "@/components/ui/Meta";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform,
   Text,
   View,
 } from "react-native";
@@ -294,7 +293,7 @@ export default function Onboarding() {
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior="padding"
       >
         <OnboardingBackContext.Provider value={backRow}>
           {step === 1 && (

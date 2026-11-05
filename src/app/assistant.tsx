@@ -3,7 +3,6 @@ import { Meta } from "@/components/ui/Meta";
 import { EmptyState } from "@/components/ui/EmptyState";
 import {
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   Text,
   TextInput,
@@ -151,7 +150,9 @@ export default function AssistantScreen() {
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        // "padding" también en Android: con edge-to-edge (SDK 54) la ventana ya
+        // no se redimensiona con el teclado y tapaba el compositor.
+        behavior="padding"
       >
         {/* Barra de uso de 3 px: solo el tier llm tiene cupo que medir. */}
         {isChat && <UsageMeter usage={usage} />}
