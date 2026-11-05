@@ -25,7 +25,7 @@ export default function Profile() {
   const router = useRouter();
   const c = useThemeColors();
   const { session } = useAuth();
-  const { avatarUrl } = useUserAvatar();
+  const { avatarSource } = useUserAvatar();
   const { data } = useQuery<ProfileData>(PROFILE_QUERY, {
     fetchPolicy: "cache-and-network",
   });
@@ -101,9 +101,9 @@ export default function Profile() {
           {t("settings.profile.avatar")}
         </Meta>
         <View className="flex-row items-center gap-4">
-          {avatarUrl ? (
+          {avatarSource ? (
             <Image
-              source={{ uri: avatarUrl }}
+              source={avatarSource}
               style={{ width: 72, height: 72, borderRadius: 36 }}
             />
           ) : (

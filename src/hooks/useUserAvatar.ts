@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import { PROFILE_QUERY, UPDATE_PROFILE } from "@/lib/graphql";
-import { getAvatarUrl, isValidAvatarId } from "@/lib/avatars";
+import { getAvatarSource, isValidAvatarId, normalizeAvatarId } from "@/lib/avatars";
 
 type ProfileData = { profile: { avatar: string | null } };
 
@@ -13,9 +13,9 @@ export function useUserAvatar() {
   });
 
   const avatarId = isValidAvatarId(data?.profile?.avatar)
-    ? (data!.profile!.avatar as string)
+    ? normalizeAvatarId(data!.profile!.avatar)
     : null;
-  const avatarUrl = avatarId ? getAvatarUrl(avatarId) : null;
+  const avatarSource = avatarId ? getAvatarSource(avatarId) : null;
 
   const setAvatar = async (id: string | null): Promise<boolean> => {
     try {
@@ -26,5 +26,5 @@ export function useUserAvatar() {
     }
   };
 
-  return { avatarId, avatarUrl, loading, setAvatar };
+  return { avatarId, avatarSource, loading, setAvatar };
 }

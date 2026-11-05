@@ -1692,12 +1692,6 @@
     }
   },
   "avatars": {
-    "styles": {
-      "3d": "3D",
-      "anime": "Anime",
-      "8bit": "8-bit",
-      "vector": "Vector"
-    },
     "names": {
       "momo": "Momo",
       "yuki": "Yuki",

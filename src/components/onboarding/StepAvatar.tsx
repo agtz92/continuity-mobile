@@ -2,14 +2,11 @@ import { memo, useCallback, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Meta } from "@/components/ui/Meta";
-import { FilterChips } from "@/components/ui/FilterChips";
 import {
   AVATAR_CATALOG,
-  AVATAR_STYLES,
-  avatarsByStyle,
-  getAvatarUrl,
+  getAvatarSource,
+  normalizeAvatarId,
   type Avatar,
-  type AvatarStyle,
 } from "@/lib/avatars";
 import { useThemeColors } from "@/theme/useThemeColors";
 import { PrimaryButton, StepHeading, StepLayout } from "./controls";
@@ -38,7 +35,7 @@ const AvatarCell = memo(function AvatarCell({
       style={{ width: "25%", paddingVertical: 6, gap: 6 }}
     >
       <Image
-        source={{ uri: getAvatarUrl(avatar.id) }}
+        source={getAvatarSource(avatar.id) ?? undefined}
         style={{
           width: CELL,
           height: CELL,
@@ -59,9 +56,8 @@ const AvatarCell = memo(function AvatarCell({
 });
 
 /**
- * Paso 3 — avatar picker. El catálogo es el de siempre (`lib/avatars`: siete
- * personajes × cuatro estilos); lo nuevo es el layout: el estilo se elige con
- * chips y la rejilla enseña los siete de ese estilo en celdas de 64 px, con
+ * Paso 3 — avatar picker. Siete personajes en estilo vector (`lib/avatars`),
+ * empaquetados en el binario: la rejilla pinta sin red, en celdas de 64 px con
  * borde accent de 2 px en el activo. Debajo, la fila de confirmación
  * "Nombre · Avatar · Plan". Selection is local and only committed on Next (the
  * flow persists it via updateProfile). Avatar is optional — Next proceeds with
@@ -82,11 +78,7 @@ export function StepAvatar({
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
-  const grouped = avatarsByStyle();
-  const [selected, setSelected] = useState<string | null>(initialAvatar);
-  const [style, setStyle] = useState<AvatarStyle>(
-    () => AVATAR_CATALOG.find((a) => a.id === initialAvatar)?.style ?? AVATAR_STYLES[0],
-  );
+  const [selected, setSelected] = useState<string | null>(() => normalizeAvatarId(initialAvatar));
 
   const toggle = useCallback((id: string) => {
     setSelected((cur) => (cur === id ? null : id));
@@ -104,13 +96,8 @@ export function StepAvatar({
       <StepHeading title={t("onboarding.avatar.heading", { name })} sub={t("onboarding.avatar.sub")} />
 
       <View style={{ gap: 12 }}>
-        <FilterChips
-          items={AVATAR_STYLES.map((s) => ({ key: s, label: t(`avatars.styles.${s}`) }))}
-          value={style}
-          onChange={setStyle}
-        />
         <View className="flex-row flex-wrap" accessibilityRole="radiogroup">
-          {grouped[style].map((a) => (
+          {AVATAR_CATALOG.map((a) => (
             <AvatarCell
               key={a.id}
               avatar={a}
@@ -129,7 +116,7 @@ export function StepAvatar({
       >
         {picked ? (
           <Image
-            source={{ uri: getAvatarUrl(picked.id) }}
+            source={getAvatarSource(picked.id) ?? undefined}
             style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: c.accent }}
           />
         ) : (

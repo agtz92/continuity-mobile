@@ -153,7 +153,7 @@ export default function More() {
   const router = useRouter();
   const { theme, palette } = useTheme();
   const { session } = useAuth();
-  const { avatarUrl } = useUserAvatar();
+  const { avatarSource } = useUserAvatar();
   const { data: profileData } = useQuery<{ profile: { firstName?: string | null } }>(
     PROFILE_QUERY,
     { fetchPolicy: "cache-first" },
@@ -257,8 +257,8 @@ export default function More() {
           </Meta>
         ) : null}
       </View>
-      {avatarUrl ? (
-        <Image source={{ uri: avatarUrl }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+      {avatarSource ? (
+        <Image source={avatarSource} style={{ width: 48, height: 48, borderRadius: 24 }} />
       ) : (
         <View
           className="items-center justify-center rounded-full"
