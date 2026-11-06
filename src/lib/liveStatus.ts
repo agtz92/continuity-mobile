@@ -44,6 +44,26 @@ export function onOwnWrite(fn: () => void): () => void {
 }
 
 /**
+ * Opciones de `useMutation` para escrituras directas (fuera de la cola) cuyo
+ * eco se resuelve con el delta: la respuesta trae la fila y Apollo la funde por
+ * `id`, y lo derivado (proyectos, activities) llega con `dashboardDelta`.
+ *
+ * Sin marcar la escritura como propia, su eco se tomaba por un cambio ajeno y
+ * bajaba el dashboard entero (y todas las queries montadas) en cada edición de
+ * proyecto, reorden o archivo de rutina.
+ *
+ * Solo para mutations cuyo efecto completo cabe en la caché + el delta. Las
+ * que borran o tocan tablas fuera de `DELTA_TABLES` no lo necesitan: su eco
+ * no pasa `isDeltaSafe` y va al refetch completo de todas formas.
+ */
+export const ownWrite = { onCompleted: () => noteOwnWrite() };
+
+/** `ownWrite` + el refetch de respaldo cuando no hay canal en vivo. */
+export function ownWriteUnlessLive(queries: DocumentNode[]) {
+  return { ...refetchUnlessLive(queries), ...ownWrite };
+}
+
+/**
  * `refetchQueries` para una mutation: la lista dada solo si no hay canal en
  * vivo. Es función para que Apollo lo evalúe al terminar la mutation, no al
  * montar el hook.

@@ -26,7 +26,7 @@ import { formatHours, summarizeDays } from "@/components/calendar/summary";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useQuickNotes } from "@/hooks/useQuickNotes";
 import { useUserAvatar } from "@/hooks/useUserAvatar";
-import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
+import { getUsageCached, type UsageSnapshot } from "@/lib/assistantApi";
 import { useAuth } from "@/lib/auth";
 import { weekDays } from "@/lib/calendar";
 import { toLocalISO, todayLocalISODate } from "@/lib/date";
@@ -172,7 +172,7 @@ export default function More() {
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      getUsage()
+      getUsageCached()
         .then((u) => {
           if (active) setUsage(u);
         })

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
-import { getUsage } from "@/lib/assistantApi";
+import { getUsageCached } from "@/lib/assistantApi";
 
 export type Plan = "free" | "pro" | "studio" | "admin";
 
@@ -40,7 +40,7 @@ export function usePlan(): { plan: Plan | null; cap: number | null } {
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      getUsage()
+      getUsageCached()
         .then((u) => {
           if (active) setPlan(u.plan);
         })

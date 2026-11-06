@@ -359,7 +359,15 @@ export async function flushOutbox(): Promise<void> {
  * plano): con cambios pendientes primero se mandan —el refetch los pisaría en
  * pantalla porque el servidor aún no los tiene— y el refetch va al final.
  */
+let lastRefreshAll = 0;
+
+/** Cuánto hace del último `refreshAll` (para no encadenar dos seguidos). */
+export function msSinceRefreshAll(): number {
+  return Date.now() - lastRefreshAll;
+}
+
 export function refreshAll(): void {
+  lastRefreshAll = Date.now();
   if (queue.length > 0) {
     void flushOutbox();
     return;

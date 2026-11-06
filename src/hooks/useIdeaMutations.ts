@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { refetchUnlessLive } from "@/lib/liveStatus";
+import { ownWriteUnlessLive, refetchUnlessLive } from "@/lib/liveStatus";
 import * as outbox from "@/lib/outbox";
 import {
   DASHBOARD_QUERY,
@@ -13,7 +13,7 @@ import {
 const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useIdeaMutations() {
-  const [updateIdeaM] = useMutation(UPDATE_IDEA, refetchAfter);
+  const [updateIdeaM] = useMutation(UPDATE_IDEA, ownWriteUnlessLive([DASHBOARD_QUERY]));
   const [deleteIdeaM] = useMutation(DELETE_IDEA, refetchAfter);
   const [promoteIdeaM] = useMutation(PROMOTE_IDEA, refetchAfter);
 

@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { refetchUnlessLive } from "@/lib/liveStatus";
+import { ownWrite, refetchUnlessLive } from "@/lib/liveStatus";
 import {
   ADD_TASK_BLOCKER,
   DASHBOARD_QUERY,
@@ -22,7 +22,7 @@ export function useTaskMutations() {
   const [addBlockerM] = useMutation(ADD_TASK_BLOCKER, refetchAfter);
   const [removeBlockerM] = useMutation(REMOVE_TASK_BLOCKER, refetchAfter);
   // Sin refetch: la respuesta trae id+position y Apollo la funde en la caché.
-  const [reorderProjectTasksM] = useMutation(REORDER_PROJECT_TASKS);
+  const [reorderProjectTasksM] = useMutation(REORDER_PROJECT_TASKS, ownWrite);
 
   const saveTask = async (t: {
     id?: string;

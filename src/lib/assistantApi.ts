@@ -76,6 +76,30 @@ export async function getUsage(): Promise<UsageSnapshot> {
   return res.json();
 }
 
+/**
+ * `getUsage` para los `useFocusEffect` de More, Billing, Plans y `usePlan`:
+ * cada foco de esas pantallas lo pedía. Comparte la petición en vuelo y la
+ * reutiliza `USAGE_TTL_MS`. Tras un chat o una compra se usa `getUsage()`
+ * directo, que siempre va fresco (y renueva lo compartido).
+ */
+const USAGE_TTL_MS = 30_000;
+let sharedUsage: { at: number; p: Promise<UsageSnapshot> } | null = null;
+
+export function getUsageCached(): Promise<UsageSnapshot> {
+  if (sharedUsage && Date.now() - sharedUsage.at < USAGE_TTL_MS) return sharedUsage.p;
+  const p = getUsage();
+  sharedUsage = { at: Date.now(), p };
+  p.catch(() => {
+    if (sharedUsage?.p === p) sharedUsage = null;
+  });
+  return p;
+}
+
+/** Olvida lo compartido (cerrar sesión, cambio de plan). */
+export function resetUsageCache(): void {
+  sharedUsage = null;
+}
+
 export type ConversationListItem = {
   id: string;
   title: string;

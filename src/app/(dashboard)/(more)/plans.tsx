@@ -5,7 +5,7 @@ import * as WebBrowser from "expo-web-browser";
 import { Check } from "lucide-react-native";
 import type { PurchasesPackage } from "react-native-purchases";
 
-import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
+import { getUsage, getUsageCached, type UsageSnapshot } from "@/lib/assistantApi";
 import {
   currentOffering,
   purchasePackage,
@@ -77,7 +77,7 @@ export default function Plans() {
     try {
       const [offering, snap] = await Promise.all([
         currentOffering(),
-        getUsage().catch(() => null),
+        getUsageCached().catch(() => null),
       ]);
       if (snap) setUsage(snap);
       const map: Record<string, PurchasesPackage> = {};

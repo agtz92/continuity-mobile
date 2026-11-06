@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { refetchUnlessLive } from "@/lib/liveStatus";
+import { noteOwnWrite, ownWrite, ownWriteUnlessLive, refetchUnlessLive } from "@/lib/liveStatus";
 import { useTranslation } from "react-i18next";
 import {
   CREATE_PROJECT,
@@ -14,15 +14,25 @@ import type { Priority } from "@/lib/types";
 // Con el canal en vivo arriba, la señal de esta escritura ya relanza el
 // dashboard; pedirlo aquí también era descargarlo dos veces (ver liveStatus).
 const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
+const ownAfter = ownWriteUnlessLive([DASHBOARD_QUERY]);
+
+/**
+ * Pausar, matar o archivar estaciona las fechas de las tareas del proyecto en
+ * el servidor (`park_project_tasks`): eso no viene en la respuesta ni en el
+ * delta, así que su eco tiene que ser el refetch completo (no se marca como
+ * escritura propia).
+ */
+const PARKING_STATUSES = new Set(["paused", "killed", "archived"]);
 
 export function useProjectMutations() {
   const { t } = useTranslation();
-  const [createProject] = useMutation(CREATE_PROJECT, refetchAfter);
+  // El delta trae la lista de proyectos completa: el nuevo entra con él.
+  const [createProject] = useMutation(CREATE_PROJECT, ownAfter);
   const [updateProject] = useMutation(UPDATE_PROJECT, refetchAfter);
   const [deleteProject] = useMutation(DELETE_PROJECT, refetchAfter);
   // No refetch: the mutation returns {id, position} per project, which Apollo
   // merges into the normalized cache so the list re-sorts without a round-trip.
-  const [reorderProjectsMut] = useMutation(REORDER_PROJECTS);
+  const [reorderProjectsMut] = useMutation(REORDER_PROJECTS, ownWrite);
 
   /** Save (create or update). Returns true on success, false on failure. */
   const saveProject = async (p: {
@@ -66,6 +76,7 @@ export function useProjectMutations() {
     try {
       if (p.id) {
         await updateProject({ variables: { id: p.id, data } });
+        if (!PARKING_STATUSES.has(p.status)) noteOwnWrite();
       } else {
         await createProject({ variables: { data } });
       }

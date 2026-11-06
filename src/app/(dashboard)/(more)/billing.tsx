@@ -7,7 +7,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, ExternalLink } from "lucide-react-native";
 import { PlanBadge } from "@/components/assistant/PlanBadge";
-import { getUsage, type UsageSnapshot } from "@/lib/assistantApi";
+import { getUsageCached, type UsageSnapshot } from "@/lib/assistantApi";
 import { alpha, useThemeColors } from "@/theme/useThemeColors";
 
 const WEB_BILLING_URL = "https://continuu.it/settings/billing";
@@ -41,7 +41,7 @@ export default function Billing() {
     useCallback(() => {
       let active = true;
       setStatus((prev) => (prev === "ready" ? prev : "loading"));
-      getUsage()
+      getUsageCached()
         .then((u) => {
           if (!active) return;
           setUsage(u);

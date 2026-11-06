@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { AppState, Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 import { useQuery } from "@apollo/client/react";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -49,14 +49,20 @@ async function loadDismissed(): Promise<Set<string>> {
  * Montado arriba de cada pestaña del dashboard, como en web (ahí vive sobre
  * todas las vistas, no solo sobre Today).
  */
+/** Compartido por las 5 instancias: el último refetch de cualquiera. */
+const REFETCH_GAP_MS = 60_000;
+let lastFetchAt = 0;
+
 export function NotificationStack({ className = "gap-2" }: { className?: string }) {
   const { data, refetch } = useQuery<{ notifications: InAppNotification[] }>(
     NOTIFICATIONS_QUERY,
-    // El poll es la red de seguridad, no el camino principal: este componente
-    // está montado en las 5 pestañas a la vez y el query cuenta cuotas en el
-    // servidor, así que 60s × 5 instancias era pagar de más. Lo que de verdad
-    // trae un anuncio nuevo es el refetch de abajo (enfoque / foreground).
-    { fetchPolicy: "cache-and-network", pollInterval: 300_000 },
+    // Montado en las 5 pestañas a la vez y el query cuenta cuotas en el
+    // servidor: cada instancia con su poll, su refetch al montar y su listener
+    // de foreground eran ~60 consultas por hora. Ahora las 5 leen la misma
+    // caché y la red se pide al enfocar, como mucho cada `REFETCH_GAP_MS`
+    // entre todas. Volver de segundo plano ya lo cubre `refreshAll`
+    // (`useLiveSync`), que relanza las queries activas.
+    { fetchPolicy: "cache-first" },
   );
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
@@ -66,19 +72,15 @@ export function NotificationStack({ className = "gap-2" }: { className?: string 
   // que es justo cuando alguien está mirando la pantalla.
   useFocusEffect(
     useCallback(() => {
-      void refetch().catch(() => undefined);
+      if (Date.now() - lastFetchAt >= REFETCH_GAP_MS) {
+        lastFetchAt = Date.now();
+        void refetch().catch(() => undefined);
+      }
       // Relee los descartes: el banner vive en las 5 pestañas y cada instancia
       // tiene su propio estado, así que cerrarlo en una debe callarlo en todas.
       void loadDismissed().then(setDismissed);
     }, [refetch]),
   );
-
-  useEffect(() => {
-    const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") void refetch().catch(() => undefined);
-    });
-    return () => sub.remove();
-  }, [refetch]);
 
   // Con el id versionado (`ann.<uuid>.<rev>`) la lista de descartes crecería
   // sin techo: cada edición del anuncio deja un id muerto. Lo que el servidor

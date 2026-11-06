@@ -84,8 +84,22 @@ Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
   se funde en la caché. Cualquier `DELETE` (salvo activities), blockers, categorías, preferencias
   o un error del delta → refetch completo como antes. Requiere el backend con `dashboardDelta`;
   contra uno viejo la query falla (sin toast, `context.silent`) y cae al refetch.
+- **Escrituras directas (fuera de la cola):** las que caben en caché + delta se marcan como
+  propias con `ownWrite` / `ownWriteUnlessLive` (`lib/liveStatus.ts`): crear/editar proyecto
+  (salvo pausar/matar/archivar, que estaciona fechas de tareas en el servidor), reordenar
+  proyectos y tareas, editar idea o nota, archivar rutina. **Una mutation directa nueva** que
+  no lleve esto hace que su eco baje el dashboard entero.
 - **Al volver a primer plano:** iOS suspende el socket en segundo plano, así que al regresar se
-  relanzan las queries activas (mínimo 15 s entre llamadas).
+  relanzan las queries activas (mínimo 15 s entre llamadas). La re-suscripción del socket ya no
+  pide todo otra vez si `refreshAll` corrió hace menos de 15 s (`msSinceRefreshAll`), ni el
+  foreground si la re-suscripción lo hizo hace menos de 5 s: antes eran dos completas por vuelta.
+- **Avisos in-app (`NotificationStack`, montado en 5 pestañas):** `cache-first`, sin poll ni
+  listener de foreground; la red se pide al enfocar, como mucho cada 60 s entre todas las
+  instancias. `getUsageCached()` (`lib/assistantApi.ts`) hace lo mismo para `/usage` en los
+  focos de More, Billing, Plans y `usePlan` (30 s); tras un chat o compra, `getUsage()`.
+- **Caché persistida:** `CACHE_VERSION` (`lib/cachePersist.ts`) se sube cada vez que cambian las
+  variables del dashboard (o queda la entrada vieja en el archivo para siempre). Al restaurar se
+  tiran las raíces bajo demanda (`completedTasks`, `activity`) y se hace `gc()`.
 - **Tema, paleta e idioma:** `ThemeProvider` **no** aplica desde el caché reactivo (para no pisar
   un cambio local a medias). Se suscribe con `onLiveChange` y, si el aviso es de
   `notifications_notificationsettings`, hace su propio refetch + `applyServerSettings`, igual que

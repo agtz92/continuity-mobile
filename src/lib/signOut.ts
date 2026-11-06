@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apolloClient } from "./apollo";
+import { resetUsageCache } from "./assistantApi";
 import { purgePersistedCache } from "./cachePersist";
 import { purgeOutbox } from "./outbox";
 import { UNREGISTER_PUSH_TOKEN } from "./graphql";
@@ -47,6 +48,7 @@ export async function clearUserData(): Promise<void> {
   purgePersistedCache();
   // Cambios offline sin mandar: son de esta cuenta y no deben salir con otra.
   purgeOutbox();
+  resetUsageCache();
   await AsyncStorage.multiRemove(USER_KEYS).catch(() => undefined);
   await apolloClient.clearStore().catch(() => undefined);
 }

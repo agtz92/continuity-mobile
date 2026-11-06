@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { refetchUnlessLive } from "@/lib/liveStatus";
+import { ownWriteUnlessLive, refetchUnlessLive } from "@/lib/liveStatus";
 import * as outbox from "@/lib/outbox";
 import {
   DASHBOARD_QUERY,
@@ -12,7 +12,7 @@ import {
 const refetchAfter = refetchUnlessLive([DASHBOARD_QUERY]);
 
 export function useNoteMutations() {
-  const [updateNoteM] = useMutation(UPDATE_NOTE, refetchAfter);
+  const [updateNoteM] = useMutation(UPDATE_NOTE, ownWriteUnlessLive([DASHBOARD_QUERY]));
   const [deleteNoteM] = useMutation(DELETE_NOTE, refetchAfter);
 
   // Agregar funciona sin red (cola); editar y borrar necesitan conexión.

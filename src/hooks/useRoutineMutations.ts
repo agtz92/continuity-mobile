@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client/react";
-import { refetchUnlessLive } from "@/lib/liveStatus";
+import { ownWriteUnlessLive, refetchUnlessLive } from "@/lib/liveStatus";
 import { ARCHIVE_ROUTINE, DASHBOARD_QUERY, DELETE_ROUTINE } from "@/lib/graphql";
 import * as outbox from "@/lib/outbox";
 import type { IntervalUnit, RecurrenceType } from "@/lib/types";
@@ -24,7 +24,7 @@ export interface RoutineFormInput {
 }
 
 export function useRoutineMutations() {
-  const [archiveRoutineM] = useMutation(ARCHIVE_ROUTINE, refetchAfter);
+  const [archiveRoutineM] = useMutation(ARCHIVE_ROUTINE, ownWriteUnlessLive([DASHBOARD_QUERY]));
   const [deleteRoutineM] = useMutation(DELETE_ROUTINE, refetchAfter);
 
   const saveRoutine = async (r: RoutineFormInput): Promise<boolean> => {

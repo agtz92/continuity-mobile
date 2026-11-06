@@ -18,6 +18,7 @@ export {
   failedCount,
   failedOps,
   flushOutbox,
+  msSinceRefreshAll,
   pendingCount,
   purgeOutbox,
   refreshAll,

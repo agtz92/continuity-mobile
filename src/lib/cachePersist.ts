@@ -29,7 +29,24 @@ import type { InMemoryCache, NormalizedCacheObject } from "@apollo/client";
  * Plan completo: `continuity/docs/plan-offline-movil.md` (fase 1).
  */
 // 3: el dashboard pasó a `dashboard(activityDays: 60)`, otra clave de caché.
-const CACHE_VERSION = 3;
+// 4: `dashboard(activityDays: 60, doneTaskDays: 30)`. Con la 3 el archivo
+//    arrastraba la entrada vieja (con todas las completadas) para siempre.
+const CACHE_VERSION = 4;
+
+/**
+ * Raíces que se piden bajo demanda y no hacen falta sin red: páginas del
+ * historial de completadas y de la bitácora. Se tiran al restaurar (antes de
+ * que nada las mire) junto con lo que ya no cuelga de ninguna query (`gc`),
+ * para que el archivo no crezca sin fin.
+ */
+const ON_DEMAND_ROOTS = ["completedTasks", "activity"];
+
+function pruneRestored(cache: InMemoryCache): void {
+  for (const fieldName of ON_DEMAND_ROOTS) {
+    cache.evict({ id: "ROOT_QUERY", fieldName });
+  }
+  cache.gc();
+}
 const SAVE_THROTTLE_MS = 15_000;
 const PREFIX = "apollo-cache-";
 
@@ -150,6 +167,7 @@ export async function startCachePersistence(
       const parsed = JSON.parse(await file.text()) as Persisted;
       if (parsed.version === versionTag()) {
         cache.restore(parsed.data);
+        pruneRestored(cache);
         syncedAt = parsed.syncedAt;
         syncListeners.forEach((fn) => fn());
       } else {

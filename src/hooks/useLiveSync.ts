@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AppState, InteractionManager } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { pendingCount, refreshAll } from "@/lib/outbox";
+import { msSinceRefreshAll, pendingCount, refreshAll } from "@/lib/outbox";
 import { isDeltaSafe, reconcileDashboard, type LiveSignal } from "@/lib/dashboardDelta";
 import { msSinceOwnWrite, onOwnWrite, setLiveConnected } from "@/lib/liveStatus";
 
@@ -28,6 +28,7 @@ import { msSinceOwnWrite, onOwnWrite, setLiveConnected } from "@/lib/liveStatus"
  */
 const DEBOUNCE_MS = 400;
 const FOREGROUND_MIN_GAP_MS = 15_000;
+const RECENT_REFRESH_MS = 5_000;
 // Eco de una escritura propia (palomear, capturar): la caché ya lo tiene, así
 // que la descarga espera a que el usuario deje de tocar. Palomear cinco tareas
 // seguidas cuesta una descarga al final, no cinco entre toque y toque. El tope
@@ -135,9 +136,14 @@ export function useLiveSync() {
       channel.subscribe((status) => {
         if (status === "SUBSCRIBED") {
           setLiveConnected(true);
-          // Al reconectar (p. ej. tras volver de segundo plano) pudo haber
-          // avisos perdidos: se pide todo una vez, preferencias incluidas.
-          if (wasDown) bump("notifications_notificationsettings");
+          // Al reconectar pudo haber avisos perdidos: se pide todo una vez,
+          // preferencias incluidas. Salvo que acabe de correr un refreshAll:
+          // al volver de segundo plano el socket se reconecta justo después
+          // del refresco de primer plano, y eran dos dashboards completos por
+          // cada vuelta a la app.
+          if (wasDown && msSinceRefreshAll() > FOREGROUND_MIN_GAP_MS) {
+            bump("notifications_notificationsettings");
+          }
           wasDown = false;
         } else if (
           status === "CHANNEL_ERROR" ||
@@ -167,6 +173,8 @@ export function useLiveSync() {
       if (state !== "active") return;
       if (Date.now() - last < FOREGROUND_MIN_GAP_MS) return;
       last = Date.now();
+      // Si el socket ya reconectó y pidió todo hace un momento, no repetir.
+      if (msSinceRefreshAll() < RECENT_REFRESH_MS) return;
       refreshAll();
     });
     return () => sub.remove();
