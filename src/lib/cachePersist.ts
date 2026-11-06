@@ -31,7 +31,8 @@ import type { InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 // 3: el dashboard pasó a `dashboard(activityDays: 60)`, otra clave de caché.
 // 4: `dashboard(activityDays: 60, doneTaskDays: 30)`. Con la 3 el archivo
 //    arrastraba la entrada vieja (con todas las completadas) para siempre.
-const CACHE_VERSION = 4;
+// 5: + `allNotes: false` (las notas viejas ya no viajan).
+const CACHE_VERSION = 5;
 
 /**
  * Raíces que se piden bajo demanda y no hacen falta sin red: páginas del

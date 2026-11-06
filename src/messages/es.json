@@ -1877,5 +1877,12 @@
     "loadMore": "Cargar más",
     "loading": "Cargando…",
     "error": "No se pudieron cargar. Reintentar"
+  },
+  "noteHistory": {
+    "showCount": "{count, plural, one {Ver # update anterior} other {Ver # updates anteriores}}",
+    "show": "Ver updates anteriores",
+    "loadMore": "Cargar más",
+    "loading": "Cargando…",
+    "error": "No se pudieron cargar. Reintentar"
   }
 }

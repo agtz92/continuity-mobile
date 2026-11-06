@@ -1877,5 +1877,12 @@
     "loadMore": "Load more",
     "loading": "Loading…",
     "error": "Couldn't load them. Retry"
+  },
+  "noteHistory": {
+    "showCount": "{count, plural, one {Show # earlier update} other {Show # earlier updates}}",
+    "show": "Show earlier updates",
+    "loadMore": "Load more",
+    "loading": "Loading…",
+    "error": "Couldn't load them. Retry"
   }
 }

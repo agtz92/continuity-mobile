@@ -100,6 +100,9 @@ Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
 - **Caché persistida:** `CACHE_VERSION` (`lib/cachePersist.ts`) se sube cada vez que cambian las
   variables del dashboard (o queda la entrada vieja en el archivo para siempre). Al restaurar se
   tiran las raíces bajo demanda (`completedTasks`, `activity`) y se hace `gc()`.
+- **Notas de bitácora recortadas** (`allNotes: false`): el dashboard solo trae las de 60 días;
+  las anteriores vienen contadas en `project.olderNoteCount` y `ProjectActivity` las pide con
+  `useOlderProjectNotes` (necesita red). Espejo de la web.
 - **Tema, paleta e idioma:** `ThemeProvider` **no** aplica desde el caché reactivo (para no pisar
   un cambio local a medias). Se suscribe con `onLiveChange` y, si el aviso es de
   `notifications_notificationsettings`, hace su propio refetch + `applyServerSettings`, igual que

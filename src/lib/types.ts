@@ -59,6 +59,8 @@ export interface Project {
    *  (`DASHBOARD_DONE_TASK_DAYS`). Ver `lib/projectProgress.ts`. */
   olderDoneCount?: number;
   olderDoneEffortHours?: number;
+  /** Notas de bitácora anteriores a la ventana de activities (no vienen en el dashboard). */
+  olderNoteCount?: number;
 }
 
 /** Tramo de enfriamiento de un proyecto. Espejo del backend y de la web. */

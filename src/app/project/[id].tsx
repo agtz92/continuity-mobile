@@ -220,9 +220,17 @@ export default function ProjectDetail() {
 
           <ProjectSection
             title={t("views.projects.card.recentActivity")}
-            meta={projectUpdates.length > 0 ? String(projectUpdates.length) : null}
+            meta={
+              projectUpdates.length + (project.olderNoteCount ?? 0) > 0
+                ? String(projectUpdates.length + (project.olderNoteCount ?? 0))
+                : null
+            }
           >
-            <ProjectActivity updates={projectUpdates} />
+            <ProjectActivity
+              updates={projectUpdates}
+              projectId={project.id}
+              olderCount={project.olderNoteCount ?? 0}
+            />
             <DashedAddButton
               label={t("views.projects.card.logUpdate")}
               onPress={() => setUpdateOpen(true)}

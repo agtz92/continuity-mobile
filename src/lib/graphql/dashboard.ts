@@ -15,8 +15,9 @@ export const ME_QUERY = gql`
 // Avisos in-app (banners) que el usuario ve; `i18nKind`/`i18nVarsJson` permiten
 // traducir el texto en cliente en lugar de mostrar el `body` del servidor.
 
-// `activityDays` recorta las actividades a los últimos 60 días (todas las notas
-// se quedan). Va fijo en el documento y no como variable: así la clave de caché
+// `activityDays` recorta las actividades a los últimos 60 días, notas de
+// bitácora incluidas (`allNotes: false`): las anteriores llegan contadas por
+// proyecto (`olderNoteCount`) y el detalle las pide con `ACTIVITY_QUERY`. Va fijo en el documento y no como variable: así la clave de caché
 // es la misma en cada `refetchQueries`, `updateQuery` de la outbox y lectura.
 // El Log trae su historial con `ACTIVITY_QUERY`. Requiere el backend con el
 // argumento desplegado; contra uno viejo la query falla por validación.
@@ -29,6 +30,10 @@ export const DASHBOARD_ACTIVITY_DAYS = 60;
 // `COMPLETED_TASKS_QUERY`. Mismo valor que en la web. Requiere el backend con el
 // argumento desplegado.
 export const DASHBOARD_DONE_TASK_DAYS = 30;
+
+/** Inicio de la ventana de activities, para pedir las notas anteriores. */
+export const activityWindowStart = (now = Date.now()): string =>
+  new Date(now - DASHBOARD_ACTIVITY_DAYS * 86_400_000).toISOString();
 
 /** Inicio de la ventana de completadas, para pedir las anteriores. */
 export const doneWindowStart = (now = Date.now()): string =>
@@ -52,6 +57,7 @@ const DASHBOARD_PROJECT_FIELDS = `
   ${PROJECT_CLOSURE_FIELDS}
   olderDoneCount
   olderDoneEffortHours
+  olderNoteCount
 `;
 
 const DASHBOARD_ACTIVITY_FIELDS = `
@@ -72,6 +78,7 @@ export const DASHBOARD_QUERY = gql`
     dashboard(
       activityDays: ${DASHBOARD_ACTIVITY_DAYS}
       doneTaskDays: ${DASHBOARD_DONE_TASK_DAYS}
+      allNotes: false
     ) {
       projects {
         ${DASHBOARD_PROJECT_FIELDS}
@@ -169,7 +176,12 @@ export const DASHBOARD_QUERY = gql`
  */
 export const DASHBOARD_DELTA_QUERY = gql`
   query DashboardDelta($since: DateTime!) {
-    dashboardDelta(since: $since, doneTaskDays: ${DASHBOARD_DONE_TASK_DAYS}) {
+    dashboardDelta(
+      since: $since
+      doneTaskDays: ${DASHBOARD_DONE_TASK_DAYS}
+      activityDays: ${DASHBOARD_ACTIVITY_DAYS}
+      allNotes: false
+    ) {
       projects {
         ${DASHBOARD_PROJECT_FIELDS}
       }
