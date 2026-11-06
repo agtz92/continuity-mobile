@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { AppState, InteractionManager } from "react-native";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
-import { refreshAll } from "@/lib/outbox";
+import { pendingCount, refreshAll } from "@/lib/outbox";
+import { isDeltaSafe, reconcileDashboard, type LiveSignal } from "@/lib/dashboardDelta";
 import { msSinceOwnWrite, onOwnWrite, setLiveConnected } from "@/lib/liveStatus";
 
 /**
@@ -56,6 +57,7 @@ export function useLiveSync() {
     if (!userId || !enabled) return;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let pending = new Set<string>();
+    let signals: LiveSignal[] = [];
     let firstPendingAt = 0;
     let cancelled = false;
     let wasDown = false;
@@ -67,9 +69,23 @@ export function useLiveSync() {
       timer = undefined;
       firstPendingAt = 0;
       const tables = pending;
+      const batch = signals;
       pending = new Set();
+      signals = [];
+      // Eco de lo que mandó la cola y nada más: la caché ya lo tiene y basta
+      // con el delta (derivados de proyectos + activities nuevas) en vez de
+      // bajar el dashboard entero. Ver `lib/dashboardDelta.ts`.
+      const deltaOnly = isEcho() && isDeltaSafe(batch) && pendingCount() === 0;
       const run = () => {
         if (cancelled) return;
+        if (deltaOnly) {
+          void reconcileDashboard().then((ok) => {
+            if (cancelled) return;
+            if (!ok) refreshAll();
+            listeners.forEach((fn) => fn(tables));
+          });
+          return;
+        }
         // Con cambios offline pendientes, primero se mandan (ver `refreshAll`).
         refreshAll();
         listeners.forEach((fn) => fn(tables));
@@ -88,8 +104,14 @@ export function useLiveSync() {
       clearTimeout(timer);
       timer = setTimeout(flush, delay);
     };
-    const bump = (table?: string) => {
-      if (table) pending.add(table);
+    const bump = (table?: string, op?: string) => {
+      if (table) {
+        pending.add(table);
+        signals.push({ table, op });
+      } else {
+        // Sin tabla (p. ej. reconexión): fuerza el camino completo.
+        signals.push({ table: "", op });
+      }
       if (!firstPendingAt) firstPendingAt = Date.now();
       schedule();
     };
@@ -102,8 +124,8 @@ export function useLiveSync() {
       config: { private: true },
     });
     channel.on("broadcast", { event: "changed" }, (msg) => {
-      const table = (msg.payload as { table?: string } | undefined)?.table;
-      bump(table);
+      const payload = msg.payload as { table?: string; op?: string } | undefined;
+      bump(payload?.table, payload?.op);
     });
 
     // Canal privado: el join se autoriza con el JWT contra la política de

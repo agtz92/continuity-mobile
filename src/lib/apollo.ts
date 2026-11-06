@@ -45,7 +45,10 @@ const authLink = new SetContextLink(async (prevContext) => {
 const errorLink = new ErrorLink(({ error, operation }) => {
   // La cola offline (`lib/outbox`) reintenta sola los fallos de red: avisar
   // de cada intento sería ruido. Los errores del servidor sí se muestran.
-  const fromOutbox = Boolean(operation.getContext().outbox);
+  // `silent`: lecturas de fondo con su propio plan B (la reconciliación de
+  // `lib/dashboardDelta.ts` cae al refetch completo); un toast ahí sería ruido.
+  const ctx = operation.getContext();
+  const fromOutbox = Boolean(ctx.outbox || ctx.silent);
   if (CombinedGraphQLErrors.is(error)) {
     // La cola avisa ella misma de lo que el servidor rechaza (y lo guarda);
     // aquí solo queda cerrar sesión si el token ya no sirve.

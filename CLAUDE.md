@@ -78,6 +78,12 @@ Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
   (`noteOwnWrite` en `lib/liveStatus.ts`), el debounce sube a 1.5 s, cada toque nuevo lo
   corre (tope 5 s desde el primer aviso) y el refetch espera a `runAfterInteractions`. Así
   palomear varias tareas seguidas cuesta una descarga al final, no una por toque.
+- **Y esa descarga ya no es el dashboard entero** (`src/lib/dashboardDelta.ts`): si el lote es
+  eco, la cola está vacía y todos los avisos son INSERT/UPDATE de tablas que escribe la cola
+  (`isDeltaSafe`), se pide `dashboardDelta` (proyectos con sus derivados + activities nuevas) y
+  se funde en la caché. Cualquier `DELETE` (salvo activities), blockers, categorías, preferencias
+  o un error del delta → refetch completo como antes. Requiere el backend con `dashboardDelta`;
+  contra uno viejo la query falla (sin toast, `context.silent`) y cae al refetch.
 - **Al volver a primer plano:** iOS suspende el socket en segundo plano, así que al regresar se
   relanzan las queries activas (mínimo 15 s entre llamadas).
 - **Tema, paleta e idioma:** `ThemeProvider` **no** aplica desde el caché reactivo (para no pisar

@@ -22,22 +22,42 @@ export const ME_QUERY = gql`
 // argumento desplegado; contra uno viejo la query falla por validación.
 export const DASHBOARD_ACTIVITY_DAYS = 60;
 
+// Selección de proyecto y de activity del dashboard. `DASHBOARD_DELTA_QUERY` usa
+// las mismas: lo que trae se escribe en la lista cacheada del dashboard y un
+// campo de menos dejaría la query incompleta (pantalla vacía).
+const DASHBOARD_PROJECT_FIELDS = `
+  id
+  name
+  description
+  why
+  nextStep
+  status
+  priority
+  categoryId
+  lastActivity
+  created
+  dueDate
+  ${PROJECT_CLOSURE_FIELDS}
+`;
+
+const DASHBOARD_ACTIVITY_FIELDS = `
+  id
+  kind
+  entityId
+  entityTitle
+  projectId
+  targetProjectId
+  note
+  previousValue
+  newValue
+  created
+`;
+
 export const DASHBOARD_QUERY = gql`
   query Dashboard {
     dashboard(activityDays: ${DASHBOARD_ACTIVITY_DAYS}) {
       projects {
-        id
-        name
-        description
-        why
-        nextStep
-        status
-        priority
-        categoryId
-        lastActivity
-        created
-        dueDate
-        ${PROJECT_CLOSURE_FIELDS}
+        ${DASHBOARD_PROJECT_FIELDS}
       }
       tasks {
         id
@@ -69,16 +89,7 @@ export const DASHBOARD_QUERY = gql`
         created
       }
       activities {
-        id
-        kind
-        entityId
-        entityTitle
-        projectId
-        targetProjectId
-        note
-        previousValue
-        newValue
-        created
+        ${DASHBOARD_ACTIVITY_FIELDS}
       }
       categories {
         id
@@ -128,6 +139,25 @@ export const DASHBOARD_QUERY = gql`
           kind
           cap
         }
+      }
+    }
+  }
+`;
+
+/**
+ * Reconciliación barata tras escribir (ver `lib/dashboardDelta.ts`): todos los
+ * proyectos con sus derivados y las activities desde `since`. Requiere el
+ * backend con `dashboardDelta`; contra uno viejo falla por validación y el
+ * cliente vuelve al refetch completo.
+ */
+export const DASHBOARD_DELTA_QUERY = gql`
+  query DashboardDelta($since: DateTime!) {
+    dashboardDelta(since: $since) {
+      projects {
+        ${DASHBOARD_PROJECT_FIELDS}
+      }
+      activities {
+        ${DASHBOARD_ACTIVITY_FIELDS}
       }
     }
   }
