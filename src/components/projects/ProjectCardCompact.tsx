@@ -17,6 +17,7 @@ import {
   projectIsBlocked,
   taskIsBlocked,
 } from "@/lib/cooling";
+import { doneTaskCount, totalTaskCount } from "@/lib/projectProgress";
 
 /** Badge de la fila de badges: versalitas 11 px, rectángulo de radio 4. */
 function CardBadge({
@@ -101,8 +102,8 @@ export const ProjectCardCompact = memo(function ProjectCardCompact({
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
-  const done = projectTasks.filter((tk) => tk.done).length;
-  const total = projectTasks.length;
+  const done = doneTaskCount(p, projectTasks);
+  const total = totalTaskCount(p, projectTasks);
   const todayCount = projectTasks.filter(
     (tk) => !tk.done && isDueToday(tk.dueDate)
   ).length;

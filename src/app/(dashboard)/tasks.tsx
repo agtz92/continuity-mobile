@@ -32,6 +32,7 @@ import {
 } from "@/components/tasks/TasksFilterSheet";
 import { SIZE } from "@/theme/tokens";
 import { useThemeColors } from "@/theme/useThemeColors";
+import { OlderCompletedTasks } from "@/components/tasks/OlderCompletedTasks";
 
 type TaskRange = "today" | "week" | "all";
 type BucketKey = "overdue" | "today" | "upcoming" | "unscheduled" | "done";
@@ -97,6 +98,12 @@ export default function Tasks() {
   // detail / graveyard instead.
   const projectById = useMemo(
     () => new Map(projects.map((p) => [p.id, p])),
+    [projects]
+  );
+  // Completadas fuera de la ventana del dashboard (solo las de proyectos: las
+  // sueltas no tienen contador, pero el pie de la sección las trae igual).
+  const olderDoneTotal = useMemo(
+    () => projects.reduce((n, p) => n + (p.olderDoneCount ?? 0), 0),
     [projects]
   );
   const visibleTasks = useMemo(
@@ -242,10 +249,39 @@ export default function Tasks() {
       push("upcoming", t("views.tasks.upcoming"), buckets.upcoming);
     if (range === "all" && buckets.unscheduled.length > 0)
       push("unscheduled", t("views.tasks.pickDay"), buckets.unscheduled);
-    if (filter.showCompleted && buckets.done.length > 0)
+    // Con completadas anteriores a la ventana del dashboard la sección se
+    // muestra aunque no haya recientes: su pie las trae (`renderSectionFooter`).
+    if (filter.showCompleted && (buckets.done.length > 0 || (!searching && olderDoneTotal > 0)))
       push("done", t("views.tasks.completed"), buckets.done);
     return out;
-  }, [buckets, openState, searching, range, filter.showCompleted, todayEffort, t]);
+  }, [buckets, openState, searching, range, filter.showCompleted, todayEffort, olderDoneTotal, t]);
+
+  const doneIds = useMemo(() => new Set(buckets.done.map((x) => x.id)), [buckets.done]);
+  // Pie de "Completadas": las anteriores a la ventana, bajo demanda. El
+  // servidor no aplica la búsqueda, así que con texto no se ofrecen.
+  const renderSectionFooter = ({
+    section,
+  }: {
+    section: SectionListData<Item, Bucket>;
+  }) =>
+    section.key === "done" && section.open && !searching ? (
+      <OlderCompletedTasks
+        excludeIds={doneIds}
+        renderItem={(task, onReopened) => (
+          <View style={{ marginBottom: 10 }}>
+            <TaskRow
+              task={task}
+              project={task.projectId ? projectById.get(task.projectId) : undefined}
+              onToggle={(x) => {
+                void Promise.resolve(toggleTask(x)).then(onReopened);
+              }}
+              onDelete={deleteTask}
+              onEdit={openEdit}
+            />
+          </View>
+        )}
+      />
+    ) : null;
 
   const toggleBucket = useCallback(
     (key: BucketKey) => setOpenState((s) => ({ ...s, [key]: !s[key] })),
@@ -441,6 +477,7 @@ export default function Tasks() {
           keyExtractor={(item) => (item === EMPTY_ROW ? EMPTY_ROW : item.id)}
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
+          renderSectionFooter={renderSectionFooter}
           stickySectionHeadersEnabled={false}
           // Elemento, no componente inline: el TextInput del buscador no se
           // remonta al teclear.

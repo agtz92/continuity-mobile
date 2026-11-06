@@ -107,3 +107,30 @@ export const REORDER_PROJECT_TASKS = gql`
     }
   }
 `;
+
+/**
+ * Completadas anteriores a la ventana del dashboard (`doneWindowStart()`),
+ * paginadas por `offset`. Ver `hooks/useOlderCompletedTasks.ts`. Espejo de la web.
+ */
+export const COMPLETED_TASKS_QUERY = gql`
+  query CompletedTasks($before: DateTime!, $projectId: ID, $offset: Int, $limit: Int) {
+    completedTasks(before: $before, projectId: $projectId, offset: $offset, limit: $limit) {
+      id
+      title
+      projectId
+      dueDate
+      done
+      completedAt
+      created
+      effortHours
+      dueTime
+      durationMinutes
+      blockedSince
+      blockedReason
+      position
+      blockers {
+        ${TASK_BLOCKER_FIELDS}
+      }
+    }
+  }
+`;

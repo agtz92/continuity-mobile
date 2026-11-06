@@ -55,6 +55,10 @@ export interface Project {
   blockedSince?: string | null;
   /** ¿Tiene al menos una tarea abierta con blocker? */
   isBlocked?: boolean | null;
+  /** Completadas que el dashboard no trae por ser anteriores a su ventana
+   *  (`DASHBOARD_DONE_TASK_DAYS`). Ver `lib/projectProgress.ts`. */
+  olderDoneCount?: number;
+  olderDoneEffortHours?: number;
 }
 
 /** Tramo de enfriamiento de un proyecto. Espejo del backend y de la web. */

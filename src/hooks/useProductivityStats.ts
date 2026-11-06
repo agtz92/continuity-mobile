@@ -6,6 +6,7 @@ import {
   hoursSince,
   isCompletedToday,
 } from "@/lib/date";
+import { doneEffortHours, doneTaskCount, totalTaskCount } from "@/lib/projectProgress";
 
 const COMEBACK_GAP_DAYS = 7;
 const COMEBACK_FRESH_HOURS = 24;
@@ -67,15 +68,11 @@ export function useProductivityStats({
     const map = new Map<string, ProjectProgress>();
     for (const p of projects) {
       const projectTasks = tasks.filter((t) => t.projectId === p.id);
-      const doneCount = projectTasks.filter((t) => t.done).length;
-      const totalCount = projectTasks.length;
+      const doneCount = doneTaskCount(p, projectTasks);
+      const totalCount = totalTaskCount(p, projectTasks);
       const donePct = totalCount === 0 ? 0 : doneCount / totalCount;
       const totalEffortHours =
-        Math.round(
-          projectTasks
-            .filter((t) => t.done && t.effortHours != null)
-            .reduce((acc, t) => acc + (t.effortHours as number), 0) * 10
-        ) / 10;
+        Math.round(doneEffortHours(p, projectTasks) * 10) / 10;
       const todayEffortHours =
         Math.round(
           projectTasks

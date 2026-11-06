@@ -8,6 +8,8 @@ import {
   REORDER_PROJECT_TASKS,
 } from "@/lib/graphql";
 import * as outbox from "@/lib/outbox";
+import { apolloClient } from "@/lib/apollo";
+import { isTaskInDashboard } from "@/lib/dashboardDelta";
 import type { Task } from "@/lib/types";
 
 // Con el canal en vivo arriba, la señal de esta escritura ya relanza el
@@ -47,7 +49,13 @@ export function useTaskMutations() {
 
   // Estado explícito, no toggle: la operación puede salir tarde o repetirse.
   const toggleTask = async (t: Task): Promise<void> => {
-    await outbox.setTaskDone(t.id, !t.done);
+    // Una completada anterior a la ventana no está en la lista del dashboard:
+    // al reabrirla, el delta no la regresa; hace falta el refetch completo.
+    const inDashboard = isTaskInDashboard(t.id);
+    const ok = await outbox.setTaskDone(t.id, !t.done);
+    if (ok && !inDashboard) {
+      void apolloClient.refetchQueries({ include: [DASHBOARD_QUERY] });
+    }
   };
 
   /** Persiste el orden manual de las tareas pendientes de un proyecto. La

@@ -1870,5 +1870,12 @@
       "nothing": "Ya estaba al día"
     },
     "actionFailed": "No se pudo aplicar. Inténtalo desde la app."
+  },
+  "completedHistory": {
+    "showCount": "{count, plural, one {Ver # completada anterior} other {Ver # completadas anteriores}}",
+    "show": "Ver completadas anteriores",
+    "loadMore": "Cargar más",
+    "loading": "Cargando…",
+    "error": "No se pudieron cargar. Reintentar"
   }
 }

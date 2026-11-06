@@ -94,6 +94,13 @@ Espejo de la "frescura" de la web (`continuity/frontend/CLAUDE.md`). Vive en
   necesita build u OTA nuevos. El apagado inmediato es en el servidor:
   `alter table … disable trigger …_live;` (ver `backend/CLAUDE.md`).
 
+- **Completadas recortadas** (`DASHBOARD_DONE_TASK_DAYS = 30`, espejo de la web): el dashboard
+  trae las abiertas y las completadas de 30 días. Progreso de proyecto con
+  `src/lib/projectProgress.ts` (espejo literal de la web; suma `olderDoneCount`) — nunca
+  `tasks.filter(done)` a mano. Las listas de completadas (Tasks, detalle de proyecto) terminan en
+  `<OlderCompletedTasks/>` (pide las anteriores con `COMPLETED_TASKS_QUERY`; necesita red).
+  Reabrir una de ésas hace refetch completo. Requiere el backend con `doneTaskDays`.
+
 ### OTA (`eas update`): solo si el binario tiene los mismos módulos nativos
 
 `runtimeVersion` usa la política `appVersion`: un `eas update` llega a **todo** build de

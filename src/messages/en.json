@@ -1870,5 +1870,12 @@
       "nothing": "Already up to date"
     },
     "actionFailed": "Couldn't apply it. Try from the app."
+  },
+  "completedHistory": {
+    "showCount": "{count, plural, one {Show # earlier completed task} other {Show # earlier completed tasks}}",
+    "show": "Show earlier completed tasks",
+    "loadMore": "Load more",
+    "loading": "Loading…",
+    "error": "Couldn't load them. Retry"
   }
 }

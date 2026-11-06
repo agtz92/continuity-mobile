@@ -136,3 +136,12 @@ export async function reconcileDashboard(): Promise<boolean> {
     return false;
   }
 }
+
+/** ¿Está la tarea en la lista cacheada del dashboard? Las completadas
+ *  anteriores a la ventana (`COMPLETED_TASKS_QUERY`) no lo están: reabrir una
+ *  necesita el refetch completo para que vuelva a la lista. */
+export function isTaskInDashboard(taskId: string): boolean {
+  const cached = apolloClient.cache.readQuery({ query: DASHBOARD_QUERY }) as DashboardResult;
+  const tasks = (cached?.dashboard?.tasks ?? []) as Array<{ id: string }>;
+  return tasks.some((t) => t?.id === taskId);
+}

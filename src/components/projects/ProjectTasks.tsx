@@ -18,6 +18,7 @@ import { TaskRow } from "@/components/tasks/TaskRow";
 import { ShowMoreList } from "@/components/ui/ShowMoreList";
 import { DashedAddButton } from "@/components/projects/DashedAddButton";
 import { useThemeColors } from "@/theme/useThemeColors";
+import { OlderCompletedTasks } from "@/components/tasks/OlderCompletedTasks";
 
 const GRIP_W = 36;
 const GRIP_H = 44;
@@ -100,7 +101,7 @@ export function ProjectTasks({
 
   return (
     <View className="gap-3">
-      {pending.length === 0 && completed.length === 0 ? (
+      {pending.length === 0 && completed.length === 0 && !project.olderDoneCount ? (
         <Text className="font-sans italic" style={{ fontSize: 15, color: c.text3 }}>
           {t("views.projects.card.noTasks")}
         </Text>
@@ -150,6 +151,22 @@ export function ProjectTasks({
               initialCount={5}
               itemKey={(task) => task.id}
               renderItem={(task) => renderTask(task)}
+            />
+            <OlderCompletedTasks
+              projectId={project.id}
+              count={project.olderDoneCount ?? 0}
+              excludeIds={new Set(completed.map((x) => x.id))}
+              renderItem={(task, onReopened) => (
+                <TaskRow
+                  task={task}
+                  project={undefined}
+                  onToggle={(x) => {
+                    void Promise.resolve(toggleTask(x)).then(onReopened);
+                  }}
+                  onDelete={deleteTask}
+                  onEdit={onEdit}
+                />
+              )}
             />
           </View>
         </View>

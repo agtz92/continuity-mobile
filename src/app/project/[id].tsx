@@ -126,7 +126,9 @@ export default function ProjectDetail() {
       params: { projectId: project.id, title: project.nextStep, due: "today" },
     });
 
-  const total = pending.length + completed.length;
+  // Las completadas anteriores a la ventana del dashboard llegan contadas.
+  const olderDone = project.olderDoneCount ?? 0;
+  const total = pending.length + completed.length + olderDone;
 
   return (
     <View className="flex-1 bg-bg">
@@ -208,7 +210,7 @@ export default function ProjectDetail() {
               total > 0
                 ? t("views.projectDetail.tasksMeta", {
                     open: pending.length,
-                    done: completed.length,
+                    done: completed.length + olderDone,
                   })
                 : null
             }

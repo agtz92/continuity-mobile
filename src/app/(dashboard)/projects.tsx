@@ -37,6 +37,7 @@ import { ScreenHeadline } from "@/components/ui/ScreenHeadline";
 import { FilterChips, type FilterChipItem } from "@/components/ui/FilterChips";
 import { SIZE } from "@/theme/tokens";
 import { useThemeColors, alpha } from "@/theme/useThemeColors";
+import { doneEffortHours } from "@/lib/projectProgress";
 
 type StatusKey = "all" | ProjectStatus;
 type ListRow =
@@ -97,15 +98,15 @@ export default function Projects() {
 
   // Horas invertidas (tareas cerradas con esfuerzo), igual que Today.
   const hoursByProject = useMemo(() => {
+    // Incluye las completadas anteriores a la ventana del dashboard
+    // (`olderDoneEffortHours`, ver `lib/projectProgress.ts`).
     const m = new Map<string, number>();
-    for (const [pid, list] of tasksByProject) {
-      const sum = list
-        .filter((tk) => tk.done && tk.effortHours != null)
-        .reduce((acc, tk) => acc + (tk.effortHours as number), 0);
-      m.set(pid, Math.round(sum * 10) / 10);
+    for (const p of projects) {
+      const sum = doneEffortHours(p, tasksByProject.get(p.id) ?? []);
+      m.set(p.id, Math.round(sum * 10) / 10);
     }
     return m;
-  }, [tasksByProject]);
+  }, [projects, tasksByProject]);
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: visibleProjects.length };
