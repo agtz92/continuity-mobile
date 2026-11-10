@@ -9,6 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "it.continuu.app",
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -147,6 +148,7 @@
         }
       ],
       "expo-web-browser",
+      "expo-apple-authentication",
       [
         "expo-notifications",
         {

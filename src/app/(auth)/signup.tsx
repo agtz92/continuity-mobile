@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
-import { signInWithGoogle, OAuthCancelled } from "@/lib/oauth";
+import { signInWithApple, signInWithGoogle, OAuthCancelled } from "@/lib/oauth";
+import { AppleSignInButton } from "@/components/auth/AppleSignInButton";
 import { FormInput } from "@/components/ui/FormInput";
 import {
   AuthButton,
@@ -26,6 +27,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [appleBusy, setAppleBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
@@ -58,6 +60,21 @@ export default function Signup() {
       }
     } finally {
       setGoogleBusy(false);
+    }
+  }
+
+  // Apple también crea la cuenta si no existe (y es obligatorio en iOS junto a Google).
+  async function onApple() {
+    setAppleBusy(true);
+    setError(null);
+    try {
+      await signInWithApple();
+    } catch (e) {
+      if (!(e instanceof OAuthCancelled)) {
+        setError(e instanceof Error ? e.message : t("auth.errors.generic"));
+      }
+    } finally {
+      setAppleBusy(false);
     }
   }
 
@@ -124,6 +141,7 @@ export default function Signup() {
           onPress={() => void onGoogle()}
           busy={googleBusy}
         />
+        <AppleSignInButton onPress={() => void onApple()} busy={appleBusy} />
       </View>
 
       <View className="flex-1 justify-end" style={{ paddingTop: 32 }}>

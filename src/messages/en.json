@@ -33,6 +33,7 @@
       "passwordPlaceholder": "Your password",
       "signIn": "Sign in",
       "google": "Continue with Google",
+      "apple": "Continue with Apple",
       "forgot": "Forgot password?",
       "noAccount": "Don't have an account?",
       "signUpLink": "Sign up",
