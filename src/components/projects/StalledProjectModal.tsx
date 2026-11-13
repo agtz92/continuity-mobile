@@ -41,7 +41,8 @@ export function StalledProjectModal({
   if (!project) return null;
 
   const days =
-    daysSince(project.stalledAt || project.lastActivity) ?? 0;
+    // Días SIN TOCAR el proyecto (no desde que el cron lo marcó, que daría 0).
+    daysSince(project.lastActivity || project.stalledAt) ?? 0;
   const canSave = choice !== null && !saving;
 
   return (

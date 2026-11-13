@@ -111,14 +111,14 @@ export function useProductivityStats({
 
   // ---------------------------------------------------------------------------
   // Stalled projects: the real persisted `stalled` status (auto-set by the
-  // backend at 14 days idle). Days measured from `stalledAt` (fallback to last
-  // activity), bucketed for the rail. Sorted oldest-first.
+  // backend at 14 days idle). Days measured from `lastActivity` (idle time, as
+  // the web does; fallback to `stalledAt`), bucketed for the rail. Sorted oldest-first.
   // ---------------------------------------------------------------------------
   const stalledProjects = useMemo<StalledProject[]>(() => {
     const out: StalledProject[] = [];
     for (const p of projects) {
       if (p.status !== "stalled") continue;
-      const days = daysSince(p.stalledAt || p.lastActivity) ?? 0;
+      const days = daysSince(p.lastActivity || p.stalledAt) ?? 0;
       const bucket: StalledProject["bucket"] =
         days <= 14 ? "7-14" : days <= 30 ? "15-30" : "30+";
       out.push({ project: p, days, bucket });
