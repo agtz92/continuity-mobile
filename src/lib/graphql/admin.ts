@@ -75,7 +75,6 @@ export const ADMIN_USER_QUERY = gql`
         dailyDigestEnabled
         dueRemindersEnabled
         sleepingAlertsEnabled
-        isAdmin
         links {
           channel
           verified

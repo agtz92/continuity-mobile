@@ -91,7 +91,6 @@ export const NOTIFICATION_SETTINGS_QUERY = gql`
       dueRemindersEnabled
       dueReminderHour
       manualEnabled
-      isAdmin
     }
   }
 `;
@@ -113,7 +112,6 @@ export const UPDATE_NOTIFICATION_SETTINGS = gql`
       dueRemindersEnabled
       dueReminderHour
       manualEnabled
-      isAdmin
     }
   }
 `;
